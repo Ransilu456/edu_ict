@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 A/L ICT Subnetting Master</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-tertiary: #27272a;
+            --border-color: #27272a;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+
+            --color-indigo: #6366f1;
+            --color-cyan: #06b6d4;
+            --color-cyan-glow: rgba(6, 182, 212, 0.15);
+            --color-success: #10b981;
+            --color-error: #ef4444;
+
+            --font-sans: 'Inter', sans-serif;
+            --font-header: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            padding-bottom: 3rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e1b4b, #311042);
+            padding: 50px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        header h1 {
+            font-family: var(--font-header);
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            margin-top: 12px;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 30px 0;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-family: var(--font-header);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            border-left: 4px solid var(--color-cyan);
+            padding-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        h3 {
+            font-family: var(--font-header);
+            font-size: 1.1rem;
+            margin: 15px 0 8px;
+            color: var(--text-primary);
+        }
+
+        p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        /* Interactive Elements */
+        .interactive-section {
+            background: var(--bg-tertiary);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .slider-container label {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--color-cyan);
+            min-width: 70px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            accent-color: var(--color-cyan);
+            cursor: pointer;
+            height: 6px;
+            border-radius: 3px;
+        }
+
+        /* Binary Bit Visualizer */
+        .binary-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            font-family: var(--font-mono);
+            font-size: 1.15rem;
+            background: var(--bg-primary);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            justify-content: center;
+            letter-spacing: 0.05em;
+        }
+
+        .octet {
+            display: flex;
+            gap: 2px;
+        }
+
+        .bit {
+            width: 14px;
+            text-align: center;
+            transition: color 0.15s;
+        }
+
+        .bit.network {
+            color: #818cf8;
+            /* indigo */
+            font-weight: 700;
+        }
+
+        .bit.subnet {
+            color: var(--color-cyan);
+            font-weight: 700;
+            text-decoration: underline;
+        }
+
+        .bit.host {
+            color: var(--text-muted);
+        }
+
+        .dot {
+            color: var(--text-muted);
+            margin: 0 4px;
+        }
+
+        /* Formulas & Highlights */
+        .highlight-box {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-family: var(--font-sans);
+        }
+
+        .highlight-box code {
+            font-family: var(--font-mono);
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .magic-metric {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 15px;
+        }
+
+        .metric-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--color-cyan);
+        }
+
+        /* Blocks display */
+        .block-list {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            margin-top: 10px;
+        }
+
+        .block-item {
+            display: grid;
+            grid-template-columns: 0.8fr 1.2fr 0.8fr;
+            padding: 8px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .block-item:last-child {
+            border-bottom: none;
+        }
+
+        .block-item.active {
+            background: var(--color-cyan-glow);
+            border-left: 4px solid var(--color-cyan);
+        }
+
+        .block-item th {
+            text-align: left;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding-bottom: 4px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-family: var(--font-header);
+            font-weight: 600;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+
+        tr.active-row td {
+            background: var(--color-cyan-glow);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Inputs and Buttons */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: var(--color-cyan);
+        }
+
+        button {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: var(--font-header);
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.15s ease;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button.btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        button.btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        /* Quiz components */
+        .quiz-section {
+            text-align: left;
+        }
+
+        .quiz-question {
+            font-family: var(--font-header);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            background: var(--bg-primary);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            line-height: 1.5;
+        }
+
+        .explanation-box {
+            display: none;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            animation: slideDown 0.25s ease-out forwards;
+        }
+
+        .explanation-box strong {
+            color: var(--color-cyan);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-message {
+            margin-top: 15px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+            background: var(--bg-secondary);
+        }
+
+        /* Tooltip style annotations */
+        .tip-badge {
+            background: var(--color-cyan-glow);
+            color: var(--color-cyan);
+            font-size: 0.7rem;
+            font-family: var(--font-header);
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>🧠 A/L ICT Subnetting Master</h1>
+        <p>Learn the mental math patterns to solve network subnetting questions instantly just by looking at them!</p>
+    </header>
+
+    <div class="container">
+
+        <!-- Left Pane: Interactive Learning & Calculator -->
+        <div class="left-column">
+
+            <div class="card">
+                <h2>
+                    ⚡ Interactive CIDR Visualizer
+                    <span class="tip-badge">Class A / B / C Support</span>
+                </h2>
+                <p>Drag the slider to change the subnet mask prefix. The tool automatically handles Class A, Class B,
+                    and Class C networks dynamically!</p>
+
+                <div class="slider-container">
+                    <input type="range" id="cidr-slider" min="8" max="30" value="24">
+                    <label id="cidr-label">/24</label>
+                </div>
+
+                <div class="binary-display" id="binary-visualizer">
+                    <!-- Dynamic bit boxes -->
+                </div>
+
+                <div class="magic-metric">
+                    <div class="metric-card">
+                        <div class="metric-title">Subnet Mask</div>
+                        <div class="metric-value" id="val-mask">255.255.255.0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">Magic Number (Block Size)</div>
+                        <div class="metric-value" id="val-magic">256</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">Subnets Created (in Octet)</div>
+                        <div class="metric-value" id="val-subnets">1</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title">Usable Hosts (Total)</div>
+                        <div class="metric-value" id="val-hosts">254</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🧮 IP Subnet Block Finder</h2>
+                <p>Enter any IP address to see which subnet block it falls into for the selected CIDR mask.</p>
+                <div class="input-group">
+                    <input type="text" id="ip-address-input" value="192.168.1.150"
+                        placeholder="e.g. 10.50.2.10 or 172.16.80.5">
+                    <button onclick="calculateIpSubnet()">Locate Subnet</button>
+                </div>
+
+                <div class="highlight-box" id="ip-result-box" style="margin-top: 15px; display: none;">
+                    <!-- Results injected here -->
+                </div>
+
+                <h3 style="margin-top: 20px;">Subnet Blocks (Sample) for /<span class="cidr-text">24</span></h3>
+                <div class="block-list" id="block-container">
+                    <!-- Dynamic Blocks -->
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📚 CIDR Reference Cheat Table</h2>
+                <p>Dynamic cheat table for the active Class block of the selected CIDR:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>CIDR</th>
+                            <th>Subnet Mask</th>
+                            <th>Usable Hosts</th>
+                            <th>Block Size (Magic)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cheat-table-body">
+                        <!-- Populated dynamically via JS based on Class A/B/C -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <!-- Right Pane: Rules & Interactive Trainer -->
+        <div class="right-column">
+
+            <div class="card">
+                <h2>⚡ The Mental Subnetting Trick</h2>
+                <h3 style="margin-top: 5px; color: var(--color-cyan);">1. Find the Magic Octet</h3>
+                <p>Divide the CIDR prefix by 8. This tells you which octet contains the subnetting boundary (the "Magic
+                    Octet"):</p>
+                <ul style="margin-left: 1.5rem; margin-bottom: 10px; color: var(--text-secondary); font-size: 0.9rem;">
+                    <li><strong>Class A:</strong> /8 to /15 (2nd octet)</li>
+                    <li><strong>Class B:</strong> /16 to /23 (3rd octet)</li>
+                    <li><strong>Class C:</strong> /24 to /30 (4th octet)</li>
+                </ul>
+
+                <h3 style="color: var(--color-cyan);">2. Find Subnet & Host Bits</h3>
+                <p>Subtract the base class boundary (8, 16, or 24) from the CIDR. E.g. For /18 (Class B), subnet bits =
+                    <code>18 - 16 = 2</code>. Host bits in magic octet = <code>8 - 2 = 6</code>.</p>
+
+                <h3 style="color: var(--color-cyan);">3. Block Size (Magic Number)</h3>
+                <p>Compute <code>2^(host bits in magic octet)</code>. For 6 host bits, <code>2^6 = 64</code>. Subnets
+                    increment in this octet by 64: <code>.0, .64, .128, .192</code>.</p>
+
+                <h3 style="color: var(--color-cyan);">4. Usable Hosts</h3>
+                <p>Formula: <code>2^(total host bits) - 2</code>. Total host bits is <code>32 - CIDR</code>. Subtract 2
+                    for the Network and Broadcast addresses.</p>
+            </div>
+
+            <div class="card quiz">
+                <h2>
+                    🎯 Subnet Mental Trainer
+                    <span class="tip-badge"
+                        style="background-color:rgba(16,185,129,0.15); color:var(--color-success);">A, B, C Quiz</span>
+                </h2>
+                <p style="margin-bottom: 20px;">Solve these random Class A, B, and C questions to master mental
+                    subnetting. Click "Explain Trick" if you get stuck!</p>
+
+                <div class="quiz-section">
+                    <div class="quiz-question" id="quiz-question-box">
+                        Loading question...
+                    </div>
+
+                    <div class="input-group">
+                        <input id="quiz-answer" type="text" placeholder="Enter your answer...">
+                        <button onclick="submitQuizAnswer()">Check Answer</button>
+                    </div>
+
+                    <div id="quiz-result-msg" class="result-message"></div>
+
+                    <div style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button class="btn-secondary" onclick="showQuizExplanation()">Explain Trick 💡</button>
+                        <button class="btn-secondary" onclick="generateNewQuiz()">Next Question ➔</button>
+                    </div>
+
+                    <div class="explanation-box" id="quiz-explanation-box">
+                        <!-- Step by step trick explanation -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <footer>
+        A/L ICT Interactive Subnetting Trainer © 2026
+    </footer>
+
+    <script>
+        let activeQuiz = null;
+
+        // Init
+        document.addEventListener("DOMContentLoaded", () => {
+            const slider = document.getElementById("cidr-slider");
+            slider.addEventListener("input", (e) => {
+                updateCidrVisualizer(parseInt(e.target.value));
+            });
+
+            updateCidrVisualizer(24);
+            generateNewQuiz();
+
+            // Handle Enter key in quiz
+            document.getElementById("quiz-answer").addEventListener("keydown", (e) => {
+                if (e.key === "Enter") submitQuizAnswer();
+            });
+        });
+
+        // Universal CIDR properties calculator
+        function getCidrInfo(cidr) {
+            // Determine active octet (0-based: 0=1st, 1=2nd, 2=3rd, 3=4th)
+            const magicOctetIdx = Math.floor((cidr - 1) / 8);
+            const baseClassPrefix = magicOctetIdx * 8;
+            const subnetBits = cidr - baseClassPrefix;
+            const hostBitsInMagic = 8 - subnetBits;
+            const magic = Math.pow(2, hostBitsInMagic);
+
+            // Mask octets construction
+            const maskParts = [255, 255, 255, 255];
+            maskParts[magicOctetIdx] = 256 - magic;
+            for (let i = magicOctetIdx + 1; i < 4; i++) {
+                maskParts[i] = 0;
+            }
+
+            const mask = maskParts.join(".");
+            const subnets = Math.pow(2, subnetBits);
+            const totalHostBits = 32 - cidr;
+            const hosts = Math.pow(2, totalHostBits) - 2;
+
+            let classLetter = "C";
+            if (cidr < 16) classLetter = "A";
+            else if (cidr < 24) classLetter = "B";
+
+            return {
+                cidr,
+                classLetter,
+                magicOctetIdx,
+                magic,
+                mask,
+                subnets,
+                hosts,
+                totalHostBits,
+                subnetBits
+            };
+        }
+
+        // Update visual elements on CIDR change
+        function updateCidrVisualizer(cidr) {
+            document.getElementById("cidr-label").innerText = `/${cidr}`;
+            document.querySelectorAll(".cidr-text").forEach(el => el.innerText = cidr);
+
+            const info = getCidrInfo(cidr);
+            document.getElementById("val-mask").innerText = info.mask;
+            document.getElementById("val-magic").innerText = info.magic === 256 ? "256 (Full Octet)" : info.magic;
+            document.getElementById("val-subnets").innerText = info.subnets;
+            document.getElementById("val-hosts").innerText = info.hosts.toLocaleString();
+
+            // Populate Cheat Table based on active Class (A, B, or C)
+            renderCheatTable(info.classLetter, cidr);
+
+            // Build Binary Display
+            buildBinaryDisplay(cidr);
+
+            // Re-render blocks
+            renderSubnetBlocks(cidr);
+
+            // Re-calculate active IP address if typed
+            calculateIpSubnet();
+        }
+
+        function buildBinaryDisplay(cidr) {
+            const container = document.getElementById("binary-visualizer");
+            container.innerHTML = "";
+
+            const info = getCidrInfo(cidr);
+
+            for (let oct = 0; oct < 4; oct++) {
+                const octDiv = document.createElement("div");
+                octDiv.className = "octet";
+
+                for (let b = 0; b < 8; b++) {
+                    const span = document.createElement("span");
+                    const absoluteBitIdx = oct * 8 + b;
+
+                    if (absoluteBitIdx < cidr) {
+                        // Network bits: check if it's default class mask or subnetted bit
+                        const isDefaultClassBit = absoluteBitIdx < (info.classLetter === "A" ? 8 : info.classLetter === "B" ? 16 : 24);
+                        if (isDefaultClassBit) {
+                            span.className = "bit network";
+                        } else {
+                            span.className = "bit subnet";
+                        }
+                        span.innerText = "1";
+                    } else {
+                        span.className = "bit host";
+                        span.innerText = "0";
+                    }
+                    octDiv.appendChild(span);
+                }
+                container.appendChild(octDiv);
+
+                if (oct < 3) {
+                    const dot = document.createElement("span");
+                    dot.className = "dot";
+                    dot.innerText = ".";
+                    container.appendChild(dot);
+                }
+            }
+        }
+
+        function renderCheatTable(classLetter, activeCidr) {
+            const tbody = document.getElementById("cheat-table-body");
+            tbody.innerHTML = "";
+
+            let minCidr = 24, maxCidr = 30;
+            if (classLetter === "A") { minCidr = 8; maxCidr = 15; }
+            else if (classLetter === "B") { minCidr = 16; maxCidr = 23; }
+
+            for (let c = minCidr; c <= maxCidr; c++) {
+                const info = getCidrInfo(c);
+                const tr = document.createElement("tr");
+                tr.setAttribute("data-cidr", c);
+                if (c === activeCidr) tr.className = "active-row";
+
+                tr.innerHTML = `
+                    <td>/${c}</td>
+                    <td>${info.mask}</td>
+                    <td>${info.hosts.toLocaleString()}</td>
+                    <td>${info.magic === 256 ? 256 : info.magic}</td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+
+        function renderSubnetBlocks(cidr) {
+            const container = document.getElementById("block-container");
+            container.innerHTML = "";
+
+            const info = getCidrInfo(cidr);
+            const magic = info.magic;
+            const mOctIdx = info.magicOctetIdx;
+
+            // Helper: build a net/broadcast address array for a given magic-octet start value
+            function buildNetAddr(magicVal) {
+                const parts = [0, 0, 0, 0];
+                if (info.classLetter === "A") { parts[0] = 10; }
+                else if (info.classLetter === "B") { parts[0] = 172; parts[1] = 16; }
+                else { parts[0] = 192; parts[1] = 168; parts[2] = 1; }
+                parts[mOctIdx] = magicVal;
+                return parts;
+            }
+
+            // Render table header labels inside container first
+            const head = document.createElement("div");
+            head.className = "block-item";
+            head.style.borderBottom = "2px solid var(--border-color)";
+            head.innerHTML = `
+                <span style="color:var(--text-muted); font-size:0.7rem; font-weight:700;">NET ADDRESS</span>
+                <span style="color:var(--text-muted); font-size:0.7rem; font-weight:700; text-align:center;">USABLE HOST RANGE</span>
+                <span style="color:var(--text-muted); font-size:0.7rem; font-weight:700; text-align:right;">BROADCAST</span>
+            `;
+            container.appendChild(head);
+
+            // Special case: magic === 256 means the entire magic octet is host space
+            if (magic === 256) {
+                const netParts = buildNetAddr(0);
+                // broadcast: all octets from mOctIdx onward = 255
+                const broadParts = [...netParts];
+                for (let i = mOctIdx; i < 4; i++) broadParts[i] = 255;
+                // first usable = net + 1 (last octet)
+                const firstParts = [...netParts]; firstParts[3] = 1;
+                const lastParts = [...broadParts]; lastParts[3] = 254;
+
+                container.innerHTML += `
+                    <div class="block-item active">
+                        <span>${netParts.join(".")}</span>
+                        <span style="text-align:center;">${firstParts.join(".")} - ${lastParts.join(".")}</span>
+                        <span style="text-align:right;">${broadParts.join(".")}</span>
+                    </div>
+                `;
+                return;
+            }
+
+            // Cap rendering to 32 blocks to prevent DOM lag
+            const maxBlocksToRender = Math.min(info.subnets, 32);
+
+            for (let i = 0; i < maxBlocksToRender; i++) {
+                const magicStart = i * magic;
+                const magicEnd = magicStart + magic - 1;
+
+                const netParts = buildNetAddr(magicStart);
+                const broadParts = buildNetAddr(magicEnd);
+                // All octets after magic octet: net→0, broad→255
+                for (let j = mOctIdx + 1; j < 4; j++) { netParts[j] = 0; broadParts[j] = 255; }
+
+                // First usable: increment the last octet of the net address
+                const firstParts = [...netParts];
+                firstParts[3] = firstParts[3] + 1;
+                // Last usable: decrement the last octet of the broadcast address
+                const lastParts = [...broadParts];
+                lastParts[3] = lastParts[3] - 1;
+
+                const blockDiv = document.createElement("div");
+                blockDiv.className = "block-item";
+                blockDiv.id = `block-${magicStart}`;
+                blockDiv.innerHTML = `
+                    <span>${netParts.join(".")}</span>
+                    <span style="text-align:center;">${firstParts.join(".")} - ${lastParts.join(".")}</span>
+                    <span style="text-align:right;">${broadParts.join(".")}</span>
+                `;
+                container.appendChild(blockDiv);
+            }
+
+            if (info.subnets > 32) {
+                const more = document.createElement("div");
+                more.style.cssText = "padding:8px; text-align:center; color:var(--text-muted); font-size:0.75rem;";
+                more.innerText = `... and ${info.subnets - 32} more subnet blocks ...`;
+                container.appendChild(more);
+            }
+        }
+
+        // Locate subnet values for typed IP
+        function calculateIpSubnet() {
+            const ipInput = document.getElementById("ip-address-input").value.trim();
+            const resultBox = document.getElementById("ip-result-box");
+
+            const parts = ipInput.split(".");
+            if (parts.length !== 4) {
+                resultBox.style.display = "none";
+                return;
+            }
+
+            // Validate IP format
+            for (let i = 0; i < 4; i++) {
+                const val = parseInt(parts[i]);
+                if (isNaN(val) || val < 0 || val > 255) {
+                    resultBox.style.display = "none";
+                    return;
+                }
+            }
+
+            const cidr = parseInt(document.getElementById("cidr-slider").value);
+            const info = getCidrInfo(cidr);
+            const magic = info.magic;
+            const mOctIdx = info.magicOctetIdx;
+
+            const inputOctetVal = parseInt(parts[mOctIdx]);
+            const netOctetVal = Math.floor(inputOctetVal / magic) * magic;
+
+            // Build Network Address Array
+            const netParts = [...parts];
+            netParts[mOctIdx] = netOctetVal;
+            for (let i = mOctIdx + 1; i < 4; i++) {
+                netParts[i] = 0;
+            }
+            const netAddr = netParts.join(".");
+
+            // Build Broadcast Address Array
+            const broadParts = [...parts];
+            broadParts[mOctIdx] = netOctetVal + magic - 1;
+            for (let i = mOctIdx + 1; i < 4; i++) {
+                broadParts[i] = 255;
+            }
+            const broadcastAddr = broadParts.join(".");
+
+            // First Usable Host: net address + 1 in the LAST octet
+            const firstParts = [...netParts];
+            firstParts[3] = parseInt(firstParts[3]) + 1;
+            const firstHost = firstParts.join(".");
+
+            // Last Usable Host: broadcast address - 1 in the LAST octet
+            const lastParts = [...broadParts];
+            lastParts[3] = parseInt(lastParts[3]) - 1;
+            const lastHost = lastParts.join(".");
+
+            resultBox.style.display = "block";
+            resultBox.innerHTML = `
+                <div style="font-weight:700; font-family:var(--font-header); font-size:1.05rem; color:var(--text-primary); margin-bottom:10px; display:flex; justify-content:space-between;">
+                    <span>IP Location Results:</span>
+                    <span style="color:var(--color-cyan);">Block size in Octet: ${magic}</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1.2fr 1.8fr; gap:6px; font-family:var(--font-mono); font-size:0.85rem;">
+                    <span style="color:var(--text-muted);">Network Address:</span> <strong style="color:var(--color-cyan);">${netAddr}</strong>
+                    <span style="color:var(--text-muted);">First Usable Host:</span> <span>${firstHost}</span>
+                    <span style="color:var(--text-muted);">Last Usable Host:</span> <span>${lastHost}</span>
+                    <span style="color:var(--text-muted);">Broadcast Address:</span> <strong style="color:var(--color-indigo);">${broadcastAddr}</strong>
+                </div>
+            `;
+
+            // Highlight active block in list
+            document.querySelectorAll(".block-item").forEach(item => {
+                item.classList.remove("active");
+            });
+            const activeBlock = document.getElementById(`block-${netOctetVal}`);
+            if (activeBlock) {
+                activeBlock.classList.add("active");
+                activeBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        // Quiz Generator supporting Class A, B, and C
+        const quizTemplates = [
+            {
+                type: "hosts",
+                question: "How many usable hosts are in a <strong>/{cidr}</strong> network?",
+                generate: () => {
+                    // Pick a random CIDR from Class A, B, or C ranges
+                    const cidrList = [10, 12, 14, 18, 20, 22, 25, 26, 27, 28, 30];
+                    const cidr = cidrList[Math.floor(Math.random() * cidrList.length)];
+                    const info = getCidrInfo(cidr);
+                    return {
+                        cidr,
+                        answer: info.hosts.toString(),
+                        explanation: `To find usable hosts for <strong>/${cidr}</strong>:<br>
+                        1. Total host bits in mask = <code>32 - ${cidr} = ${32 - cidr}</code> bits.<br>
+                        2. Total host configurations = <code>2^${32 - cidr} = ${Math.pow(2, 32 - cidr).toLocaleString()}</code>.<br>
+                        3. Usable hosts = <code>Total - 2 = ${info.hosts.toLocaleString()}</code> (one subtracted for network, one for broadcast).`
+                    };
+                }
+            },
+            {
+                type: "mask",
+                question: "What is the subnet mask for CIDR <strong>/{cidr}</strong>?",
+                generate: () => {
+                    const cidrList = [9, 10, 13, 18, 19, 22, 25, 26, 27, 28, 30];
+                    const cidr = cidrList[Math.floor(Math.random() * cidrList.length)];
+                    const info = getCidrInfo(cidr);
+                    return {
+                        cidr,
+                        answer: info.mask,
+                        explanation: `To find the subnet mask for <strong>/${cidr}</strong>:<br>
+                        1. Prefix is /${cidr}. Divided by 8: <code>${cidr} / 8 = ${Math.floor(cidr / 8)}</code> full octets of 255.<br>
+                        2. The remainder is <code>${cidr % 8}</code> bits in the magic octet (octet index <code>${info.magicOctetIdx + 1}</code>).<br>
+                        3. Value in this octet = <code>256 - 2^(8 - ${cidr % 8}) = 256 - ${info.magic} = ${256 - info.magic}</code>.<br>
+                        4. All remaining octets are 0, resulting in: <strong>${info.mask}</strong>.`
+                    };
+                }
+            },
+            {
+                type: "net-addr",
+                question: "What is the network address for IP <strong>{ip}</strong> with CIDR <strong>/{cidr}</strong>?",
+                generate: () => {
+                    // Pick a random class
+                    const classes = ["A", "B", "C"];
+                    const netClass = classes[Math.floor(Math.random() * classes.length)];
+
+                    let cidr, ipBase, parts;
+                    if (netClass === "A") {
+                        cidr = [10, 11, 12, 14][Math.floor(Math.random() * 4)];
+                        parts = [10, Math.floor(Math.random() * 240) + 10, Math.floor(Math.random() * 254), Math.floor(Math.random() * 254)];
+                    } else if (netClass === "B") {
+                        cidr = [18, 19, 20, 22][Math.floor(Math.random() * 4)];
+                        parts = [172, 16, Math.floor(Math.random() * 240) + 10, Math.floor(Math.random() * 254)];
+                    } else {
+                        cidr = [25, 26, 27, 28][Math.floor(Math.random() * 4)];
+                        parts = [192, 168, 1, Math.floor(Math.random() * 240) + 10];
+                    }
+
+                    const ip = parts.join(".");
+                    const info = getCidrInfo(cidr);
+                    const magic = info.magic;
+                    const mOctIdx = info.magicOctetIdx;
+
+                    const netOctetVal = Math.floor(parts[mOctIdx] / magic) * magic;
+                    const netParts = [...parts];
+                    netParts[mOctIdx] = netOctetVal;
+                    for (let i = mOctIdx + 1; i < 4; i++) {
+                        netParts[i] = 0;
+                    }
+                    const answer = netParts.join(".");
+
+                    return {
+                        cidr,
+                        ip,
+                        answer,
+                        explanation: `To find the network address for <strong>${ip}</strong> on <strong>/${cidr}</strong>:<br>
+                        1. This prefix is Class ${info.classLetter}, so the boundary magic octet is index <code>${mOctIdx + 1}</code> (value: <code>${parts[mOctIdx]}</code>).<br>
+                        2. The block size (magic number) in this octet is <code>${magic}</code>.<br>
+                        3. Find the largest multiple of ${magic} below or equal to ${parts[mOctIdx]}: <code>Math.floor(${parts[mOctIdx]} / ${magic}) * ${magic} = ${netOctetVal}</code>.<br>
+                        4. Keep octets before identical, change magic octet to <code>${netOctetVal}</code>, and set remaining to 0: <strong>${answer}</strong>.`
+                    };
+                }
+            },
+            {
+                type: "broad-addr",
+                question: "What is the broadcast address for IP <strong>{ip}</strong> with CIDR <strong>/{cidr}</strong>?",
+                generate: () => {
+                    const classes = ["A", "B", "C"];
+                    const netClass = classes[Math.floor(Math.random() * classes.length)];
+
+                    let cidr, parts;
+                    if (netClass === "A") {
+                        cidr = [10, 11, 12, 14][Math.floor(Math.random() * 4)];
+                        parts = [10, Math.floor(Math.random() * 240) + 10, Math.floor(Math.random() * 254), Math.floor(Math.random() * 254)];
+                    } else if (netClass === "B") {
+                        cidr = [18, 19, 20, 22][Math.floor(Math.random() * 4)];
+                        parts = [172, 16, Math.floor(Math.random() * 240) + 10, Math.floor(Math.random() * 254)];
+                    } else {
+                        cidr = [25, 26, 27, 28][Math.floor(Math.random() * 4)];
+                        parts = [192, 168, 1, Math.floor(Math.random() * 240) + 10];
+                    }
+
+                    const ip = parts.join(".");
+                    const info = getCidrInfo(cidr);
+                    const magic = info.magic;
+                    const mOctIdx = info.magicOctetIdx;
+
+                    const netOctetVal = Math.floor(parts[mOctIdx] / magic) * magic;
+                    const broadParts = [...parts];
+                    broadParts[mOctIdx] = netOctetVal + magic - 1;
+                    for (let i = mOctIdx + 1; i < 4; i++) {
+                        broadParts[i] = 255;
+                    }
+                    const answer = broadParts.join(".");
+
+                    return {
+                        cidr,
+                        ip,
+                        answer,
+                        explanation: `To find the broadcast address for <strong>${ip}</strong> on <strong>/${cidr}</strong>:<br>
+                        1. The magic octet index is <code>${mOctIdx + 1}</code> (value: <code>${parts[mOctIdx]}</code>) with block size <code>${magic}</code>.<br>
+                        2. The network octet value begins at <code>${netOctetVal}</code>.<br>
+                        3. The broadcast value in this octet is <code>Network Octet + Block Size - 1 = ${netOctetVal} + ${magic} - 1 = ${netOctetVal + magic - 1}</code>.<br>
+                        4. Set remaining trailing octets to 255: <strong>${answer}</strong>.`
+                    };
+                }
+            }
+        ];
+
+        function generateNewQuiz() {
+            const template = quizTemplates[Math.floor(Math.random() * quizTemplates.length)];
+            activeQuiz = template.generate();
+
+            let qText = template.question
+                .replace("{cidr}", activeQuiz.cidr)
+                .replace("{ip}", activeQuiz.ip);
+
+            document.getElementById("quiz-question-box").innerHTML = qText;
+            document.getElementById("quiz-answer").value = "";
+            document.getElementById("quiz-result-msg").innerText = "";
+            document.getElementById("quiz-explanation-box").style.display = "none";
+        }
+
+        function submitQuizAnswer() {
+            const answerInput = document.getElementById("quiz-answer").value.trim().toLowerCase();
+            const resultMsg = document.getElementById("quiz-result-msg");
+
+            if (!answerInput) {
+                resultMsg.innerText = "⚠️ Please enter an answer.";
+                resultMsg.style.color = "var(--text-muted)";
+                return;
+            }
+
+            if (answerInput === activeQuiz.answer.toLowerCase()) {
+                resultMsg.innerHTML = "✅ Correct! Excellent mental math!";
+                resultMsg.style.color = "var(--color-success)";
+                showQuizExplanation();
+            } else {
+                resultMsg.innerHTML = `❌ Incorrect. The correct answer was: <strong>${activeQuiz.answer}</strong>`;
+                resultMsg.style.color = "var(--color-error)";
+            }
+        }
+
+        function showQuizExplanation() {
+            const box = document.getElementById("quiz-explanation-box");
+            box.innerHTML = activeQuiz.explanation;
+            box.style.display = "block";
+        }
+    </script>
+</body>
+
+</html>
