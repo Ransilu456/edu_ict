@@ -769,7 +769,7 @@ function handlePortClick(nodeId, direction, portIdx) {
       cancelWiring();
       return;
     }
-    
+
     if (activeWiringSource.direction === direction) {
       // Clicked same direction port (e.g. another output while routing output) -> switch source
       cancelWiring();
@@ -1603,9 +1603,9 @@ const CIRCUIT_TEMPLATES = {
   'not-demo': {
     version: 2, nextNodeId: 4,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Toggle Switch', x: 80,  y: 160, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'not',    label: 'NOT Gate',      x: 280, y: 155, inputsCount: 1, outputsCount: 1, outputState: 1, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'output', label: 'LED Light',     x: 480, y: 145, inputsCount: 1, outputsCount: 0, outputState: 1, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Toggle Switch', x: 80, y: 160, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'not', label: 'NOT Gate', x: 280, y: 155, inputsCount: 1, outputsCount: 1, outputState: 1, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'output', label: 'LED Light', x: 480, y: 145, inputsCount: 1, outputsCount: 0, outputState: 1, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-2', toPortIdx: 0 },
@@ -1616,9 +1616,9 @@ const CIRCUIT_TEMPLATES = {
   'and-demo': {
     version: 2, nextNodeId: 5,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Switch A',  x: 70,  y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Switch B',  x: 70,  y: 230, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'and',    label: 'AND Gate',  x: 280, y: 155, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Switch A', x: 70, y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Switch B', x: 70, y: 230, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'and', label: 'AND Gate', x: 280, y: 155, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
       { id: 'sb-node-4', type: 'output', label: 'LED Light', x: 490, y: 145, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
@@ -1631,12 +1631,12 @@ const CIRCUIT_TEMPLATES = {
   'xor-parity': {
     version: 2, nextNodeId: 8,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Bit A',     x: 60,  y: 60,  inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Bit B',     x: 60,  y: 190, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'input',  label: 'Bit C',     x: 60,  y: 320, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'xor',    label: 'XOR 1',     x: 270, y: 110, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-5', type: 'xor',    label: 'XOR 2',     x: 460, y: 190, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-6', type: 'output', label: 'Parity LED',x: 660, y: 175, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Bit A', x: 60, y: 60, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Bit B', x: 60, y: 190, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'input', label: 'Bit C', x: 60, y: 320, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'xor', label: 'XOR 1', x: 270, y: 110, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-5', type: 'xor', label: 'XOR 2', x: 460, y: 190, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-6', type: 'output', label: 'Parity LED', x: 660, y: 175, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
@@ -1650,12 +1650,12 @@ const CIRCUIT_TEMPLATES = {
   'sr-latch': {
     version: 2, nextNodeId: 7,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Set (S)',    x: 60,  y: 100, inputsCount: 0, outputsCount: 1, outputState: 1, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Reset (R)', x: 60,  y: 270, inputsCount: 0, outputsCount: 1, outputState: 1, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'nand',   label: 'NAND 1',    x: 280, y: 95,  inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'nand',   label: 'NAND 2',    x: 280, y: 255, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-5', type: 'output', label: 'Q',         x: 490, y: 80,  inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-6', type: 'output', label: 'Q\'',       x: 490, y: 265, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Set (S)', x: 60, y: 100, inputsCount: 0, outputsCount: 1, outputState: 1, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Reset (R)', x: 60, y: 270, inputsCount: 0, outputsCount: 1, outputState: 1, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'nand', label: 'NAND 1', x: 280, y: 95, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'nand', label: 'NAND 2', x: 280, y: 255, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-5', type: 'output', label: 'Q', x: 490, y: 80, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-6', type: 'output', label: 'Q\'', x: 490, y: 265, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
@@ -1670,11 +1670,11 @@ const CIRCUIT_TEMPLATES = {
   'half-adder-demo': {
     version: 2, nextNodeId: 7,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Bit A',     x: 60,  y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Bit B',     x: 60,  y: 250, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'xor',    label: 'XOR (Sum)', x: 270, y: 95,  inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'and',    label: 'AND (Carry)',x: 270, y: 240, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-5', type: 'output', label: 'Sum (S)',   x: 480, y: 80,  inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Bit A', x: 60, y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Bit B', x: 60, y: 250, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'xor', label: 'XOR (Sum)', x: 270, y: 95, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'and', label: 'AND (Carry)', x: 270, y: 240, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-5', type: 'output', label: 'Sum (S)', x: 480, y: 80, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
       { id: 'sb-node-6', type: 'output', label: 'Carry (C)', x: 480, y: 250, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
@@ -1690,16 +1690,16 @@ const CIRCUIT_TEMPLATES = {
   'full-adder-gate': {
     version: 2, nextNodeId: 11,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Switch A',  x: 60,  y: 60,  inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Switch B',  x: 60,  y: 180, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'input',  label: 'Switch Cin',x: 60,  y: 300, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'xor',    label: 'XOR 1',     x: 240, y: 100, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-5', type: 'and',    label: 'AND 1',     x: 240, y: 220, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-6', type: 'and',    label: 'AND 2',     x: 420, y: 320, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-7', type: 'xor',    label: 'XOR 2',     x: 420, y: 200, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-8', type: 'or',     label: 'OR 1',      x: 580, y: 280, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-9', type: 'output', label: 'Sum (S)',   x: 660, y: 180, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-10',type: 'output', label: 'Carry (Cout)',x: 740, y: 280, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Switch A', x: 60, y: 60, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Switch B', x: 60, y: 180, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'input', label: 'Switch Cin', x: 60, y: 300, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'xor', label: 'XOR 1', x: 240, y: 100, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-5', type: 'and', label: 'AND 1', x: 240, y: 220, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-6', type: 'and', label: 'AND 2', x: 420, y: 320, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-7', type: 'xor', label: 'XOR 2', x: 420, y: 200, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-8', type: 'or', label: 'OR 1', x: 580, y: 280, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-9', type: 'output', label: 'Sum (S)', x: 660, y: 180, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-10', type: 'output', label: 'Carry (Cout)', x: 740, y: 280, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
@@ -1720,11 +1720,11 @@ const CIRCUIT_TEMPLATES = {
   'nand-universality-and': {
     version: 2, nextNodeId: 6,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Switch A',  x: 60,  y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Switch B',  x: 60,  y: 240, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'nand',   label: 'NAND 1',    x: 240, y: 160, inputsCount: 2, outputsCount: 1, outputState: 1, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'nand',   label: 'NAND 2 (NOT)', x: 420, y: 160, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [1,1], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-5', type: 'output', label: 'AND Output',x: 580, y: 150, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Switch A', x: 60, y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Switch B', x: 60, y: 240, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'nand', label: 'NAND 1', x: 240, y: 160, inputsCount: 2, outputsCount: 1, outputState: 1, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'nand', label: 'NAND 2 (NOT)', x: 420, y: 160, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [1, 1], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-5', type: 'output', label: 'AND Output', x: 580, y: 150, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
@@ -1738,10 +1738,10 @@ const CIRCUIT_TEMPLATES = {
   'd-flipflop-reg': {
     version: 2, nextNodeId: 5,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Data (D)',  x: 60,  y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'clock',  label: 'CLK Clock', x: 60,  y: 240, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'd-flop', label: 'D Flip-Flop',x: 260, y: 160, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'output', label: 'Q LED',     x: 460, y: 150, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Data (D)', x: 60, y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'clock', label: 'CLK Clock', x: 60, y: 240, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'd-flop', label: 'D Flip-Flop', x: 260, y: 160, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'output', label: 'Q LED', x: 460, y: 150, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
@@ -1753,11 +1753,11 @@ const CIRCUIT_TEMPLATES = {
   'seven-seg-decoder-demo': {
     version: 2, nextNodeId: 6,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'D3 (MSB)',  x: 60,  y: 60,  inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'D2',        x: 60,  y: 160, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'input',  label: 'D1',        x: 60,  y: 260, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'input',  label: 'D0 (LSB)',  x: 60,  y: 360, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-5', type: 'seven-seg', label: '7-Segment', x: 300, y: 170, inputsCount: 4, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0,0,0,0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'D3 (MSB)', x: 60, y: 60, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'D2', x: 60, y: 160, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'input', label: 'D1', x: 60, y: 260, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'input', label: 'D0 (LSB)', x: 60, y: 360, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-5', type: 'seven-seg', label: '7-Segment', x: 300, y: 170, inputsCount: 4, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0, 0, 0, 0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-5', toPortIdx: 3 },
@@ -1771,9 +1771,9 @@ const CIRCUIT_TEMPLATES = {
   'or-gate-demo': {
     version: 2, nextNodeId: 5,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Switch A',  x: 70,  y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Switch B',  x: 70,  y: 230, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'or',     label: 'OR Gate',   x: 280, y: 155, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Switch A', x: 70, y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Switch B', x: 70, y: 230, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'or', label: 'OR Gate', x: 280, y: 155, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
       { id: 'sb-node-4', type: 'output', label: 'LED Light', x: 490, y: 145, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
@@ -1786,9 +1786,9 @@ const CIRCUIT_TEMPLATES = {
   'nor-gate-demo': {
     version: 2, nextNodeId: 5,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Switch A',  x: 70,  y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Switch B',  x: 70,  y: 230, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'nor',    label: 'NOR Gate',  x: 280, y: 155, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Switch A', x: 70, y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Switch B', x: 70, y: 230, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'nor', label: 'NOR Gate', x: 280, y: 155, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
       { id: 'sb-node-4', type: 'output', label: 'LED Light', x: 490, y: 145, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
@@ -1801,10 +1801,10 @@ const CIRCUIT_TEMPLATES = {
   'xnor-equality': {
     version: 2, nextNodeId: 5,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Value A',   x: 70,  y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Value B',   x: 70,  y: 230, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'xnor',   label: 'XNOR Equal',x: 280, y: 155, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'output', label: '= Equal LED',x: 490, y: 145, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Value A', x: 70, y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Value B', x: 70, y: 230, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'xnor', label: 'XNOR Equal', x: 280, y: 155, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'output', label: '= Equal LED', x: 490, y: 145, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
@@ -1817,15 +1817,15 @@ const CIRCUIT_TEMPLATES = {
   'majority-gate': {
     version: 2, nextNodeId: 10,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Voter A',   x: 60,  y: 60,  inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Voter B',   x: 60,  y: 190, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'input',  label: 'Voter C',   x: 60,  y: 320, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'and',    label: 'AND AB',    x: 250, y: 80,  inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-5', type: 'and',    label: 'AND BC',    x: 250, y: 200, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-6', type: 'and',    label: 'AND AC',    x: 250, y: 320, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-7', type: 'or',     label: 'OR 1',      x: 440, y: 120, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-8', type: 'or',     label: 'OR 2',      x: 590, y: 200, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-9', type: 'output', label: 'Majority',  x: 750, y: 185, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Voter A', x: 60, y: 60, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Voter B', x: 60, y: 190, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'input', label: 'Voter C', x: 60, y: 320, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'and', label: 'AND AB', x: 250, y: 80, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-5', type: 'and', label: 'AND BC', x: 250, y: 200, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-6', type: 'and', label: 'AND AC', x: 250, y: 320, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-7', type: 'or', label: 'OR 1', x: 440, y: 120, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-8', type: 'or', label: 'OR 2', x: 590, y: 200, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-9', type: 'output', label: 'Majority', x: 750, y: 185, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
@@ -1846,12 +1846,12 @@ const CIRCUIT_TEMPLATES = {
   'nor-sr-latch': {
     version: 2, nextNodeId: 7,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Set (S)',   x: 60,  y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Reset (R)', x: 60,  y: 270, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'nor',    label: 'NOR 1',     x: 280, y: 95,  inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'nor',    label: 'NOR 2',     x: 280, y: 255, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-5', type: 'output', label: 'Q',         x: 490, y: 80,  inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-6', type: 'output', label: 'Q\'',       x: 490, y: 265, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Set (S)', x: 60, y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Reset (R)', x: 60, y: 270, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'nor', label: 'NOR 1', x: 280, y: 95, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'nor', label: 'NOR 2', x: 280, y: 255, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-5', type: 'output', label: 'Q', x: 490, y: 80, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-6', type: 'output', label: 'Q\'', x: 490, y: 265, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
@@ -1867,11 +1867,11 @@ const CIRCUIT_TEMPLATES = {
   'alarm-circuit': {
     version: 2, nextNodeId: 7,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Sensor A',  x: 60,  y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Sensor B',  x: 60,  y: 230, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'or',     label: 'OR Gate',   x: 260, y: 155, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Sensor A', x: 60, y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Sensor B', x: 60, y: 230, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'or', label: 'OR Gate', x: 260, y: 155, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
       { id: 'sb-node-4', type: 'output', label: 'Alert LED', x: 440, y: 110, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-5', type: 'buzzer', label: 'Buzzer',    x: 440, y: 200, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-5', type: 'buzzer', label: 'Buzzer', x: 440, y: 200, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
@@ -1884,10 +1884,10 @@ const CIRCUIT_TEMPLATES = {
   'rgb-color-mixer': {
     version: 2, nextNodeId: 6,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Red Ctrl',   x: 60,  y: 80,  inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Green Ctrl', x: 60,  y: 200, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'input',  label: 'Blue Ctrl',  x: 60,  y: 320, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'rgb-led',label: 'RGB LED',    x: 280, y: 180, inputsCount: 3, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0,0,0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Red Ctrl', x: 60, y: 80, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Green Ctrl', x: 60, y: 200, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'input', label: 'Blue Ctrl', x: 60, y: 320, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'rgb-led', label: 'RGB LED', x: 280, y: 180, inputsCount: 3, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0, 0, 0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
@@ -1899,11 +1899,11 @@ const CIRCUIT_TEMPLATES = {
   'led-binary-display': {
     version: 2, nextNodeId: 6,
     nodes: [
-      { id: 'sb-node-1', type: 'input',   label: 'Bit D3',  x: 60,  y: 60,  inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',   label: 'Bit D2',  x: 60,  y: 160, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'input',   label: 'Bit D1',  x: 60,  y: 260, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'input',   label: 'Bit D0',  x: 60,  y: 360, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-5', type: 'led-bar', label: 'LED Bar', x: 280, y: 185, inputsCount: 4, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0,0,0,0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Bit D3', x: 60, y: 60, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Bit D2', x: 60, y: 160, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'input', label: 'Bit D1', x: 60, y: 260, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'input', label: 'Bit D0', x: 60, y: 360, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-5', type: 'led-bar', label: 'LED Bar', x: 280, y: 185, inputsCount: 4, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0, 0, 0, 0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-5', toPortIdx: 3 },
@@ -1916,11 +1916,11 @@ const CIRCUIT_TEMPLATES = {
   'and-alarm': {
     version: 2, nextNodeId: 7,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Security A', x: 60,  y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Security B', x: 60,  y: 230, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'and',    label: 'AND Guard',  x: 260, y: 155, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'output', label: 'Alert LED',  x: 450, y: 100, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-5', type: 'buzzer', label: 'Alarm',      x: 450, y: 200, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Security A', x: 60, y: 100, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Security B', x: 60, y: 230, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'and', label: 'AND Guard', x: 260, y: 155, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'output', label: 'Alert LED', x: 450, y: 100, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-5', type: 'buzzer', label: 'Alarm', x: 450, y: 200, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
@@ -1933,14 +1933,14 @@ const CIRCUIT_TEMPLATES = {
   'multi-led-and': {
     version: 2, nextNodeId: 10,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Switch A',  x: 60,  y: 80,  inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input',  label: 'Switch B',  x: 60,  y: 210, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'and',    label: 'AND',       x: 250, y: 100, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'or',     label: 'OR',        x: 250, y: 230, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-5', type: 'xor',    label: 'XOR',       x: 250, y: 360, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-6', type: 'output', label: 'AND LED',   x: 440, y: 90,  inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-7', type: 'output', label: 'OR LED',    x: 440, y: 220, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-8', type: 'output', label: 'XOR LED',   x: 440, y: 350, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Switch A', x: 60, y: 80, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'input', label: 'Switch B', x: 60, y: 210, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'and', label: 'AND', x: 250, y: 100, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'or', label: 'OR', x: 250, y: 230, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-5', type: 'xor', label: 'XOR', x: 250, y: 360, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-6', type: 'output', label: 'AND LED', x: 440, y: 90, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-7', type: 'output', label: 'OR LED', x: 440, y: 220, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-8', type: 'output', label: 'XOR LED', x: 440, y: 350, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
@@ -1958,10 +1958,10 @@ const CIRCUIT_TEMPLATES = {
   'clock-rgb-chase': {
     version: 2, nextNodeId: 10,
     nodes: [
-      { id: 'sb-node-1', type: 'clock',  label: 'CLK',      x: 60,  y: 150, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'not',    label: 'NOT A',    x: 240, y: 100, inputsCount: 1, outputsCount: 1, outputState: 1, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'not',    label: 'NOT B',    x: 240, y: 240, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-4', type: 'rgb-led',label: 'RGB LED',  x: 430, y: 155, inputsCount: 3, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0,0,0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'clock', label: 'CLK', x: 60, y: 150, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'not', label: 'NOT A', x: 240, y: 100, inputsCount: 1, outputsCount: 1, outputState: 1, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'not', label: 'NOT B', x: 240, y: 240, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-4', type: 'rgb-led', label: 'RGB LED', x: 430, y: 155, inputsCount: 3, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0, 0, 0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-2', toPortIdx: 0 },
@@ -1975,9 +1975,9 @@ const CIRCUIT_TEMPLATES = {
   'nand-not-gate': {
     version: 2, nextNodeId: 5,
     nodes: [
-      { id: 'sb-node-1', type: 'input',  label: 'Switch A',  x: 70,  y: 155, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'nand',   label: 'NAND (NOT)',x: 270, y: 150, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0,0], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'output', label: 'NOT LED',   x: 470, y: 140, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-1', type: 'input', label: 'Switch A', x: 70, y: 155, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-2', type: 'nand', label: 'NAND (NOT)', x: 270, y: 150, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '' },
+      { id: 'sb-node-3', type: 'output', label: 'NOT LED', x: 470, y: 140, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
     ],
     wires: [
       { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-2', toPortIdx: 0 },
@@ -2386,7 +2386,7 @@ const TEMPLATE_THEORY = {
 let activeChallengeTemplate = null;
 let challengePassed = false;
 
-window.updateTheoryGuide = function(name) {
+window.updateTheoryGuide = function (name) {
   const guide = TEMPLATE_THEORY[name];
   const card = document.getElementById('sandbox-learning-card');
   const body = document.getElementById('learning-card-body');
@@ -2452,7 +2452,7 @@ window.updateTheoryGuide = function(name) {
   window.checkTheoryChallenge();
 };
 
-window.checkTheoryChallenge = function() {
+window.checkTheoryChallenge = function () {
   if (!activeChallengeTemplate || challengePassed) return;
   const guide = TEMPLATE_THEORY[activeChallengeTemplate];
   if (!guide || !guide.checkPassed) return;
@@ -2474,7 +2474,7 @@ window.checkTheoryChallenge = function() {
   }
 };
 
-window.loadSandboxTemplate = function(name) {
+window.loadSandboxTemplate = function (name) {
   const layout = CIRCUIT_TEMPLATES[name];
   if (!layout) { showToast('Template not found.'); return; }
   if (sandboxNodes.length > 0) {
@@ -2497,7 +2497,7 @@ window.loadSandboxTemplate = function(name) {
   window.updateTheoryGuide(name);
 };
 
-window.appendSandboxTemplate = function(name, dropX, dropY) {
+window.appendSandboxTemplate = function (name, dropX, dropY) {
   const layout = CIRCUIT_TEMPLATES[name];
   if (!layout) { showToast('Template not found.'); return; }
 

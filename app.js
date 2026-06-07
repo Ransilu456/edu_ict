@@ -9,6 +9,9 @@ import './sandbox.js';
 import { initSubnetting }              from './subnetting.js';
 import { initEncoder, refreshEncoderCanvases } from './encoder.js';
 
+// Web Components
+import './components/home-view.js';
+
 // ── Boot ──────────────────────────────────────────────────────
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', boot);
@@ -20,10 +23,19 @@ function boot() {
   setupViewNavigation();
 }
 
+// ── Get all view panels (including those inside custom elements) ─
+function getAllPanels() {
+  // Standard panels in <main>
+  const direct = Array.from(document.querySelectorAll('main > .view-panel'));
+  // Panel inside <home-view> custom element
+  const homeEl = document.querySelector('home-view');
+  const homePanel = homeEl ? homeEl.querySelector('.home-view') : null;
+  return homePanel ? [homePanel, ...direct] : direct;
+}
+
 // ── View Navigation ───────────────────────────────────────────
 function setupViewNavigation() {
-  const tabs   = document.querySelectorAll('.nav-tab');
-  const panels = document.querySelectorAll('.view-panel');
+  const tabs = document.querySelectorAll('.nav-tab');
 
   // Track which modules have been initialised
   let subnettingReady = false;
@@ -34,10 +46,22 @@ function setupViewNavigation() {
       if (window.playSound) window.playSound('click');
       const target = tab.dataset.target;
 
-      tabs.forEach(t   => t.classList.remove('active'));
-      panels.forEach(p => p.classList.remove('active'));
-
+      // Deactivate all tabs
+      tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
+
+      // Deactivate all panels
+      getAllPanels().forEach(p => p.classList.remove('active'));
+
+      if (target === 'home-view') {
+        const homeEl = document.querySelector('home-view');
+        if (homeEl) {
+          const panel = homeEl.querySelector('.home-view');
+          if (panel) panel.classList.add('active');
+        }
+        return;
+      }
+
       const targetPanel = document.querySelector(`.${target}`);
       if (targetPanel) targetPanel.classList.add('active');
 
@@ -62,10 +86,15 @@ function setupViewNavigation() {
           initEncoder();
           encoderReady = true;
         } else {
-          // Redraw canvases when view becomes visible
           setTimeout(refreshEncoderCanvases, 80);
         }
       }
     });
   });
+
+  // Expose a global helper so home-view.js can trigger tab changes
+  window.navigateToView = (targetClass) => {
+    const tab = document.querySelector(`.nav-tab[data-target="${targetClass}"]`);
+    if (tab) tab.click();
+  };
 }
