@@ -168,6 +168,15 @@ function initCourse() {
   initLessonSelect();
   renderLesson();
   
+  // Wire back to map button
+  const backBtn = document.getElementById('back-to-map-btn');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      if (window.playSound) window.playSound('click');
+      if (window.navigateToView) window.navigateToView('course-map-view');
+    });
+  }
+  
   // Wire re-render on resize
   window.addEventListener('resize', () => {
     drawCourseWires();
@@ -182,6 +191,14 @@ if (document.readyState === "loading") {
 
 window.onRestartCourseProgression = () => {
   currentLessonIdx = 0;
+  localStorage.setItem('logicQuest_step', 0);
+  renderLesson();
+};
+
+window.loadLesson = (idx) => {
+  currentLessonIdx = idx;
+  localStorage.setItem('logicQuest_step', idx);
+  if (window.updateXPDisplay) window.updateXPDisplay();
   renderLesson();
 };
 
@@ -325,12 +342,18 @@ document.getElementById("cta-btn").addEventListener("click", () => {
   } else {
     const feedback = document.getElementById("quiz-feedback");
     if (feedback.classList.contains("success")) {
+      // Mark lesson as complete
+      if (window.markLessonComplete) {
+        window.markLessonComplete(currentLessonIdx);
+      }
+      
       if (currentLessonIdx === lessons.length - 1) {
         showSuccessModal();
       } else {
         currentLessonIdx++;
         localStorage.setItem('logicQuest_step', currentLessonIdx);
         if (window.updateXPDisplay) window.updateXPDisplay();
+        if (window.renderCourseMap) window.renderCourseMap();
         renderLesson();
       }
     } else {

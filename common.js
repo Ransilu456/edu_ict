@@ -138,16 +138,39 @@ function initRestartProgress() {
 function updateXPDisplay() {
   const scoreCount = document.getElementById("score-count");
   if (scoreCount) {
-    const step = parseInt(localStorage.getItem('logicQuest_step')) || 0;
-    const extraXp = parseInt(localStorage.getItem('logicQuest_extraXp')) || 0;
-    scoreCount.innerText = step * 10 + extraXp;
+    // Get XP from completed lessons (each worth 10 XP) + extra XP
+    const completed = localStorage.getItem('logicQuest_completedLessons');
+    const completedLessons = new Set(completed ? JSON.parse(completed) : []);
+    const xp = completedLessons.size * 10 + (parseInt(localStorage.getItem('logicQuest_extraXp')) || 0);
+    scoreCount.innerText = xp;
+  }
+  updateKeysDisplay();
+  
+  // Refresh course map if it's visible
+  if (window.renderCourseMap) {
+    const mapContainer = document.getElementById('course-map-container');
+    if (mapContainer && mapContainer.innerHTML.trim() !== '') {
+      window.renderCourseMap();
+    }
+  }
+}
+
+function updateKeysDisplay() {
+  const keysCount = document.getElementById("keys-count");
+  if (keysCount) {
+    let keys = localStorage.getItem('logicQuest_keys');
+    if (keys === null) {
+      keys = 5;
+      localStorage.setItem('logicQuest_keys', keys);
+    }
+    keysCount.innerText = keys;
   }
 }
 window.updateXPDisplay = updateXPDisplay;
 
 // Listen for storage events (XP changes in other tabs)
 window.addEventListener('storage', (e) => {
-  if (e.key === 'logicQuest_step') {
+  if (e.key === 'logicQuest_step' || e.key === 'logicQuest_completedLessons' || e.key === 'logicQuest_extraXp') {
     updateXPDisplay();
   }
 });

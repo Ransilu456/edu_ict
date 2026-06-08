@@ -40,6 +40,10 @@ function sn_getCidrInfo(cidr) {
   maskParts[magicOctetIdx] = 256 - magic;
   for (let i = magicOctetIdx + 1; i < 4; i++) maskParts[i] = 0;
 
+  // Wildcard mask = bitwise inverse of subnet mask
+  const wildcardParts = maskParts.map(o => 255 - o);
+  const wildcard      = wildcardParts.join('.');
+
   const mask          = maskParts.join('.');
   const subnets       = Math.pow(2, subnetBits);
   const totalHostBits = 32 - cidr;
@@ -49,7 +53,7 @@ function sn_getCidrInfo(cidr) {
   if (cidr < 16) classLetter = 'A';
   else if (cidr < 24) classLetter = 'B';
 
-  return { cidr, classLetter, magicOctetIdx, magic, mask, subnets, hosts, totalHostBits, subnetBits };
+  return { cidr, classLetter, magicOctetIdx, magic, mask, wildcard, subnets, hosts, totalHostBits, subnetBits };
 }
 
 // ── CIDR Visualizer ───────────────────────────────────────────
@@ -60,10 +64,11 @@ function sn_updateCidrVisualizer(cidr) {
 
   const info = sn_getCidrInfo(cidr);
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
-  set('sn-val-mask',    info.mask);
-  set('sn-val-magic',   info.magic === 256 ? '256 (Full Octet)' : info.magic);
-  set('sn-val-subnets', info.subnets);
-  set('sn-val-hosts',   info.hosts.toLocaleString());
+  set('sn-val-mask',     info.mask);
+  set('sn-val-wildcard', info.wildcard);
+  set('sn-val-magic',    info.magic === 256 ? '256 (Full Octet)' : info.magic);
+  set('sn-val-subnets',  info.subnets);
+  set('sn-val-hosts',    info.hosts.toLocaleString());
 
   sn_renderCheatTable(info.classLetter, cidr);
   sn_buildBinaryDisplay(cidr);
@@ -208,17 +213,21 @@ function sn_calculateIpSubnet() {
   const firstParts = [...netParts];  firstParts[3] = parseInt(firstParts[3]) + 1;
   const lastParts  = [...broadParts]; lastParts[3]  = parseInt(lastParts[3])  - 1;
 
+  const info2 = sn_getCidrInfo(cidr);
   resultBox.style.display = 'block';
   resultBox.innerHTML = `
     <div style="font-weight:700;font-family:var(--font-header);color:var(--text-primary);margin-bottom:10px;display:flex;justify-content:space-between;">
-      <span>IP Location Results</span>
-      <span style="color:var(--color-cyan)">Block size: ${magic}</span>
+      <span>IP Analysis — /${cidr} (Class ${info2.classLetter})</span>
+      <span style="color:var(--color-cyan);font-size:0.8rem">Block: ${magic}</span>
     </div>
-    <div style="display:grid;grid-template-columns:1.3fr 1.7fr;gap:6px;font-family:var(--font-mono);font-size:0.85rem;">
+    <div style="display:grid;grid-template-columns:1.4fr 1.6fr;gap:5px 8px;font-family:var(--font-mono);font-size:0.83rem;">
+      <span style="color:var(--text-muted)">Subnet Mask:</span>       <strong style="color:#a78bfa">${info2.mask}</strong>
+      <span style="color:var(--text-muted)">Wildcard Mask:</span>     <strong style="color:#f59e0b">${info2.wildcard}</strong>
       <span style="color:var(--text-muted)">Network Address:</span>   <strong style="color:var(--color-cyan)">${netParts.join('.')}</strong>
       <span style="color:var(--text-muted)">First Usable Host:</span> <span>${firstParts.join('.')}</span>
       <span style="color:var(--text-muted)">Last Usable Host:</span>  <span>${lastParts.join('.')}</span>
       <span style="color:var(--text-muted)">Broadcast Address:</span> <strong style="color:#818cf8">${broadParts.join('.')}</strong>
+      <span style="color:var(--text-muted)">Usable Hosts:</span>      <span style="color:#10b981">${info2.hosts.toLocaleString()}</span>
     </div>`;
 
   document.querySelectorAll('.sn-block-item').forEach(el => el.classList.remove('sn-active-block'));
@@ -317,6 +326,45 @@ const sn_quizTemplates = [
           4. Broadcast = <strong>${broadP.join('.')}</strong>`
       };
     }
+  },
+  {
+    type: 'wildcard',
+    question: 'What is the <strong>wildcard mask</strong> for CIDR <strong>/{cidr}</strong>?',
+    generate: () => {
+      const cidrs = [8,10,16,18,20,22,24,25,26,27,28,30];
+      const cidr  = cidrs[Math.floor(Math.random() * cidrs.length)];
+      const info  = sn_getCidrInfo(cidr);
+      return {
+        cidr,
+        answer: info.wildcard,
+        explanation: `<strong>Wildcard for /${cidr}:</strong><br>
+          1. Subnet mask = <code>${info.mask}</code><br>
+          2. Wildcard = 255.255.255.255 − Subnet mask<br>
+          3. Each octet: 255 − mask octet value<br>
+          4. Wildcard mask = <strong>${info.wildcard}</strong>`
+      };
+    }
+  },
+  {
+    type: 'hosts-needed',
+    question: 'You need to support <strong>{hosts} hosts</strong> on one subnet. What is the <strong>minimum CIDR prefix</strong> (e.g. /26)?',
+    generate: () => {
+      const targetCidrs = [25, 26, 27, 28, 29];
+      const cidr = targetCidrs[Math.floor(Math.random() * targetCidrs.length)];
+      const info = sn_getCidrInfo(cidr);
+      // Show a host count between (prev block - 2) and info.hosts to make it unique
+      const hostsNeeded = Math.floor(Math.random() * (info.hosts - 1)) + 1;
+      return {
+        cidr,
+        hostsNeeded,
+        answer: `/${cidr}`,
+        explanation: `<strong>To support ${hostsNeeded} hosts:</strong><br>
+          1. Need host bits: smallest n where 2ⁿ − 2 ≥ ${hostsNeeded}<br>
+          2. Host bits needed = ${32 - cidr} → CIDR = /${cidr}<br>
+          3. /${cidr} gives <strong>${info.hosts}</strong> usable hosts — fits ${hostsNeeded} hosts<br>
+          Subnet mask = <code>${info.mask}</code>`
+      };
+    }
   }
 ];
 
@@ -339,7 +387,8 @@ function sn_startChallenge() {
     const qData = template.generate();
     const qText = template.question
       .replace('{cidr}', qData.cidr)
-      .replace('{ip}', qData.ip || '');
+      .replace('{ip}', qData.ip || '')
+      .replace('{hosts}', qData.hostsNeeded || '');
     sn_challengeState.questions.push({
       text: qText,
       answer: qData.answer,

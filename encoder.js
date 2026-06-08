@@ -52,6 +52,9 @@ export function initEncoder() {
     });
   }
 
+  // Bandwidth Calculator
+  initBandwidthCalc();
+
   // Quiz start
   const qStartBtn = document.getElementById('enc-quiz-start-btn');
   if (qStartBtn) qStartBtn.addEventListener('click', startEncoderQuiz);
@@ -434,6 +437,88 @@ function runEncoder() {
   resEl.style.display = 'block';
 }
 
+// ── Bandwidth / Capacity Calculator ─────────────────────────
+function initBandwidthCalc() {
+  const calcBtn = document.getElementById('enc-bandwidth-calc-btn');
+  if (!calcBtn) return;
+
+  calcBtn.addEventListener('click', () => {
+    const bw    = parseFloat(document.getElementById('enc-bw-input')?.value || 0);
+    const snr   = parseFloat(document.getElementById('enc-snr-input')?.value || 0);
+    const M     = parseInt(document.getElementById('enc-M-input')?.value || 2);
+
+    const errEl  = document.getElementById('enc-bw-error');
+    const resEl  = document.getElementById('enc-bw-result');
+
+    if (errEl) errEl.style.display = 'none';
+    if (resEl) resEl.style.display = 'none';
+
+    if (!bw || bw <= 0) {
+      if (errEl) { errEl.textContent = 'Please enter a valid bandwidth (Hz).'; errEl.style.display = 'block'; }
+      return;
+    }
+    if (!M || M < 2 || !Number.isInteger(M)) {
+      if (errEl) { errEl.textContent = 'Signal levels (M) must be an integer ≥ 2.'; errEl.style.display = 'block'; }
+      return;
+    }
+
+    // Nyquist theorem (noise-free): Max data rate = 2 × B × log₂(M)
+    const nyquist = 2 * bw * Math.log2(M);
+
+    // Shannon's theorem (noisy channel): C = B × log₂(1 + SNR)
+    let shannon = null;
+    let shannonStr = 'N/A (SNR not provided)';
+    if (!isNaN(snr) && snr > 0) {
+      shannon = bw * Math.log2(1 + snr);
+      shannonStr = formatRate(shannon);
+    } else if (snr === 0) {
+      shannonStr = '0 bps (SNR = 0 means no signal)';
+    }
+
+    const actualMax = shannon !== null ? Math.min(nyquist, shannon) : nyquist;
+
+    if (resEl) {
+      resEl.innerHTML = `
+        <div style="display:grid;grid-template-columns:1.3fr 1.7fr;gap:5px 10px;font-family:var(--font-mono);font-size:0.85rem;">
+          <span style="color:var(--text-muted)">Bandwidth (B):</span>       <strong>${formatHz(bw)}</strong>
+          <span style="color:var(--text-muted)">Signal Levels (M):</span>   <strong>${M}</strong>
+          <span style="color:var(--text-muted)">Bits per baud:</span>        <strong>${Math.log2(M).toFixed(2)} bits (log₂${M})</strong>
+          <span style="color:var(--text-muted)">SNR:</span>                  <strong>${snr > 0 ? snr : 'Not specified'}</strong>
+        </div>
+        <hr style="margin:0.75rem 0; border-color:var(--border-color);">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+          <div style="background:rgba(99,102,241,0.08);border:1.5px solid rgba(99,102,241,0.3);border-radius:10px;padding:0.75rem;">
+            <div style="font-family:var(--font-header);font-size:0.72rem;color:#818cf8;font-weight:800;margin-bottom:4px;">NYQUIST (Noise-free)</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">2 × ${formatHz(bw)} × log₂(${M})</div>
+            <div style="font-family:var(--font-header);font-weight:900;color:#a78bfa;font-size:1.05rem;">${formatRate(nyquist)}</div>
+          </div>
+          <div style="background:rgba(16,185,129,0.08);border:1.5px solid rgba(16,185,129,0.3);border-radius:10px;padding:0.75rem;">
+            <div style="font-family:var(--font-header);font-size:0.72rem;color:#34d399;font-weight:800;margin-bottom:4px;">SHANNON (Noisy channel)</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">${formatHz(bw)} × log₂(1 + ${snr > 0 ? snr : '?'})</div>
+            <div style="font-family:var(--font-header);font-weight:900;color:#10b981;font-size:1.05rem;">${shannonStr}</div>
+          </div>
+        </div>
+        ${shannon !== null ? `<div style="margin-top:0.75rem;padding:0.6rem 0.85rem;background:rgba(251,191,36,0.08);border:1.5px solid rgba(251,191,36,0.3);border-radius:10px;font-family:var(--font-header);font-size:0.85rem;font-weight:700;color:#fbbf24;">Practical Max ≈ <strong>${formatRate(actualMax)}</strong> <span style="font-size:0.75rem;opacity:0.8;">(limited by ${nyquist < shannon ? 'Nyquist' : 'Shannon'})</span></div>` : ''}
+      `;
+      resEl.style.display = 'block';
+    }
+  });
+}
+
+function formatHz(hz) {
+  if (hz >= 1e9) return (hz / 1e9).toFixed(2) + ' GHz';
+  if (hz >= 1e6) return (hz / 1e6).toFixed(2) + ' MHz';
+  if (hz >= 1e3) return (hz / 1e3).toFixed(2) + ' kHz';
+  return hz + ' Hz';
+}
+
+function formatRate(bps) {
+  if (bps >= 1e9) return (bps / 1e9).toFixed(2) + ' Gbps';
+  if (bps >= 1e6) return (bps / 1e6).toFixed(2) + ' Mbps';
+  if (bps >= 1e3) return (bps / 1e3).toFixed(2) + ' kbps';
+  return Math.round(bps) + ' bps';
+}
+
 // ── Quiz ──────────────────────────────────────────────────────
 const ENC_QUIZ = [
   { q:'Which encoding scheme varies the FREQUENCY of a carrier wave to represent binary data?', opts:['ASK','FSK','PSK','NRZ-L'], ans:1, exp:'FSK (Frequency Shift Keying) uses different frequencies: higher frequency for 1, base frequency for 0.' },
@@ -446,6 +531,11 @@ const ENC_QUIZ = [
   { q:"Shannon's capacity theorem states C = ?", opts:['2 × B × log₂(M)','B × log₂(1 + SNR)','B / SNR','2B × SNR'], ans:1, exp:'C = B × log₂(1 + SNR) gives the theoretical maximum data rate for a noisy channel with bandwidth B.' },
   { q:'In BPSK, a binary 0 is represented by shifting the carrier phase by:', opts:['0°','90°','180°','360°'], ans:2, exp:'BPSK: 1 = 0° phase, 0 = 180° phase shift. The receiver detects phase reversals to determine the bit value.' },
   { q:'Which line code suffers synchronisation loss during long runs of 0s?', opts:['Manchester','NRZ-L','AMI','RZ'], ans:1, exp:'NRZ-L has no transitions during long runs of 0s, making clock recovery impossible for the receiver.' },
+  { q:'Nyquist\'s theorem states the maximum data rate for a NOISE-FREE channel is:', opts:['B × log₂(M)','2 × B × log₂(M)','B / log₂(M)','2 × B × SNR'], ans:1, exp:'Nyquist: Max data rate = 2 × B × log₂(M), where B = bandwidth (Hz) and M = number of discrete signal levels.' },
+  { q:'A channel has 4 MHz bandwidth and SNR of 63. What is Shannon\'s capacity (C)?', opts:['24 Mbps','16 Mbps','32 Mbps','8 Mbps'], ans:0, exp:'C = B × log₂(1+SNR) = 4MHz × log₂(64) = 4MHz × 6 = 24 Mbps.' },
+  { q:'In QAM-16, how many bits are carried per symbol?', opts:['2 bits','4 bits','8 bits','16 bits'], ans:1, exp:'QAM-16 has 16 distinct signal states (combinations of amplitude and phase). log₂(16) = 4 bits per symbol.' },
+  { q:'Why does NRZ-L have a DC component problem?', opts:['Too many transitions','A long sequence of 1s or 0s creates a constant voltage with no transitions','Voltage levels are too high','It alternates polarity randomly'], ans:1, exp:'NRZ-L holds the line high (or low) for long runs of 1s (or 0s). This DC offset can saturate AC-coupled equipment and prevent clock recovery.' },
+  { q:'Which modulation technique is most bandwidth-efficient?', opts:['ASK','FSK','PSK','QAM'], ans:3, exp:'QAM (Quadrature Amplitude Modulation) combines both amplitude and phase changes, allowing more bits per symbol and achieving greater bandwidth efficiency than ASK, FSK, or PSK alone.' },
 ];
 
 let enc_challengeState = {

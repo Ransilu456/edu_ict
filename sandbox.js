@@ -18,6 +18,33 @@ let workspace = null;
 let wiresSvg = null;
 let isDragging = false;          // suppress click-after-drag
 
+// ── Undo Stack ──────────────────────────────────────────────────
+const MAX_UNDO = 30;
+let undoStack = [];  // array of serialized layout snapshots
+
+function pushUndo() {
+  // Deep clone current state
+  const snapshot = JSON.stringify(serializeLayout());
+  undoStack.push(snapshot);
+  if (undoStack.length > MAX_UNDO) undoStack.shift();
+  // Update undo button state
+  const undoBtn = document.getElementById('sandbox-undo');
+  if (undoBtn) undoBtn.disabled = undoStack.length === 0;
+}
+
+function performUndo() {
+  if (undoStack.length === 0) {
+    showToast('Nothing to undo.');
+    return;
+  }
+  const snapshot = JSON.parse(undoStack.pop());
+  importLayout(snapshot);
+  playSound('click');
+  showToast('Undone ↩');
+  const undoBtn = document.getElementById('sandbox-undo');
+  if (undoBtn) undoBtn.disabled = undoStack.length === 0;
+}
+
 // ── Component Definitions ────────────────────────────────────
 // Each component spec: { inputs, outputs, label, category }
 const COMPONENT_DEFS = {
@@ -70,6 +97,12 @@ window.initSandboxCanvas = function () {
 
   // Keyboard shortcuts
   window.addEventListener('keydown', (e) => {
+    // Undo (Ctrl+Z / Cmd+Z)
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+      e.preventDefault();
+      performUndo();
+      return;
+    }
     if (!selectedNodeId) return;
     if (document.activeElement && document.activeElement.tagName === 'TEXTAREA') return;
     if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -203,6 +236,13 @@ function setupToolbar() {
       stopSimulationLoop();
     }
   });
+
+  // ─ Undo button
+  const undoBtn = document.getElementById('sandbox-undo');
+  if (undoBtn) {
+    undoBtn.disabled = true;
+    undoBtn.addEventListener('click', () => performUndo());
+  }
 
   // ─ Clear
   document.getElementById('sandbox-clear')?.addEventListener('click', () => {
@@ -1262,6 +1302,7 @@ function stopSimulationLoop() {
 
 // ── Node / Sandbox Operations ─────────────────────────────────
 function deleteNode(id) {
+  pushUndo();
   playSound('click');
   document.getElementById(id)?.remove();
   sandboxNodes = sandboxNodes.filter(n => n.id !== id);
