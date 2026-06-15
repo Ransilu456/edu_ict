@@ -146,226 +146,7 @@
     ══════════════════════════════════════════════════ -->
     <home-view></home-view>
     <template id="home-view-template">
-      <section class="view-panel home-view active" id="home-view-panel">
-
-        <!-- Hero Section -->
-        <div class="hero-section">
-          <div class="hero-bg-grid"></div>
-          <div class="hero-floating-gates">
-            <div class="floating-gate fg-1">
-              <svg viewBox="0 0 60 40"><path d="M5 10 H20 A15 15 0 0 1 35 20 A15 15 0 0 1 20 30 H5 Z" fill="#ffd43b" stroke="#e6b800" stroke-width="1.5"/><line x1="0" y1="15" x2="5" y2="15" stroke="#e6b800" stroke-width="2"/><line x1="0" y1="25" x2="5" y2="25" stroke="#e6b800" stroke-width="2"/><line x1="35" y1="20" x2="40" y2="20" stroke="#e6b800" stroke-width="2"/></svg>
-              <span class="gate-tag">AND</span>
-            </div>
-            <div class="floating-gate fg-2">
-              <svg viewBox="0 0 50 40"><path d="M5 10 C10 10, 15 14, 15 20 C15 26, 10 30, 5 30 C10 30, 20 28, 25 20 C20 12, 10 10, 5 10 Z" fill="#8a3ffc" stroke="#6929c4" stroke-width="1.5"/><line x1="0" y1="15" x2="5" y2="15" stroke="#6929c4" stroke-width="2"/><line x1="0" y1="25" x2="5" y2="25" stroke="#6929c4" stroke-width="2"/><line x1="25" y1="20" x2="30" y2="20" stroke="#6929c4" stroke-width="2"/></svg>
-              <span class="gate-tag">OR</span>
-            </div>
-            <div class="floating-gate fg-3">
-              <svg viewBox="0 0 50 40"><path d="M5 10 L20 20 L5 30 Z" fill="#1cb0f6" stroke="#0e90d6" stroke-width="1.5"/><circle cx="22.5" cy="20" r="2.5" fill="none" stroke="#0e90d6" stroke-width="1.5"/><line x1="0" y1="20" x2="5" y2="20" stroke="#0e90d6" stroke-width="2"/><line x1="25" y1="20" x2="30" y2="20" stroke="#0e90d6" stroke-width="2"/></svg>
-              <span class="gate-tag">NOT</span>
-            </div>
-            <div class="floating-gate fg-4">
-              <svg viewBox="0 0 60 40"><path d="M5 10 H20 A15 15 0 0 1 35 20 A15 15 0 0 1 20 30 H5 Z" fill="#ff6b6b" stroke="#e63946" stroke-width="1.5"/><circle cx="37" cy="20" r="2.5" fill="none" stroke="#e63946" stroke-width="1.5"/><line x1="0" y1="15" x2="5" y2="15" stroke="#e63946" stroke-width="2"/><line x1="0" y1="25" x2="5" y2="25" stroke="#e63946" stroke-width="2"/></svg>
-              <span class="gate-tag">NAND</span>
-            </div>
-            <div class="floating-gate fg-5">
-              <svg viewBox="0 0 60 40"><path d="M5 10 C10 10, 15 14, 15 20 C15 26, 10 30, 5 30 C10 30, 20 28, 25 20 C20 12, 10 10, 5 10 Z" fill="#10b981" stroke="#059669" stroke-width="1.5"/><line x1="28" y1="15" x2="24" y2="15" stroke="#059669" stroke-width="2"/><line x1="28" y1="25" x2="24" y2="25" stroke="#059669" stroke-width="2"/></svg>
-              <span class="gate-tag">XOR</span>
-            </div>
-          </div>
-
-          <div class="hero-content">
-            <div class="hero-badge">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              A/L ICT Interactive Platform
-            </div>
-            <h1 class="hero-title">
-              Master Digital Logic<br>
-              <span class="hero-title-accent">One Gate at a Time</span>
-            </h1>
-            <p class="hero-subtitle">From transistors to full adders — learn, simulate, and quiz yourself with interactive circuits and visualizations</p>
-            <div class="hero-actions">
-              <button class="hero-cta-primary" id="home-hero-start-btn">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                Start Learning
-              </button>
-              <button class="hero-cta-secondary" id="home-hero-sandbox-btn">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-                Open Sandbox
-              </button>
-            </div>
-
-            <!-- Live Stats Row -->
-            <div class="hero-stats-row">
-              <div class="hero-stat-pill">
-                <span class="hero-stat-val" id="home-hero-xp">0</span>
-                <span class="hero-stat-label">XP Earned</span>
-              </div>
-              <div class="hero-stat-sep">·</div>
-              <div class="hero-stat-pill">
-                <span class="hero-stat-val" id="home-hero-lesson">Lesson 1</span>
-                <span class="hero-stat-label">Current Lesson</span>
-              </div>
-              <div class="hero-stat-sep">·</div>
-              <div class="hero-stat-pill">
-                <span class="hero-stat-val" id="home-hero-pct">0%</span>
-                <span class="hero-stat-label">Complete</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Animated circuit SVG illustration -->
-          <div class="hero-illustration">
-            <svg viewBox="0 0 320 220" class="circuit-illustration">
-              <!-- Grid dots -->
-              <pattern id="circuit-dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <circle cx="10" cy="10" r="1.5" fill="rgba(99,102,241,0.2)"/>
-              </pattern>
-              <rect width="320" height="220" fill="url(#circuit-dots)" rx="16"/>
-              <!-- Animated wires -->
-              <path d="M20 60 H90 M20 100 H90 M140 80 H190 M240 80 H290" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-              <path d="M20 160 H70 H90 M140 160 H190 M240 160 H290" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" fill="none" stroke-dasharray="6,4" class="wire-anim"/>
-              <path d="M190 80 L190 160 M95 80 L95 120" stroke="#a78bfa" stroke-width="2" fill="none" opacity="0.6"/>
-              <!-- AND gate box -->
-              <rect x="90" y="55" width="50" height="50" rx="8" fill="rgba(255,212,59,0.15)" stroke="#ffd43b" stroke-width="2"/>
-              <text x="115" y="84" text-anchor="middle" font-family="'Outfit',sans-serif" font-weight="800" font-size="12" fill="#ffd43b">AND</text>
-              <!-- OR gate box -->
-              <rect x="90" y="135" width="50" height="50" rx="8" fill="rgba(138,63,252,0.15)" stroke="#8a3ffc" stroke-width="2"/>
-              <text x="115" y="165" text-anchor="middle" font-family="'Outfit',sans-serif" font-weight="800" font-size="12" fill="#8a3ffc">OR</text>
-              <!-- XOR gate -->
-              <rect x="190" y="55" width="50" height="50" rx="8" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="2"/>
-              <text x="215" y="84" text-anchor="middle" font-family="'Outfit',sans-serif" font-weight="800" font-size="12" fill="#10b981">XOR</text>
-              <!-- NOT gate -->
-              <rect x="190" y="135" width="50" height="50" rx="8" fill="rgba(28,176,246,0.15)" stroke="#1cb0f6" stroke-width="2"/>
-              <text x="215" y="165" text-anchor="middle" font-family="'Outfit',sans-serif" font-weight="800" font-size="12" fill="#1cb0f6">NOT</text>
-              <!-- Output LEDs -->
-              <circle cx="260" cy="80" r="14" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="2"/>
-              <circle cx="260" cy="80" r="8" fill="#6366f1" class="led-pulse"/>
-              <circle cx="260" cy="160" r="14" fill="rgba(251,191,36,0.2)" stroke="#fbbf24" stroke-width="2"/>
-              <circle cx="260" cy="160" r="8" fill="rgba(251,191,36,0.4)" class="led-off"/>
-              <!-- Input nodes -->
-              <circle cx="20" cy="60" r="7" fill="#10b981" stroke="#065f46" stroke-width="1.5"/>
-              <text x="20" y="64" text-anchor="middle" font-size="8" font-weight="900" fill="white">1</text>
-              <circle cx="20" cy="100" r="7" fill="rgba(100,116,139,0.4)" stroke="#475569" stroke-width="1.5"/>
-              <text x="20" y="104" text-anchor="middle" font-size="8" font-weight="900" fill="#94a3b8">0</text>
-              <circle cx="20" cy="160" r="7" fill="#10b981" stroke="#065f46" stroke-width="1.5"/>
-              <text x="20" y="164" text-anchor="middle" font-size="8" font-weight="900" fill="white">1</text>
-            </svg>
-          </div>
-        </div>
-
-        <!-- Feature Cards Grid -->
-        <div class="home-features-section">
-          <h2 class="home-features-title">Everything you need to ace A/L ICT</h2>
-          <div class="home-features-grid">
-
-            <!-- Guided Course -->
-            <div class="feature-card feature-card--course" id="home-feat-course" tabindex="0">
-              <div class="feat-card-glow"></div>
-              <div class="feat-card-icon">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-              </div>
-              <div class="feat-card-body">
-                <h3 class="feat-card-title">Guided Course</h3>
-                <p class="feat-card-desc">Step through 9 interactive lessons from binary to full adders with instant quiz feedback</p>
-                <div class="feat-card-tags">
-                  <span class="feat-tag">9 Lessons</span>
-                  <span class="feat-tag">+10 XP each</span>
-                </div>
-              </div>
-              <div class="feat-card-arrow">→</div>
-            </div>
-
-            <!-- Sandbox Builder -->
-            <div class="feature-card feature-card--sandbox" id="home-feat-sandbox" tabindex="0">
-              <div class="feat-card-glow"></div>
-              <div class="feat-card-icon">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-              </div>
-              <div class="feat-card-body">
-                <h3 class="feat-card-title">Sandbox Builder</h3>
-                <p class="feat-card-desc">Drag-and-drop logic gates to build custom circuits. Simulate flip-flops, adders, and more in real time</p>
-                <div class="feat-card-tags">
-                  <span class="feat-tag">15 Components</span>
-                  <span class="feat-tag">Live Sim</span>
-                </div>
-              </div>
-              <div class="feat-card-arrow">→</div>
-            </div>
-
-            <!-- Gate Explorer -->
-            <div class="feature-card feature-card--explorer" id="home-feat-explorer" tabindex="0">
-              <div class="feat-card-glow"></div>
-              <div class="feat-card-icon">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              </div>
-              <div class="feat-card-body">
-                <h3 class="feat-card-title">Gate Explorer</h3>
-                <p class="feat-card-desc">Inspect any logic gate's truth table, transistor-level schematic, and boolean expression</p>
-                <div class="feat-card-tags">
-                  <span class="feat-tag">Truth Tables</span>
-                  <span class="feat-tag">Transistors</span>
-                </div>
-              </div>
-              <div class="feat-card-arrow">→</div>
-            </div>
-
-            <!-- Subnetting Master -->
-            <div class="feature-card feature-card--subnet" id="home-feat-subnetting" tabindex="0">
-              <div class="feat-card-glow"></div>
-              <div class="feat-card-icon">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"/></svg>
-              </div>
-              <div class="feat-card-body">
-                <h3 class="feat-card-title">Subnetting Master</h3>
-                <p class="feat-card-desc">CIDR visualizer, subnet block explorer, IP calculator, wildcard masks — plus a timed challenge quiz</p>
-                <div class="feat-card-tags">
-                  <span class="feat-tag">CIDR &amp; Masks</span>
-                  <span class="feat-tag">IP Calculator</span>
-                </div>
-              </div>
-              <div class="feat-card-arrow">→</div>
-            </div>
-
-            <!-- Signal Encoding Lab -->
-            <div class="feature-card feature-card--signal" id="home-feat-encoder" tabindex="0">
-              <div class="feat-card-glow"></div>
-              <div class="feat-card-icon">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-              </div>
-              <div class="feat-card-body">
-                <h3 class="feat-card-title">Signal Encoding Lab</h3>
-                <p class="feat-card-desc">Visualise ASK, FSK, PSK, NRZ-L, Manchester on live canvas. Encode/decode bits, calculate channel capacity</p>
-                <div class="feat-card-tags">
-                  <span class="feat-tag">Analog &amp; Digital</span>
-                  <span class="feat-tag">Shannon's Law</span>
-                </div>
-              </div>
-              <div class="feat-card-arrow">→</div>
-            </div>
-
-            <!-- Quick Stats (Progress Card) -->
-            <div class="feature-card feature-card--progress" id="home-feat-progress">
-              <div class="feat-card-glow"></div>
-              <div class="feat-card-icon feat-icon-trophy">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H3.5a2.5 2.5 0 0 0 0 5H6"/><path d="M18 9h2.5a2.5 2.5 0 0 1 0 5H18"/><path d="M6 9v7a6 6 0 0 0 12 0V9"/><path d="M12 21v2"/><path d="M9 21h6"/></svg>
-              </div>
-              <div class="feat-card-body">
-                <h3 class="feat-card-title">Your Progress</h3>
-                <div class="progress-mini-bar-wrap">
-                  <div class="progress-mini-bar-track">
-                    <div class="progress-mini-bar-fill" id="home-progress-mini-fill" style="width: 0%"></div>
-                  </div>
-                  <span class="progress-mini-pct" id="home-progress-mini-pct">0%</span>
-                </div>
-                <p class="feat-card-desc" style="margin-top: 0.5rem" id="home-progress-desc">Start the course to earn XP and track your progress!</p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </section>
+      <?php include __DIR__ . '/src/js/components/home-view.html'; ?>
     </template>
 
 
@@ -501,49 +282,102 @@
             Drag to drop anywhere on canvas, or click to load template.
           </div>
           <div class="template-grid">
-            <div class="template-card" id="tpl-not" draggable="true" data-template-name="not-demo" onclick="window.loadSandboxTemplate('not-demo')" title="NOT Gate Demo">
-              <div class="template-card-icon" style="background:rgba(99,102,241,0.15);color:#818cf8"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="12" r="2"/><path d="M4 12h10l4-6v12l-4-6"/></svg></div>
-              <div class="template-card-info"><div class="template-card-name">NOT Inverter</div><div class="template-card-desc">Switch → NOT → LED</div></div>
+            <div class="template-card" id="tpl-not" draggable="true" data-template-name="not-demo" onclick="window.loadSandboxTemplate('not-demo')" title="NOT Gate Demo (Drag to drop or Click to load)">
+              <div class="template-card-icon" style="background:rgba(99,102,241,0.15);color:#818cf8">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="12" r="2"/><path d="M4 12h10l4-6v12l-4-6"/></svg>
+              </div>
+              <div class="template-card-info">
+                <div class="template-card-name">NOT Inverter</div>
+                <div class="template-card-desc">Switch → NOT → LED</div>
+              </div>
               <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
-            <div class="template-card" id="tpl-and" draggable="true" data-template-name="and-demo" onclick="window.loadSandboxTemplate('and-demo')" title="AND Gate Demo">
-              <div class="template-card-icon" style="background:rgba(6,182,212,0.15);color:#06b6d4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a6 6 0 0 1 0 12H6V4z"/><line x1="2" y1="10" x2="6" y2="10"/></svg></div>
-              <div class="template-card-info"><div class="template-card-name">AND Gate Test</div><div class="template-card-desc">2 switches → AND → LED</div></div>
+
+            <div class="template-card" id="tpl-and" draggable="true" data-template-name="and-demo" onclick="window.loadSandboxTemplate('and-demo')" title="AND Gate Demo (Drag to drop or Click to load)">
+              <div class="template-card-icon" style="background:rgba(6,182,212,0.15);color:#06b6d4">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a6 6 0 0 1 0 12H6V4z"/><line x1="2" y1="10" x2="6" y2="10"/></svg>
+              </div>
+              <div class="template-card-info">
+                <div class="template-card-name">AND Gate Test</div>
+                <div class="template-card-desc">2 switches → AND → LED</div>
+              </div>
               <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
-            <div class="template-card" id="tpl-xor" draggable="true" data-template-name="xor-parity" onclick="window.loadSandboxTemplate('xor-parity')" title="XOR Parity">
-              <div class="template-card-icon" style="background:rgba(16,185,129,0.15);color:#10b981"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a6 6 0 0 1 0 12H6V4z"/><path d="M3 4c1.5 3 1.5 9 0 12"/></svg></div>
-              <div class="template-card-info"><div class="template-card-name">XOR Parity</div><div class="template-card-desc">3-bit parity checker</div></div>
+
+            <div class="template-card" id="tpl-xor" draggable="true" data-template-name="xor-parity" onclick="window.loadSandboxTemplate('xor-parity')" title="XOR Parity (Drag to drop or Click to load)">
+              <div class="template-card-icon" style="background:rgba(16,185,129,0.15);color:#10b981">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a6 6 0 0 1 0 12H6V4z"/><path d="M3 4c1.5 3 1.5 9 0 12"/></svg>
+              </div>
+              <div class="template-card-info">
+                <div class="template-card-name">XOR Parity</div>
+                <div class="template-card-desc">3-bit parity checker</div>
+              </div>
               <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
-            <div class="template-card" id="tpl-sr" draggable="true" data-template-name="sr-latch" onclick="window.loadSandboxTemplate('sr-latch')" title="SR Latch">
-              <div class="template-card-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
-              <div class="template-card-info"><div class="template-card-name">SR Latch</div><div class="template-card-desc">NAND feedback latch</div></div>
+
+            <div class="template-card" id="tpl-sr" draggable="true" data-template-name="sr-latch" onclick="window.loadSandboxTemplate('sr-latch')" title="SR Latch (Drag to drop or Click to load)">
+              <div class="template-card-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              </div>
+              <div class="template-card-info">
+                <div class="template-card-name">SR Latch</div>
+                <div class="template-card-desc">NAND feedback latch</div>
+              </div>
               <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
-            <div class="template-card" id="tpl-ha" draggable="true" data-template-name="half-adder-demo" onclick="window.loadSandboxTemplate('half-adder-demo')" title="Half Adder">
-              <div class="template-card-icon" style="background:rgba(139,92,246,0.15);color:#8b5cf6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 8l2 4-2 4M15 8h2"/></svg></div>
-              <div class="template-card-info"><div class="template-card-name">Half Adder</div><div class="template-card-desc">S + Carry logic</div></div>
+
+            <div class="template-card" id="tpl-ha" draggable="true" data-template-name="half-adder-demo" onclick="window.loadSandboxTemplate('half-adder-demo')" title="Half Adder (Drag to drop or Click to load)">
+              <div class="template-card-icon" style="background:rgba(139,92,246,0.15);color:#8b5cf6">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 8l2 4-2 4M15 8h2"/></svg>
+              </div>
+              <div class="template-card-info">
+                <div class="template-card-name">Half Adder</div>
+                <div class="template-card-desc">S + Carry logic</div>
+              </div>
               <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
-            <div class="template-card" id="tpl-fa" draggable="true" data-template-name="full-adder-gate" onclick="window.loadSandboxTemplate('full-adder-gate')" title="Full Adder">
-              <div class="template-card-icon" style="background:rgba(236,72,153,0.15);color:#ec4899"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 8l2 4-2 4M14 8l2 4-2 4"/></svg></div>
-              <div class="template-card-info"><div class="template-card-name">Full Adder</div><div class="template-card-desc">Gate-level 3-bit adder</div></div>
+
+            <div class="template-card" id="tpl-fa" draggable="true" data-template-name="full-adder-gate" onclick="window.loadSandboxTemplate('full-adder-gate')" title="Full Adder (Drag to drop or Click to load)">
+              <div class="template-card-icon" style="background:rgba(236,72,153,0.15);color:#ec4899">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 8l2 4-2 4M14 8l2 4-2 4"/></svg>
+              </div>
+              <div class="template-card-info">
+                <div class="template-card-name">Full Adder</div>
+                <div class="template-card-desc">Gate-level 3-bit adder</div>
+              </div>
               <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
-            <div class="template-card" id="tpl-nand-univ" draggable="true" data-template-name="nand-universality-and" onclick="window.loadSandboxTemplate('nand-universality-and')" title="NAND Universality">
-              <div class="template-card-icon" style="background:rgba(20,184,166,0.15);color:#20b2aa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg></div>
-              <div class="template-card-info"><div class="template-card-name">NAND → AND</div><div class="template-card-desc">Universal NAND gate demo</div></div>
+
+            <div class="template-card" id="tpl-nand-univ" draggable="true" data-template-name="nand-universality-and" onclick="window.loadSandboxTemplate('nand-universality-and')" title="NAND Universality (Drag to drop or Click to load)">
+              <div class="template-card-icon" style="background:rgba(20,184,166,0.15);color:#20b2aa">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>
+              </div>
+              <div class="template-card-info">
+                <div class="template-card-name">NAND → AND</div>
+                <div class="template-card-desc">Universal NAND gate demo</div>
+              </div>
               <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
-            <div class="template-card" id="tpl-dff" draggable="true" data-template-name="d-flipflop-reg" onclick="window.loadSandboxTemplate('d-flipflop-reg')" title="D Flip-Flop Register">
-              <div class="template-card-icon" style="background:rgba(239,68,68,0.15);color:#f87171"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 12h4M15 8v8"/></svg></div>
-              <div class="template-card-info"><div class="template-card-name">1-Bit Register</div><div class="template-card-desc">D Flip-Flop rising clock</div></div>
+
+            <div class="template-card" id="tpl-dff" draggable="true" data-template-name="d-flipflop-reg" onclick="window.loadSandboxTemplate('d-flipflop-reg')" title="D Flip-Flop Register (Drag to drop or Click to load)">
+              <div class="template-card-icon" style="background:rgba(239,68,68,0.15);color:#f87171">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 12h4M15 8v8"/></svg>
+              </div>
+              <div class="template-card-info">
+                <div class="template-card-name">1-Bit Register</div>
+                <div class="template-card-desc">D Flip-Flop rising clock</div>
+              </div>
               <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
-            <div class="template-card" id="tpl-dec" draggable="true" data-template-name="seven-seg-decoder-demo" onclick="window.loadSandboxTemplate('seven-seg-decoder-demo')" title="7-Seg Decoder">
-              <div class="template-card-icon" style="background:rgba(107,114,128,0.15);color:#9ca3af"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 7h6M9 12h6M9 17h6"/></svg></div>
-              <div class="template-card-info"><div class="template-card-name">7-Seg Decoder</div><div class="template-card-desc">4-bit hex display tester</div></div>
+
+            <div class="template-card" id="tpl-dec" draggable="true" data-template-name="seven-seg-decoder-demo" onclick="window.loadSandboxTemplate('seven-seg-decoder-demo')" title="7-Seg Decoder (Drag to drop or Click to load)">
+              <div class="template-card-icon" style="background:rgba(107,114,128,0.15);color:#9ca3af">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 7h6M9 12h6M9 17h6"/></svg>
+              </div>
+              <div class="template-card-info">
+                <div class="template-card-name">7-Seg Decoder</div>
+                <div class="template-card-desc">4-bit hex display tester</div>
+              </div>
               <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
           </div>
@@ -586,7 +420,7 @@
           <div class="learning-card-header" id="learning-card-header">
             <span>
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-              Circuit Guide &amp; Theory
+              Circuit Guide & Theory
             </span>
             <div class="learning-card-controls">
               <button class="learning-card-btn" id="collapse-learning-card" title="Minimize/Expand">
@@ -650,8 +484,10 @@
       </div>
 
       <div class="sn-container">
+
         <!-- Left Column -->
         <div class="sn-left">
+
           <!-- CIDR Visualizer -->
           <div class="util-card">
             <div class="util-card-header">
@@ -662,11 +498,14 @@
               </div>
             </div>
             <p style="font-size:.875rem;color:var(--text-secondary);margin-bottom:12px">Drag the slider — see binary bits, subnet mask, and block sizes update live.</p>
+
             <div class="sn-slider-row">
               <input type="range" id="sn-cidr-slider" min="8" max="30" value="24">
               <label id="sn-cidr-label" style="font-family:var(--font-mono);font-weight:700;font-size:1.4rem;color:var(--color-cyan);min-width:48px">/24</label>
             </div>
+
             <div class="sn-binary-display" id="sn-binary-visualizer"></div>
+
             <div class="sn-metrics">
               <div class="sn-metric-card"><div class="sn-metric-title">Subnet Mask</div><div class="sn-metric-value" id="sn-val-mask">255.255.255.0</div></div>
               <div class="sn-metric-card"><div class="sn-metric-title">Block Size (Magic #)</div><div class="sn-metric-value" id="sn-val-magic">256</div></div>
@@ -689,6 +528,7 @@
               <button class="sn-btn" onclick="sn_calculateIpSubnet()">Locate Subnet</button>
             </div>
             <div id="sn-ip-result-box" class="sn-result-box" style="display:none"></div>
+
             <h3 style="margin-top:18px;font-size:.95rem;color:var(--text-secondary)">
               Subnet Blocks for /<span class="sn-cidr-text">24</span>
             </h3>
@@ -713,6 +553,7 @@
 
         <!-- Right Column -->
         <div class="sn-right">
+
           <!-- Mental Trick Guide -->
           <div class="util-card">
             <div class="util-card-header">
@@ -722,53 +563,319 @@
                 <div class="util-card-sub">4 steps to instant answers</div>
               </div>
             </div>
-            <div class="sn-trick-step"><div class="sn-step-num">1</div><div><strong>Find the Magic Octet</strong><p>Divide CIDR by 8 → which octet has the boundary?<br>Class A (/8–/15) → 2nd octet | Class B (/16–/23) → 3rd | Class C (/24–/30) → 4th</p></div></div>
-            <div class="sn-trick-step"><div class="sn-step-num">2</div><div><strong>Find Subnet &amp; Host Bits</strong><p>Subnet bits = CIDR − class boundary. Host bits = 8 − subnet bits.<br>E.g. /18 (Class B): subnet bits = 18 − 16 = 2, host bits = 8 − 2 = 6</p></div></div>
-            <div class="sn-trick-step"><div class="sn-step-num">3</div><div><strong>Block Size (Magic Number)</strong><p>Magic = 2<sup>host bits</sup>. For 6 host bits → 2<sup>6</sup> = 64.<br>Subnets increment by 64: .0, .64, .128, .192</p></div></div>
-            <div class="sn-trick-step"><div class="sn-step-num">4</div><div><strong>Usable Hosts</strong><p>Formula: 2<sup>(32 − CIDR)</sup> − 2. Subtract 2 for Network &amp; Broadcast addresses.</p></div></div>
+            <div class="sn-trick-step">
+              <div class="sn-step-num">1</div>
+              <div>
+                <strong>Find the Magic Octet</strong>
+                <p>Divide CIDR by 8 → which octet has the boundary?<br>
+                Class A (/8–/15) → 2nd octet | Class B (/16–/23) → 3rd | Class C (/24–/30) → 4th</p>
+              </div>
+            </div>
+            <div class="sn-trick-step">
+              <div class="sn-step-num">2</div>
+              <div>
+                <strong>Find Subnet &amp; Host Bits</strong>
+                <p>Subnet bits = CIDR − class boundary. Host bits = 8 − subnet bits.<br>
+                E.g. /18 (Class B): subnet bits = 18 − 16 = 2, host bits = 8 − 2 = 6</p>
+              </div>
+            </div>
+            <div class="sn-trick-step">
+              <div class="sn-step-num">3</div>
+              <div>
+                <strong>Block Size (Magic Number)</strong>
+                <p>Magic = 2<sup>host bits</sup>. For 6 host bits → 2<sup>6</sup> = 64.<br>
+                Subnets increment by 64: .0, .64, .128, .192</p>
+              </div>
+            </div>
+            <div class="sn-trick-step">
+              <div class="sn-step-num">4</div>
+              <div>
+                <strong>Usable Hosts</strong>
+                <p>Formula: 2<sup>(32 − CIDR)</sup> − 2. Subtract 2 for Network &amp; Broadcast addresses.</p>
+              </div>
+            </div>
           </div>
 
           <!-- Quiz -->
           <div class="util-card" style="text-align:center;padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
             <div class="sn-trainer-icon" style="color:var(--color-cyan);margin-bottom:12px">
-              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="6"/>
+                <circle cx="12" cy="12" r="2"/>
+              </svg>
             </div>
             <div class="util-card-title" style="font-size:1.2rem;margin-bottom:4px">Subnet Mental Trainer</div>
             <div class="util-card-sub">Interactive 5-Question Challenge</div>
-            <p style="font-size:.875rem;color:var(--text-secondary);margin-top:8px;margin-bottom:16px">Master the mental tricks to solve subnetting questions instantly.</p>
+            <p style="font-size:.875rem;color:var(--text-secondary);margin-top:8px;margin-bottom:16px">
+              Master the mental tricks to solve subnetting questions instantly.
+            </p>
             <button class="sn-btn" id="sn-quiz-start-challenge-btn" style="width:100%;font-size:1rem;padding:12px">Start Subnetting Challenge ➔</button>
           </div>
+
         </div>
       </div>
     </section>
 
     <!-- ══════════════════════════════════════════════════
-         VIEW 5: Signal Encoding Lab  (encoder view content retained from original)
+         VIEW 5: Signal Encoding Lab
     ══════════════════════════════════════════════════ -->
-    <section class="view-panel encoder-view" id="encoder-view-section">
+    <section class="view-panel encoder-view">
       <div class="util-view-header">
         <div class="util-view-badge"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px"><path d="M4.93 4.93a10 10 0 0 0 0 14.14M19.07 4.93a10 10 0 0 1 0 14.14M1.64 10.36a14 14 0 0 0 0 3.27M22.36 10.36a14 14 0 0 1 0 3.27M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/></svg> A/L ICT Networking</div>
         <h1 class="util-view-title">Signal Encoding Lab</h1>
         <p class="util-view-subtitle">Visualise ASK, FSK, PSK, NRZ, Manchester &amp; 4B/5B. Toggle bits — see waveforms update live.</p>
       </div>
-      <div class="enc-container" id="enc-main-container">
-        <!-- Tab Strip -->
+
+      <div class="enc-container">
+
+        <!-- Internal Tab Strip -->
         <div class="enc-tab-strip" id="enc-tab-strip">
           <button class="enc-tab-btn active" data-tab="analog"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Analog Encoding</button>
           <button class="enc-tab-btn" data-tab="digital"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polyline points="5 9 5 5 19 5 19 9"/><polyline points="5 15 5 19 19 19 19 15"/></svg> Digital Line Codes</button>
           <button class="enc-tab-btn" data-tab="manchester"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg> Manchester / 4B5B</button>
           <button class="enc-tab-btn" data-tab="decoder"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg> Decoder Tool</button>
-          <button class="enc-tab-btn" data-tab="theory"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Theory &amp; Reference</button>
-          <button class="enc-tab-btn" data-tab="quiz"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Quiz</button>
+          <button class="enc-tab-btn" data-tab="theory"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Theory Reference</button>
+          <button class="enc-tab-btn" data-tab="quiz"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Quick Quiz</button>
         </div>
-        <!-- Tab panel content is injected by encoder.js -->
-        <div id="enc-tab-analog"     class="enc-tab-panel active"></div>
-        <div id="enc-tab-digital"    class="enc-tab-panel"></div>
-        <div id="enc-tab-manchester" class="enc-tab-panel"></div>
-        <div id="enc-tab-decoder"    class="enc-tab-panel"></div>
-        <div id="enc-tab-theory"     class="enc-tab-panel"></div>
-        <div id="enc-tab-quiz"       class="enc-tab-panel"></div>
-      </div>
+
+        <!-- ── TAB: Analog ─────────────────────────────────── -->
+        <div class="enc-tab-panel active" id="enc-tab-analog">
+          <div class="util-card">
+            <div class="util-card-header">
+              <div class="util-card-icon" style="background:rgba(245,158,11,0.15)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+              <div><div class="util-card-title">Analog Signal Encoding</div><div class="util-card-sub">Toggle bits → see ASK, FSK &amp; PSK modulate a carrier wave</div></div>
+            </div>
+            <div class="enc-bit-label">Binary Data Bits (click to toggle)</div>
+            <div class="enc-bit-grid" id="enc-analog-bits"></div>
+
+            <div class="enc-params-grid">
+              <div class="enc-param-group">
+                <label>Carrier Frequency</label>
+                <input type="range" id="enc-carrier-freq" min="1" max="6" value="3">
+                <span class="enc-param-val" id="enc-carrier-freq-val">3 units</span>
+              </div>
+              <div class="enc-param-group">
+                <label>ASK Amplitude</label>
+                <input type="range" id="enc-ask-amp" min="20" max="55" value="40">
+                <span class="enc-param-val" id="enc-ask-amp-val">40</span>
+              </div>
+              <div class="enc-param-group">
+                <label>FSK Freq Multiplier</label>
+                <input type="range" id="enc-fsk-mult" min="2" max="5" value="3">
+                <span class="enc-param-val" id="enc-fsk-mult-val">3×</span>
+              </div>
+            </div>
+
+            <div class="enc-wave-stack">
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#06b6d4">DATA</span><div class="enc-wave-box"><canvas id="enc-canvas-data-a" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#f59e0b">ASK</span><div class="enc-wave-box"><canvas id="enc-canvas-ask" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#10b981">FSK</span><div class="enc-wave-box"><canvas id="enc-canvas-fsk" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#a78bfa">PSK</span><div class="enc-wave-box"><canvas id="enc-canvas-psk" class="enc-canvas"></canvas></div></div>
+            </div>
+            <div class="enc-chips" style="margin-top:14px">
+              <span class="enc-chip enc-chip-amber">ASK – Amplitude Shift Keying</span>
+              <span class="enc-chip enc-chip-green">FSK – Frequency Shift Keying</span>
+              <span class="enc-chip enc-chip-violet">PSK – Phase Shift Keying</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TAB: Digital ────────────────────────────────── -->
+        <div class="enc-tab-panel" id="enc-tab-digital">
+          <div class="util-card">
+            <div class="util-card-header">
+              <div class="util-card-icon" style="background:rgba(6,182,212,0.15)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 5 5 19 5 19 9"/><polyline points="5 15 5 19 19 19 19 15"/></svg></div>
+              <div><div class="util-card-title">Digital Line Coding Schemes</div><div class="util-card-sub">NRZ-L, NRZ-I, RZ, AMI — click bits to update</div></div>
+            </div>
+            <div class="enc-bit-label">Binary Data Bits</div>
+            <div class="enc-bit-grid" id="enc-digital-bits"></div>
+            <div class="enc-wave-stack" style="margin-top:14px">
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#06b6d4">DATA</span><div class="enc-wave-box"><canvas id="enc-canvas-data-d" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#f59e0b">NRZ-L</span><div class="enc-wave-box"><canvas id="enc-canvas-nrzl" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#10b981">NRZ-I</span><div class="enc-wave-box"><canvas id="enc-canvas-nrzi" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#a78bfa">RZ</span><div class="enc-wave-box"><canvas id="enc-canvas-rz" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#f43f5e">AMI</span><div class="enc-wave-box"><canvas id="enc-canvas-ami" class="enc-canvas"></canvas></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TAB: Manchester ─────────────────────────────── -->
+        <div class="enc-tab-panel" id="enc-tab-manchester">
+          <div class="util-card">
+            <div class="util-card-header">
+              <div class="util-card-icon" style="background:rgba(16,185,129,0.15)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
+              <div><div class="util-card-title">Manchester Encoding</div><div class="util-card-sub">IEEE 802.3, G.E. Thomas &amp; Differential Manchester</div></div>
+            </div>
+            <div class="enc-bit-label">Binary Data Bits (up to 8)</div>
+            <div class="enc-bit-grid" id="enc-manch-bits"></div>
+            <div class="enc-wave-stack" style="margin-top:14px">
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#06b6d4">DATA</span><div class="enc-wave-box"><canvas id="enc-canvas-data-m" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#10b981">IEEE 802.3</span><div class="enc-wave-box"><canvas id="enc-canvas-manch-ieee" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#f97316">G.E.Thomas</span><div class="enc-wave-box"><canvas id="enc-canvas-manch-g3" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#f43f5e">Diff. Manch.</span><div class="enc-wave-box"><canvas id="enc-canvas-diff-manch" class="enc-canvas"></canvas></div></div>
+            </div>
+            <div class="enc-chips" style="margin-top:14px">
+              <span class="enc-chip enc-chip-green">IEEE 802.3: 0=L→H, 1=H→L</span>
+              <span class="enc-chip enc-chip-cyan">G.E.Thomas: 0=H→L, 1=L→H</span>
+            </div>
+          </div>
+
+          <div class="util-card" style="margin-top:16px">
+            <div class="util-card-header">
+              <div class="util-card-icon" style="background:rgba(139,92,246,0.15)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></div>
+              <div><div class="util-card-title">4B/5B Encoding Table</div><div class="util-card-sub">Used in Fast Ethernet (100BASE-TX)</div></div>
+            </div>
+            <p style="font-size:.875rem;color:var(--text-secondary);margin-bottom:14px">Maps 4-bit nibbles to 5-bit codes ensuring no more than one leading zero and two trailing zeros.</p>
+            <div class="enc-code-table" id="enc-code-table-4b5b"></div>
+          </div>
+        </div>
+
+        <!-- ── TAB: Decoder ────────────────────────────────── -->
+        <div class="enc-tab-panel" id="enc-tab-decoder">
+          <div class="util-card">
+            <div class="util-card-header">
+              <div class="util-card-icon" style="background:rgba(244,63,94,0.15)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+              <div><div class="util-card-title">Signal Decoder</div><div class="util-card-sub">Paste encoded bits → choose scheme → decode</div></div>
+            </div>
+            <label class="enc-bit-label">Encoded Bit String</label>
+            <textarea class="enc-decoder-input" id="enc-decoder-input" placeholder="e.g. 01101001 for Manchester…"></textarea>
+            <div class="enc-ctrl-row" style="margin-top:12px">
+              <select class="enc-select" id="enc-decoder-scheme">
+                <option value="manchester-ieee">Manchester (IEEE 802.3)</option>
+                <option value="manchester-g3">Manchester (G.E. Thomas)</option>
+                <option value="diff-manchester">Differential Manchester</option>
+                <option value="4b5b">4B/5B → 4-bit nibbles</option>
+                <option value="nrzi">NRZ-I</option>
+                <option value="ami">AMI (+V/−V → 1)</option>
+              </select>
+              <button class="enc-btn" id="enc-decode-btn">Decode →</button>
+              <button class="enc-btn enc-btn-secondary" id="enc-clear-btn">Clear</button>
+            </div>
+            <div class="enc-result-box" id="enc-decoder-result" style="display:none">
+              <div class="enc-result-label">Decoded Output</div>
+              <div class="enc-result-bits" id="enc-decoded-bits"></div>
+              <div style="margin-top:6px;font-size:.78rem;color:var(--text-muted)" id="enc-decoded-info"></div>
+            </div>
+            <div id="enc-decoder-error" style="display:none;margin-top:10px;padding:12px;border-radius:8px;background:rgba(244,63,94,0.1);border:1px solid #f43f5e;color:#f43f5e;font-size:.875rem"></div>
+
+            <hr style="border:none;border-top:1px solid var(--border-color);margin:20px 0">
+
+            <div class="util-card-header">
+              <div class="util-card-icon" style="background:rgba(6,182,212,0.15)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg></div>
+              <div><div class="util-card-title">Encode Data Bits</div><div class="util-card-sub">Type raw bits → select scheme → see encoded output</div></div>
+            </div>
+            <label class="enc-bit-label">Raw Data Bits</label>
+            <input type="text" class="enc-decoder-input" style="height:auto" id="enc-encoder-raw" placeholder="e.g. 1101">
+            <div class="enc-ctrl-row" style="margin-top:10px">
+              <select class="enc-select" id="enc-encoder-scheme">
+                <option value="manchester-ieee">Manchester (IEEE 802.3)</option>
+                <option value="manchester-g3">Manchester (G.E. Thomas)</option>
+                <option value="diff-manchester">Differential Manchester</option>
+                <option value="4b5b">4B/5B (pad to nibbles)</option>
+                <option value="nrzi">NRZ-I</option>
+              </select>
+            </div>
+            <div class="enc-result-box" id="enc-encoder-result" style="display:none">
+              <div class="enc-result-label">Encoded Output</div>
+              <div class="enc-result-bits" id="enc-encoded-bits"></div>
+              <div style="margin-top:6px;font-size:.78rem;color:var(--text-muted)" id="enc-encoded-info"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TAB: Theory ─────────────────────────────────── -->
+        <div class="enc-tab-panel" id="enc-tab-theory">
+          <div class="util-card">
+            <div class="util-card-header">
+              <div class="util-card-icon" style="background:rgba(59,130,246,0.15)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+              <div><div class="util-card-title">Theory Reference — Signal Encoding</div><div class="util-card-sub">Key concepts for A/L ICT Paper 2</div></div>
+            </div>
+
+            <h3 style="color:#a78bfa;margin-bottom:10px">Key Terminology</h3>
+            <table class="sn-table" style="margin-bottom:20px">
+              <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Baud Rate</strong></td><td>Signal changes per second (symbols/sec)</td></tr>
+                <tr><td><strong>Bit Rate</strong></td><td>Data bits transmitted per second (bps)</td></tr>
+                <tr><td><strong>Carrier Wave</strong></td><td>Continuous analog signal used as a base for modulation</td></tr>
+                <tr><td><strong>Baseband</strong></td><td>Direct encoding as voltage levels (NRZ, Manchester)</td></tr>
+                <tr><td><strong>Broadband</strong></td><td>Bits encoded onto a carrier (ASK, FSK, PSK)</td></tr>
+                <tr><td><strong>DC Component</strong></td><td>Non-zero average voltage; problematic for transformers</td></tr>
+                <tr><td><strong>Self-Clocking</strong></td><td>Signal contains timing info (Manchester always has mid-bit transition)</td></tr>
+              </tbody>
+            </table>
+
+            <h3 style="color:#a78bfa;margin-bottom:10px">Scheme Comparison</h3>
+            <div style="overflow-x:auto">
+              <table class="sn-table">
+                <thead><tr><th>Scheme</th><th>Type</th><th>DC Component</th><th>Self-Clock</th><th>Noise Immunity</th><th>Used In</th></tr></thead>
+                <tbody>
+                  <tr><td>NRZ-L</td><td>Digital</td><td style="color:#f43f5e">Yes</td><td style="color:#f43f5e">No</td><td style="color:#f59e0b">Low</td><td>RS-232</td></tr>
+                  <tr><td>NRZ-I</td><td>Digital</td><td style="color:#f43f5e">Yes</td><td style="color:#f59e0b">Partial</td><td style="color:#f59e0b">Low</td><td>USB, HDLC</td></tr>
+                  <tr><td>RZ</td><td>Digital</td><td style="color:#10b981">No</td><td style="color:#10b981">Yes</td><td style="color:#f59e0b">Med</td><td>—</td></tr>
+                  <tr><td>AMI</td><td>Digital</td><td style="color:#10b981">No</td><td style="color:#f59e0b">Partial</td><td style="color:#10b981">High</td><td>T1/E1 lines</td></tr>
+                  <tr><td>Manchester</td><td>Digital</td><td style="color:#10b981">No</td><td style="color:#10b981">Yes</td><td style="color:#10b981">High</td><td>10BASE-T Ethernet</td></tr>
+                  <tr><td>Diff. Manchester</td><td>Digital</td><td style="color:#10b981">No</td><td style="color:#10b981">Yes</td><td style="color:#10b981">High</td><td>Token Ring</td></tr>
+                  <tr><td>4B/5B + NRZ-I</td><td>Digital</td><td style="color:#10b981">No</td><td style="color:#10b981">Yes</td><td style="color:#10b981">High</td><td>Fast Ethernet</td></tr>
+                  <tr><td>ASK</td><td>Analog</td><td style="color:#10b981">No</td><td style="color:#f43f5e">No</td><td style="color:#f43f5e">Low</td><td>Optical fiber</td></tr>
+                  <tr><td>FSK</td><td>Analog</td><td style="color:#10b981">No</td><td style="color:#f43f5e">No</td><td style="color:#f59e0b">Med</td><td>Radio modems</td></tr>
+                  <tr><td>PSK / BPSK</td><td>Analog</td><td style="color:#10b981">No</td><td style="color:#f43f5e">No</td><td style="color:#10b981">High</td><td>Wi-Fi, satellite</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="enc-theory-grid" style="margin-top:18px">
+              <div class="enc-theory-card">
+                <div class="enc-theory-tag enc-tag-analog">Nyquist</div>
+                <h3>Max Rate (Noiseless)</h3>
+                <p>Maximum bit rate for bandwidth B and M signal levels:</p>
+                <div class="enc-formula">Max bit rate = 2 × B × log₂(M)</div>
+              </div>
+              <div class="enc-theory-card">
+                <div class="enc-theory-tag enc-tag-analog">Shannon</div>
+                <h3>Max Rate (Noisy)</h3>
+                <p>Theoretical maximum considering signal-to-noise ratio:</p>
+                <div class="enc-formula">C = B × log₂(1 + SNR)</div>
+              </div>
+              <div class="enc-theory-card">
+                <div class="enc-theory-tag enc-tag-digital">Manchester</div>
+                <h3>Manchester Rule</h3>
+                <p>IEEE 802.3 convention for guaranteed mid-bit clocking:</p>
+                <div class="enc-formula">0 → Low→High (↑)
+1 → High→Low (↓)
+Always mid-bit transition!</div>
+              </div>
+              <div class="enc-theory-card">
+                <div class="enc-theory-tag enc-tag-spread">4B/5B</div>
+                <h3>4B/5B Efficiency</h3>
+                <p>4 data bits per 5-bit code, then NRZ-I on the wire:</p>
+                <div class="enc-formula">Efficiency = 4/5 = 80%
+100 Mbps wire rate →
+80 Mbps actual data</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TAB: Quiz ───────────────────────────────────── -->
+        <div class="enc-tab-panel" id="enc-tab-quiz">
+          <div class="util-card" style="text-align:center;padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div class="enc-trainer-icon" style="color:var(--color-cyan);margin-bottom:12px">
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
+            </div>
+            <div class="util-card-title" style="font-size:1.2rem;margin-bottom:4px">Signal Encoding Quiz</div>
+            <div class="util-card-sub">Interactive 5-Question Challenge</div>
+            <p style="font-size:.875rem;color:var(--text-secondary);margin-top:8px;margin-bottom:16px">
+              Test your A/L ICT knowledge of Analog/Digital line coding and formulas.
+            </p>
+            <button class="enc-btn" id="enc-quiz-start-btn" style="width:100%;font-size:1rem;padding:12px">Start Signal Quiz ➔</button>
+          </div>
+        </div>
+
+      </div><!-- .enc-container -->
     </section>
 
   </main>
@@ -789,9 +896,10 @@
     </div>
   </div>
 
-  <!-- App-wide Quiz Modal -->
+  <!-- Brilliant.org-style Quiz Modal -->
   <div class="success-modal-overlay" id="app-quiz-modal" style="display:none">
     <div class="success-modal app-quiz-modal-box" id="app-quiz-modal-box">
+      <!-- Modal Header -->
       <div class="quiz-modal-header">
         <div class="quiz-progress-container">
           <div class="quiz-progress-bar" id="quiz-modal-progress"></div>
@@ -802,13 +910,21 @@
         </div>
         <button class="quiz-modal-close" id="close-quiz-modal-btn">&times;</button>
       </div>
+      
+      <!-- Modal Content -->
       <div class="quiz-modal-body">
         <div id="quiz-modal-question-step">
           <div class="quiz-modal-q-num" id="quiz-modal-q-num">Question 1 of 5</div>
           <div class="quiz-modal-question" id="quiz-modal-question-text">Question goes here...</div>
+          
+          <!-- Answer area (text input or multiple choice) -->
           <div id="quiz-modal-answer-area"></div>
+          
+          <!-- Feedback Alert -->
           <div class="feedback-alert" id="quiz-modal-feedback"></div>
         </div>
+        
+        <!-- Summary Step (hidden by default) -->
         <div id="quiz-modal-summary-step" style="display:none">
           <div class="quiz-modal-summary-icon" id="quiz-modal-summary-icon"></div>
           <h2 class="quiz-modal-summary-title" id="quiz-modal-summary-title">Challenge Completed!</h2>
@@ -816,6 +932,8 @@
           <div class="quiz-modal-summary-xp" id="quiz-modal-summary-xp">+100 XP</div>
         </div>
       </div>
+      
+      <!-- Modal Footer -->
       <div class="quiz-modal-footer">
         <button class="btn-primary" id="quiz-modal-cta-btn" disabled>Check Answer</button>
       </div>

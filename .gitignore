@@ -35,3 +35,5 @@ pids
 *.tmp
 .cache/
 assets/*
+api/*
+data/*

@@ -22,18 +22,15 @@ if (document.readyState === 'loading') {
 
 function boot() {
   setupViewNavigation();
+  // Preload completion state for course map
+  if (window.syncCompletionState) window.syncCompletionState();
 }
 
 // ── Get all view panels (including those inside custom elements) ─
 function getAllPanels() {
-  // Panel inside <home-view> custom element (prioritized)
   const homeEl = document.querySelector('home-view');
   const homePanel = homeEl ? homeEl.querySelector('.home-view') : null;
-  
-  // Standard panels in <main>
   const direct = Array.from(document.querySelectorAll('main > .view-panel'));
-  
-  // Always include home panel if it exists
   if (homePanel) {
     return [homePanel, ...direct];
   }
@@ -42,9 +39,8 @@ function getAllPanels() {
 
 // ── View Navigation ───────────────────────────────────────────
 function setupViewNavigation() {
-  const tabs = document.querySelectorAll('.nav-tab');
+  const tabs = document.querySelectorAll('.nav-tab, .mobile-nav-btn');
 
-  // Track which modules have been initialised
   let subnettingReady = false;
   let encoderReady    = false;
 
@@ -53,11 +49,21 @@ function setupViewNavigation() {
       if (window.playSound) window.playSound('click');
       const target = tab.dataset.target;
 
-      // Deactivate all tabs
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
+      cleanupCurrentView();
 
-      // Deactivate ALL panels (including home-view and direct panels)
+      // Deactivate all nav tabs (desktop + mobile)
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.mobile-nav-btn').forEach(t => t.classList.remove('active'));
+
+      // Activate matching desktop tab
+      const desktopTab = document.querySelector(`.nav-tab[data-target="${target}"]`);
+      if (desktopTab) desktopTab.classList.add('active');
+
+      // Activate matching mobile tab
+      const mobileTab = document.querySelector(`.mobile-nav-btn[data-target="${target}"]`);
+      if (mobileTab) mobileTab.classList.add('active');
+
+      // Deactivate all panels
       getAllPanels().forEach(p => {
         if (p) p.classList.remove('active');
       });
@@ -71,7 +77,6 @@ function setupViewNavigation() {
         return;
       }
 
-      // Find and activate the target panel
       const targetPanel = document.querySelector(`.${target}`);
       if (targetPanel) {
         targetPanel.classList.add('active');
@@ -79,9 +84,11 @@ function setupViewNavigation() {
 
       // Per-view initialisation hooks
       if (target === 'course-map-view') {
+        if (window.syncCompletionState) window.syncCompletionState();
         if (window.renderCourseMap) setTimeout(window.renderCourseMap, 50);
 
       } else if (target === 'course-view') {
+        if (window.syncCourseProgression) window.syncCourseProgression();
         if (window.drawCourseWires) setTimeout(window.drawCourseWires, 50);
 
       } else if (target === 'explorer-view') {
@@ -107,9 +114,54 @@ function setupViewNavigation() {
     });
   });
 
-  // Expose a global helper so home-view.js can trigger tab changes
+  // Set initial active state on home nav
+  document.querySelectorAll('[data-target="home-view"]').forEach(t => t.classList.add('active'));
+
+  function cleanupCurrentView() {
+    if (window.cleanupCommon) window.cleanupCommon();
+    if (window.cleanupCourse) window.cleanupCourse();
+    if (window.cleanupCourseMap) window.cleanupCourseMap();
+    if (window.cleanupExplorer) window.cleanupExplorer();
+    if (window.cleanupSandbox) window.cleanupSandbox();
+  }
+
+  // Global navigation helper
   window.navigateToView = (targetClass) => {
     const tab = document.querySelector(`.nav-tab[data-target="${targetClass}"]`);
-    if (tab) tab.click();
+    if (tab) {
+      tab.click();
+    } else {
+      const mTab = document.querySelector(`.mobile-nav-btn[data-target="${targetClass}"]`);
+      if (mTab) {
+        mTab.click();
+      } else {
+        // Direct panel activation (e.g. for course-view)
+        cleanupCurrentView();
+
+        // Deactivate all nav tabs
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.mobile-nav-btn').forEach(t => t.classList.remove('active'));
+
+        // Deactivate all panels
+        getAllPanels().forEach(p => {
+          if (p) p.classList.remove('active');
+        });
+
+        // Activate target panel
+        const targetPanel = document.querySelector(`.${targetClass}`);
+        if (targetPanel) {
+          targetPanel.classList.add('active');
+        }
+
+        // Perform target-specific hook manually since tab click was bypassed
+        if (targetClass === 'course-view') {
+          if (window.syncCourseProgression) window.syncCourseProgression();
+          if (window.drawCourseWires) setTimeout(window.drawCourseWires, 50);
+        } else if (targetClass === 'course-map-view') {
+          if (window.syncCompletionState) window.syncCompletionState();
+          if (window.renderCourseMap) setTimeout(window.renderCourseMap, 50);
+        }
+      }
+    }
   };
 }

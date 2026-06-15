@@ -2,13 +2,11 @@
 //  Home View Component — <home-view>
 // ============================================================
 
-import template from './home-view.html?raw';
-import './home-view.css';
-
 const TOTAL_LESSONS = 9;
 
 class HomeView extends HTMLElement {
   connectedCallback() {
+    const template = document.getElementById('home-view-template').innerHTML;
     this.innerHTML = template;
     this._bindNavigation();
     this._syncProgress();

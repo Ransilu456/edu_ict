@@ -1,10 +1,15 @@
 // ============================================================
 //  LogicQuest Common Shared Utilities (Theme, Audio, XP Sync)
 // ============================================================
+import UserService from './user-service.js';
+
 
 // Web Audio API Synthesizer (Zero audio files required)
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let soundEnabled = localStorage.getItem("soundEnabled") !== "false";
+
+// Storage listener reference for cleanup
+let storageListener = null;
 
 function playSound(type) {
   if (!soundEnabled) return;
@@ -120,12 +125,11 @@ function initRestartProgress() {
   const resetBtn = document.getElementById("restart-course");
   if (!resetBtn) return;
   
-  resetBtn.addEventListener("click", () => {
+  resetBtn.addEventListener("click", async () => {
     playSound('click');
-    if (confirm("Are you sure you want to restart the course from the beginning? This will reset your XP.")) {
-      localStorage.setItem('logicQuest_step', 0);
+    if (confirm("Are you sure you want to restart the course from the beginning? This will reset your XP and progress.")) {
+      await UserService.reset();
       updateXPDisplay();
-      // If we are on the course page, trigger a reload or callback
       if (window.onRestartCourseProgression) {
         window.onRestartCourseProgression();
       } else {
@@ -136,14 +140,13 @@ function initRestartProgress() {
 }
 
 function updateXPDisplay() {
-  const scoreCount = document.getElementById("score-count");
-  if (scoreCount) {
-    // Get XP from completed lessons (each worth 10 XP) + extra XP
-    const completed = localStorage.getItem('logicQuest_completedLessons');
-    const completedLessons = new Set(completed ? JSON.parse(completed) : []);
-    const xp = completedLessons.size * 10 + (parseInt(localStorage.getItem('logicQuest_extraXp')) || 0);
-    scoreCount.innerText = xp;
-  }
+  const xp = UserService.getXP();
+
+  // Update all score-count elements on page
+  document.querySelectorAll('#score-count').forEach(el => {
+    el.innerText = xp;
+  });
+
   updateKeysDisplay();
   
   // Refresh course map if it's visible
@@ -158,19 +161,28 @@ function updateXPDisplay() {
 function updateKeysDisplay() {
   const keysCount = document.getElementById("keys-count");
   if (keysCount) {
-    let keys = localStorage.getItem('logicQuest_keys');
-    if (keys === null) {
-      keys = 5;
-      localStorage.setItem('logicQuest_keys', keys);
-    }
+    const keys = UserService.getKeys();
     keysCount.innerText = keys;
   }
 }
 window.updateXPDisplay = updateXPDisplay;
 
 // Listen for storage events (XP changes in other tabs)
-window.addEventListener('storage', (e) => {
-  if (e.key === 'logicQuest_step' || e.key === 'logicQuest_completedLessons' || e.key === 'logicQuest_extraXp') {
+// Store reference to listener for cleanup
+storageListener = async (e) => {
+  if (e.key === 'logicQuest_step' || e.key === 'logicQuest_completedLessons' || e.key === 'logicQuest_extraXp' || e.key === 'logicQuest_keys') {
+    await UserService.refresh();
     updateXPDisplay();
   }
-});
+};
+window.addEventListener('storage', storageListener);
+
+// Cleanup function to remove all event listeners and prevent memory leaks
+function cleanupCommon() {
+  // Remove storage listener
+  if (storageListener) {
+    window.removeEventListener('storage', storageListener);
+    storageListener = null;
+  }
+}
+window.cleanupCommon = cleanupCommon;

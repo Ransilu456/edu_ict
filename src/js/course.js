@@ -1,6 +1,7 @@
 // ============================================================
 //  LogicQuest Guided Course Module
 // ============================================================
+import UserService from './user-service.js';
 
 // Course Level Data
 const lessons = [
@@ -159,7 +160,7 @@ const lessons = [
   }
 ];
 
-let currentLessonIdx = parseInt(localStorage.getItem('logicQuest_step')) || 0;
+let currentLessonIdx = UserService.getCurrentStep();
 if (currentLessonIdx >= lessons.length) currentLessonIdx = 0;
 let selectedOptionIdx = null;
 let quizSubmitted = false;
@@ -189,15 +190,16 @@ if (document.readyState === "loading") {
   initCourse();
 }
 
-window.onRestartCourseProgression = () => {
+window.onRestartCourseProgression = async () => {
   currentLessonIdx = 0;
-  localStorage.setItem('logicQuest_step', 0);
+  await UserService.reset();
+  if (window.updateXPDisplay) window.updateXPDisplay();
   renderLesson();
 };
 
 window.loadLesson = (idx) => {
   currentLessonIdx = idx;
-  localStorage.setItem('logicQuest_step', idx);
+  UserService.save({ currentStep: idx });
   if (window.updateXPDisplay) window.updateXPDisplay();
   renderLesson();
 };
@@ -216,7 +218,7 @@ function initLessonSelect() {
     lessonSelect.addEventListener("change", (e) => {
       window.playSound('click');
       currentLessonIdx = parseInt(e.target.value);
-      localStorage.setItem('logicQuest_step', currentLessonIdx);
+      UserService.save({ currentStep: currentLessonIdx });
       if (window.updateXPDisplay) window.updateXPDisplay();
       renderLesson();
     });
@@ -342,7 +344,12 @@ document.getElementById("cta-btn").addEventListener("click", () => {
   } else {
     const feedback = document.getElementById("quiz-feedback");
     if (feedback.classList.contains("success")) {
-      // Mark lesson as complete
+      // Award XP and record via UserService (handles PHP + localStorage)
+      const quizAnswer = selectedOptionIdx !== null ? String.fromCharCode(65 + selectedOptionIdx) : null;
+      UserService.completeLesson(currentLessonIdx, 10, quizAnswer, true).then(() => {
+        if (window.updateXPDisplay) window.updateXPDisplay();
+      });
+      // Mark lesson as complete in course map
       if (window.markLessonComplete) {
         window.markLessonComplete(currentLessonIdx);
       }
@@ -351,12 +358,12 @@ document.getElementById("cta-btn").addEventListener("click", () => {
         showSuccessModal();
       } else {
         currentLessonIdx++;
-        localStorage.setItem('logicQuest_step', currentLessonIdx);
-        if (window.updateXPDisplay) window.updateXPDisplay();
+        UserService.save({ currentStep: currentLessonIdx });
         if (window.renderCourseMap) window.renderCourseMap();
         renderLesson();
       }
     } else {
+      // Retry: reset quiz state so user can try again
       renderLesson();
     }
   }
@@ -642,15 +649,15 @@ function renderVisualSimulation(type) {
   } else if (type === "course-complete") {
     html = `
       <div style="text-align: center; max-width: 400px; padding: 2rem;">
-        <div class="success-icon" style="width: 100px; height: 100px; margin-bottom: 2rem; background: var(--bg-tertiary);">
+        <div class="success-icon" style="width: 100px; height: 100px; margin-bottom: 2rem; background: var(--bg-tertiary); border-radius: 50%; display:flex; align-items:center; justify-content:center; color:var(--color-success); margin-left:auto; margin-right:auto;">
           <svg viewBox="0 0 24 24" width="50" height="50" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
         </div>
-        <h2 style="font-family: var(--font-header); font-size: 2.2rem; margin-bottom: 1rem;">You Did It!</h2>
-        <p style="color: var(--text-secondary); line-height: 1.6; font-size: 1.1rem; margin-bottom: 2rem;">
-          You successfully completed the Digital Logic Guided Course. Go ahead and experiment in the drag-and-drop sandbox!
+        <h2 style="font-family: var(--font-header); font-size: 2rem; margin-bottom: 1rem;">You Did It! 🏆</h2>
+        <p style="color: var(--text-secondary); line-height: 1.6; font-size: 1rem; margin-bottom: 2rem;">
+          You mastered Digital Logic! Experiment in the drag-and-drop Sandbox.
         </p>
-        <button class="btn-primary" style="margin: 0 auto; width: auto;" onclick="location.href='sandbox.html'">
-          Open Sandbox Canvas
+        <button class="btn-primary" style="margin: 0 auto; width: auto; padding: 0.75rem 2rem;" onclick="window.navigateToView && window.navigateToView('sandbox-view')">
+          Open Sandbox Canvas →
         </button>
       </div>
     `;
@@ -915,3 +922,8 @@ function createConfetti() {
 }
 
 window.drawCourseWires = drawCourseWires;
+window.syncCourseProgression = () => {
+  currentLessonIdx = UserService.getCurrentStep();
+  if (currentLessonIdx >= lessons.length) currentLessonIdx = 0;
+  renderLesson();
+};

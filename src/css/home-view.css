@@ -483,3 +483,184 @@
   }
   .fg-2, .fg-4, .fg-5 { display: none; }
 }
+
+/* Additional improvements for smaller mobile devices (< 640px) */
+@media (max-width: 640px) {
+  .hero-section {
+    padding: 1.5rem 0.75rem 2rem;
+    gap: 1.25rem;
+    min-height: auto;
+  }
+
+  .hero-badge {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.65rem;
+  }
+
+  .hero-title {
+    font-size: 1.6rem;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .hero-title-accent {
+    display: block;
+    margin-top: 0.25rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .hero-content {
+    gap: 1rem;
+  }
+
+  .hero-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .hero-cta-primary,
+  .hero-cta-secondary {
+    width: 100%;
+    padding: 0.85rem;
+    font-size: 0.9rem;
+  }
+
+  .hero-stats-row {
+    width: 100%;
+    font-size: 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .hero-stat-pill {
+    gap: 0.2rem;
+  }
+
+  .hero-stat-val {
+    font-size: 0.95rem;
+  }
+
+  .hero-stat-label {
+    font-size: 0.65rem;
+  }
+
+  .hero-stat-sep {
+    display: none;
+  }
+
+  .home-features-section {
+    padding: 1rem 0.75rem 2rem;
+  }
+
+  .home-features-title {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .home-features-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .feature-card {
+    padding: 0.85rem;
+  }
+
+  .feat-card-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .feat-card-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .feat-card-title {
+    font-size: 0.95rem;
+  }
+
+  .feat-card-desc {
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+
+  .feat-card-tags {
+    gap: 0.3rem;
+  }
+
+  .feat-tag {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.45rem;
+  }
+
+  .feat-card-arrow {
+    font-size: 1rem;
+    right: 1rem;
+  }
+
+  /* Hide floating gates on very small screens */
+  .hero-floating-gates {
+    opacity: 0.1;
+  }
+
+  /* Progress card adjustments */
+  .progress-mini-bar-track {
+    height: 12px;
+  }
+
+  .progress-mini-pct {
+    font-size: 0.8rem;
+    min-width: 32px;
+  }
+}
+
+/* Extra small phones (< 480px) */
+@media (max-width: 479px) {
+  .hero-section {
+    padding: 1rem 0.5rem 1.5rem;
+    gap: 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.4rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .hero-cta-primary,
+  .hero-cta-secondary {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .home-features-section {
+    padding: 0.75rem 0.5rem 1.5rem;
+  }
+
+  .home-features-title {
+    font-size: 1.2rem;
+  }
+
+  .feature-card {
+    padding: 0.7rem;
+  }
+
+  .feat-card-title {
+    font-size: 0.9rem;
+  }
+
+  .feat-card-desc {
+    font-size: 0.75rem;
+  }
+
+  .feat-tag {
+    font-size: 0.6rem;
+  }
+}
