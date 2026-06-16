@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 :root {
-  /* Colorful Gamified Light Theme (Warm Cream & Pastel Accents) */
   --bg-primary: #faf6eb;
   --bg-secondary: #ffffff;
   --bg-tertiary: #f2ede0;
   --border-color: #e2dbcd;
+  --bg-mobile: #e2dbcd;
 
   --text-primary: #3c3c3c;
   --text-secondary: #777777;
@@ -24,6 +24,7 @@
   --color-success: #58cc02;
   --color-error: #ea2b2b;
   --color-amber: #ff9600;
+  --color-label: #100036b9;
 
   --font-sans: 'Inter', sans-serif;
   --font-header: 'Outfit', sans-serif;
@@ -35,11 +36,13 @@
 }
 
 :root.dark-theme {
-  /* Colorful Gamified Dark Theme (Deep Indigo & Soft Gradients) */
   --bg-primary: #15131c;
   --bg-secondary: #201d29;
   --bg-tertiary: #2a2736;
   --border-color: #353144;
+  --bg-mobile: transparent;
+
+  --color-label: #817e8d;
 
   --text-primary: #f5f4f7;
   --text-secondary: #bbb8c4;
@@ -3671,14 +3674,7 @@ home-view:has(.home-view.active) {
   color: var(--color-success);
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   COMPREHENSIVE RESPONSIVE DESIGN OVERHAUL
-   Mobile-first approach with breakpoints: 360px, 480px, 640px, 768px, 1024px, 1280px
-   ═══════════════════════════════════════════════════════════════════════ */
 
-/* ───────────────────────────────────────────────────────────────────────
-   EXTRA SMALL DEVICES: 360px - 479px (Mobile Portrait)
-   ─────────────────────────────────────────────────────────────────────── */
 @media (max-width: 479px) {
   /* Header & Navigation */
   header {
@@ -4015,9 +4011,7 @@ home-view:has(.home-view.active) {
   }
 }
 
-/* ───────────────────────────────────────────────────────────────────────
-   SMALL DEVICES: 480px - 639px (Mobile Landscape)
-   ─────────────────────────────────────────────────────────────────────── */
+
 @media (min-width: 480px) and (max-width: 639px) {
   header {
     padding: 0.85rem 1rem;
@@ -4028,7 +4022,7 @@ home-view:has(.home-view.active) {
   }
 
   nav {
-    display: none; /* Still hidden, use hamburger */
+    display: none;
   }
 
   .hero-section {
@@ -4507,7 +4501,6 @@ home-view:has(.home-view.active) {
     margin: 0.5rem 0 0.25rem 0;
   }
 
-  /* Quiz styling for mobile */
   .quiz-container {
     display: flex;
     flex-direction: column;
@@ -4609,11 +4602,6 @@ home-view:has(.home-view.active) {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   EXPLORER, SUBNETTING & OTHER MODULES RESPONSIVE IMPROVEMENTS
-   ═══════════════════════════════════════════════════════════════════════ */
-
-/* Explorer improvements for mobile */
 @media (max-width: 767px) {
   .explorer-sidebar {
     width: 100%;
@@ -4640,7 +4628,6 @@ home-view:has(.home-view.active) {
   }
 }
 
-/* Subnetting improvements for mobile */
 @media (max-width: 767px) {
   .sn-container {
     grid-template-columns: 1fr;
@@ -4687,7 +4674,6 @@ home-view:has(.home-view.active) {
   }
 }
 
-/* Sandbox improvements for mobile */
 @media (max-width: 767px) {
   .sandbox-toolbox {
     width: 100%;
@@ -4711,7 +4697,6 @@ home-view:has(.home-view.active) {
   }
 }
 
-/* Encoder improvements for mobile */
 @media (max-width: 767px) {
   .enc-params-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -4740,10 +4725,6 @@ home-view:has(.home-view.active) {
     font-size: 0.9rem;
   }
 }
-
-/* ═══════════════════════════════════════════════════════════════════════
-   UTILITY MODULES (Sandbox theory guide, learning cards)
-   ═══════════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 767px) {
   .sandbox-learning-card {
@@ -4775,10 +4756,6 @@ home-view:has(.home-view.active) {
     padding: 3px 4px;
   }
 }
-
-/* ═══════════════════════════════════════════════════════════════════════
-   MODALS AND DIALOGS RESPONSIVE
-   ═══════════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 639px) {
   .modal {
@@ -4833,10 +4810,6 @@ home-view:has(.home-view.active) {
     font-size: 0.85rem;
   }
 }
-
-/* ═══════════════════════════════════════════════════════════════════════
-   COURSE MAP RESPONSIVE IMPROVEMENTS
-   ═══════════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 767px) {
   .course-map-header {
@@ -4903,10 +4876,6 @@ home-view:has(.home-view.active) {
   }
 }
 
-/* ══════════════════════════════════════════════════════════
-   MOBILE NAVBAR (Bottom Navigation) — Mobile Only
-══════════════════════════════════════════════════════════ */
-
 .mobile-navbar {
   display: none;
   position: fixed;
@@ -4914,9 +4883,8 @@ home-view:has(.home-view.active) {
   left: 0;
   right: 0;
   height: 80px;
-  background: var(--bg-elevated);
-     background: #ffe18936;
-    backdrop-filter: blur(50px);
+  background: var(--bg-mobile);
+  backdrop-filter: blur(50px);
   border-top: 1px solid var(--border-color);
   padding-top: 0.5rem;
   z-index: 98;
@@ -4934,7 +4902,7 @@ home-view:has(.home-view.active) {
   padding: 0.5rem;
   border: none;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--color-label);
   cursor: pointer;
   font-size: 0.7rem;
   font-family: var(--font-header);
@@ -4956,7 +4924,6 @@ home-view:has(.home-view.active) {
   transform: scale(0.95);
 }
 
-/* Show mobile navbar on mobile devices */
 @media (max-width: 768px) {
   .mobile-navbar {
     display: flex;
@@ -4970,10 +4937,6 @@ home-view:has(.home-view.active) {
     display: none;
   }
 }
-
-/* ══════════════════════════════════════════════════════════
-   GLOBAL FOOTER
-══════════════════════════════════════════════════════════ */
 
 .global-footer {
   background: var(--bg-elevated);
@@ -4998,19 +4961,12 @@ home-view:has(.home-view.active) {
   }
 }
 
-/* ══════════════════════════════════════════════════════════════════════
-   MOBILE NAV ACTIVE STATE
-══════════════════════════════════════════════════════════════════════ */
 .mobile-navbar .mobile-nav-btn.active {
   color: var(--color-indigo);
 }
 .mobile-navbar .mobile-nav-btn.active svg {
   stroke: var(--color-indigo);
 }
-
-/* ══════════════════════════════════════════════════════════════════════
-   REDESIGNED COURSE MAP — Beautiful Duolingo-Style Path
-══════════════════════════════════════════════════════════════════════ */
 
 .course-map-page {
   max-width: 700px;
@@ -5021,7 +4977,6 @@ home-view:has(.home-view.active) {
   gap: 1.5rem;
 }
 
-/* ── Hero Header ── */
 .cm-hero {
   display: flex;
   justify-content: space-between;
@@ -6313,7 +6268,7 @@ home-view:has(.home-view.active) {
   -webkit-user-drag: element;
 }
 
-/* On mobile: toolbox becomes a horizontal scrollable pill row */
+
 @media (max-width: 768px) {
   .sandbox-view {
     display: flex;
@@ -6341,14 +6296,12 @@ home-view:has(.home-view.active) {
 
   .sandbox-toolbox::-webkit-scrollbar { display: none !important; }
 
-  /* Hide verbose sidebar headings/text on mobile */
   .sandbox-toolbox > h3,
   .sandbox-toolbox > p,
   .toolbox-section-title {
     display: none !important;
   }
 
-  /* Each toolbox section becomes a horizontal pill group */
   .toolbox-section {
     display: flex !important;
     flex-direction: column !important;
@@ -6357,7 +6310,7 @@ home-view:has(.home-view.active) {
     margin-bottom: 0 !important;
   }
 
-  /* Toolbox section category header */
+
   .toolbox-section::before {
     display: none;
   }
@@ -6370,7 +6323,7 @@ home-view:has(.home-view.active) {
     white-space: nowrap !important;
   }
 
-  /* Workspace — tall enough to work on phone */
+  /* Workspace*/
   .sandbox-workspace {
     width: 100% !important;
     height: 500px !important;
@@ -6380,7 +6333,6 @@ home-view:has(.home-view.active) {
     overflow: hidden !important;
   }
 
-  /* Toolbar wraps on small screens */
   .sandbox-toolbar {
     flex-wrap: wrap !important;
     top: 0.4rem !important;
@@ -6401,7 +6353,6 @@ home-view:has(.home-view.active) {
     height: 11px !important;
   }
 
-  /* Sandbox node: larger touch targets */
   .sandbox-node {
     min-width: 80px !important;
   }
@@ -6411,7 +6362,6 @@ home-view:has(.home-view.active) {
     height: 14px !important;
   }
 
-  /* Theory card on mobile */
   .sandbox-learning-card {
     width: calc(100vw - 1rem) !important;
     max-width: calc(100vw - 1rem) !important;
@@ -6419,9 +6369,17 @@ home-view:has(.home-view.active) {
     left: 0.5rem !important;
     right: 0.5rem !important;
   }
+
+  .template-grid{
+    display: none !important;
+  }
+
+  .template-card{
+    display: none !important;
+  }
 }
 
-/* Extra-small phones */
+
 @media (max-width: 420px) {
   .sandbox-workspace {
     height: 420px !important;
