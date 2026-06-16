@@ -6271,3 +6271,175 @@ home-view:has(.home-view.active) {
   .cm-vnode-card { min-width: 120px; max-width: 155px; padding: 0.5rem 0.75rem; }
   .cm-vnode-card-title { font-size: 0.8rem; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   TOUCH DRAG GHOST — shown when dragging toolbox items on mobile
+══════════════════════════════════════════════════════════════════════ */
+.touch-drag-ghost {
+  position: fixed;
+  z-index: 9999;
+  background: var(--color-indigo);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-family: var(--font-header);
+  font-weight: 700;
+  pointer-events: none;
+  opacity: 0.92;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  white-space: nowrap;
+  transform: scale(1.08);
+  animation: ghostAppear 0.12s ease;
+}
+
+@keyframes ghostAppear {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 0.92; transform: scale(1.08); }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SANDBOX MOBILE — Improved toolbox & workspace layout
+══════════════════════════════════════════════════════════════════════ */
+
+/* Ensure nodes use touch-action: none so the browser doesn't interfere
+   with our custom touch drag handlers */
+.sandbox-node {
+  touch-action: none;
+}
+
+.toolbox-item {
+  touch-action: none;
+  -webkit-user-drag: element;
+}
+
+/* On mobile: toolbox becomes a horizontal scrollable pill row */
+@media (max-width: 768px) {
+  .sandbox-view {
+    display: flex;
+    flex-direction: column !important;
+    height: auto !important;
+  }
+
+  .sandbox-toolbox {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    border-right: none !important;
+    border-bottom: 2px solid var(--border-color) !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 0.6rem 0.75rem !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0.75rem !important;
+    align-items: flex-start !important;
+    scrollbar-width: none !important;
+    flex-shrink: 0 !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sandbox-toolbox::-webkit-scrollbar { display: none !important; }
+
+  /* Hide verbose sidebar headings/text on mobile */
+  .sandbox-toolbox > h3,
+  .sandbox-toolbox > p,
+  .toolbox-section-title {
+    display: none !important;
+  }
+
+  /* Each toolbox section becomes a horizontal pill group */
+  .toolbox-section {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.35rem !important;
+    flex-shrink: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Toolbox section category header */
+  .toolbox-section::before {
+    display: none;
+  }
+
+  .toolbox-item {
+    padding: 0.45rem 0.7rem !important;
+    font-size: 0.72rem !important;
+    gap: 0.3rem !important;
+    min-height: 36px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Workspace — tall enough to work on phone */
+  .sandbox-workspace {
+    width: 100% !important;
+    height: 500px !important;
+    min-height: 400px !important;
+    flex: none !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  /* Toolbar wraps on small screens */
+  .sandbox-toolbar {
+    flex-wrap: wrap !important;
+    top: 0.4rem !important;
+    right: 0.4rem !important;
+    gap: 0.2rem !important;
+    padding: 0.2rem !important;
+    max-width: calc(100% - 0.8rem) !important;
+  }
+
+  .sandbox-btn {
+    padding: 0.3rem 0.4rem !important;
+    font-size: 0.68rem !important;
+    gap: 0.2rem !important;
+  }
+
+  .sandbox-btn svg {
+    width: 11px !important;
+    height: 11px !important;
+  }
+
+  /* Sandbox node: larger touch targets */
+  .sandbox-node {
+    min-width: 80px !important;
+  }
+
+  .sandbox-port {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  /* Theory card on mobile */
+  .sandbox-learning-card {
+    width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
+    max-height: 70vh !important;
+    left: 0.5rem !important;
+    right: 0.5rem !important;
+  }
+}
+
+/* Extra-small phones */
+@media (max-width: 420px) {
+  .sandbox-workspace {
+    height: 420px !important;
+    min-height: 380px !important;
+  }
+
+  .toolbox-item {
+    padding: 0.4rem 0.55rem !important;
+    font-size: 0.68rem !important;
+    min-height: 32px !important;
+  }
+
+  .sandbox-toolbar {
+    gap: 0.15rem !important;
+  }
+
+  .sandbox-btn {
+    padding: 0.25rem 0.35rem !important;
+    font-size: 0.62rem !important;
+  }
+}

@@ -190,8 +190,15 @@ function sn_calculateIpSubnet() {
 
   const rawVal = ipInput.value.trim();
   const parts  = rawVal.split('.');
-  if (parts.length !== 4 || parts.some(p => isNaN(parseInt(p)) || parseInt(p) < 0 || parseInt(p) > 255)) {
-    resultBox.style.display = 'none';
+  if (parts.length !== 4 || parts.some(p => !/^\d+$/.test(p) || parseInt(p, 10) < 0 || parseInt(p, 10) > 255)) {
+    resultBox.style.display = 'block';
+    resultBox.innerHTML = `
+      <div style="font-weight:700;font-family:var(--font-header);color:var(--color-error);margin-bottom:5px;">
+        Invalid IP Address Format
+      </div>
+      <p style="font-size:0.825rem;color:var(--text-secondary);margin:0;line-height:1.4">
+        Please enter a valid IPv4 address in dot-decimal format (e.g. 192.168.1.150).
+      </p>`;
     return;
   }
 

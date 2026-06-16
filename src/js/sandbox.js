@@ -167,7 +167,8 @@ function setupDragAndDrop() {
     const type = item.dataset.type;
     const label = item.querySelector('span')?.innerText || type;
 
-    // HTML5 drag start
+    // HTML5 drag start (desktop)
+    item.setAttribute('draggable', 'true');
     item.addEventListener('dragstart', (e) => {
       e.dataTransfer.effectAllowed = 'copy';
       e.dataTransfer.setData('type', type);
@@ -179,11 +180,84 @@ function setupDragAndDrop() {
       if (!workspace) return;
       const r = workspace.getBoundingClientRect();
       placeNode(type, label, r.width / 2 - 60, r.height / 2 - 40);
+      showToast(`${label} placed ✓`);
+    });
+
+    // ── Touch-drag from toolbox to workspace (mobile) ──────────
+    let touchDragGhost = null;
+    let touchDragActive = false;
+
+    item.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      touchDragActive = false;
+      const touch = e.touches[0];
+
+      // Create ghost element
+      touchDragGhost = document.createElement('div');
+      touchDragGhost.className = 'touch-drag-ghost';
+      touchDragGhost.textContent = label;
+      touchDragGhost.style.cssText = `
+        position: fixed;
+        z-index: 9999;
+        background: var(--color-indigo);
+        color: #fff;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-family: var(--font-header);
+        font-weight: 700;
+        pointer-events: none;
+        opacity: 0.92;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+        left: ${touch.clientX - 40}px;
+        top: ${touch.clientY - 20}px;
+        white-space: nowrap;
+        transform: scale(1.1);
+        transition: transform 0.1s;
+      `;
+      document.body.appendChild(touchDragGhost);
+    }, { passive: true });
+
+    item.addEventListener('touchmove', (e) => {
+      if (!touchDragGhost) return;
+      e.preventDefault();
+      touchDragActive = true;
+      const touch = e.touches[0];
+      touchDragGhost.style.left = `${touch.clientX - 40}px`;
+      touchDragGhost.style.top = `${touch.clientY - 20}px`;
+
+      // Highlight workspace if over it
+      const wr = workspace.getBoundingClientRect();
+      const over = touch.clientX >= wr.left && touch.clientX <= wr.right &&
+                   touch.clientY >= wr.top  && touch.clientY <= wr.bottom;
+      workspace.classList.toggle('drag-over', over);
+    }, { passive: false });
+
+    item.addEventListener('touchend', (e) => {
+      if (touchDragGhost) {
+        touchDragGhost.remove();
+        touchDragGhost = null;
+      }
+      workspace.classList.remove('drag-over');
+      if (!touchDragActive) return; // was a tap, handled by click
+      touchDragActive = false;
+
+      const touch = e.changedTouches[0];
+      const wr = workspace.getBoundingClientRect();
+      const inWorkspace = touch.clientX >= wr.left && touch.clientX <= wr.right &&
+                          touch.clientY >= wr.top  && touch.clientY <= wr.bottom;
+      if (inWorkspace) {
+        const dropX = touch.clientX - wr.left - 60;
+        const dropY = touch.clientY - wr.top  - 30;
+        placeNode(type, label, dropX, dropY);
+        showToast(`${label} placed ✓`);
+      }
     });
   });
 
   // Draggable templates
   document.querySelectorAll('.template-card').forEach(card => {
+    card.setAttribute('draggable', 'true');
     card.addEventListener('dragstart', (e) => {
       e.dataTransfer.effectAllowed = 'copy';
       e.dataTransfer.setData('type', 'template');
@@ -740,27 +814,42 @@ function getOutputPortLabels(type) {
 
 // ── Drag ─────────────────────────────────────────────────────
 function startDrag(e, node) {
-  if (e.type !== 'touchstart') e.preventDefault();
+  // Prevent page scroll while dragging on touch
+  if (e.type === 'touchstart') {
+    e.preventDefault();
+  } else {
+    e.preventDefault();
+  }
   selectNode(node.id);
   isDragging = false;
 
-  const getClientPos = (ev) => ev.type.startsWith('touch')
-    ? { x: ev.touches[0].clientX, y: ev.touches[0].clientY }
-    : { x: ev.clientX, y: ev.clientY };
+  const getClientPos = (ev) => {
+    if (ev.type.startsWith('touch')) {
+      const t = ev.touches && ev.touches.length ? ev.touches[0] : ev.changedTouches[0];
+      return { x: t.clientX, y: t.clientY };
+    }
+    return { x: ev.clientX, y: ev.clientY };
+  };
 
-  const start = getClientPos(e);
-  const startX = start.x - node.x;
-  const startY = start.y - node.y;
+  // Get workspace offset so we can correctly map to canvas coords
+  const workspaceRect = workspace.getBoundingClientRect();
+  const startClient = getClientPos(e);
+
+  // Offset of pointer within the node element itself
+  const offsetX = startClient.x - workspaceRect.left - node.x;
+  const offsetY = startClient.y - workspaceRect.top  - node.y;
 
   function onMove(mv) {
+    if (mv.cancelable) mv.preventDefault();
     isDragging = true;
     const cur = getClientPos(mv);
-    node.x = Math.max(0, Math.round((cur.x - startX) / 10) * 10);
-    node.y = Math.max(0, Math.round((cur.y - startY) / 10) * 10);
+    const wr = workspace.getBoundingClientRect();
+    node.x = Math.max(0, Math.round((cur.x - wr.left - offsetX) / 10) * 10);
+    node.y = Math.max(0, Math.round((cur.y - wr.top  - offsetY) / 10) * 10);
     const domEl = document.getElementById(node.id);
     if (domEl) {
       domEl.style.left = `${node.x}px`;
-      domEl.style.top = `${node.y}px`;
+      domEl.style.top  = `${node.y}px`;
     }
     updateSandboxWires();
   }
@@ -771,12 +860,13 @@ function startDrag(e, node) {
     window.removeEventListener('touchmove', onMove);
     window.removeEventListener('touchend', onUp);
     setTimeout(() => { isDragging = false; }, 50);
+    pushUndo();
   }
 
   window.addEventListener('mousemove', onMove);
   window.addEventListener('mouseup', onUp);
   window.addEventListener('touchmove', onMove, { passive: false });
-  window.addEventListener('touchend', onUp);
+  window.addEventListener('touchend', onUp, { passive: true });
 }
 
 // ── Selection ────────────────────────────────────────────────
