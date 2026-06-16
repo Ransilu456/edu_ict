@@ -1,8 +1,4 @@
-// ============================================================
-//  LogicQuest Gate Explorer Module
-// ============================================================
 
-// Gate Explorer List
 const gatesCatalog = [
   { name: "AND", symbol: "AND", formula: "A • B", desc: "Outputs 1 if both inputs are 1.", truthTable: [[0,0,0],[0,1,0],[1,0,0],[1,1,1]] },
   { name: "OR", symbol: "OR", formula: "A + B", desc: "Outputs 1 if at least one input is 1.", truthTable: [[0,0,0],[0,1,1],[1,0,1],[1,1,1]] },
@@ -18,7 +14,6 @@ function initGateExplorer() {
   initExplorer();
   renderExplorerGate();
   
-  // Wire re-render on resize
   window.addEventListener('resize', () => {
     drawExplorerWires();
   });
@@ -57,11 +52,9 @@ function renderExplorerGate() {
   const gate = gatesCatalog[activeExplorerGateIdx];
   if (!gate) return;
   
-  // Render main descriptive texts
   document.getElementById("exp-gate-title").innerText = `${gate.name} Gate Explorer`;
   document.getElementById("exp-gate-desc").innerText = gate.desc;
   
-  // Setup Simulator box HTML
   const simBox = document.getElementById("explorer-sim-box");
   simBox.innerHTML = `
     <svg class="wires-svg" id="exp-wires-svg"></svg>
@@ -92,7 +85,6 @@ function renderExplorerGate() {
     </div>
   `;
   
-  // Add Explorer Inputs click hooks
   const inputs = simBox.querySelectorAll(".exp-input");
   inputs.forEach(input => {
     input.addEventListener("click", () => {
@@ -103,13 +95,10 @@ function renderExplorerGate() {
     });
   });
   
-  // Render Truth Table
   renderTruthTable(gate);
   
-  // Render Transistor Circuit Explanation
   renderTransistorCircuitDetails(gate.name);
   
-  // Render Universality Card for NAND / NOR
   const univCard = document.getElementById("exp-universality-desc");
   if (univCard) {
     if (gate.universal) {
@@ -174,10 +163,8 @@ function evaluateExplorerGate() {
     }
   }
   
-  // Update wires
   drawExplorerWires();
   
-  // Highlight Truth Table Row matching input
   highlightTruthTableRow(inA, inB);
 }
 
@@ -242,7 +229,6 @@ function renderTruthTable(gate) {
   if (!table) return;
   table.innerHTML = "";
   
-  // Create Headers
   const headerTr = document.createElement("tr");
   if (gate.name === "NOT") {
     headerTr.innerHTML = "<th>Input A</th><th>Output Y</th>";
@@ -251,7 +237,6 @@ function renderTruthTable(gate) {
   }
   table.appendChild(headerTr);
   
-  // Create Rows
   gate.truthTable.forEach(row => {
     const tr = document.createElement("tr");
     tr.className = "truth-table-row";

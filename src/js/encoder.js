@@ -1,7 +1,3 @@
-// ============================================================
-//  LogicQuest — Signal Encoding Lab Module
-//  All DOM IDs are prefixed with "enc-" to prevent conflicts
-// ============================================================
 
 const DEFAULT_BITS = [1, 0, 1, 1, 0, 1, 0, 0];
 
@@ -17,13 +13,11 @@ export function initEncoder() {
   createBitToggles('enc-manch-bits',   enc_manchBits,   updateManchester);
   build4b5bTable();
 
-  // Param sliders
   const bind = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('input', fn); };
   bind('enc-carrier-freq', updateAnalog);
   bind('enc-ask-amp',      updateAnalog);
   bind('enc-fsk-mult',     updateAnalog);
 
-  // Decoder
   const decBtn = document.getElementById('enc-decode-btn');
   if (decBtn) decBtn.addEventListener('click', runDecoder);
   const clrBtn = document.getElementById('enc-clear-btn');
@@ -33,7 +27,6 @@ export function initEncoder() {
   const encScheme = document.getElementById('enc-encoder-scheme');
   if (encScheme) encScheme.addEventListener('change', runEncoder);
 
-  // Internal tab strip
   const tabStrip = document.getElementById('enc-tab-strip');
   if (tabStrip) {
     tabStrip.addEventListener('click', e => {
@@ -52,10 +45,8 @@ export function initEncoder() {
     });
   }
 
-  // Bandwidth Calculator
   initBandwidthCalc();
 
-  // Quiz start
   const qStartBtn = document.getElementById('enc-quiz-start-btn');
   if (qStartBtn) qStartBtn.addEventListener('click', startEncoderQuiz);
 
@@ -66,7 +57,6 @@ export function initEncoder() {
   }, 120);
 }
 
-// ── Bit toggle grid ───────────────────────────────────────────
 function createBitToggles(containerId, bits, onChange) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -87,7 +77,6 @@ function createBitToggles(containerId, bits, onChange) {
   });
 }
 
-// ── Canvas helpers ────────────────────────────────────────────
 function resizeCanvas(id) {
   const canvas = document.getElementById(id);
   if (!canvas) return null;
@@ -113,7 +102,6 @@ function drawGrid(ctx, w, h) {
   ctx.beginPath(); ctx.moveTo(0, h/2); ctx.lineTo(w, h/2); ctx.stroke();
 }
 
-// ── Analog Encoding ───────────────────────────────────────────
 function updateAnalog() {
   const getVal = (id, def) => { const el = document.getElementById(id); return el ? parseInt(el.value) : def; };
   const freq = getVal('enc-carrier-freq', 3);
@@ -184,7 +172,6 @@ function drawPsk(bits, freq, amp) {
   drawSineSegments('enc-canvas-psk', bits, () => freq, () => amp, b => b ? '#a78bfa' : '#7c3aed', b => b ? 0 : Math.PI);
 }
 
-// ── Digital Line Codes ────────────────────────────────────────
 function updateDigital() {
   drawDataWave(enc_digitalBits, 'enc-canvas-data-d', '#06b6d4');
   drawNrzL();

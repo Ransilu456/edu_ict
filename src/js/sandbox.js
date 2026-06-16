@@ -226,7 +226,6 @@ function setupDragAndDrop() {
       touchDragGhost.style.left = `${touch.clientX - 40}px`;
       touchDragGhost.style.top = `${touch.clientY - 20}px`;
 
-      // Highlight workspace if over it
       const wr = workspace.getBoundingClientRect();
       const over = touch.clientX >= wr.left && touch.clientX <= wr.right &&
                    touch.clientY >= wr.top  && touch.clientY <= wr.bottom;
@@ -295,7 +294,6 @@ function setupDragAndDrop() {
 
 // ── Toolbar Setup ────────────────────────────────────────────
 function setupToolbar() {
-  // ─ Play / Pause
   const playBtn = document.getElementById('sandbox-play');
   playBtn?.addEventListener('click', () => {
     isSimRunning = !isSimRunning;
@@ -311,7 +309,6 @@ function setupToolbar() {
     }
   });
 
-  // ─ Undo button
   const undoBtn = document.getElementById('sandbox-undo');
   if (undoBtn) {
     undoBtn.disabled = true;

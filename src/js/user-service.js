@@ -1,9 +1,4 @@
-// ============================================================
-//  LogicQuest — UserService (localStorage-only, no PHP)
-//  All progress is stored in the browser's localStorage.
-// ============================================================
 
-// ── UUID helper ────────────────────────────────────────────────
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
@@ -14,9 +9,7 @@ function generateUUID() {
 
 let _cache = null;
 
-// ── Public API ────────────────────────────────────────────────
 export const UserService = {
-  /** Retrieve or create the user's UUID (persisted in localStorage) */
   getUserId() {
     let uid = localStorage.getItem('logicQuest_userId');
     if (!uid) {
@@ -26,19 +19,12 @@ export const UserService = {
     return uid;
   },
 
-  /**
-   * Load user state from localStorage.
-   * Returns the user object and caches it internally.
-   */
   async load() {
     const userId = this.getUserId();
     _cache = this._loadFromLocal(userId);
     return _cache;
   },
 
-  /**
-   * Save user state to localStorage.
-   */
   async save(partialState = {}) {
     const userId = this.getUserId();
     if (_cache) {
@@ -50,9 +36,6 @@ export const UserService = {
     return _cache;
   },
 
-  /**
-   * Mark a lesson as complete. Awards XP, updates step, records quiz.
-   */
   async completeLesson(lessonId, xpGain = 10, quizAnswer = null, correct = true) {
     const userId = this.getUserId();
     const state = _cache || this._loadFromLocal(userId);
@@ -72,7 +55,6 @@ export const UserService = {
       state.quizAnswers = state.quizAnswers || {};
       state.quizAnswers[lessonId] = { answer: quizAnswer, correct, timestamp: new Date().toISOString() };
     }
-    // Key reward every 3 lessons
     if (!alreadyDone && state.completedLessons.length % 3 === 0) {
       state.keys = (state.keys ?? 5) + 1;
     }
@@ -81,37 +63,31 @@ export const UserService = {
     return _cache;
   },
 
-  /** Get current XP from cache. */
   getXP() {
     const s = _cache || this._loadFromLocal(this.getUserId());
     return s.xp ?? 0;
   },
 
-  /** Get current keys count from cache. */
   getKeys() {
     const s = _cache || this._loadFromLocal(this.getUserId());
     return s.keys ?? 5;
   },
 
-  /** Get current streak from cache. */
   getStreak() {
     const s = _cache || this._loadFromLocal(this.getUserId());
     return s.streak ?? 0;
   },
 
-  /** Get completed lessons set from cache. */
   getCompletedLessons() {
     const s = _cache || this._loadFromLocal(this.getUserId());
     return new Set(s.completedLessons || []);
   },
 
-  /** Get current lesson step from cache. */
   getCurrentStep() {
     const s = _cache || this._loadFromLocal(this.getUserId());
     return s.currentStep ?? parseInt(localStorage.getItem('logicQuest_step') || '0', 10);
   },
 
-  /** Reset all user progress. */
   async reset() {
     const userId = this.getUserId();
     const fresh = {
@@ -130,13 +106,10 @@ export const UserService = {
     return fresh;
   },
 
-  /** Force refresh cache from localStorage */
   async refresh() {
     _cache = null;
     return this.load();
   },
-
-  // ── Private helpers ────────────────────────────────────────
 
   _loadFromLocal(userId) {
     try {
@@ -147,9 +120,8 @@ export const UserService = {
           return parsed;
         }
       }
-    } catch (e) { /* ignore parse errors */ }
+    } catch (e) { }
 
-    // Legacy fallback — read from old individual keys
     const completed = localStorage.getItem('logicQuest_completedLessons');
     const completedArr = completed ? JSON.parse(completed) : [];
     const extraXp = parseInt(localStorage.getItem('logicQuest_extraXp') || '0', 10);
@@ -168,9 +140,7 @@ export const UserService = {
 
   _saveToLocal(state) {
     if (!state) return;
-    // Save full state object
     localStorage.setItem('logicQuest_state', JSON.stringify(state));
-    // Also keep legacy keys in sync for backward compat
     const xp = state.xp ?? 0;
     const step = state.currentStep ?? 0;
     const completedArr = state.completedLessons ?? [];

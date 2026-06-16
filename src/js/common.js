@@ -1,14 +1,10 @@
-// ============================================================
-//  LogicQuest Common Shared Utilities (Theme, Audio, XP Sync)
-// ============================================================
+
 import UserService from './user-service.js';
 
 
-// Web Audio API Synthesizer (Zero audio files required)
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let soundEnabled = localStorage.getItem("soundEnabled") !== "false";
 
-// Storage listener reference for cleanup
 let storageListener = null;
 
 function playSound(type) {

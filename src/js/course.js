@@ -1,9 +1,6 @@
-// ============================================================
-//  LogicQuest Guided Course Module
-// ============================================================
+
 import UserService from './user-service.js';
 
-// Course Level Data
 const lessons = [
   {
     id: 0,

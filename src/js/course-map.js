@@ -1,13 +1,8 @@
-// ============================================================
-//  LogicQuest Course Map — Redesigned Vertical Duolingo-Style
-//  Now powered by UserService (PHP API + localStorage fallback)
-// ============================================================
 
 import UserService from './user-service.js';
 
 const TOTAL_LESSONS = 9;
 
-// Lesson metadata with categories and icons
 const lessonMetadata = [
   { id: 0, title: 'The Binary Code',        level: 1, category: 'Fundamentals',  icon: '⚡', color: '#58cc02', desc: 'Voltage & Binary States' },
   { id: 1, title: 'The Transistor Switch',  level: 1, category: 'Fundamentals',  icon: '🔌', color: '#58cc02', desc: 'NPN Transistor Basics' },
@@ -20,7 +15,6 @@ const lessonMetadata = [
   { id: 8, title: 'Master of Logic!',       level: 5, category: 'Mastery',       icon: '🏆', color: '#7c5ef2', desc: 'Complete the Journey' },
 ];
 
-// Category sections
 const categories = [
   { name: 'Fundamentals', icon: '⚡', color: '#58cc02', bg: 'rgba(88,204,2,0.1)', border: 'rgba(88,204,2,0.3)', lessons: [0, 1] },
   { name: 'Logic Gates',  icon: '🔮', color: '#1cb0f6', bg: 'rgba(28,176,246,0.1)', border: 'rgba(28,176,246,0.3)', lessons: [2, 3, 4, 5] },
