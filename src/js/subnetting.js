@@ -1,5 +1,10 @@
 let sn_activeQuiz = null;
 
+/**
+ * Initialize subnetting module
+ * Sets up event listeners for CIDR slider, IP input, and challenge button
+ * Renders initial CIDR /24 visualizer
+ */
 export function initSubnetting() {
   const slider = document.getElementById('sn-cidr-slider');
   if (!slider) return;
