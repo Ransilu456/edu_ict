@@ -1,8 +1,5 @@
-/* ============================================================
-   Home View — Hero Landing Page
-   ============================================================ */
 
-/* ── Hero Section ─────────────────────────────────────────── */
+
 .home-view {
   display: flex;
   flex-direction: column;
@@ -34,7 +31,6 @@
   z-index: 0;
 }
 
-/* Floating gate decorations */
 .hero-floating-gates {
   position: absolute;
   inset: 0;
@@ -73,7 +69,6 @@
   100% { transform: translateY(-20px) rotate(3deg); }
 }
 
-/* ── Hero Content ─────────────────────────────────────────── */
 .hero-content {
   position: relative;
   z-index: 2;
@@ -187,7 +182,6 @@
   box-shadow: 0 1px 0 var(--border-color);
 }
 
-/* ── Hero Stats Row ───────────────────────────────────────── */
 .hero-stats-row {
   display: flex;
   align-items: center;
@@ -227,7 +221,6 @@
   font-weight: 300;
 }
 
-/* ── Hero Illustration ───────────────────────────────────── */
 .hero-illustration {
   position: relative;
   z-index: 2;
@@ -264,7 +257,6 @@
   100% { opacity: 1;   r: 8; }
 }
 
-/* ── Features Section ─────────────────────────────────────── */
 .home-features-section {
   padding: 2rem 4rem 4rem;
   max-width: 1200px;
@@ -287,7 +279,6 @@
   gap: 1.25rem;
 }
 
-/* ── Feature Cards ────────────────────────────────────────── */
 .feature-card {
   position: relative;
   display: flex;
@@ -314,7 +305,6 @@
   box-shadow: 0 2px 0 var(--border-color);
 }
 
-/* Glow effect */
 .feat-card-glow {
   position: absolute;
   top: -30px;
@@ -338,7 +328,6 @@
 .feature-card--signal  .feat-card-glow { background: #10b981; }
 .feature-card--progress .feat-card-glow { background: #fbbf24; }
 
-/* Icons */
 .feat-card-icon {
   width: 52px;
   height: 52px;
@@ -410,7 +399,6 @@
   color: var(--text-primary);
 }
 
-/* Progress card specifics */
 .progress-mini-bar-wrap {
   display: flex;
   align-items: center;
@@ -442,7 +430,6 @@
   min-width: 36px;
 }
 
-/* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .hero-section {
     padding: 4rem 2.5rem 3rem;
@@ -484,7 +471,6 @@
   .fg-2, .fg-4, .fg-5 { display: none; }
 }
 
-/* Additional improvements for smaller mobile devices (< 640px) */
 @media (max-width: 640px) {
   .hero-section {
     padding: 1.5rem 0.75rem 2rem;
@@ -603,12 +589,12 @@
     right: 1rem;
   }
 
-  /* Hide floating gates on very small screens */
+  
   .hero-floating-gates {
     opacity: 0.1;
   }
 
-  /* Progress card adjustments */
+  
   .progress-mini-bar-track {
     height: 12px;
   }
@@ -619,7 +605,6 @@
   }
 }
 
-/* Extra small phones (< 480px) */
 @media (max-width: 479px) {
   .hero-section {
     padding: 1rem 0.5rem 1.5rem;

@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --bg-primary: #faf6eb;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f2ede0;
+  --border-color: #e2dbcd;
+  --bg-mobile: #e2dbcd;
+
+  --text-primary: #3c3c3c;
+  --text-secondary: #777777;
+  --text-muted: #afafaf;
+
+  --color-indigo: #7c5ef2;
+  --color-indigo-glow: rgba(124, 94, 242, 0.15);
+  --color-cyan: #1cb0f6;
+  --color-cyan-glow: rgba(28, 176, 246, 0.15);
+
+  --color-high: #7c5ef2;
+  --color-high-glow: rgba(124, 94, 242, 0.2);
+  --color-low: #e2dbcd;
+  --color-low-glow: transparent;
+
+  --color-success: #58cc02;
+  --color-error: #ea2b2b;
+  --color-amber: #ff9600;
+  --color-label: #100036b9;
+
+  --font-sans: 'Inter', sans-serif;
+  --font-header: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --transition-fast: 0.1s ease;
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:root.dark-theme {
+  --bg-primary: #15131c;
+  --bg-secondary: #201d29;
+  --bg-tertiary: #2a2736;
+  --border-color: #353144;
+  --bg-mobile: transparent;
+
+  --color-label: #817e8d;
+
+  --text-primary: #f5f4f7;
+  --text-secondary: #bbb8c4;
+  --text-muted: #817e8d;
+
+  --color-indigo: #9075ff;
+  --color-cyan: #3fc0ff;
+
+  --color-high: #9075ff;
+  --color-low: #353144;
+
+  --color-success: #63e203;
+  --color-error: #ff4d4d;
+  --color-amber: #ffb13b;
+}
+
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-header);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+

@@ -1,4 +1,3 @@
-
 import UserService from './user-service.js';
 
 
@@ -63,8 +62,6 @@ function playSound(type) {
   }
 }
 window.playSound = playSound;
-
-// Page Initialization
 function initCommon() {
   initTheme();
   initSoundToggle();
@@ -99,8 +96,6 @@ function initTheme() {
 function initSoundToggle() {
   const audioBtn = document.getElementById("audio-toggle");
   if (!audioBtn) return;
-  
-  // Set initial state visual
   updateAudioIcon(audioBtn);
   
   audioBtn.addEventListener("click", () => {
@@ -123,29 +118,27 @@ function initRestartProgress() {
   
   resetBtn.addEventListener("click", async () => {
     playSound('click');
-    if (confirm("Are you sure you want to restart the course from the beginning? This will reset your XP and progress.")) {
-      await UserService.reset();
-      updateXPDisplay();
-      if (window.onRestartCourseProgression) {
-        window.onRestartCourseProgression();
-      } else {
-        location.reload();
+    showConfirm("Are you sure you want to restart the course from the beginning? This will reset your XP and progress.", async (result) => {
+      if (result) {
+        await UserService.reset();
+        updateXPDisplay();
+        if (window.onRestartCourseProgression) {
+          window.onRestartCourseProgression();
+        } else {
+          location.reload();
+        }
       }
-    }
+    });
   });
 }
 
 function updateXPDisplay() {
   const xp = UserService.getXP();
-
-  // Update all score-count elements on page
   document.querySelectorAll('#score-count').forEach(el => {
     el.innerText = xp;
   });
 
   updateKeysDisplay();
-  
-  // Refresh course map if it's visible
   if (window.renderCourseMap) {
     const mapContainer = document.getElementById('course-map-container');
     if (mapContainer && mapContainer.innerHTML.trim() !== '') {
@@ -163,8 +156,89 @@ function updateKeysDisplay() {
 }
 window.updateXPDisplay = updateXPDisplay;
 
-// Listen for storage events (XP changes in other tabs)
-// Store reference to listener for cleanup
+function showAlert(message, title, callback) {
+  const modal = document.getElementById('custom-alert-modal');
+  const box = document.getElementById('custom-alert-box');
+  const titleEl = document.getElementById('custom-alert-title');
+  const msgEl = document.getElementById('custom-alert-msg');
+  const iconEl = document.getElementById('custom-alert-icon');
+  const okBtn = document.getElementById('custom-alert-ok-btn');
+  const cancelBtn = document.getElementById('custom-alert-cancel-btn');
+  if (!modal || !box) return;
+
+  titleEl.textContent = title || 'Info';
+  msgEl.innerHTML = message;
+  iconEl.style.display = 'flex';
+  cancelBtn.style.display = 'none';
+  okBtn.style.display = 'inline-block';
+  okBtn.textContent = 'OK';
+  modal.style.display = 'flex';
+
+  const close = (result) => {
+    modal.style.display = 'none';
+    okBtn.onclick = null;
+    cancelBtn.onclick = null;
+    if (callback) callback(result);
+  };
+
+  okBtn.onclick = () => close(true);
+  box.addEventListener('click', (e) => e.stopPropagation());
+  modal.addEventListener('click', () => close(true));
+}
+window.showAlert = showAlert;
+
+function showConfirm(message, callback, title) {
+  const modal = document.getElementById('custom-alert-modal');
+  const box = document.getElementById('custom-alert-box');
+  const titleEl = document.getElementById('custom-alert-title');
+  const msgEl = document.getElementById('custom-alert-msg');
+  const iconEl = document.getElementById('custom-alert-icon');
+  const okBtn = document.getElementById('custom-alert-ok-btn');
+  const cancelBtn = document.getElementById('custom-alert-cancel-btn');
+  if (!modal || !box) return;
+
+  titleEl.textContent = title || 'Confirm';
+  msgEl.innerHTML = message;
+  iconEl.style.display = 'none';
+  okBtn.style.display = 'inline-block';
+  okBtn.textContent = 'Yes';
+  cancelBtn.style.display = 'inline-block';
+  cancelBtn.textContent = 'Cancel';
+  modal.style.display = 'flex';
+
+  const close = (result) => {
+    modal.style.display = 'none';
+    okBtn.onclick = null;
+    cancelBtn.onclick = null;
+    if (callback) callback(result);
+  };
+
+  okBtn.onclick = () => close(true);
+  cancelBtn.onclick = () => close(false);
+  box.addEventListener('click', (e) => e.stopPropagation());
+  modal.addEventListener('click', () => close(false));
+}
+window.showConfirm = showConfirm;
+function showToast(msg) {
+  let toast = document.getElementById('sb-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'sb-toast';
+    toast.style.cssText = `
+      position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%);
+      background:var(--text-primary); color:var(--bg-primary);
+      padding:0.5rem 1.25rem; border-radius:6px; font-size:0.85rem;
+      font-family:var(--font-header); font-weight:600;
+      z-index:999; pointer-events:none; opacity:0;
+      transition:opacity 0.2s ease;`;
+    document.body.appendChild(toast);
+  }
+  toast.innerText = msg;
+  toast.style.opacity = '1';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2200);
+}
+window.showToast = showToast;
 storageListener = async (e) => {
   if (e.key === 'logicQuest_step' || e.key === 'logicQuest_completedLessons' || e.key === 'logicQuest_extraXp' || e.key === 'logicQuest_keys') {
     await UserService.refresh();
@@ -172,10 +246,7 @@ storageListener = async (e) => {
   }
 };
 window.addEventListener('storage', storageListener);
-
-// Cleanup function to remove all event listeners and prevent memory leaks
 function cleanupCommon() {
-  // Remove storage listener
   if (storageListener) {
     window.removeEventListener('storage', storageListener);
     storageListener = null;

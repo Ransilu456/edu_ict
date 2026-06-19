@@ -1,4 +1,3 @@
-
 const DEFAULT_BITS = [1, 0, 1, 1, 0, 1, 0, 0];
 
 let enc_analogBits  = [...DEFAULT_BITS];
@@ -46,6 +45,15 @@ export function initEncoder() {
   }
 
   initBandwidthCalc();
+  let resizeTimer;
+  const handleResize = () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      const visible = document.querySelector('.enc-tab-panel.active');
+      if (visible) refreshEncoderCanvases();
+    }, 250);
+  };
+  window.addEventListener('resize', handleResize);
 
   const qStartBtn = document.getElementById('enc-quiz-start-btn');
   if (qStartBtn) qStartBtn.addEventListener('click', startEncoderQuiz);
@@ -253,8 +261,6 @@ function drawAmi() {
   ctx.lineTo(x0+bits.length*bw,py);
   ctx.stroke(); ctx.shadowBlur=0;
 }
-
-// ── Manchester Encoding ───────────────────────────────────────
 function manchIEEE(bits)  { const o=[]; bits.forEach(b=>b===0?o.push(0,1):o.push(1,0)); return o; }
 function manchG3(bits)    { const o=[]; bits.forEach(b=>b===0?o.push(1,0):o.push(0,1)); return o; }
 function diffManch(bits)  {
@@ -285,8 +291,6 @@ function updateManchester() {
   drawManchWave('enc-canvas-manch-g3',   manchG3(enc_manchBits),   '#f97316');
   drawManchWave('enc-canvas-diff-manch', diffManch(enc_manchBits), '#f43f5e');
 }
-
-// ── 4B/5B Table ───────────────────────────────────────────────
 const TABLE_4B5B = {
   '0000':'11110','0001':'01001','0010':'10100','0011':'10101',
   '0100':'01010','0101':'01011','0110':'01110','0111':'01111',
@@ -306,8 +310,6 @@ function build4b5bTable() {
     container.appendChild(row);
   });
 }
-
-// ── Decoder / Encoder Tool ────────────────────────────────────
 function cleanBits(str) { return str.replace(/[^01]/g, ''); }
 
 function runDecoder() {
@@ -423,8 +425,6 @@ function runEncoder() {
   if (infoEl) infoEl.textContent = info;
   resEl.style.display = 'block';
 }
-
-// ── Bandwidth / Capacity Calculator ─────────────────────────
 function initBandwidthCalc() {
   const calcBtn = document.getElementById('enc-bandwidth-calc-btn');
   if (!calcBtn) return;
@@ -448,11 +448,7 @@ function initBandwidthCalc() {
       if (errEl) { errEl.textContent = 'Signal levels (M) must be an integer ≥ 2.'; errEl.style.display = 'block'; }
       return;
     }
-
-    // Nyquist theorem (noise-free): Max data rate = 2 × B × log₂(M)
     const nyquist = 2 * bw * Math.log2(M);
-
-    // Shannon's theorem (noisy channel): C = B × log₂(1 + SNR)
     let shannon = null;
     let shannonStr = 'N/A (SNR not provided)';
     if (!isNaN(snr) && snr > 0) {
@@ -505,8 +501,6 @@ function formatRate(bps) {
   if (bps >= 1e3) return (bps / 1e3).toFixed(2) + ' kbps';
   return Math.round(bps) + ' bps';
 }
-
-// ── Quiz ──────────────────────────────────────────────────────
 const ENC_QUIZ = [
   { q:'Which encoding scheme varies the FREQUENCY of a carrier wave to represent binary data?', opts:['ASK','FSK','PSK','NRZ-L'], ans:1, exp:'FSK (Frequency Shift Keying) uses different frequencies: higher frequency for 1, base frequency for 0.' },
   { q:'In IEEE 802.3 Manchester encoding, how is a binary 1 represented?', opts:['High-to-Low transition','Low-to-High transition','No transition','Zero voltage'], ans:0, exp:'IEEE 802.3: 1 = High→Low mid-bit transition, 0 = Low→High. (G.E. Thomas is the opposite.)' },
@@ -535,7 +529,6 @@ let enc_challengeState = {
 };
 
 function startEncoderQuiz() {
-  // Select 5 random questions from the ENC_QUIZ pool
   enc_challengeState.questions = [];
   const shuffled = [...ENC_QUIZ].sort(() => 0.5 - Math.random());
   enc_challengeState.questions = shuffled.slice(0, 5);
@@ -545,13 +538,9 @@ function startEncoderQuiz() {
   enc_challengeState.xpGain = 0;
   enc_challengeState.selectedOpt = null;
   enc_challengeState.answered = false;
-
-  // Open modal
   const modal = document.getElementById('app-quiz-modal');
   if (!modal) return;
   modal.style.display = 'flex';
-
-  // Setup close events
   const closeBtn = document.getElementById('close-quiz-modal-btn');
   if (closeBtn) closeBtn.onclick = enc_closeChallenge;
 
@@ -569,8 +558,6 @@ function enc_renderChallengeQuestion() {
 
   enc_challengeState.selectedOpt = null;
   enc_challengeState.answered = false;
-
-  // UI elements
   const progress = document.getElementById('quiz-modal-progress');
   const qNum = document.getElementById('quiz-modal-q-num');
   const qText = document.getElementById('quiz-modal-question-text');
@@ -578,18 +565,12 @@ function enc_renderChallengeQuestion() {
   const feedback = document.getElementById('quiz-modal-feedback');
   const ctaBtn = document.getElementById('quiz-modal-cta-btn');
   const xpGainText = document.getElementById('quiz-modal-xp-gain');
-
-  // Hide summary step, show question step
   document.getElementById('quiz-modal-question-step').style.display = 'block';
   document.getElementById('quiz-modal-summary-step').style.display = 'none';
-
-  // Reset progress and texts
   if (progress) progress.style.width = ((idx + 1) / 5) * 100 + '%';
   if (qNum) qNum.innerText = `Question ${idx + 1} of 5`;
   if (qText) qText.innerHTML = q.q;
   if (xpGainText) xpGainText.innerText = `+${enc_challengeState.xpGain}`;
-
-  // Render multiple choice options
   if (answerArea) {
     answerArea.innerHTML = `
       <div class="quiz-modal-opts">
@@ -601,8 +582,6 @@ function enc_renderChallengeQuestion() {
         `).join('')}
       </div>
     `;
-
-    // Add click listeners to options
     q.opts.forEach((_, oi) => {
       const optBtn = document.getElementById(`quiz-modal-opt-${oi}`);
       if (optBtn) {
@@ -610,8 +589,6 @@ function enc_renderChallengeQuestion() {
           if (enc_challengeState.answered) return;
           if (window.playSound) window.playSound('click');
           enc_challengeState.selectedOpt = oi;
-
-          // Highlight selection
           q.opts.forEach((_, tempIdx) => {
             const btn = document.getElementById(`quiz-modal-opt-${tempIdx}`);
             if (btn) btn.classList.toggle('selected', tempIdx === oi);
@@ -622,8 +599,6 @@ function enc_renderChallengeQuestion() {
       }
     });
   }
-
-  // Reset feedback and button
   if (feedback) {
     feedback.className = 'feedback-alert';
     feedback.innerHTML = '';
@@ -650,8 +625,6 @@ function enc_checkChallengeAnswer() {
 
   enc_challengeState.answered = true;
   const isCorrect = chosen === q.ans;
-
-  // Highlight correct and incorrect options
   q.opts.forEach((_, oi) => {
     const btn = document.getElementById(`quiz-modal-opt-${oi}`);
     if (btn) {
@@ -672,8 +645,6 @@ function enc_checkChallengeAnswer() {
     enc_challengeState.score++;
     enc_challengeState.xpGain += 20;
     if (xpGainText) xpGainText.innerText = `+${enc_challengeState.xpGain}`;
-
-    // Add extra XP to localStorage
     const extraXp = (parseInt(localStorage.getItem('logicQuest_extraXp')) || 0) + 20;
     localStorage.setItem('logicQuest_extraXp', extraXp);
     if (window.updateXPDisplay) window.updateXPDisplay();
@@ -702,7 +673,6 @@ function enc_continueChallenge() {
     enc_challengeState.currentIdx++;
     enc_renderChallengeQuestion();
   } else {
-    // Show summary
     document.getElementById('quiz-modal-question-step').style.display = 'none';
     const summary = document.getElementById('quiz-modal-summary-step');
     summary.style.display = 'block';
@@ -727,8 +697,6 @@ function enc_continueChallenge() {
       ctaBtn.innerText = 'Close Challenge';
       ctaBtn.onclick = enc_closeChallenge;
     }
-
-    // Trigger confetti on good scores
     const modalBox = document.getElementById('app-quiz-modal-box');
     if (modalBox && score >= 3) {
       for (let i = 0; i < 40; i++) enc_createConfettiParticle(modalBox);
@@ -750,8 +718,6 @@ function enc_createConfettiParticle(container) {
   container.appendChild(p);
   setTimeout(() => { p.remove(); }, duration * 1000);
 }
-
-// Expose resize handler
 export function refreshEncoderCanvases() {
   updateAnalog(); updateDigital(); updateManchester();
 }

@@ -1,4 +1,3 @@
-
 const gatesCatalog = [
   { name: "AND", symbol: "AND", formula: "A • B", desc: "Outputs 1 if both inputs are 1.", truthTable: [[0,0,0],[0,1,0],[1,0,0],[1,1,1]] },
   { name: "OR", symbol: "OR", formula: "A + B", desc: "Outputs 1 if at least one input is 1.", truthTable: [[0,0,0],[0,1,1],[1,0,1],[1,1,1]] },

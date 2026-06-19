@@ -1,7 +1,3 @@
-// ============================================================
-//  Home View Component — <home-view>
-// ============================================================
-
 const TOTAL_LESSONS = 9;
 
 class HomeView extends HTMLElement {
@@ -10,8 +6,6 @@ class HomeView extends HTMLElement {
     this.innerHTML = template;
     this._bindNavigation();
     this._syncProgress();
-
-    // Re-sync whenever the home panel becomes active
     const observer = new MutationObserver(() => {
       if (this.querySelector('.home-view')?.classList.contains('active')) {
         this._syncProgress();
@@ -22,14 +16,10 @@ class HomeView extends HTMLElement {
       observer.observe(panel, { attributes: true, attributeFilter: ['class'] });
     }
   }
-
-  // ── Navigate to a view tab ────────────────────────────────
   _goToView(targetClass) {
-    // Use global helper if available, otherwise fallback
     if (window.navigateToView) {
       window.navigateToView(targetClass);
     } else {
-      // Fallback: directly find and click the tab
       const tab = document.querySelector(`.nav-tab[data-target="${targetClass}"]`);
       if (tab) {
         tab.click();
@@ -38,10 +28,7 @@ class HomeView extends HTMLElement {
       }
     }
   }
-
-  // ── Wire all buttons & feature cards to navigation ───────
   _bindNavigation() {
-    // Hero CTA buttons
     const startBtn = this.querySelector('#home-hero-start-btn');
     if (startBtn) startBtn.addEventListener('click', () => {
       const step = parseInt(localStorage.getItem('logicQuest_step') || '0', 10);
@@ -51,8 +38,6 @@ class HomeView extends HTMLElement {
 
     const sandboxBtn = this.querySelector('#home-hero-sandbox-btn');
     if (sandboxBtn) sandboxBtn.addEventListener('click', () => this._goToView('sandbox-view'));
-
-    // Feature cards
     const cardNav = (id, target) => {
       const card = this.querySelector(`#${id}`);
       if (card) {
@@ -62,7 +47,6 @@ class HomeView extends HTMLElement {
           if (window.playSound) window.playSound('click');
           this._goToView(target);
         });
-        // Also handle Enter key on keyboard
         card.addEventListener('keypress', (e) => {
           if (e.key === 'Enter') {
             e.preventDefault();
@@ -78,18 +62,13 @@ class HomeView extends HTMLElement {
     cardNav('home-feat-explorer',   'explorer-view');
     cardNav('home-feat-subnetting', 'subnetting-view');
     cardNav('home-feat-encoder',    'encoder-view');
-    // progress card goes to course map
     cardNav('home-feat-progress',   'course-map-view');
   }
-
-  // ── Sync progress from localStorage ──────────────────────
   _syncProgress() {
     const step = parseInt(localStorage.getItem('logicQuest_step') || '0', 10);
     const extraXp = parseInt(localStorage.getItem('logicQuest_extraXp') || '0', 10);
     const xp = step * 10 + extraXp;
     const pct = Math.min(100, Math.round((step / TOTAL_LESSONS) * 100));
-
-    // Hero stat row
     const heroXp = this.querySelector('#home-hero-xp');
     if (heroXp) heroXp.textContent = xp + ' XP';
 
@@ -102,12 +81,8 @@ class HomeView extends HTMLElement {
 
     const heroPct = this.querySelector('#home-hero-pct');
     if (heroPct) heroPct.textContent = `${pct}%`;
-
-    // Also sync header badge
     const scoreHeader = document.getElementById('score-count');
     if (scoreHeader) scoreHeader.textContent = xp;
-
-    // Progress card mini bar
     const miniFill = this.querySelector('#home-progress-mini-fill');
     if (miniFill) miniFill.style.width = `${pct}%`;
 

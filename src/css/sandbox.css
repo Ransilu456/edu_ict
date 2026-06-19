@@ -1,0 +1,602 @@
+
+.sandbox-view {
+  flex-direction: row;
+  height: calc(100vh - 58px);
+  overflow: hidden;
+}
+
+.sandbox-toolbox {
+  width: 230px;
+  border-right: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.toolbox-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.toolbox-section-title {
+  font-family: var(--font-header);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+}
+
+.toolbox-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-header);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.toolbox-item:hover {
+  border-color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.toolbox-item svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--text-secondary);
+  stroke-width: 2;
+}
+
+
+.toolbox-item[data-type="battery"],
+.toolbox-item[data-type="resistor"],
+.toolbox-item[data-type="bulb"],
+.toolbox-item[data-type="switch"],
+.toolbox-item[data-type="ammeter"],
+.toolbox-item[data-type="voltmeter"],
+.toolbox-item[data-type="motor"],
+.toolbox-item[data-type="fuse"],
+.toolbox-item[data-type="led-elec"],
+.toolbox-item[data-type="junction"],
+.toolbox-item[data-type="transistor"] {
+  background: linear-gradient(135deg, rgba(34, 211, 165, 0.1), rgba(251, 191, 36, 0.1));
+  border-color: rgba(34, 211, 165, 0.3);
+}
+
+.toolbox-item[data-type="battery"] svg,
+.toolbox-item[data-type="resistor"] svg,
+.toolbox-item[data-type="bulb"] svg,
+.toolbox-item[data-type="switch"] svg,
+.toolbox-item[data-type="ammeter"] svg,
+.toolbox-item[data-type="voltmeter"] svg,
+.toolbox-item[data-type="motor"] svg,
+.toolbox-item[data-type="fuse"] svg,
+.toolbox-item[data-type="led-elec"] svg,
+.toolbox-item[data-type="junction"] svg,
+.toolbox-item[data-type="transistor"] svg {
+  stroke: #22d3a5;
+  stroke-width: 2.2;
+}
+
+.toolbox-item:active {
+  cursor: grabbing;
+}
+
+.sandbox-workspace {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+  background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
+  background-size: 20px 20px;
+  transition: background-color var(--transition-normal);
+}
+
+.sandbox-toolbar {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  gap: 0.35rem;
+  background: var(--bg-secondary);
+  padding: 0.35rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  z-index: 20;
+  align-items: center;
+}
+
+.sandbox-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  font-family: var(--font-header);
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.sandbox-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.sandbox-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.sandbox-btn.btn-play {
+  color: var(--color-success);
+}
+
+.sandbox-btn.btn-play.running {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+}
+
+
+.sandbox-node {
+  position: absolute;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-color);
+  border-radius: 6px;
+  min-width: 90px;
+  padding: 0.5rem;
+  cursor: move;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  z-index: 5;
+  transition: border-color var(--transition-fast);
+}
+
+.sandbox-node.selected {
+  border-color: var(--text-primary);
+}
+
+
+.sandbox-node.elec-active {
+  border-color: var(--color-cyan);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-cyan) 40%, transparent),
+              0 0 20px color-mix(in srgb, var(--color-cyan) 15%, transparent);
+  animation: elecFlowPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes elecFlowPulse {
+  0%, 100% { box-shadow: 0 0 4px color-mix(in srgb, var(--color-cyan) 30%, transparent),
+                         0 0 12px color-mix(in srgb, var(--color-cyan) 10%, transparent); }
+  50%      { box-shadow: 0 0 10px color-mix(in srgb, var(--color-cyan) 50%, transparent),
+                         0 0 28px color-mix(in srgb, var(--color-cyan) 20%, transparent); }
+}
+
+.sandbox-node-header {
+  font-family: var(--font-header);
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+  pointer-events: none;
+}
+
+.sandbox-node-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  pointer-events: auto;
+}
+
+
+.sandbox-port {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--bg-primary);
+  border: 1.5px solid var(--border-color);
+  position: absolute;
+  cursor: crosshair;
+  z-index: 10;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+  
+}
+
+.sandbox-port:hover {
+  background-color: var(--text-primary);
+  border-color: var(--text-primary);
+  transform: scale(1.4);
+}
+
+.sandbox-port::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  cursor: crosshair;
+  z-index: 12;
+}
+
+
+.sandbox-port.eligible {
+  border-color: var(--color-cyan);
+  background: var(--color-cyan);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-cyan) 25%, transparent);
+  animation: portPulse 0.9s ease-in-out infinite alternate;
+}
+
+
+.sandbox-port.wiring-source {
+  border-color: var(--color-success);
+  background: var(--color-success);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-success) 25%, transparent);
+}
+
+.sandbox-port.active-port {
+  background-color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+
+.node-delete-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 18px;
+  height: 18px;
+  background: var(--color-error);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 15;
+  line-height: 1;
+  pointer-events: auto;
+}
+
+.sandbox-node:hover .node-delete-btn,
+.sandbox-node.selected .node-delete-btn {
+  display: flex;
+}
+
+
+.sandbox-node.compound-node {
+  min-width: 120px;
+}
+
+
+.sandbox-node.seven-seg-node {
+  min-width: 75px;
+}
+
+
+.gate-type-label {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  pointer-events: none;
+}
+
+
+.compound-body-grid {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.cb-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.cb-pin {
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.cb-name {
+  font-family: var(--font-header);
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  flex: 1;
+  text-align: center;
+}
+
+.cb-pin.out-pin {
+  color: var(--text-secondary);
+}
+
+
+.wires-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  
+  pointer-events: none;
+  overflow: visible;
+}
+
+
+.sandbox-workspace.drag-over {
+  outline: 2px dashed var(--color-cyan);
+  outline-offset: -4px;
+}
+
+
+.sandbox-toggle-btn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.sandbox-toggle-btn.high {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-color: var(--text-primary);
+}
+
+.sandbox-bulb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  border: 1.5px solid var(--border-color);
+  transition: all var(--transition-normal);
+}
+
+.sandbox-bulb.high {
+  background: #fde047;
+  border-color: #ca8a04;
+}
+
+
+.bulb-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px;
+}
+.bulb-svg {
+  width: 52px;
+  height: 60px;
+}
+.bulb-halo {
+  fill: transparent;
+  transition: fill 0.3s, filter 0.3s;
+}
+.bulb-wrap.high .bulb-halo {
+  fill: rgba(253, 224, 71, 0.35);
+  filter: blur(4px);
+}
+.bulb-glass {
+  fill: rgba(60, 60, 70, 0.2);
+  stroke: var(--text-secondary);
+  stroke-width: 1.2;
+  transition: fill 0.3s, stroke 0.3s;
+}
+.bulb-wrap.high .bulb-glass {
+  fill: rgba(255, 245, 180, 0.92);
+  stroke: #ca8a04;
+}
+.bulb-wire {
+  stroke: var(--text-muted);
+  stroke-width: 1.2;
+}
+.bulb-filament {
+  fill: none;
+  stroke: var(--text-secondary);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  transition: stroke 0.3s;
+}
+.bulb-wrap.high .bulb-filament {
+  stroke: #fde047;
+  filter: drop-shadow(0 0 3px #fde047);
+}
+.bulb-base {
+  fill: var(--bg-tertiary);
+  stroke: var(--border-color);
+  stroke-width: 1;
+}
+.bulb-base-tip {
+  fill: var(--text-muted);
+}
+.bulb-shine {
+  fill: rgba(255, 255, 255, 0.25);
+}
+.bulb-wrap.high {
+  animation: bulbGlow 1.5s ease-in-out infinite;
+}
+@keyframes bulbGlow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(253, 224, 71, 0.4)); }
+  50% { filter: drop-shadow(0 0 12px rgba(253, 224, 71, 0.8)); }
+}
+.bulb-state-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.bulb-state-label.high {
+  color: var(--text-primary);
+}
+
+
+.clk-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+}
+.clk-osc-svg {
+  width: 80px;
+  height: 36px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+.osc-bg {
+  fill: var(--bg-primary);
+}
+.osc-grid {
+  stroke: var(--border-color);
+  stroke-width: 0.5;
+}
+.osc-wave {
+  fill: none;
+  stroke: var(--text-primary);
+  stroke-width: 1.8;
+  stroke-linecap: square;
+}
+.osc-cursor {
+  stroke: var(--color-cyan);
+  stroke-width: 1.5;
+  stroke-dasharray: 2, 2;
+  opacity: 0.8;
+  transition: transform 0.1s ease-in-out;
+}
+.clk-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 80px;
+}
+.clk-badge {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.clk-hz {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-muted);
+}
+
+
+.seven-seg-svg {
+  width: 50px;
+  height: 75px;
+}
+
+.seven-seg-segment {
+  fill: var(--bg-primary);
+  stroke: var(--border-color);
+  stroke-width: 1;
+  transition: fill var(--transition-fast);
+}
+
+.seven-seg-segment.active {
+  fill: var(--color-success);
+  stroke: var(--color-success);
+}
+
+
+.sandbox-node.node-text-label {
+  background: transparent;
+  border: 1.5px dashed transparent;
+  min-width: 80px;
+  box-shadow: none;
+  padding: 4px;
+}
+
+.sandbox-node.node-text-label:hover,
+.sandbox-node.node-text-label.selected {
+  border-color: var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.sandbox-node.node-text-label .sandbox-node-header,
+.sandbox-node.node-text-label .node-delete-btn {
+  display: none;
+}
+
+.sandbox-node.node-text-label.selected .node-delete-btn {
+  display: flex;
+}
+
+.label-textarea {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  text-align: center;
+  resize: none;
+  outline: none;
+  pointer-events: auto;
+  min-width: 80px;
+  overflow: hidden;
+  height: auto;
+}
+
+
+.lesson-select {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.lesson-select:hover {
+  border-color: var(--text-muted);
+}
+

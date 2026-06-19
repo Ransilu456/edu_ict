@@ -37,3 +37,6 @@ pids
 assets/*
 api/*
 data/*
+
+AGENTS.md
+src.zip
