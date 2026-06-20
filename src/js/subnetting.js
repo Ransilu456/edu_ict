@@ -298,18 +298,6 @@ const sn_quizTemplates = [
   },
   {
     generate() {
-      const cidr = pick([8,10,16,18,20,22,24,...SN_CIDRS_C]);
-      const info = sn_getCidrInfo(cidr);
-      return {
-        question: `What is the <strong>wildcard mask</strong> (inverse mask) for <strong>/${cidr}</strong>?`,
-        answer: info.wildcard,
-        hint: `e.g. 0.0.0.255`,
-        explanation: `Wildcard = 255.255.255.255 − subnet mask (${info.mask}) = <strong>${info.wildcard}</strong>.`,
-      };
-    },
-  },
-  {
-    generate() {
       const cidr = pick(SN_CIDRS_C);
       const info = sn_getCidrInfo(cidr);
       const need = randInt(1, info.hosts - 1);
@@ -367,54 +355,6 @@ const sn_quizTemplates = [
         answer: last.join('.'),
         hint: `e.g. 192.168.1.254`,
         explanation: `Broadcast = ${brd.join('.')}. Last usable = Broadcast − 1 = <strong>${last.join('.')}</strong>.`,
-      };
-    },
-  },
-  {
-    generate() {
-      const cidr = pick([24, 25, 26, 27, 28]);
-      const info = sn_getCidrInfo(cidr);
-      const { magic } = info;
-      const netOct = pick([0, magic, magic*2, magic*3].filter(v => v < 256));
-      const testOct = netOct + randInt(1, magic - 2);
-      const ip = `192.168.1.${testOct}`;
-      const network = `192.168.1.${netOct}`;
-      return {
-        question: `Is host <strong>${ip}</strong> inside subnet <strong>${network}/${cidr}</strong>? (Answer: Yes or No)`,
-        answer: 'yes',
-        hint: `Yes or No`,
-        explanation: `Block = ${magic}. Network = 192.168.1.${netOct}. Range: ${netOct+1}–${netOct+magic-2}. ${testOct} is within range → <strong>Yes</strong>.`,
-      };
-    },
-  },
-  {
-    generate() {
-      const cidr = pick([...SN_CIDRS_C, ...SN_CIDRS_B]);
-      const info = sn_getCidrInfo(cidr);
-      return {
-        question: `What is the <strong>block size (magic number)</strong> for CIDR prefix <strong>/${cidr}</strong>?`,
-        answer: String(info.magic),
-        hint: `A power of 2`,
-        explanation: `Host bits in magic octet = 8 − ${info.subnetBits} = ${8-info.subnetBits}. Block size = 2^${8-info.subnetBits} = <strong>${info.magic}</strong>.`,
-      };
-    },
-  },
-  {
-    generate() {
-      const scenarios = [
-        { ip: '10.0.0.1',       isPrivate: true,  range: 'Class A private (10.0.0.0/8)' },
-        { ip: '172.16.5.1',     isPrivate: true,  range: 'Class B private (172.16.0.0–172.31.255.255)' },
-        { ip: '192.168.100.1',  isPrivate: true,  range: 'Class C private (192.168.0.0/16)' },
-        { ip: '8.8.8.8',        isPrivate: false, range: 'Public (Google DNS)' },
-        { ip: '203.94.95.1',    isPrivate: false, range: 'Public (Lanka Bell, Sri Lanka)' },
-        { ip: '172.32.0.1',     isPrivate: false, range: 'Public (outside 172.16–31 range)' },
-      ];
-      const s = pick(scenarios);
-      return {
-        question: `Is IP address <strong>${s.ip}</strong> a <strong>private</strong> (RFC 1918) address? (Answer: Yes or No)`,
-        answer: s.isPrivate ? 'yes' : 'no',
-        hint: `Yes or No`,
-        explanation: `${s.ip} is ${s.isPrivate ? 'a' : 'NOT a'} private address. It belongs to: ${s.range}.`,
       };
     },
   },

@@ -11,7 +11,13 @@ let clockTick = 0;          // global clock phase
 
 let workspace = null;
 let wiresSvg = null;
+let panContainer = null;
 let isDragging = false;          // suppress click-after-drag
+let panX = 0, panY = 0;
+let isPanning = false;
+let didPan = false;
+let panStart = { x: 0, y: 0 };
+let panStartOffset = { x: 0, y: 0 };
 const MAX_UNDO = 30;
 let undoStack = [];  // array of serialized layout snapshots
 
@@ -73,23 +79,33 @@ window.initSandboxCanvas = function () {
   if (!workspace || workspace.dataset.initialized) return;
   workspace.dataset.initialized = 'true';
 
+  panContainer = document.createElement('div');
+  panContainer.className = 'sandbox-pan-container';
+  panContainer.style.cssText = 'position:absolute;inset:0;transform-origin:0 0;z-index:1';
+  panContainer.dataset.panContainer = 'true';
+  workspace.insertBefore(panContainer, wiresSvg);
+  panContainer.appendChild(wiresSvg);
+
   setupDragAndDrop();
   setupToolbar();
   startSimulationLoop();
   workspace.addEventListener('click', (e) => {
-    if (e.target === workspace || e.target === wiresSvg) {
+    if (didPan) { didPan = false; return; }
+    if (e.target === workspace || e.target === wiresSvg || e.target === panContainer) {
       deselectAllNodes();
       cancelWiring();
     }
   });
   workspace.addEventListener('touchend', (e) => {
-    if (e.target === workspace || e.target === wiresSvg) {
+    if (didPan) { didPan = false; return; }
+    if (e.target === workspace || e.target === wiresSvg || e.target === panContainer) {
       deselectAllNodes();
       cancelWiring();
     }
   });
   workspace.addEventListener('mousemove', drawWiringPreview);
   workspace.addEventListener('touchmove', drawWiringPreview, { passive: true });
+  setupPanning();
   window.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
       e.preventDefault();
@@ -227,8 +243,8 @@ function setupDragAndDrop() {
       const inWorkspace = touch.clientX >= wr.left && touch.clientX <= wr.right &&
         touch.clientY >= wr.top && touch.clientY <= wr.bottom;
       if (inWorkspace) {
-        const dropX = touch.clientX - wr.left - 60;
-        const dropY = touch.clientY - wr.top - 30;
+        const dropX = touch.clientX - wr.left - panX - 60;
+        const dropY = touch.clientY - wr.top - panY - 30;
         placeNode(type, label, dropX, dropY);
         showToast(`${label} placed ✓`);
       }
@@ -258,8 +274,8 @@ function setupDragAndDrop() {
     workspace.classList.remove('drag-over');
     const type = e.dataTransfer.getData('type');
     const r = workspace.getBoundingClientRect();
-    const dropX = e.clientX - r.left;
-    const dropY = e.clientY - r.top;
+    const dropX = e.clientX - r.left - panX;
+    const dropY = e.clientY - r.top - panY;
 
     if (type === 'template') {
       const templateName = e.dataTransfer.getData('templateName');
@@ -404,8 +420,8 @@ function placeNode(type, label, x, y) {
     id,
     type,
     label: label || def.label,
-    x: Math.max(0, Math.round(x / 10) * 10),
-    y: Math.max(0, Math.round(y / 10) * 10),
+    x: Math.round(x / 10) * 10,
+    y: Math.round(y / 10) * 10,
     inputsCount: def.inputs,
     outputsCount: def.outputs,
     outputState: 0,           // primary output (port 0)
@@ -469,7 +485,7 @@ function renderNodeDOM(node) {
     selectNode(node.id);
   });
 
-  workspace.appendChild(el);
+  (panContainer || workspace).appendChild(el);
 }
 
 function renderNodeBody(node, body) {
@@ -798,7 +814,7 @@ function renderInputPorts(node, el) {
       handlePortClick(node.id, 'input', i);
     });
     port.addEventListener('touchend', (e) => {
-      e.preventDefault();
+      if (e.cancelable) e.preventDefault();
       e.stopPropagation();
       handlePortClick(node.id, 'input', i);
     });
@@ -829,7 +845,7 @@ function renderOutputPorts(node, el) {
       handlePortClick(node.id, 'output', i);
     });
     port.addEventListener('touchend', (e) => {
-      e.preventDefault();
+      if (e.cancelable) e.preventDefault();
       e.stopPropagation();
       handlePortClick(node.id, 'output', i);
     });
@@ -857,6 +873,59 @@ function getOutputPortLabels(type) {
     default: return ['Y'];
   }
 }
+function setupPanning() {
+  const getPanPos = (e) => {
+    if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    return { x: e.clientX, y: e.clientY };
+  };
+
+  const onPanStart = (e) => {
+    if (isDragging) return;
+    if (!e.touches && e.button !== 0) return;
+    if (e.target !== workspace && e.target !== panContainer && e.target !== wiresSvg) return;
+    if (e.target.closest('.sandbox-node') || e.target.closest('.sandbox-port') || e.target.closest('.sandbox-btn') || e.target.closest('.template-card')) return;
+    if (e.cancelable) e.preventDefault();
+    const pos = getPanPos(e);
+    panStart.x = pos.x;
+    panStart.y = pos.y;
+    panStartOffset.x = panX;
+    panStartOffset.y = panY;
+    isPanning = false;
+    panContainer.style.cursor = 'grabbing';
+  };
+
+  const onPanMove = (e) => {
+    if (isDragging) return;
+    if (panStart.x === 0 && panStart.y === 0) return;
+    const pos = getPanPos(e);
+    const dx = pos.x - panStart.x;
+    const dy = pos.y - panStart.y;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+      isPanning = true;
+      didPan = true;
+      panX = panStartOffset.x + dx;
+      panY = panStartOffset.y + dy;
+      panContainer.style.transform = `translate(${panX}px, ${panY}px)`;
+    }
+  };
+
+  const onPanEnd = () => {
+    if (isPanning) {
+      updateSandboxWires();
+    }
+    panStart.x = 0;
+    panStart.y = 0;
+    panContainer.style.cursor = '';
+  };
+
+  workspace.addEventListener('mousedown', onPanStart);
+  window.addEventListener('mousemove', onPanMove);
+  window.addEventListener('mouseup', onPanEnd);
+  workspace.addEventListener('touchstart', onPanStart, { passive: false });
+  window.addEventListener('touchmove', onPanMove, { passive: true });
+  window.addEventListener('touchend', onPanEnd, { passive: true });
+}
+
 function startDrag(e, node) {
   if (e.type === 'touchstart') {
     e.preventDefault();
@@ -875,16 +944,16 @@ function startDrag(e, node) {
   };
   const workspaceRect = workspace.getBoundingClientRect();
   const startClient = getClientPos(e);
-  const offsetX = startClient.x - workspaceRect.left - node.x;
-  const offsetY = startClient.y - workspaceRect.top - node.y;
+  const offsetX = startClient.x - workspaceRect.left - panX - node.x;
+  const offsetY = startClient.y - workspaceRect.top - panY - node.y;
 
   function onMove(mv) {
     if (mv.cancelable) mv.preventDefault();
     isDragging = true;
     const cur = getClientPos(mv);
     const wr = workspace.getBoundingClientRect();
-    node.x = Math.max(0, Math.round((cur.x - wr.left - offsetX) / 10) * 10);
-    node.y = Math.max(0, Math.round((cur.y - wr.top - offsetY) / 10) * 10);
+    node.x = Math.round((cur.x - wr.left - panX - offsetX) / 10) * 10;
+    node.y = Math.round((cur.y - wr.top - panY - offsetY) / 10) * 10;
     const domEl = document.getElementById(node.id);
     if (domEl) {
       domEl.style.left = `${node.x}px`;
@@ -1009,10 +1078,10 @@ function drawWiringPreview(e) {
   const canvasRect = workspace.getBoundingClientRect();
   const portRect = port.getBoundingClientRect();
 
-  const x1 = portRect.left + portRect.width / 2 - canvasRect.left;
-  const y1 = portRect.top + portRect.height / 2 - canvasRect.top;
-  const x2 = pos.x - canvasRect.left;
-  const y2 = pos.y - canvasRect.top;
+  const x1 = portRect.left + portRect.width / 2 - canvasRect.left - panX;
+  const y1 = portRect.top + portRect.height / 2 - canvasRect.top - panY;
+  const x2 = pos.x - canvasRect.left - panX;
+  const y2 = pos.y - canvasRect.top - panY;
 
   updateSandboxWires();   // draw committed wires first
 
@@ -1052,10 +1121,10 @@ function updateSandboxWires() {
     const oR = outPort.getBoundingClientRect();
     const iR = inPort.getBoundingClientRect();
 
-    const x1 = oR.left + oR.width / 2 - canvasRect.left;
-    const y1 = oR.top + oR.height / 2 - canvasRect.top;
-    const x2 = iR.left + iR.width / 2 - canvasRect.left;
-    const y2 = iR.top + iR.height / 2 - canvasRect.top;
+    const x1 = oR.left + oR.width / 2 - canvasRect.left - panX;
+    const y1 = oR.top + oR.height / 2 - canvasRect.top - panY;
+    const x2 = iR.left + iR.width / 2 - canvasRect.left - panX;
+    const y2 = iR.top + iR.height / 2 - canvasRect.top - panY;
     const srcNode = sandboxNodes.find(n => n.id === wire.fromNodeId);
     const electricityTypes = ['battery','resistor','bulb','switch','ammeter','voltmeter','motor','fuse','led-elec','junction','transistor'];
     const isElectricityCircuit = srcNode && electricityTypes.includes(srcNode.type);
@@ -3097,8 +3166,8 @@ window.appendSandboxTemplate = function (name, dropX, dropY) {
     idMap[oldId] = newId;
 
     n.id = newId;
-    n.x = Math.max(10, Math.round((n.x + offsetX) / 10) * 10);
-    n.y = Math.max(10, Math.round((n.y + offsetY) / 10) * 10);
+    n.x = Math.round((n.x + offsetX) / 10) * 10;
+    n.y = Math.round((n.y + offsetY) / 10) * 10;
 
     const def = COMPONENT_DEFS[n.type];
     if (def) {

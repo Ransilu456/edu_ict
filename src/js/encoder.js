@@ -184,7 +184,6 @@ function updateDigital() {
   drawDataWave(enc_digitalBits, 'enc-canvas-data-d', '#06b6d4');
   drawNrzL();
   drawNrzI();
-  drawRz();
   drawAmi();
 }
 
@@ -228,20 +227,6 @@ function drawNrzI() {
   ctx.stroke(); ctx.shadowBlur=0;
 }
 
-function drawRz() {
-  const r = resizeCanvas('enc-canvas-rz'); if (!r) return;
-  const { ctx, w, h } = r;
-  const bits=enc_digitalBits, bw=(w-36)/bits.length, x0=36, top=10, bot=h-10, mid=h/2;
-  ctx.clearRect(0,0,w,h); drawGrid(ctx,w,h);
-  ctx.strokeStyle='#a78bfa'; ctx.lineWidth=2.5; ctx.shadowColor='#a78bfa'; ctx.shadowBlur=6;
-  ctx.beginPath();
-  bits.forEach((b,i)=>{
-    const x=x0+i*bw, xm=x+bw/2, xe=x+bw, y=b?top:mid;
-    ctx.moveTo(x,mid); ctx.lineTo(x,y); ctx.lineTo(xm,y); ctx.lineTo(xm,mid); ctx.lineTo(xe,mid);
-  });
-  ctx.stroke(); ctx.shadowBlur=0;
-}
-
 function drawAmi() {
   const r = resizeCanvas('enc-canvas-ami'); if (!r) return;
   const { ctx, w, h } = r;
@@ -263,12 +248,6 @@ function drawAmi() {
 }
 function manchIEEE(bits)  { const o=[]; bits.forEach(b=>b===0?o.push(0,1):o.push(1,0)); return o; }
 function manchG3(bits)    { const o=[]; bits.forEach(b=>b===0?o.push(1,0):o.push(0,1)); return o; }
-function diffManch(bits)  {
-  let o=[], cur=1;
-  bits.forEach(b=>{ if(b===0)cur^=1; o.push(cur); cur^=1; o.push(cur); });
-  return o;
-}
-
 function drawManchWave(id, halfBits, color) {
   const r = resizeCanvas(id); if (!r) return;
   const { ctx, w, h } = r;
@@ -289,7 +268,7 @@ function updateManchester() {
   drawDataWave(enc_manchBits,'enc-canvas-data-m','#06b6d4');
   drawManchWave('enc-canvas-manch-ieee', manchIEEE(enc_manchBits), '#10b981');
   drawManchWave('enc-canvas-manch-g3',   manchG3(enc_manchBits),   '#f97316');
-  drawManchWave('enc-canvas-diff-manch', diffManch(enc_manchBits), '#f43f5e');
+
 }
 const TABLE_4B5B = {
   '0000':'11110','0001':'01001','0010':'10100','0011':'10101',
@@ -342,15 +321,6 @@ function runDecoder() {
         else { showDecErr(`Invalid Manchester pair "${p}" at position ${i}`); return; }
       }
       info = `G.E.Thomas Manchester: ${raw.length} encoded → ${decoded.length} data bits`;
-    } else if (scheme === 'diff-manchester') {
-      if (raw.length % 2 !== 0) { showDecErr('Differential Manchester requires even length.'); return; }
-      let prev = -1;
-      for (let i=0; i<raw.length; i+=2) {
-        const startBit = parseInt(raw[i]);
-        decoded += (prev === -1 || startBit !== prev) ? '0' : '1';
-        prev = parseInt(raw[i+1]);
-      }
-      info = `Differential Manchester: ${raw.length} encoded → ${decoded.length} data bits`;
     } else if (scheme === '4b5b') {
       if (raw.length % 5 !== 0) { showDecErr('4B/5B codes must be in groups of 5 bits.'); return; }
       for (let i=0; i<raw.length; i+=5) {
@@ -404,10 +374,6 @@ function runEncoder() {
   } else if (scheme === 'manchester-g3') {
     encoded = raw.split('').map(b=>b==='0'?'10':'01').join(' ');
     info = `${raw.length} data bits → ${raw.length*2} encoded bits`;
-  } else if (scheme === 'diff-manchester') {
-    let cur=0; const halves=[];
-    raw.split('').forEach(b=>{ if(b==='0')cur^=1; halves.push(cur); cur^=1; halves.push(cur); });
-    encoded = halves.join(''); info = `${raw.length} data → ${encoded.length} encoded`;
   } else if (scheme === '4b5b') {
     const padded = raw.padStart(Math.ceil(raw.length/4)*4,'0');
     const parts  = [];
@@ -514,9 +480,7 @@ const ENC_QUIZ = [
   { q:'Which line code suffers synchronisation loss during long runs of 0s?', opts:['Manchester','NRZ-L','AMI','RZ'], ans:1, exp:'NRZ-L has no transitions during long runs of 0s, making clock recovery impossible for the receiver.' },
   { q:'Nyquist\'s theorem states the maximum data rate for a NOISE-FREE channel is:', opts:['B × log₂(M)','2 × B × log₂(M)','B / log₂(M)','2 × B × SNR'], ans:1, exp:'Nyquist: Max data rate = 2 × B × log₂(M), where B = bandwidth (Hz) and M = number of discrete signal levels.' },
   { q:'A channel has 4 MHz bandwidth and SNR of 63. What is Shannon\'s capacity (C)?', opts:['24 Mbps','16 Mbps','32 Mbps','8 Mbps'], ans:0, exp:'C = B × log₂(1+SNR) = 4MHz × log₂(64) = 4MHz × 6 = 24 Mbps.' },
-  { q:'In QAM-16, how many bits are carried per symbol?', opts:['2 bits','4 bits','8 bits','16 bits'], ans:1, exp:'QAM-16 has 16 distinct signal states (combinations of amplitude and phase). log₂(16) = 4 bits per symbol.' },
   { q:'Why does NRZ-L have a DC component problem?', opts:['Too many transitions','A long sequence of 1s or 0s creates a constant voltage with no transitions','Voltage levels are too high','It alternates polarity randomly'], ans:1, exp:'NRZ-L holds the line high (or low) for long runs of 1s (or 0s). This DC offset can saturate AC-coupled equipment and prevent clock recovery.' },
-  { q:'Which modulation technique is most bandwidth-efficient?', opts:['ASK','FSK','PSK','QAM'], ans:3, exp:'QAM (Quadrature Amplitude Modulation) combines both amplitude and phase changes, allowing more bits per symbol and achieving greater bandwidth efficiency than ASK, FSK, or PSK alone.' },
 ];
 
 let enc_challengeState = {
