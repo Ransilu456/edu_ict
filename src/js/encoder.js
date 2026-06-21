@@ -9,8 +9,6 @@ export function initEncoder() {
 
   createBitToggles('enc-analog-bits',  enc_analogBits,  updateAnalog);
   createBitToggles('enc-digital-bits', enc_digitalBits, updateDigital);
-  createBitToggles('enc-manch-bits',   enc_manchBits,   updateManchester);
-  build4b5bTable();
 
   const bind = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('input', fn); };
   bind('enc-carrier-freq', updateAnalog);
@@ -39,7 +37,6 @@ export function initEncoder() {
       setTimeout(() => {
         if (btn.dataset.tab === 'analog')    updateAnalog();
         if (btn.dataset.tab === 'digital')   updateDigital();
-        if (btn.dataset.tab === 'manchester') updateManchester();
       }, 50);
     });
   }
@@ -61,7 +58,6 @@ export function initEncoder() {
   setTimeout(() => {
     updateAnalog();
     updateDigital();
-    updateManchester();
   }, 120);
 }
 
@@ -184,7 +180,11 @@ function updateDigital() {
   drawDataWave(enc_digitalBits, 'enc-canvas-data-d', '#06b6d4');
   drawNrzL();
   drawNrzI();
+  drawRz();
+  drawManchesterIEEE();
+  drawDiffManchester();
   drawAmi();
+  drawPseudoternary();
 }
 
 function drawNrzL() {
@@ -227,6 +227,86 @@ function drawNrzI() {
   ctx.stroke(); ctx.shadowBlur=0;
 }
 
+function drawRz() {
+  const r = resizeCanvas('enc-canvas-rz'); if (!r) return;
+  const { ctx, w, h } = r;
+  const bits = enc_digitalBits;
+  const bw=(w-36)/bits.length, x0=36, top=10, bot=h-10, mid=h/2;
+  ctx.clearRect(0,0,w,h); drawGrid(ctx,w,h);
+  ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='10px JetBrains Mono,monospace';
+  ctx.fillText('+V',4,top+8); ctx.fillText(' 0',4,mid+4); ctx.fillText('−V',4,bot);
+  ctx.strokeStyle='#6366f1'; ctx.lineWidth=2.5; ctx.shadowColor='#6366f1'; ctx.shadowBlur=6;
+  ctx.beginPath();
+  let px=x0, py=mid;
+  ctx.moveTo(px,py);
+  bits.forEach((b,i)=>{
+    const xStart = x0 + i * bw;
+    const xMid = xStart + bw / 2;
+    const xEnd = xStart + bw;
+    const level = b ? top : bot;
+    ctx.lineTo(xStart, level);
+    ctx.lineTo(xMid, level);
+    ctx.lineTo(xMid, mid);
+    ctx.lineTo(xEnd, mid);
+    py = mid;
+  });
+  ctx.stroke(); ctx.shadowBlur=0;
+}
+
+function drawManchesterIEEE() {
+  const r = resizeCanvas('enc-canvas-manch-ieee'); if (!r) return;
+  const { ctx, w, h } = r;
+  const bits = enc_digitalBits;
+  const bw=(w-36)/bits.length, x0=36, top=10, bot=h-10, mid=h/2;
+  ctx.clearRect(0,0,w,h); drawGrid(ctx,w,h);
+  ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='10px JetBrains Mono,monospace';
+  ctx.fillText('+V',4,top+8); ctx.fillText(' 0',4,mid+4); ctx.fillText('−V',4,bot);
+  ctx.strokeStyle='#a78bfa'; ctx.lineWidth=2.5; ctx.shadowColor='#a78bfa'; ctx.shadowBlur=6;
+  ctx.beginPath();
+  let py = bits[0] ? top : bot;
+  ctx.moveTo(x0, py);
+  bits.forEach((b,i)=>{
+    const xStart = x0 + i * bw;
+    const xMid = xStart + bw / 2;
+    const xEnd = xStart + bw;
+    const firstHalf = b ? top : bot;
+    const secondHalf = b ? bot : top;
+    ctx.lineTo(xStart, firstHalf);
+    ctx.lineTo(xMid, firstHalf);
+    ctx.lineTo(xMid, secondHalf);
+    ctx.lineTo(xEnd, secondHalf);
+    py = secondHalf;
+  });
+  ctx.stroke(); ctx.shadowBlur=0;
+}
+
+function drawDiffManchester() {
+  const r = resizeCanvas('enc-canvas-diffmanch'); if (!r) return;
+  const { ctx, w, h } = r;
+  const bits = enc_digitalBits;
+  const bw=(w-36)/bits.length, x0=36, top=10, bot=h-10, mid=h/2;
+  ctx.clearRect(0,0,w,h); drawGrid(ctx,w,h);
+  ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='10px JetBrains Mono,monospace';
+  ctx.fillText('+V',4,top+8); ctx.fillText(' 0',4,mid+4); ctx.fillText('−V',4,bot);
+  ctx.strokeStyle='#ec4899'; ctx.lineWidth=2.5; ctx.shadowColor='#ec4899'; ctx.shadowBlur=6;
+  ctx.beginPath();
+  let lastLevel = bot;
+  ctx.moveTo(x0, lastLevel);
+  bits.forEach((b, i) => {
+    const xStart = x0 + i * bw;
+    const xMid = xStart + bw / 2;
+    const xEnd = xStart + bw;
+    let firstHalf = (b === 0) ? (lastLevel === top ? bot : top) : lastLevel;
+    const secondHalf = firstHalf === top ? bot : top;
+    ctx.lineTo(xStart, firstHalf);
+    ctx.lineTo(xMid, firstHalf);
+    ctx.lineTo(xMid, secondHalf);
+    ctx.lineTo(xEnd, secondHalf);
+    lastLevel = secondHalf;
+  });
+  ctx.stroke(); ctx.shadowBlur=0;
+}
+
 function drawAmi() {
   const r = resizeCanvas('enc-canvas-ami'); if (!r) return;
   const { ctx, w, h } = r;
@@ -234,7 +314,7 @@ function drawAmi() {
   ctx.clearRect(0,0,w,h); drawGrid(ctx,w,h);
   ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='10px JetBrains Mono,monospace';
   ctx.fillText('+V',4,top+8); ctx.fillText(' 0',4,mid+4); ctx.fillText('−V',4,bot);
-  ctx.strokeStyle='#f43f5e'; ctx.lineWidth=2.5; ctx.shadowColor='#f43f5e'; ctx.shadowBlur=6;
+  ctx.strokeStyle='#f97316'; ctx.lineWidth=2.5; ctx.shadowColor='#f97316'; ctx.shadowBlur=6;
   ctx.beginPath();
   let polarity=1, px=x0, py=mid;
   bits.forEach((b,i)=>{
@@ -246,48 +326,30 @@ function drawAmi() {
   ctx.lineTo(x0+bits.length*bw,py);
   ctx.stroke(); ctx.shadowBlur=0;
 }
-function manchIEEE(bits)  { const o=[]; bits.forEach(b=>b===0?o.push(0,1):o.push(1,0)); return o; }
-function manchG3(bits)    { const o=[]; bits.forEach(b=>b===0?o.push(1,0):o.push(0,1)); return o; }
-function drawManchWave(id, halfBits, color) {
-  const r = resizeCanvas(id); if (!r) return;
+
+function drawPseudoternary() {
+  const r = resizeCanvas('enc-canvas-pseudoternary'); if (!r) return;
   const { ctx, w, h } = r;
-  const bw=(w-36)/halfBits.length, x0=36, top=10, bot=h-10;
+  const bits = enc_digitalBits;
+  const bw=(w-36)/bits.length, x0=36, top=10, bot=h-10, mid=h/2;
   ctx.clearRect(0,0,w,h); drawGrid(ctx,w,h);
-  ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.shadowColor=color; ctx.shadowBlur=6;
+  ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='10px JetBrains Mono,monospace';
+  ctx.fillText('+V',4,top+8); ctx.fillText(' 0',4,mid+4); ctx.fillText('−V',4,bot);
+  ctx.strokeStyle='#f43f5e'; ctx.lineWidth=2.5; ctx.shadowColor='#f43f5e'; ctx.shadowBlur=6;
   ctx.beginPath();
-  let py=halfBits[0]?top:bot; ctx.moveTo(x0,py);
-  halfBits.forEach((hb,i)=>{
-    const ny=hb?top:bot, nx=x0+i*bw;
-    ctx.lineTo(nx,py); ctx.lineTo(nx,ny); py=ny;
+  let polarity = 1, px = x0, py = mid;
+  ctx.moveTo(px, py);
+  bits.forEach((b, i) => {
+    const x = x0 + i * bw;
+    let ny = b === 1 ? mid : (polarity === 1 ? top : bot);
+    if (b === 0) polarity *= -1;
+    ctx.lineTo(x, py);
+    ctx.lineTo(x, ny);
+    px = x;
+    py = ny;
   });
-  ctx.lineTo(x0+halfBits.length*bw,py);
-  ctx.stroke(); ctx.shadowBlur=0;
-}
-
-function updateManchester() {
-  drawDataWave(enc_manchBits,'enc-canvas-data-m','#06b6d4');
-  drawManchWave('enc-canvas-manch-ieee', manchIEEE(enc_manchBits), '#10b981');
-  drawManchWave('enc-canvas-manch-g3',   manchG3(enc_manchBits),   '#f97316');
-
-}
-const TABLE_4B5B = {
-  '0000':'11110','0001':'01001','0010':'10100','0011':'10101',
-  '0100':'01010','0101':'01011','0110':'01110','0111':'01111',
-  '1000':'10010','1001':'10011','1010':'10110','1011':'10111',
-  '1100':'11010','1101':'11011','1110':'11100','1111':'11101'
-};
-const REVERSE_4B5B = Object.fromEntries(Object.entries(TABLE_4B5B).map(([k,v])=>[v,k]));
-
-function build4b5bTable() {
-  const container = document.getElementById('enc-code-table-4b5b');
-  if (!container) return;
-  container.innerHTML = '';
-  Object.entries(TABLE_4B5B).forEach(([nibble, code]) => {
-    const row = document.createElement('div');
-    row.className = 'enc-code-row';
-    row.innerHTML = `<span class="enc-nibble">${nibble}</span><span class="enc-arrow">→</span><span class="enc-fiveb">${code}</span>`;
-    container.appendChild(row);
-  });
+  ctx.lineTo(x0 + bits.length * bw, py);
+  ctx.stroke(); ctx.shadowBlur = 0;
 }
 function cleanBits(str) { return str.replace(/[^01]/g, ''); }
 
@@ -312,23 +374,21 @@ function runDecoder() {
         else { showDecErr(`Invalid Manchester pair "${p}" at position ${i}`); return; }
       }
       info = `IEEE 802.3 Manchester: ${raw.length} encoded → ${decoded.length} data bits`;
-    } else if (scheme === 'manchester-g3') {
-      if (raw.length % 2 !== 0) { showDecErr('Manchester bits must be even length.'); return; }
+    } else if (scheme === 'diff-manchester') {
+      if (raw.length % 2 !== 0) { showDecErr('Differential Manchester bits must be even length.'); return; }
+      let lastLevel = '0'; // assume initial state is 0/low
       for (let i=0; i<raw.length; i+=2) {
-        const p = raw[i]+raw[i+1];
-        if      (p==='10') decoded += '0';
-        else if (p==='01') decoded += '1';
-        else { showDecErr(`Invalid Manchester pair "${p}" at position ${i}`); return; }
+        const b1 = raw[i];
+        const b2 = raw[i+1];
+        if (b1 === b2) { showDecErr(`Invalid Differential Manchester mid-bit transition at position ${i}`); return; }
+        if (b1 !== lastLevel) {
+          decoded += '0';
+        } else {
+          decoded += '1';
+        }
+        lastLevel = b2;
       }
-      info = `G.E.Thomas Manchester: ${raw.length} encoded → ${decoded.length} data bits`;
-    } else if (scheme === '4b5b') {
-      if (raw.length % 5 !== 0) { showDecErr('4B/5B codes must be in groups of 5 bits.'); return; }
-      for (let i=0; i<raw.length; i+=5) {
-        const code = raw.slice(i,i+5);
-        if (!REVERSE_4B5B[code]) { showDecErr(`Unknown 4B/5B code: "${code}"`); return; }
-        decoded += REVERSE_4B5B[code];
-      }
-      info = `4B/5B: ${raw.length/5} code words → ${decoded.length} data bits`;
+      info = `Differential Manchester: ${raw.length} encoded → ${decoded.length} data bits`;
     } else if (scheme === 'nrzi') {
       let cur=0;
       for (const b of raw) { if(b==='1') cur^=1; decoded+=cur; }
@@ -336,6 +396,9 @@ function runDecoder() {
     } else if (scheme === 'ami') {
       for (const b of raw) decoded += b==='0' ? '0' : '1';
       info = `AMI decoded: ${decoded.length} bits`;
+    } else if (scheme === 'pseudoternary') {
+      for (const b of raw) decoded += b==='0' ? '1' : '0';
+      info = `Pseudoternary decoded: ${decoded.length} bits`;
     }
     showDecResult(decoded, info);
   } catch(e) { showDecErr(e.message); }
@@ -371,23 +434,50 @@ function runEncoder() {
   if (scheme === 'manchester-ieee') {
     encoded = raw.split('').map(b=>b==='0'?'01':'10').join(' ');
     info = `${raw.length} data bits → ${raw.length*2} encoded bits`;
-  } else if (scheme === 'manchester-g3') {
-    encoded = raw.split('').map(b=>b==='0'?'10':'01').join(' ');
+  } else if (scheme === 'diff-manchester') {
+    let lastLevel = '0';
+    const encodedParts = [];
+    raw.split('').forEach(b => {
+      let firstHalf = (b === '0') ? (lastLevel === '0' ? '1' : '0') : lastLevel;
+      let secondHalf = (firstHalf === '0') ? '1' : '0';
+      encodedParts.push(firstHalf + secondHalf);
+      lastLevel = secondHalf;
+    });
+    encoded = encodedParts.join(' ');
     info = `${raw.length} data bits → ${raw.length*2} encoded bits`;
-  } else if (scheme === '4b5b') {
-    const padded = raw.padStart(Math.ceil(raw.length/4)*4,'0');
-    const parts  = [];
-    for(let i=0;i<padded.length;i+=4) parts.push(TABLE_4B5B[padded.slice(i,i+4)]||'?????');
-    encoded = parts.join(' '); info = `${padded.length/4} nibble(s) → ${parts.length*5} encoded bits`;
   } else if (scheme === 'nrzi') {
     let cur=0;
     encoded = raw.split('').map(b=>{if(b==='1')cur^=1;return cur;}).join('');
     info = `NRZ-I: ${raw.length} bits`;
+  } else if (scheme === 'ami') {
+    let polarity = 1;
+    encoded = raw.split('').map(b => {
+      if (b === '0') return '0';
+      const code = polarity === 1 ? '+' : '-';
+      polarity *= -1;
+      return code;
+    }).join(' ');
+    info = `AMI: ${raw.length} bits`;
+  } else if (scheme === 'pseudoternary') {
+    let polarity = 1;
+    encoded = raw.split('').map(b => {
+      if (b === '1') return '0';
+      const code = polarity === 1 ? '+' : '-';
+      polarity *= -1;
+      return code;
+    }).join(' ');
+    info = `Pseudoternary: ${raw.length} bits`;
   }
 
   const bitsEl = document.getElementById('enc-encoded-bits');
   const infoEl = document.getElementById('enc-encoded-info');
-  if (bitsEl) bitsEl.innerHTML = encoded.split('').map(b=>b==='1'?`<span class="enc-bit-1">1</span>`:b==='0'?`<span class="enc-bit-0">0</span>`:b).join('');
+  if (bitsEl) {
+    bitsEl.innerHTML = encoded.split('').map(b => {
+      if (b === '1' || b === '+') return `<span class="enc-bit-1">${b}</span>`;
+      if (b === '0' || b === '-') return `<span class="enc-bit-0">${b}</span>`;
+      return b;
+    }).join('');
+  }
   if (infoEl) infoEl.textContent = info;
   resEl.style.display = 'block';
 }
@@ -469,12 +559,12 @@ function formatRate(bps) {
 }
 const ENC_QUIZ = [
   { q:'Which encoding scheme varies the FREQUENCY of a carrier wave to represent binary data?', opts:['ASK','FSK','PSK','NRZ-L'], ans:1, exp:'FSK (Frequency Shift Keying) uses different frequencies: higher frequency for 1, base frequency for 0.' },
-  { q:'In IEEE 802.3 Manchester encoding, how is a binary 1 represented?', opts:['High-to-Low transition','Low-to-High transition','No transition','Zero voltage'], ans:0, exp:'IEEE 802.3: 1 = High→Low mid-bit transition, 0 = Low→High. (G.E. Thomas is the opposite.)' },
+  { q:'In IEEE 802.3 Manchester encoding, how is a binary 1 represented?', opts:['High-to-Low transition','Low-to-High transition','No transition','Zero voltage'], ans:0, exp:'IEEE 802.3: 1 = High→Low mid-bit transition, 0 = Low→High.' },
   { q:'Which digital line code has NO DC component AND is self-clocking?', opts:['NRZ-L','NRZ-I','Manchester','AMI'], ans:2, exp:'Manchester always has a guaranteed mid-bit transition, providing self-clocking, with no net DC component.' },
-  { q:'4B/5B encoding on Fast Ethernet wire is combined with which line code?', opts:['NRZ-L','Manchester','NRZ-I','RZ'], ans:2, exp:'4B/5B codes are transmitted using NRZ-I in 100BASE-TX Fast Ethernet.' },
-  { q:'What is the efficiency of 4B/5B encoding?', opts:['50%','80%','100%','60%'], ans:1, exp:'4 data bits per 5 encoded bits = 4/5 = 80% efficiency. A 100 Mbps wire rate yields 80 Mbps of actual data.' },
+  { q:'In Differential Manchester encoding, how is a binary 0 represented?', opts:['A transition at the beginning of the bit period', 'No transition at the beginning of the bit period', 'Zero voltage throughout the bit period', 'No mid-bit transition'], ans:0, exp:'Differential Manchester always has a mid-bit transition. A binary 0 is represented by a transition at the beginning of the bit period, and a binary 1 by no transition.' },
+  { q:'In Pseudoternary encoding, how are binary 1 and binary 0 represented?', opts:['1 is zero voltage, 0 alternates between +V and -V', '0 is zero voltage, 1 alternates between +V and -V', 'Both 1 and 0 are alternating voltages', '1 is +V, 0 is -V'], ans:0, exp:'In Pseudoternary, binary 1 is represented by zero voltage (0V) and binary 0 is represented by alternating positive and negative voltages (+V and -V).' },
   { q:'In AMI (Alternate Mark Inversion), how are 1-bits encoded?', opts:['Always +V','Always 0V','Alternating +V and −V','High-frequency burst'], ans:2, exp:'AMI alternates between +V and −V for successive 1-bits, with 0-bits encoded as zero voltage. This eliminates DC component.' },
-  { q:'Which encoding is used in 10BASE-T Ethernet?', opts:['4B/5B + NRZ-I','Manchester (IEEE 802.3)','NRZ-L','AMI'], ans:1, exp:'10BASE-T Ethernet uses IEEE 802.3 Manchester encoding for self-clocking on the physical wire.' },
+  { q:'Which encoding is used in 10BASE-T Ethernet?', opts:['Manchester (IEEE 802.3)','NRZ-L','AMI','Pseudoternary'], ans:0, exp:'10BASE-T Ethernet uses IEEE 802.3 Manchester encoding for self-clocking on the physical wire.' },
   { q:"Shannon's capacity theorem states C = ?", opts:['2 × B × log₂(M)','B × log₂(1 + SNR)','B / SNR','2B × SNR'], ans:1, exp:'C = B × log₂(1 + SNR) gives the theoretical maximum data rate for a noisy channel with bandwidth B.' },
   { q:'In BPSK, a binary 0 is represented by shifting the carrier phase by:', opts:['0°','90°','180°','360°'], ans:2, exp:'BPSK: 1 = 0° phase, 0 = 180° phase shift. The receiver detects phase reversals to determine the bit value.' },
   { q:'Which line code suffers synchronisation loss during long runs of 0s?', opts:['Manchester','NRZ-L','AMI','RZ'], ans:1, exp:'NRZ-L has no transitions during long runs of 0s, making clock recovery impossible for the receiver.' },
@@ -683,5 +773,5 @@ function enc_createConfettiParticle(container) {
   setTimeout(() => { p.remove(); }, duration * 1000);
 }
 export function refreshEncoderCanvases() {
-  updateAnalog(); updateDigital(); updateManchester();
+  updateAnalog(); updateDigital();
 }

@@ -1,6 +1,6 @@
 import UserService from './user-service.js';
 
-const TOTAL_LESSONS = 13; // expanded from 9
+const TOTAL_LESSONS = 16;
 
 export const lessonMetadata = [
   { id: 0,  title: 'The Binary Code',       level: 1, category: 'Fundamentals', icon: '⚡', color: '#58cc02', desc: 'Voltage & Binary States' },
@@ -16,12 +16,15 @@ export const lessonMetadata = [
   { id: 10, title: 'TCP/IP & Protocols',    level: 6, category: 'Networking',   icon: '🌐', color: '#a855f7', desc: 'Internet Protocols' },
   { id: 11, title: 'IP Addressing',         level: 6, category: 'Networking',   icon: '🔢', color: '#a855f7', desc: 'IPv4, Subnets & CIDR' },
   { id: 12, title: 'Master of ICT!',        level: 7, category: 'Mastery',      icon: '🏆', color: '#7c5ef2', desc: 'Complete the Journey' },
+  { id: 13, title: 'Number Systems',        level: 2, category: 'Fundamentals', icon: '🔢', color: '#58cc02', desc: 'Binary, Octal & Hex' },
+  { id: 14, title: 'Boolean Algebra',       level: 3, category: 'Logic Gates',  icon: '📐', color: '#1cb0f6', desc: 'Laws & Simplification' },
+  { id: 15, title: 'Flip Flops',            level: 5, category: 'Circuits',     icon: '🔄', color: '#ff9600', desc: 'SR, D & JK Sequential' },
 ];
 
 const categories = [
-  { name: 'Fundamentals', icon: '⚡', color: '#58cc02', bg: 'rgba(88,204,2,0.1)',    border: 'rgba(88,204,2,0.3)',    lessons: [0, 1] },
-  { name: 'Logic Gates',  icon: '🔮', color: '#1cb0f6', bg: 'rgba(28,176,246,0.1)',  border: 'rgba(28,176,246,0.3)',  lessons: [2, 3, 4, 5] },
-  { name: 'Circuits',     icon: '🔧', color: '#ff9600', bg: 'rgba(255,150,0,0.1)',   border: 'rgba(255,150,0,0.3)',   lessons: [6, 7] },
+  { name: 'Fundamentals', icon: '⚡', color: '#58cc02', bg: 'rgba(88,204,2,0.1)',    border: 'rgba(88,204,2,0.3)',    lessons: [0, 1, 13] },
+  { name: 'Logic Gates',  icon: '🔮', color: '#1cb0f6', bg: 'rgba(28,176,246,0.1)',  border: 'rgba(28,176,246,0.3)',  lessons: [2, 3, 4, 5, 14] },
+  { name: 'Circuits',     icon: '🔧', color: '#ff9600', bg: 'rgba(255,150,0,0.1)',   border: 'rgba(255,150,0,0.3)',   lessons: [6, 7, 15] },
   { name: 'Networking',   icon: '📡', color: '#a855f7', bg: 'rgba(168,85,247,0.1)',  border: 'rgba(168,85,247,0.3)',  lessons: [8, 9, 10, 11] },
   { name: 'Mastery',      icon: '🏆', color: '#7c5ef2', bg: 'rgba(124,94,242,0.1)',  border: 'rgba(124,94,242,0.3)',  lessons: [12] },
 ];
@@ -35,6 +38,10 @@ function getCompletedCount() {
   return completedLessons.size;
 }
 function canAccessLesson(idx) {
+  if (idx === 0) return true;
+  if (idx === 13) return completedLessons.has(1);
+  if (idx === 14) return completedLessons.has(5);
+  if (idx === 15) return completedLessons.has(7);
   if (idx <= 2) return true;
   return completedLessons.has(idx - 1);
 }
@@ -76,6 +83,12 @@ function navigateToLesson(lessonIdx) {
 export function renderCourseMap() {
   const container = document.getElementById('course-map-container');
   if (!container) return;
+
+  const mode = localStorage.getItem('logicQuest_interfaceMode') || 'classic';
+  if (mode === 'professional') {
+    renderProfessionalSyllabus(container);
+    return;
+  }
 
   syncCompletionState();
   const completedCount = getCompletedCount();
@@ -254,6 +267,153 @@ export function renderCourseMap() {
     container.appendChild(done);
   }
 }
+
+function renderProfessionalSyllabus(container) {
+  syncCompletionState();
+  const completedCount = getCompletedCount();
+  const pct = Math.round((completedCount / TOTAL_LESSONS) * 100);
+
+  container.innerHTML = '';
+  container.className = 'course-map-page professional-syllabus-view';
+
+  // Create syllabus container
+  const wrap = document.createElement('div');
+  wrap.className = 'syllabus-view-container';
+
+  // Create header progress info
+  const header = document.createElement('div');
+  header.className = 'syllabus-header';
+  
+  // Clean language support
+  const currentLang = localStorage.getItem('logicQuest_medium') || 'en';
+  const titleText = currentLang === 'si' ? 'විෂය මාලා දළ විශ්ලේෂණය' : 'Curriculum Overview';
+  const progressText = currentLang === 'si' ? 'සම්පූර්ණ ප්‍රගතිය' : 'Overall Progress';
+
+  header.innerHTML = `
+    <div>
+      <h2 class="syllabus-header-title">${titleText}</h2>
+      <div style="font-size:0.85rem;color:var(--text-secondary);margin-top:2px;">
+        ${completedCount} / ${TOTAL_LESSONS} ${currentLang === 'si' ? 'පාඩම් නිම කර ඇත' : 'Lessons Completed'}
+      </div>
+    </div>
+    <div class="syllabus-progress-bar">
+      <div style="display:flex;justify-content:space-between;font-size:0.75rem;font-weight:600;color:var(--text-secondary)">
+        <span>${progressText}</span>
+        <span>${pct}%</span>
+      </div>
+      <div class="cm-progress-track">
+        <div class="cm-progress-fill" style="width: ${pct}%"></div>
+      </div>
+    </div>
+  `;
+  wrap.appendChild(header);
+
+  // Render categories as syllabus modules
+  categories.forEach((cat, catIdx) => {
+    const catCompleted = cat.lessons.filter(id => completedLessons.has(id)).length;
+    const modulePct = Math.round((catCompleted / cat.lessons.length) * 100);
+
+    const modCard = document.createElement('div');
+    modCard.className = 'syllabus-module-card';
+
+    // Collapsible header
+    const modHeader = document.createElement('div');
+    modHeader.className = 'syllabus-module-header';
+    modHeader.innerHTML = `
+      <div class="syllabus-module-info">
+        <div class="syllabus-module-icon" style="background:${cat.bg}; border:1.5px solid ${cat.border}; color:${cat.color}">
+          ${cat.icon}
+        </div>
+        <div class="syllabus-module-meta">
+          <span class="syllabus-module-title">${cat.name}</span>
+          <span class="syllabus-module-count">${catCompleted} / ${cat.lessons.length} ${currentLang === 'si' ? 'පාඩම් නිමයි' : 'Lessons Done'}</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:0.8rem;font-weight:700;color:var(--text-secondary)">${modulePct}%</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform 0.2s;" class="syllabus-chevron">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+    `;
+
+    const lessonsList = document.createElement('div');
+    lessonsList.className = 'syllabus-lessons-list';
+    lessonsList.style.display = 'block'; // defaults to expanded
+
+    // Bind toggle collapse
+    modHeader.addEventListener('click', () => {
+      const isCollapsed = lessonsList.style.display === 'none';
+      lessonsList.style.display = isCollapsed ? 'block' : 'none';
+      const chevron = modHeader.querySelector('.syllabus-chevron');
+      if (chevron) {
+        chevron.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(-90deg)';
+      }
+      if (window.playSound) window.playSound('click');
+    });
+
+    cat.lessons.forEach((lessonId) => {
+      const lesson = lessonMetadata[lessonId];
+      const state = getLessonState(lessonId);
+      const isCompleted = state === 'completed';
+      const isAvailable = state === 'available';
+      const isLocked = state === 'locked';
+
+      const row = document.createElement('div');
+      row.className = `syllabus-lesson-row ${isLocked ? 'locked' : ''}`;
+
+      let statusIconHtml = '';
+      if (isCompleted) {
+        statusIconHtml = `<div class="syllabus-lesson-status completed"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>`;
+      } else if (isAvailable) {
+        statusIconHtml = `<div class="syllabus-lesson-status available"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>`;
+      } else {
+        statusIconHtml = `<div class="syllabus-lesson-status locked"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>`;
+      }
+
+      const startText = currentLang === 'si' ? 'ආරම්භ කරන්න' : 'Start';
+      const reviewText = currentLang === 'si' ? 'පුනරීක්ෂණය' : 'Review';
+      const lockedText = currentLang === 'si' ? 'අගුළු දමා ඇත' : 'Locked';
+
+      row.innerHTML = `
+        <div class="syllabus-lesson-main">
+          ${statusIconHtml}
+          <div class="syllabus-lesson-details">
+            <span class="syllabus-lesson-title">${lessonId + 1}. ${lesson.title}</span>
+            <span class="syllabus-lesson-desc">${lesson.desc}</span>
+          </div>
+        </div>
+        <button class="syllabus-btn-action" ${isLocked ? 'disabled' : ''}>
+          ${isCompleted ? reviewText : isAvailable ? startText : lockedText}
+        </button>
+      `;
+
+      if (!isLocked) {
+        const btn = row.querySelector('.syllabus-btn-action');
+        const handleStart = () => {
+          if (window.playSound) window.playSound('click');
+          navigateToLesson(lessonId);
+        };
+        btn?.addEventListener('click', handleStart);
+        row.addEventListener('click', (e) => {
+          if (e.target !== btn && !btn?.contains(e.target)) {
+            handleStart();
+          }
+        });
+        row.style.cursor = 'pointer';
+      }
+
+      lessonsList.appendChild(row);
+    });
+
+    modCard.appendChild(modHeader);
+    modCard.appendChild(lessonsList);
+    wrap.appendChild(modCard);
+  });
+
+  container.appendChild(wrap);
+}
+
 function showLockedToast(lessonTitle) {
   document.getElementById('cm-toast')?.remove();
   const toast = document.createElement('div');

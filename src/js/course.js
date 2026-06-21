@@ -192,6 +192,80 @@ Mnemonic: <em>"All People Seem To Need Data Processing"</em>`,
       explanation: 'A Router operates at Layer 3, using IP addresses to make forwarding decisions across different networks.',
     },
   },
+  {
+    id: 13,
+    title: 'Number Systems & Codes',
+    text: `<strong>Number systems</strong> are the foundation of digital computing. Understanding them is essential for A/L ICT.<br><br>
+<strong>Binary (Base-2)</strong>: uses digits 0,1. Example: 1101₂ = 1×8 + 1×4 + 0×2 + 1×1 = 13₁₀<br><br>
+<strong>Octal (Base-8)</strong>: uses digits 0–7. Each octal digit maps to 3 binary bits.<br>
+Example: 15₈ = 001 101₂ = 13₁₀<br><br>
+<strong>Hexadecimal (Base-16)</strong>: uses digits 0–9, A–F. Each hex digit maps to 4 binary bits.<br>
+Example: D₁₆ = 1101₂ = 13₁₀<br><br>
+<strong>BCD (Binary Coded Decimal)</strong>: each decimal digit encoded as 4 binary bits.<br>
+Example: 13₁₀ = 0001 0011 (BCD)<br><br>
+<strong>ASCII codes</strong>: standard 7-bit encoding for text. 'A' = 65₁₀ = 01000001₂.`,
+    type: 'info-card',
+    quiz: {
+      question: 'What is the hexadecimal equivalent of the binary number <strong>11011011₂</strong>?',
+      options: ['DB₁₆', 'B3₁₆', 'D9₁₆', '9B₁₆'],
+      correctIndex: 0,
+      explanation: '11011011₂ = 1101 1011 = D (13) and B (11) = DB₁₆.',
+    },
+  },
+  {
+    id: 14,
+    title: 'Boolean Algebra',
+    text: `<strong>Boolean Algebra</strong> is the mathematical foundation of digital logic circuits. Key laws for A/L ICT:<br><br>
+<strong>Basic Laws:</strong><br>
+• A + 0 = A &nbsp;&nbsp; A · 1 = A<br>
+• A + 1 = 1 &nbsp;&nbsp; A · 0 = 0<br>
+• A + A = A &nbsp;&nbsp; A · A = A<br>
+• A + A' = 1 &nbsp;&nbsp; A · A' = 0<br><br>
+<strong>De Morgan's Theorems:</strong><br>
+• (A + B)' = A' · B'<br>
+• (A · B)' = A' + B'<br><br>
+<strong>Distributive &amp; Associative:</strong><br>
+• A + (B + C) = (A + B) + C<br>
+• A · (B · C) = (A · B) · C<br>
+• A · (B + C) = A·B + A·C<br>
+• A + (B · C) = (A + B) · (A + C)<br><br>
+<strong>Absorption Laws:</strong><br>
+• A + (A · B) = A<br>
+• A · (A + B) = A<br><br>
+These laws help <strong>simplify logic circuits</strong>, reducing the number of gates needed.`,
+    type: 'info-card',
+    quiz: {
+      question: 'Apply De Morgan\'s theorem: the complement of (X + Y) is:',
+      options: ['X\' + Y\'', 'X\' · Y\'', 'X · Y', '(X · Y)\''],
+      correctIndex: 1,
+      explanation: 'De Morgan says (X + Y)\' = X\' · Y\'. The OR inside becomes AND outside, and both terms get complemented.',
+    },
+  },
+  {
+    id: 15,
+    title: 'Flip Flops',
+    text: `<strong>Flip Flops</strong> are sequential logic elements that store 1 bit of data. Unlike logic gates, they have <strong>memory</strong> — output depends on past inputs.<br><br>
+<strong>SR Flip Flop (Set-Reset):</strong><br>
+• S=1, R=0 → Q=1 (SET)<br>
+• S=0, R=1 → Q=0 (RESET)<br>
+• S=0, R=0 → Q unchanged (HOLD)<br>
+• S=1, R=1 → Invalid (both outputs 0)<br><br>
+<strong>D Flip Flop (Data/Latch):</strong><br>
+• Stores the D input value on each clock edge.<br>
+• Q = D when clock transitions.<br>
+• Used in registers and data storage.<br><br>
+<strong>JK Flip Flop:</strong><br>
+• J=1, K=0 → SET | J=0, K=1 → RESET<br>
+• J=0, K=0 → HOLD | J=1, K=1 → TOGGLE<br><br>
+<strong>Applications:</strong> Counters, Shift Registers, Memory cells, Frequency dividers.`,
+    type: 'info-card',
+    quiz: {
+      question: 'In a JK flip flop, what happens when both J=1 and K=1 on a clock edge?',
+      options: ['Output is forced to 0', 'Output toggles', 'Output stays unchanged', 'Invalid state'],
+      correctIndex: 1,
+      explanation: 'J=1, K=1 is the TOGGLE mode — the output flips from 0→1 or 1→0 on each clock edge.',
+    },
+  },
 ];
 let currentLessonIdx = 0;
 let selectedOptionIdx = null;

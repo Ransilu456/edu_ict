@@ -80,6 +80,11 @@
       </nav>
       
       <div style="display:flex; align-items:center; gap:0.5rem">
+        <div class="mode-pill-toggle" id="header-mode-toggle">
+          <button class="mode-toggle-btn active" data-mode="classic" id="header-mode-classic-btn">Classic</button>
+          <button class="mode-toggle-btn" data-mode="professional" id="header-mode-pro-btn">Pro</button>
+        </div>
+
         <div class="header-badge energy" title="XP Points Badge">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align:middle; margin-right:2px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
           <span id="score-count" style="font-family:var(--font-header); font-weight:800">0</span>
@@ -250,6 +255,27 @@
               <circle cx="20" cy="160" r="7" fill="#10b981" stroke="#065f46" stroke-width="1.5"/>
               <text x="20" y="164" text-anchor="middle" font-size="8" font-weight="900" fill="white">1</text>
             </svg>
+          </div>
+        </div>
+
+        
+        <div class="home-activity-strip" id="home-activity-strip">
+          <div class="home-activity-item">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v6M12 16v6M2 8h10M2 16h10M1 6v12"/></svg>
+            <span class="home-activity-val" id="home-stat-sessions">0</span>
+            <span class="home-activity-label">Sessions</span>
+          </div>
+          <div class="home-activity-sep"></div>
+          <div class="home-activity-item">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <span class="home-activity-val" id="home-stat-streak">0</span>
+            <span class="home-activity-label">Day Streak</span>
+          </div>
+          <div class="home-activity-sep"></div>
+          <div class="home-activity-item">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="home-activity-val" id="home-stat-lastactive">—</span>
+            <span class="home-activity-label">Last Active</span>
           </div>
         </div>
 
@@ -618,32 +644,44 @@
         <svg class="wires-svg" id="sandbox-wires-svg"></svg>
         <div class="sandbox-toolbar">
           <button class="sandbox-btn btn-play" id="sandbox-play" title="Run / Pause">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Run
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> <span>Run</span>
           </button>
           <div style="width:1px;background:var(--border-color);height:20px"></div>
           <button class="sandbox-btn" id="sandbox-clear" title="Clear Canvas">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6l-1 14H6L5 6M10 6V4h4v2"/></svg> Clear
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6l-1 14H6L5 6M10 6V4h4v2"/></svg> <span>Clear</span>
           </button>
           <button class="sandbox-btn" id="sandbox-save" title="Save Circuit">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> <span>Save</span>
           </button>
           <button class="sandbox-btn" id="sandbox-load" title="Load Circuit">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Load
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> <span>Load</span>
           </button>
           <div style="width:1px;background:var(--border-color);height:20px"></div>
           <button class="sandbox-btn" id="sandbox-export" title="Export JSON">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> <span>Export</span>
           </button>
           <button class="sandbox-btn" id="sandbox-import-btn" title="Import JSON">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Import
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> <span>Import</span>
           </button>
           <div style="width:1px;background:var(--border-color);height:20px"></div>
           <button class="sandbox-btn" id="sandbox-theory-btn" title="Toggle Theory Guide">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Theory Guide
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> <span>Theory Guide</span>
           </button>
           <button class="sandbox-btn" id="sandbox-gate-style-btn" title="Toggle Gate Style (Box / ANSI Symbol)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7l5 5-5 5"/></svg> Gate: Box
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7l5 5-5 5"/></svg> <span>Gate: Box</span>
           </button>
+          <div class="zoom-controls">
+            <button class="sandbox-btn" id="sandbox-zoom-out" title="Zoom Out">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <span class="sandbox-zoom-indicator" id="sandbox-zoom-val">100%</span>
+            <button class="sandbox-btn" id="sandbox-zoom-in" title="Zoom In">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <button class="sandbox-btn" id="sandbox-zoom-reset" title="Recenter / Reset Zoom">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>
+            </button>
+          </div>
           <input type="file" id="sandbox-import-file" accept=".json" style="display:none">
         </div>
 
@@ -768,10 +806,10 @@
                 <div class="util-card-sub">Dynamic for the active Class block</div>
               </div>
             </div>
-            <table class="sn-table">
+            <div style="overflow-x:auto"><table class="sn-table">
               <thead><tr><th>CIDR</th><th>Subnet Mask</th><th>Usable Hosts</th><th>Block Size</th></tr></thead>
               <tbody id="sn-cheat-table-body"></tbody>
-            </table>
+            </table></div>
           </div>
         </div>
 
@@ -840,14 +878,13 @@
       <div class="util-view-header">
         <div class="util-view-badge"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px"><path d="M4.93 4.93a10 10 0 0 0 0 14.14M19.07 4.93a10 10 0 0 1 0 14.14M1.64 10.36a14 14 0 0 0 0 3.27M22.36 10.36a14 14 0 0 1 0 3.27M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/></svg> A/L ICT Networking</div>
         <h1 class="util-view-title">Signal Encoding Lab</h1>
-        <p class="util-view-subtitle">Visualise ASK, FSK, PSK, NRZ, Manchester &amp; 4B/5B. Toggle bits — see waveforms update live.</p>
+        <p class="util-view-subtitle">Visualise ASK, FSK, PSK, NRZ-L/I, RZ, Manchester, AMI &amp; Pseudoternary. Toggle bits — see waveforms update live.</p>
       </div>
       <div class="enc-container" id="enc-main-container">
         
         <div class="enc-tab-strip" id="enc-tab-strip">
           <button class="enc-tab-btn active" data-tab="analog"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Analog Encoding</button>
           <button class="enc-tab-btn" data-tab="digital"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polyline points="5 9 5 5 19 5 19 9"/><polyline points="5 15 5 19 19 19 19 15"/></svg> Digital Line Codes</button>
-          <button class="enc-tab-btn" data-tab="manchester"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg> Manchester / 4B5B</button>
           <button class="enc-tab-btn" data-tab="decoder"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg> Decoder Tool</button>
           <button class="enc-tab-btn" data-tab="theory"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Theory &amp; Reference</button>
           <button class="enc-tab-btn" data-tab="quiz"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Quiz</button>
@@ -907,40 +944,25 @@
               <div class="enc-wave-row"><span class="enc-wave-label" style="color:#06b6d4">DATA</span><div class="enc-wave-box"><canvas id="enc-canvas-data-d" class="enc-canvas"></canvas></div></div>
               <div class="enc-wave-row"><span class="enc-wave-label" style="color:#f59e0b">NRZ-L</span><div class="enc-wave-box"><canvas id="enc-canvas-nrzl" class="enc-canvas"></canvas></div></div>
               <div class="enc-wave-row"><span class="enc-wave-label" style="color:#10b981">NRZ-I</span><div class="enc-wave-box"><canvas id="enc-canvas-nrzi" class="enc-canvas"></canvas></div></div>
-              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#f43f5e">AMI</span><div class="enc-wave-box"><canvas id="enc-canvas-ami" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#6366f1">RZ</span><div class="enc-wave-box"><canvas id="enc-canvas-rz" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#a78bfa">Manchester</span><div class="enc-wave-box"><canvas id="enc-canvas-manch-ieee" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#ec4899">Diff. Manch.</span><div class="enc-wave-box"><canvas id="enc-canvas-diffmanch" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#f97316">AMI</span><div class="enc-wave-box"><canvas id="enc-canvas-ami" class="enc-canvas"></canvas></div></div>
+              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#f43f5e">Pseudoternary</span><div class="enc-wave-box"><canvas id="enc-canvas-pseudoternary" class="enc-canvas"></canvas></div></div>
+            </div>
+            <div class="enc-chips" style="margin-top:14px; display:flex; flex-wrap:wrap; gap:8px;">
+              <span class="enc-chip enc-chip-amber">NRZ-L: 0=H, 1=L</span>
+              <span class="enc-chip enc-chip-green">NRZ-I: 1=Transition, 0=No Transition</span>
+              <span class="enc-chip enc-chip-blue">RZ: Return to Zero at half-duration</span>
+              <span class="enc-chip enc-chip-violet">Manchester: 0=L→H, 1=H→L</span>
+              <span class="enc-chip enc-chip-pink">Diff. Manchester: 0=Transition at start, 1=No Transition at start</span>
+              <span class="enc-chip enc-chip-orange">AMI: 0=0V, 1=Alternating +V/-V</span>
+              <span class="enc-chip enc-chip-red">Pseudoternary: 1=0V, 0=Alternating +V/-V</span>
             </div>
           </div>
         </div>
 
-        
-        <div class="enc-tab-panel" id="enc-tab-manchester">
-          <div class="util-card">
-            <div class="util-card-header">
-              <div class="util-card-icon" style="background:rgba(16,185,129,0.15)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
-              <div><div class="util-card-title">Manchester Encoding</div><div class="util-card-sub">IEEE 802.3 &amp; G.E. Thomas</div></div>
-            </div>
-            <div class="enc-bit-label">Binary Data Bits (up to 8)</div>
-            <div class="enc-bit-grid" id="enc-manch-bits"></div>
-            <div class="enc-wave-stack" style="margin-top:14px">
-              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#06b6d4">DATA</span><div class="enc-wave-box"><canvas id="enc-canvas-data-m" class="enc-canvas"></canvas></div></div>
-              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#10b981">IEEE 802.3</span><div class="enc-wave-box"><canvas id="enc-canvas-manch-ieee" class="enc-canvas"></canvas></div></div>
-              <div class="enc-wave-row"><span class="enc-wave-label" style="color:#f97316">G.E.Thomas</span><div class="enc-wave-box"><canvas id="enc-canvas-manch-g3" class="enc-canvas"></canvas></div></div>
-            </div>
-            <div class="enc-chips" style="margin-top:14px">
-              <span class="enc-chip enc-chip-green">IEEE 802.3: 0=L→H, 1=H→L</span>
-              <span class="enc-chip enc-chip-cyan">G.E.Thomas: 0=H→L, 1=L→H</span>
-            </div>
-          </div>
 
-          <div class="util-card" style="margin-top:16px">
-            <div class="util-card-header">
-              <div class="util-card-icon" style="background:rgba(139,92,246,0.15)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></div>
-              <div><div class="util-card-title">4B/5B Encoding Table</div><div class="util-card-sub">Used in Fast Ethernet (100BASE-TX)</div></div>
-            </div>
-            <p style="font-size:.875rem;color:var(--text-secondary);margin-bottom:14px">Maps 4-bit nibbles to 5-bit codes ensuring no more than one leading zero and two trailing zeros.</p>
-            <div class="enc-code-table" id="enc-code-table-4b5b"></div>
-          </div>
-        </div>
 
         
         <div class="enc-tab-panel" id="enc-tab-decoder">
@@ -954,10 +976,10 @@
             <div class="enc-ctrl-row" style="margin-top:12px">
               <select class="enc-select" id="enc-decoder-scheme">
                 <option value="manchester-ieee">Manchester (IEEE 802.3)</option>
-                <option value="manchester-g3">Manchester (G.E. Thomas)</option>
-                <option value="4b5b">4B/5B → 4-bit nibbles</option>
+                <option value="diff-manchester">Differential Manchester</option>
                 <option value="nrzi">NRZ-I</option>
                 <option value="ami">AMI (+V/−V → 1)</option>
+                <option value="pseudoternary">Pseudoternary (0V → 1)</option>
               </select>
               <button class="enc-btn" id="enc-decode-btn">Decode →</button>
               <button class="enc-btn enc-btn-secondary" id="enc-clear-btn">Clear</button>
@@ -980,9 +1002,10 @@
             <div class="enc-ctrl-row" style="margin-top:10px">
               <select class="enc-select" id="enc-encoder-scheme">
                 <option value="manchester-ieee">Manchester (IEEE 802.3)</option>
-                <option value="manchester-g3">Manchester (G.E. Thomas)</option>
-                <option value="4b5b">4B/5B (pad to nibbles)</option>
+                <option value="diff-manchester">Differential Manchester</option>
                 <option value="nrzi">NRZ-I</option>
+                <option value="ami">AMI</option>
+                <option value="pseudoternary">Pseudoternary</option>
               </select>
             </div>
             <div class="enc-result-box" id="enc-encoder-result" style="display:none">
@@ -1002,7 +1025,7 @@
             </div>
 
             <h3 style="color:#a78bfa;margin-bottom:10px">Key Terminology</h3>
-            <table class="sn-table" style="margin-bottom:20px">
+            <div style="overflow-x:auto"><table class="sn-table" style="margin-bottom:20px">
               <thead><tr><th>Term</th><th>Definition</th></tr></thead>
               <tbody>
                 <tr><td><strong>Baud Rate</strong></td><td>Signal changes per second (symbols/sec)</td></tr>
@@ -1013,7 +1036,7 @@
                 <tr><td><strong>DC Component</strong></td><td>Non-zero average voltage; problematic for transformers</td></tr>
                 <tr><td><strong>Self-Clocking</strong></td><td>Signal contains timing info (Manchester always has mid-bit transition)</td></tr>
               </tbody>
-            </table>
+            </table></div>
 
             <h3 style="color:#a78bfa;margin-bottom:10px">Scheme Comparison</h3>
             <div style="overflow-x:auto">
@@ -1026,7 +1049,7 @@
                   <tr><td>AMI</td><td>Digital</td><td style="color:#10b981">No</td><td style="color:#f59e0b">Partial</td><td style="color:#10b981">High</td><td>T1/E1 lines</td></tr>
                   <tr><td>Manchester</td><td>Digital</td><td style="color:#10b981">No</td><td style="color:#10b981">Yes</td><td style="color:#10b981">High</td><td>10BASE-T Ethernet</td></tr>
                   <tr><td>Diff. Manchester</td><td>Digital</td><td style="color:#10b981">No</td><td style="color:#10b981">Yes</td><td style="color:#10b981">High</td><td>Token Ring</td></tr>
-                  <tr><td>4B/5B + NRZ-I</td><td>Digital</td><td style="color:#10b981">No</td><td style="color:#10b981">Yes</td><td style="color:#10b981">High</td><td>Fast Ethernet</td></tr>
+                  <tr><td>Pseudoternary</td><td>Digital</td><td style="color:#10b981">No</td><td style="color:#f43f5e">No</td><td style="color:#f59e0b">Low</td><td>Telephony</td></tr>
                   <tr><td>ASK</td><td>Analog</td><td style="color:#10b981">No</td><td style="color:#f43f5e">No</td><td style="color:#f43f5e">Low</td><td>Optical fiber</td></tr>
                   <tr><td>FSK</td><td>Analog</td><td style="color:#10b981">No</td><td style="color:#f43f5e">No</td><td style="color:#f59e0b">Med</td><td>Radio modems</td></tr>
                   <tr><td>PSK / BPSK</td><td>Analog</td><td style="color:#10b981">No</td><td style="color:#f43f5e">No</td><td style="color:#10b981">High</td><td>Wi-Fi, satellite</td></tr>
@@ -1056,12 +1079,12 @@
 Always mid-bit transition!</div>
               </div>
               <div class="enc-theory-card">
-                <div class="enc-theory-tag enc-tag-spread">4B/5B</div>
-                <h3>4B/5B Efficiency</h3>
-                <p>4 data bits per 5-bit code, then NRZ-I on the wire:</p>
-                <div class="enc-formula">Efficiency = 4/5 = 80%
-100 Mbps wire rate →
-80 Mbps actual data</div>
+                <div class="enc-theory-tag enc-tag-spread">Pseudoternary</div>
+                <h3>Pseudoternary Rule</h3>
+                <p>Binary 1 is zero voltage, binary 0 alternates between +V and -V:</p>
+                <div class="enc-formula">1 → 0V
+0 → Alternating +V / -V
+Eliminates DC component!</div>
               </div>
             </div>
           </div>
@@ -1093,9 +1116,10 @@ Always mid-bit transition!</div>
             <div id="enc-bw-error" style="display:none;margin-top:10px;padding:12px;border-radius:8px;background:rgba(244,63,94,0.1);border:1px solid #f43f5e;color:#f43f5e;font-size:.875rem"></div>
           </div>
         </div>
+      </div>
 
-        
-        <div class="enc-tab-panel" id="enc-tab-quiz">
+      
+      <div class="enc-tab-panel" id="enc-tab-quiz">
           <div class="util-card" style="text-align:center;padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
             <div class="enc-trainer-icon" style="color:var(--color-cyan);margin-bottom:12px">
               <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
@@ -1108,6 +1132,7 @@ Always mid-bit transition!</div>
               Test your A/L ICT knowledge of Analog/Digital line coding and formulas.
             </p>
             <button class="enc-btn" id="enc-quiz-start-btn" style="width:100%;font-size:1rem;padding:12px">Start Signal Quiz ➔</button>
+          </div>
         </div>
       </div>
     </section>
@@ -1126,62 +1151,7 @@ Always mid-bit transition!</div>
 
       <div class="settings-container">
 
-        <div class="settings-stats-grid">
-          <div class="settings-stat-item">
-            <div class="ss-icon" style="color:#a78bfa;background:rgba(167,139,250,0.12)">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            </div>
-            <div class="ss-body">
-              <span class="ss-value" id="settings-stat-xp">0</span>
-              <span class="ss-label">Total XP</span>
-            </div>
-          </div>
-          <div class="settings-stat-item">
-            <div class="ss-icon" style="color:#06b6d4;background:rgba(6,182,212,0.12)">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
-            </div>
-            <div class="ss-body">
-              <span class="ss-value" id="settings-stat-keys">0</span>
-              <span class="ss-label">Keys</span>
-            </div>
-          </div>
-          <div class="settings-stat-item">
-            <div class="ss-icon" style="color:#f59e0b;background:rgba(245,158,11,0.12)">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-            </div>
-            <div class="ss-body">
-              <span class="ss-value" id="settings-stat-streak">0</span>
-              <span class="ss-label">Day Streak</span>
-            </div>
-          </div>
-          <div class="settings-stat-item">
-            <div class="ss-icon" style="color:#10b981;background:rgba(16,185,129,0.12)">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-            </div>
-            <div class="ss-body">
-              <span class="ss-value" id="settings-stat-lessons">0</span>
-              <span class="ss-label">Lessons</span>
-            </div>
-          </div>
-          <div class="settings-stat-item">
-            <div class="ss-icon" style="color:#ec4899;background:rgba(236,72,153,0.12)">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div class="ss-body">
-              <span class="ss-value" id="settings-stat-sessions">0</span>
-              <span class="ss-label">Sessions</span>
-            </div>
-          </div>
-          <div class="settings-stat-item">
-            <div class="ss-icon" style="color:var(--text-muted);background:var(--bg-tertiary)">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div class="ss-body">
-              <span class="ss-value ss-value-sm" id="settings-stat-lastactive">—</span>
-              <span class="ss-label">Last Active</span>
-            </div>
-          </div>
-        </div>
+
 
         <div class="settings-split">
           <div class="settings-card" id="settings-card-profile">
@@ -1229,6 +1199,32 @@ Always mid-bit transition!</div>
                   <input type="radio" name="settings-medium" value="ta">
                   <span class="settings-radio-dot"></span>
                   <span>தமிழ் மொழி</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card" id="settings-card-interface-mode">
+            <div class="settings-card-head">
+              <div class="ss-icon" style="color:#7c5ef2;background:rgba(124,94,242,0.12)">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              </div>
+              <div>
+                <span class="settings-card-title" id="settings-card-mode-title">Interface Theme</span>
+                <span class="settings-card-sub" id="settings-card-mode-sub">Select learning layout style</span>
+              </div>
+            </div>
+            <div class="settings-card-body">
+              <div class="settings-radio-group">
+                <label class="settings-radio">
+                  <input type="radio" name="settings-interface-mode" value="classic" checked>
+                  <span class="settings-radio-dot"></span>
+                  <span id="settings-mode-classic-label">Classic Mode (Gamified)</span>
+                </label>
+                <label class="settings-radio">
+                  <input type="radio" name="settings-interface-mode" value="professional">
+                  <span class="settings-radio-dot"></span>
+                  <span id="settings-mode-pro-label">Professional Mode (Academic)</span>
                 </label>
               </div>
             </div>

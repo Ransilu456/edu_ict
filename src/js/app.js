@@ -15,10 +15,65 @@ if (document.readyState === 'loading') {
 }
 
 function boot() {
+  initInterfaceMode();
   setupViewNavigation();
   if (window.syncCompletionState) window.syncCompletionState();
   setTimeout(() => UserService.recordSession(), 500);
 }
+
+function initInterfaceMode() {
+  const savedMode = localStorage.getItem('logicQuest_interfaceMode') || 'classic';
+  setInterfaceMode(savedMode);
+
+  const classicBtn = document.getElementById('header-mode-classic-btn');
+  const proBtn = document.getElementById('header-mode-pro-btn');
+
+  if (classicBtn && proBtn) {
+    classicBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (window.playSound) window.playSound('click');
+      setInterfaceMode('classic');
+    });
+
+    proBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (window.playSound) window.playSound('click');
+      setInterfaceMode('professional');
+    });
+  }
+}
+
+function setInterfaceMode(mode) {
+  localStorage.setItem('logicQuest_interfaceMode', mode);
+  
+  const classicBtn = document.getElementById('header-mode-classic-btn');
+  const proBtn = document.getElementById('header-mode-pro-btn');
+  
+  if (mode === 'professional') {
+    document.documentElement.classList.add('professional-mode');
+    if (classicBtn) classicBtn.classList.remove('active');
+    if (proBtn) proBtn.classList.add('active');
+  } else {
+    document.documentElement.classList.remove('professional-mode');
+    if (classicBtn) classicBtn.classList.add('active');
+    if (proBtn) proBtn.classList.remove('active');
+  }
+
+  // Update Settings UI radio selection if setting elements are initialized
+  const radios = document.getElementsByName('settings-interface-mode');
+  if (radios.length) {
+    radios.forEach(r => {
+      r.checked = (r.value === mode);
+    });
+  }
+
+  // Re-render course map to reflect Classic (Duolingo map) or Pro (LMS syllabus) layout
+  if (window.renderCourseMap) {
+    window.renderCourseMap();
+  }
+}
+window.setInterfaceMode = setInterfaceMode;
+
 function getAllPanels() {
   const homeEl = document.querySelector('home-view');
   const homePanel = homeEl ? homeEl.querySelector('.home-view') : null;

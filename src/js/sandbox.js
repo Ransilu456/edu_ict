@@ -20,6 +20,7 @@ let panStart = { x: 0, y: 0 };
 let panStartOffset = { x: 0, y: 0 };
 const MAX_UNDO = 30;
 let undoStack = [];  // array of serialized layout snapshots
+let _ignorePortClick = false; // prevent synthetic click after touchend on port
 
 function pushUndo() {
   const snapshot = JSON.stringify(serializeLayout());
@@ -60,11 +61,12 @@ const COMPONENT_DEFS = {
   'full-adder': { inputs: 3, outputs: 2, label: 'Full Adder', category: 'Compound' },
   'seven-seg': { inputs: 4, outputs: 0, label: '7-Seg Display', category: 'Advanced' },
   'text-label': { inputs: 0, outputs: 0, label: 'Text Label', category: 'Utility' },
+  
   'battery': { inputs: 1, outputs: 1, label: 'Battery', category: 'Electricity', data: { emf: 9 } },
   'resistor': { inputs: 1, outputs: 1, label: 'Resistor', category: 'Electricity', data: { R: 10 } },
   'bulb': { inputs: 1, outputs: 1, label: 'Light Bulb', category: 'Electricity', data: { brightness: 0 } },
   'switch': { inputs: 1, outputs: 1, label: 'Switch', category: 'Electricity', data: { closed: false } },
-  'ammeter': { inputs: 1, outputs: 1, label: 'Ammeter (A)', category: 'Electricity', data: { current: 0 } },
+  'ammeter': { inputs: 2, outputs: 1, label: 'Ammeter (A)', category: 'Electricity', data: { current: 0 } },
   'voltmeter': { inputs: 2, outputs: 0, label: 'Voltmeter (V)', category: 'Electricity', data: { voltage: 0 } },
   'motor': { inputs: 1, outputs: 1, label: 'Electric Motor', category: 'Electricity', data: { speed: 0 } },
   'fuse': { inputs: 1, outputs: 1, label: 'Fuse', category: 'Electricity', data: { blown: false } },
@@ -293,11 +295,11 @@ function setupToolbar() {
     playSound('click');
     if (isSimRunning) {
       playBtn.classList.add('running');
-      playBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg> Pause`;
+      playBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg> <span>Pause</span>`;
       startSimulationLoop();
     } else {
       playBtn.classList.remove('running');
-      playBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Run`;
+      playBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> <span>Run</span>`;
       stopSimulationLoop();
     }
   });
@@ -395,9 +397,9 @@ function setupToolbar() {
 
 function updateGateStyleBtn(btn, style) {
   if (style === 'realistic') {
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17V7l7 5-7 5"/><circle cx="12" cy="12" r="1.5"/><path d="M13 7h7v10h-7"/></svg> Gate: ANSI`;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17V7l7 5-7 5"/><circle cx="12" cy="12" r="1.5"/><path d="M13 7h7v10h-7"/></svg> <span>Gate: ANSI</span>`;
   } else {
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7l5 5-5 5"/></svg> Gate: Box`;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7l5 5-5 5"/></svg> <span>Gate: Box</span>`;
   }
 }
 
@@ -810,12 +812,15 @@ function renderInputPorts(node, el) {
     port.style.left = '-7px';
 
     port.addEventListener('click', (e) => {
+      if (_ignorePortClick) return;
       e.stopPropagation();
       handlePortClick(node.id, 'input', i);
     });
     port.addEventListener('touchend', (e) => {
       if (e.cancelable) e.preventDefault();
       e.stopPropagation();
+      _ignorePortClick = true;
+      setTimeout(() => { _ignorePortClick = false; }, 200);
       handlePortClick(node.id, 'input', i);
     });
     el.appendChild(port);
@@ -841,12 +846,15 @@ function renderOutputPorts(node, el) {
     port.style.right = '-7px';
 
     port.addEventListener('click', (e) => {
+      if (_ignorePortClick) return;
       e.stopPropagation();
       handlePortClick(node.id, 'output', i);
     });
     port.addEventListener('touchend', (e) => {
       if (e.cancelable) e.preventDefault();
       e.stopPropagation();
+      _ignorePortClick = true;
+      setTimeout(() => { _ignorePortClick = false; }, 200);
       handlePortClick(node.id, 'output', i);
     });
     el.appendChild(port);
@@ -912,6 +920,7 @@ function setupPanning() {
   const onPanEnd = () => {
     if (isPanning) {
       updateSandboxWires();
+      isPanning = false;
     }
     panStart.x = 0;
     panStart.y = 0;
@@ -1288,7 +1297,7 @@ function getElectricityNodeInner(node) {
       <div style="display:flex;align-items:center;gap:4px;width:100%;padding:0 2px;color:#22d3a5">
         <span style="font-size:10px;font-weight:600;white-space:nowrap">${emf}V</span>
         <input type="range" min="1" max="20" value="${emf}" step="0.5" style="flex:1;height:3px;accent-color:#22d3a5"
-          oninput="window.updateElectricProp && window.updateElectricProp('${node.id}','emf',+this.value);evaluateSandbox()">
+          oninput="window.updateElectricProp && window.updateElectricProp('${node.id}','emf',+this.value);window.evaluateSandbox()">
       </div>`;
   }
 
@@ -1300,7 +1309,7 @@ function getElectricityNodeInner(node) {
       <div style="display:flex;align-items:center;gap:4px;width:100%;padding:0 2px">
         <span style="font-size:10px;font-weight:600;white-space:nowrap;color:#fbbf24">${R}Ω</span>
         <input type="range" min="1" max="1000" value="${R}" style="flex:1;height:3px;accent-color:#fbbf24"
-          oninput="window.updateElectricProp && window.updateElectricProp('${node.id}','R',+this.value);evaluateSandbox()">
+          oninput="window.updateElectricProp && window.updateElectricProp('${node.id}','R',+this.value);window.evaluateSandbox()">
       </div>
       <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);margin-top:2px;width:100%">
         <span>${cur > 0.001 ? cur.toFixed(3) + 'A' : ''}</span>
@@ -1469,9 +1478,17 @@ function evaluateElectricity() {
     const circuitActive = !anyOpen && batteries.length > 0 && !anyTransistorOff && hasLoop;
 
     const totalEMF = batteries.reduce((sum, b) => sum + (b.data.emf || 9), 0);
-    const totalR = resistors.reduce((sum, r) => sum + (r.data.R || 10), 0) || 1;
+    const totalR = cluster.reduce((sum, n) => {
+      if (n.type === 'resistor') return sum + (n.data.R !== undefined ? parseFloat(n.data.R) : 10);
+      if (n.type === 'bulb') return sum + 10;
+      if (n.type === 'motor') return sum + 15;
+      if (n.type === 'led-elec') return sum + 5;
+      if (n.type === 'ammeter') return sum + 0.1;
+      if (n.type === 'fuse') return sum + 0.1;
+      return sum;
+    }, 0) || 1;
+
     const current = circuitActive ? totalEMF / totalR : 0;
-    const voltage = current * totalR;
     const clusterIds = new Set(cluster.map(nd => nd.id));
     sandboxWires.forEach(w => {
       if (clusterIds.has(w.fromNodeId) && clusterIds.has(w.toNodeId)) {
@@ -1480,17 +1497,77 @@ function evaluateElectricity() {
     });
     cluster.forEach(n => { n.outputState = circuitActive ? 1 : 0; });
 
+    // Solve voltage drops and potentials at each step of the series circuit
+    const nodePotentials = {};
+    cluster.forEach(n => {
+      nodePotentials[n.id] = { input: 0, output: 0 };
+    });
+
+    if (circuitActive && batteries.length > 0) {
+      const b = batteries[0];
+      nodePotentials[b.id] = { input: 0, output: totalEMF };
+      
+      let currentId = b.id;
+      const visitedInLoop = new Set();
+      while (true) {
+        const nextId = (dirAdj[currentId] || []).find(nid => {
+          const nd = sandboxNodes.find(n => n.id === nid);
+          return nd && nd.type !== 'voltmeter' && !visitedInLoop.has(nid) && cluster.some(c => c.id === nid);
+        });
+        if (!nextId || nextId === b.id) break;
+        
+        const nextNode = sandboxNodes.find(n => n.id === nextId);
+        visitedInLoop.add(nextId);
+        
+        const prevPot = nodePotentials[currentId].output;
+        let R_comp = 0;
+        if (nextNode.type === 'resistor') R_comp = (nextNode.data.R !== undefined ? parseFloat(nextNode.data.R) : 10);
+        else if (nextNode.type === 'bulb') R_comp = 10;
+        else if (nextNode.type === 'motor') R_comp = 15;
+        else if (nextNode.type === 'led-elec') R_comp = 5;
+        else if (nextNode.type === 'ammeter') R_comp = 0.1;
+        else if (nextNode.type === 'fuse') R_comp = 0.1;
+        
+        const nextPot = Math.max(0, prevPot - current * R_comp);
+        nodePotentials[nextId] = { input: prevPot, output: nextPot };
+        
+        currentId = nextId;
+      }
+    }
+
     ammeters.forEach(n => { n.data.current = current; updateNodeVisuals(n); });
-    voltmeters.forEach(n => { n.data.voltage = voltage; updateNodeVisuals(n); });
+    
+    voltmeters.forEach(v => {
+      let p0 = 0;
+      let p1 = 0;
+      sandboxWires.forEach(w => {
+        if (w.toNodeId === v.id) {
+          const srcPot = nodePotentials[w.fromNodeId];
+          if (srcPot) {
+            if (w.toPortIdx === 0) {
+              p0 = srcPot.output;
+            } else if (w.toPortIdx === 1) {
+              p1 = srcPot.output;
+            }
+          }
+        }
+      });
+      v.data.voltage = Math.abs(p0 - p1);
+      updateNodeVisuals(v);
+    });
+
     resistors.forEach(n => {
       n.data.current = current;
-      n.data.voltageDrop = current * (n.data.R || 10);
+      n.data.voltageDrop = current * (n.data.R !== undefined ? parseFloat(n.data.R) : 10);
       updateNodeVisuals(n);
     });
+    
     bulbs.forEach(n => {
-      n.data.brightness = Math.min(current * totalR / 12, 1);
+      const bulbV = current * 10;
+      n.data.brightness = circuitActive ? Math.min(bulbV / 6, 1) : 0;
       updateNodeVisuals(n);
     });
+    
     leds.forEach(n => { n.data.on = circuitActive && current > 0.01; updateNodeVisuals(n); });
     motors.forEach(n => { n.data.speed = current; updateNodeVisuals(n); });
     fuses.forEach(n => { n.data.blown = current > 0.5; updateNodeVisuals(n); });
@@ -1571,6 +1648,7 @@ function evaluateSandbox() {
   updateSandboxWires();
   if (window.checkTheoryChallenge) window.checkTheoryChallenge();
 }
+window.evaluateSandbox = evaluateSandbox;
 
 function computeNodeOutput(node) {
   const [a, b, c] = node.inputValues;
@@ -2547,6 +2625,8 @@ const CIRCUIT_TEMPLATES = {
       { fromNodeId: 'sb-node-3', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
       { fromNodeId: 'sb-node-4', fromPortIdx: 0, toNodeId: 'sb-node-2', toPortIdx: 0 },
       { fromNodeId: 'sb-node-2', fromPortIdx: 0, toNodeId: 'sb-node-1', toPortIdx: 0 },
+      { fromNodeId: 'sb-node-3', fromPortIdx: 0, toNodeId: 'sb-node-5', toPortIdx: 0 },
+      { fromNodeId: 'sb-node-4', fromPortIdx: 0, toNodeId: 'sb-node-5', toPortIdx: 1 },
     ]
   },
 

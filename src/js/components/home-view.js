@@ -1,3 +1,5 @@
+import UserService from '../user-service.js';
+
 const TOTAL_LESSONS = 9;
 
 class HomeView extends HTMLElement {
@@ -6,9 +8,11 @@ class HomeView extends HTMLElement {
     this.innerHTML = template;
     this._bindNavigation();
     this._syncProgress();
+    this._syncActivity();
     const observer = new MutationObserver(() => {
       if (this.querySelector('.home-view')?.classList.contains('active')) {
         this._syncProgress();
+        this._syncActivity();
       }
     });
     const panel = this.querySelector('.home-view');
@@ -104,6 +108,13 @@ class HomeView extends HTMLElement {
         progressDesc.textContent = `Next up: "${lessonName}" — ${xp} XP earned so far`;
       }
     }
+  }
+  _syncActivity() {
+    const set = (id, val) => { const el = this.querySelector(`#${id}`); if (el) el.textContent = val; };
+    set('home-stat-sessions', UserService.getSessions());
+    set('home-stat-streak', UserService.getStreak());
+    const last = UserService.getLastActive();
+    set('home-stat-lastactive', last ? last.slice(0, 10) : '—');
   }
 }
 

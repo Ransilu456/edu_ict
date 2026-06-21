@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Sinhala:wght@300;400;500;600;700&display=swap');
 
 :root {
   --bg-primary: #faf6eb;
@@ -26,8 +26,9 @@
   --color-amber: #ff9600;
   --color-label: #100036b9;
 
-  --font-sans: 'Inter', sans-serif;
-  --font-header: 'Outfit', sans-serif;
+  --font-sans: 'Poppins', 'Inter', sans-serif;
+  --font-header: 'Poppins', 'Outfit', sans-serif;
+  --font-sinhala: 'Noto Sans Sinhala', 'Poppins', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
   --transition-fast: 0.1s ease;

@@ -24,6 +24,10 @@ const LANG_DICT = {
     alertImportSuccess: "Progress successfully imported and synced!",
     alertImportError: "Invalid sync code.",
     alertResetConfirm: "Are you absolutely sure you want to reset all progress? This cannot be undone.",
+    interfaceModeTitle: "Interface Theme",
+    interfaceModeSub: "Select learning layout style",
+    classicModeLabel: "Classic Mode (Gamified)",
+    proModeLabel: "Professional Mode (Academic)",
     bilingualSuffix: ""
   },
   si: {
@@ -49,6 +53,10 @@ const LANG_DICT = {
     alertImportSuccess: "ප්‍රගතිය සාර්ථකව ආනයනය කර සමමුහුර්ත කරන ලදී!",
     alertImportError: "වලංගු නොවන සමමුහුර්ත කේතයකි.",
     alertResetConfirm: "ඔබට සියලු ප්‍රගතිය මකා දැමීමට අවශ්‍ය බව සහතිකද? මෙය ආපසු හැරවිය නොහැක.",
+    interfaceModeTitle: "අතුරුමුහුණත් තේමාව (Interface Theme)",
+    interfaceModeSub: "ඉගෙනුම් පිරිසැලසුම් විලාසය තෝරන්න",
+    classicModeLabel: "ක්ලැසික් ප්‍රකාරය (Classic Mode)",
+    proModeLabel: "වෘත්තීය ප්‍රකාරය (Professional Mode)",
     bilingualSuffix: " (Sinhala Medium)"
   }
 };
@@ -73,6 +81,24 @@ export function initSettingsView() {
       localStorage.setItem('logicQuest_medium', selected);
       applyLanguage(selected);
       if (window.playSound) window.playSound('click');
+    });
+  });
+
+  // Interface Mode radio settings init
+  const currentMode = localStorage.getItem('logicQuest_interfaceMode') || 'classic';
+  const modeRadios = document.getElementsByName('settings-interface-mode');
+  modeRadios.forEach(radio => {
+    if (radio.value === currentMode) {
+      radio.checked = true;
+    }
+    radio.addEventListener('change', () => {
+      const selected = radio.value;
+      if (window.playSound) window.playSound('click');
+      if (window.setInterfaceMode) {
+        window.setInterfaceMode(selected);
+      } else {
+        localStorage.setItem('logicQuest_interfaceMode', selected);
+      }
     });
   });
   document.getElementById('settings-save-profile-btn')?.addEventListener('click', () => {
@@ -153,14 +179,7 @@ export function initSettingsView() {
       }
     });
   });
-  const setStat = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  setStat('settings-stat-xp', UserService.getXP());
-  setStat('settings-stat-keys', UserService.getKeys());
-  setStat('settings-stat-streak', UserService.getStreak());
-  setStat('settings-stat-lessons', UserService.getCompletedLessons().size);
-  setStat('settings-stat-sessions', UserService.getSessions());
-  const lastActive = UserService.getLastActive();
-  setStat('settings-stat-lastactive', lastActive || '—');
+  // Stats grid was removed from HTML to clean up the interface
   applyLanguage(currentMedium);
 }
 
@@ -199,6 +218,12 @@ function applyLanguage(lang) {
   setText('settings-label-import', dict.importLabel);
   setText('settings-card-danger-title', dict.dangerTitle);
   setText('settings-card-danger-sub', dict.dangerSub);
+
+  // Localization for Interface Mode selectors
+  setText('settings-card-mode-title', dict.interfaceModeTitle);
+  setText('settings-card-mode-sub', dict.interfaceModeSub);
+  setText('settings-mode-classic-label', dict.classicModeLabel);
+  setText('settings-mode-pro-label', dict.proModeLabel);
 
   const saveBtn = document.getElementById('settings-save-profile-btn');
   if (saveBtn) saveBtn.textContent = dict.saveBtn;
