@@ -63,7 +63,6 @@
   stroke-width: 2;
 }
 
-
 .toolbox-item[data-type="battery"],
 .toolbox-item[data-type="resistor"],
 .toolbox-item[data-type="bulb"],
@@ -159,7 +158,6 @@
   color: var(--bg-primary);
 }
 
-
 .sandbox-node {
   position: absolute;
   background: var(--bg-secondary);
@@ -180,7 +178,6 @@
 .sandbox-node.selected {
   border-color: var(--text-primary);
 }
-
 
 .sandbox-node.elec-active {
   border-color: var(--color-cyan);
@@ -213,7 +210,6 @@
   pointer-events: auto;
 }
 
-
 .sandbox-port {
   width: 8px;
   height: 8px;
@@ -224,7 +220,7 @@
   cursor: crosshair;
   z-index: 10;
   transition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
-  
+
 }
 
 .sandbox-port:hover {
@@ -246,14 +242,12 @@
   z-index: 12;
 }
 
-
 .sandbox-port.eligible {
   border-color: var(--color-cyan);
   background: var(--color-cyan);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-cyan) 25%, transparent);
   animation: portPulse 0.9s ease-in-out infinite alternate;
 }
-
 
 .sandbox-port.wiring-source {
   border-color: var(--color-success);
@@ -265,7 +259,6 @@
   background-color: var(--text-primary);
   border-color: var(--text-primary);
 }
-
 
 .node-delete-btn {
   position: absolute;
@@ -293,16 +286,13 @@
   display: flex;
 }
 
-
 .sandbox-node.compound-node {
   min-width: 120px;
 }
 
-
 .sandbox-node.seven-seg-node {
   min-width: 75px;
 }
-
 
 .gate-type-label {
   font-family: var(--font-mono);
@@ -311,7 +301,6 @@
   color: var(--text-primary);
   pointer-events: none;
 }
-
 
 .compound-body-grid {
   width: 100%;
@@ -348,24 +337,21 @@
   color: var(--text-secondary);
 }
 
-
 .wires-svg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   z-index: 2;
-  
+
   pointer-events: none;
   overflow: visible;
 }
-
 
 .sandbox-workspace.drag-over {
   outline: 2px dashed var(--color-cyan);
   outline-offset: -4px;
 }
-
 
 .sandbox-toggle-btn {
   background: var(--bg-primary);
@@ -399,7 +385,6 @@
   background: #fde047;
   border-color: #ca8a04;
 }
-
 
 .bulb-wrap {
   display: flex;
@@ -473,7 +458,6 @@
   color: var(--text-primary);
 }
 
-
 .clk-wrap {
   display: flex;
   flex-direction: column;
@@ -524,7 +508,6 @@
   color: var(--text-muted);
 }
 
-
 .seven-seg-svg {
   width: 50px;
   height: 75px;
@@ -541,7 +524,6 @@
   fill: var(--color-success);
   stroke: var(--color-success);
 }
-
 
 .sandbox-node.node-text-label {
   background: transparent;
@@ -580,7 +562,6 @@
   overflow: hidden;
   height: auto;
 }
-
 
 .lesson-select {
   background: var(--bg-secondary);

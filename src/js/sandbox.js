@@ -1,26 +1,26 @@
 let sandboxNodes = [];
 let sandboxWires = [];
-let activeWiringSource = null;   // { nodeId }
-let pendingWirePortIdx = 0;      // output port index (always 0 for now)
+let activeWiringSource = null;   
+let pendingWirePortIdx = 0;      
 let selectedNodeId = null;
 let simInterval = null;
 let clockInterval = null;
 let isSimRunning = true;
 let nextNodeId = 1;
-let clockTick = 0;          // global clock phase
+let clockTick = 0;          
 
 let workspace = null;
 let wiresSvg = null;
 let panContainer = null;
-let isDragging = false;          // suppress click-after-drag
+let isDragging = false;          
 let panX = 0, panY = 0;
 let isPanning = false;
 let didPan = false;
 let panStart = { x: 0, y: 0 };
 let panStartOffset = { x: 0, y: 0 };
 const MAX_UNDO = 30;
-let undoStack = [];  // array of serialized layout snapshots
-let _ignorePortClick = false; // prevent synthetic click after touchend on port
+let undoStack = [];  
+let _ignorePortClick = false; 
 
 function pushUndo() {
   const snapshot = JSON.stringify(serializeLayout());
@@ -61,7 +61,7 @@ const COMPONENT_DEFS = {
   'full-adder': { inputs: 3, outputs: 2, label: 'Full Adder', category: 'Compound' },
   'seven-seg': { inputs: 4, outputs: 0, label: '7-Seg Display', category: 'Advanced' },
   'text-label': { inputs: 0, outputs: 0, label: 'Text Label', category: 'Utility' },
-  
+
   'battery': { inputs: 1, outputs: 1, label: 'Battery', category: 'Electricity', data: { emf: 9 } },
   'resistor': { inputs: 1, outputs: 1, label: 'Resistor', category: 'Electricity', data: { R: 10 } },
   'bulb': { inputs: 1, outputs: 1, label: 'Light Bulb', category: 'Electricity', data: { brightness: 0 } },
@@ -237,7 +237,7 @@ function setupDragAndDrop() {
         touchDragGhost = null;
       }
       workspace.classList.remove('drag-over');
-      if (!touchDragActive) return; // was a tap, handled by click
+      if (!touchDragActive) return; 
       touchDragActive = false;
 
       const touch = e.changedTouches[0];
@@ -426,8 +426,8 @@ function placeNode(type, label, x, y) {
     y: Math.round(y / 10) * 10,
     inputsCount: def.inputs,
     outputsCount: def.outputs,
-    outputState: 0,           // primary output (port 0)
-    outputState2: 0,           // secondary output (port 1) — for compound gates
+    outputState: 0,           
+    outputState2: 0,           
     inputValues: Array(def.inputs).fill(0),
     prevClockState: 0,
     labelText: type === 'text-label' ? 'Label' : '',
@@ -512,20 +512,20 @@ function renderNodeBody(node, body) {
       body.innerHTML = `
         <div class="bulb-wrap" id="${node.id}-bulb">
           <svg class="bulb-svg" viewBox="0 0 100 120">
-            <!-- Glow halo -->
+            
             <circle cx="50" cy="45" r="42" class="bulb-halo"/>
-            <!-- Glass bulb -->
+            
             <path d="M 32 75 C 20 62 20 40 32 26 C 44 12 56 12 68 26 C 80 40 80 62 68 75 C 62 82 58 90 58 95 L 42 95 C 42 90 38 82 32 75 Z" class="bulb-glass"/>
-            <!-- Internal wires -->
+            
             <line x1="42" y1="95" x2="45" y2="70" class="bulb-wire"/>
             <line x1="58" y1="95" x2="55" y2="70" class="bulb-wire"/>
-            <!-- Filament -->
+            
             <path d="M 45 70 C 45 60 48 56 50 56 C 52 56 55 60 55 70" class="bulb-filament"/>
-            <!-- Metal base -->
+            
             <rect x="40" y="95" width="20" height="12" rx="2" class="bulb-base"/>
-            <!-- Base tip contact -->
+            
             <path d="M 44 107 L 56 107 C 54 113 46 113 44 107 Z" class="bulb-base-tip"/>
-            <!-- Glass reflection shine -->
+            
             <path d="M 38 32 A 20 20 0 0 1 54 20" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.8" stroke-linecap="round" class="bulb-shine"/>
           </svg>
           <span class="bulb-state-label" id="${node.id}-state">○ OFF</span>
@@ -590,18 +590,18 @@ function renderNodeBody(node, body) {
       body.innerHTML = `
         <div class="clk-wrap" id="${node.id}-clk-wrap">
           <svg class="clk-osc-svg" viewBox="0 0 100 40">
-            <!-- Screen background -->
+            
             <rect x="0" y="0" width="100" height="40" class="osc-bg"/>
-            <!-- Grid lines -->
+            
             <line x1="0" y1="10" x2="100" y2="10" class="osc-grid"/>
             <line x1="0" y1="20" x2="100" y2="20" class="osc-grid"/>
             <line x1="0" y1="30" x2="100" y2="30" class="osc-grid"/>
             <line x1="25" y1="0" x2="25" y2="40" class="osc-grid"/>
             <line x1="50" y1="0" x2="50" y2="40" class="osc-grid"/>
             <line x1="75" y1="0" x2="75" y2="40" class="osc-grid"/>
-            <!-- Square wave path (dynamic shifting wave) -->
+            
             <path d="M 0 30 L 25 30 L 25 10 L 50 10 L 50 30 L 75 30 L 75 10 L 100 10" class="osc-wave"/>
-            <!-- Active time cursor line -->
+            
             <line x1="25" y1="0" x2="25" y2="40" class="osc-cursor" id="${node.id}-cursor"/>
           </svg>
           <div class="clk-meta">
@@ -1092,7 +1092,7 @@ function drawWiringPreview(e) {
   const x2 = pos.x - canvasRect.left - panX;
   const y2 = pos.y - canvasRect.top - panY;
 
-  updateSandboxWires();   // draw committed wires first
+  updateSandboxWires();   
 
   const dx = Math.abs(x2 - x1) * 0.5;
   const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
@@ -1497,7 +1497,6 @@ function evaluateElectricity() {
     });
     cluster.forEach(n => { n.outputState = circuitActive ? 1 : 0; });
 
-    // Solve voltage drops and potentials at each step of the series circuit
     const nodePotentials = {};
     cluster.forEach(n => {
       nodePotentials[n.id] = { input: 0, output: 0 };
@@ -1506,7 +1505,7 @@ function evaluateElectricity() {
     if (circuitActive && batteries.length > 0) {
       const b = batteries[0];
       nodePotentials[b.id] = { input: 0, output: totalEMF };
-      
+
       let currentId = b.id;
       const visitedInLoop = new Set();
       while (true) {
@@ -1515,10 +1514,10 @@ function evaluateElectricity() {
           return nd && nd.type !== 'voltmeter' && !visitedInLoop.has(nid) && cluster.some(c => c.id === nid);
         });
         if (!nextId || nextId === b.id) break;
-        
+
         const nextNode = sandboxNodes.find(n => n.id === nextId);
         visitedInLoop.add(nextId);
-        
+
         const prevPot = nodePotentials[currentId].output;
         let R_comp = 0;
         if (nextNode.type === 'resistor') R_comp = (nextNode.data.R !== undefined ? parseFloat(nextNode.data.R) : 10);
@@ -1527,16 +1526,16 @@ function evaluateElectricity() {
         else if (nextNode.type === 'led-elec') R_comp = 5;
         else if (nextNode.type === 'ammeter') R_comp = 0.1;
         else if (nextNode.type === 'fuse') R_comp = 0.1;
-        
+
         const nextPot = Math.max(0, prevPot - current * R_comp);
         nodePotentials[nextId] = { input: prevPot, output: nextPot };
-        
+
         currentId = nextId;
       }
     }
 
     ammeters.forEach(n => { n.data.current = current; updateNodeVisuals(n); });
-    
+
     voltmeters.forEach(v => {
       let p0 = 0;
       let p1 = 0;
@@ -1561,13 +1560,13 @@ function evaluateElectricity() {
       n.data.voltageDrop = current * (n.data.R !== undefined ? parseFloat(n.data.R) : 10);
       updateNodeVisuals(n);
     });
-    
+
     bulbs.forEach(n => {
       const bulbV = current * 10;
       n.data.brightness = circuitActive ? Math.min(bulbV / 6, 1) : 0;
       updateNodeVisuals(n);
     });
-    
+
     leds.forEach(n => { n.data.on = circuitActive && current > 0.01; updateNodeVisuals(n); });
     motors.forEach(n => { n.data.speed = current; updateNodeVisuals(n); });
     fuses.forEach(n => { n.data.blown = current > 0.5; updateNodeVisuals(n); });
@@ -1658,9 +1657,9 @@ function computeNodeOutput(node) {
       node.outputState = a ? 1 : 0;
       break;
     case 'rgb-led':
-      node.outputState = a ? 1 : 0;   // R
-      node.outputState2 = b ? 1 : 0;  // G
-      node._blueState = c ? 1 : 0;    // B (extra)
+      node.outputState = a ? 1 : 0;   
+      node.outputState2 = b ? 1 : 0;  
+      node._blueState = c ? 1 : 0;    
       break;
     case 'buzzer':
       node.outputState = a ? 1 : 0;
@@ -1694,15 +1693,15 @@ function computeNodeOutput(node) {
     case 'd-flop': {
       const clk = b ? 1 : 0;
       if (clk === 1 && node.prevClockState === 0) {
-        node.outputState = a ? 1 : 0;  // latch D
+        node.outputState = a ? 1 : 0;  
       }
       node.prevClockState = clk;
       break;
     }
 
     case 'half-adder': {
-      node.outputState = (!!a !== !!b) ? 1 : 0;  // Sum  (port 0)
-      node.outputState2 = (a && b) ? 1 : 0;        // Carry (port 1)
+      node.outputState = (!!a !== !!b) ? 1 : 0;  
+      node.outputState2 = (a && b) ? 1 : 0;        
       break;
     }
 
@@ -1711,8 +1710,8 @@ function computeNodeOutput(node) {
       const carry1 = (a && b);
       const sum2 = (sum1 !== !!c);
       const carry2 = (sum1 && c);
-      node.outputState = sum2 ? 1 : 0;              // Sum (port 0)
-      node.outputState2 = (carry1 || carry2) ? 1 : 0;  // Cout (port 1)
+      node.outputState = sum2 ? 1 : 0;              
+      node.outputState2 = (carry1 || carry2) ? 1 : 0;  
       break;
     }
 
@@ -1786,7 +1785,7 @@ function updateNodeVisuals(node) {
       }
       const cursor = document.getElementById(`${node.id}-cursor`);
       if (cursor) {
-        const x = node.outputState === 1 ? 62.5 : 12.5; // Toggle time cursor position
+        const x = node.outputState === 1 ? 62.5 : 12.5; 
         cursor.setAttribute('x1', x);
         cursor.setAttribute('x2', x);
       }
@@ -1822,13 +1821,13 @@ function updateNodeVisuals(node) {
 }
 
 function getRgbColor(r, g, b) {
-  if (r && g && b) return '#ffffff';  // white
-  if (r && g) return '#fde047';       // yellow
-  if (r && b) return '#d946ef';       // magenta
-  if (g && b) return '#06b6d4';       // cyan
-  if (r) return '#ef4444';            // red
-  if (g) return '#22c55e';            // green
-  if (b) return '#3b82f6';            // blue
+  if (r && g && b) return '#ffffff';  
+  if (r && g) return '#fde047';       
+  if (r && b) return '#d946ef';       
+  if (g && b) return '#06b6d4';       
+  if (r) return '#ef4444';            
+  if (g) return '#22c55e';            
+  if (b) return '#3b82f6';            
   return 'var(--bg-primary)';
 }
 
@@ -1861,22 +1860,22 @@ function updateSevenSeg(node) {
   const val = (node.inputValues[3] << 3) | (node.inputValues[2] << 2)
     | (node.inputValues[1] << 1) | node.inputValues[0];
   const SEG = [
-    [1, 1, 1, 1, 1, 1, 0], // 0
-    [0, 1, 1, 0, 0, 0, 0], // 1
-    [1, 1, 0, 1, 1, 0, 1], // 2
-    [1, 1, 1, 1, 0, 0, 1], // 3
-    [0, 1, 1, 0, 0, 1, 1], // 4
-    [1, 0, 1, 1, 0, 1, 1], // 5
-    [1, 0, 1, 1, 1, 1, 1], // 6
-    [1, 1, 1, 0, 0, 0, 0], // 7
-    [1, 1, 1, 1, 1, 1, 1], // 8
-    [1, 1, 1, 1, 0, 1, 1], // 9
-    [1, 1, 1, 0, 1, 1, 1], // A
-    [0, 0, 1, 1, 1, 1, 1], // b
-    [1, 0, 0, 1, 1, 1, 0], // C
-    [0, 1, 1, 1, 1, 0, 1], // d
-    [1, 0, 0, 1, 1, 1, 1], // E
-    [1, 0, 0, 0, 1, 1, 1], // F
+    [1, 1, 1, 1, 1, 1, 0], 
+    [0, 1, 1, 0, 0, 0, 0], 
+    [1, 1, 0, 1, 1, 0, 1], 
+    [1, 1, 1, 1, 0, 0, 1], 
+    [0, 1, 1, 0, 0, 1, 1], 
+    [1, 0, 1, 1, 0, 1, 1], 
+    [1, 0, 1, 1, 1, 1, 1], 
+    [1, 1, 1, 0, 0, 0, 0], 
+    [1, 1, 1, 1, 1, 1, 1], 
+    [1, 1, 1, 1, 0, 1, 1], 
+    [1, 1, 1, 0, 1, 1, 1], 
+    [0, 0, 1, 1, 1, 1, 1], 
+    [1, 0, 0, 1, 1, 1, 0], 
+    [0, 1, 1, 1, 1, 0, 1], 
+    [1, 0, 0, 1, 1, 1, 1], 
+    [1, 0, 0, 0, 1, 1, 1], 
   ];
 
   const segs = SEG[val & 0xF];
@@ -2034,13 +2033,13 @@ const halfAdderSvg = `
   <text x="30" y="55" fill="var(--text-primary)" font-family="var(--font-mono)" font-weight="700">A</text>
   <text x="30" y="165" fill="var(--text-primary)" font-family="var(--font-mono)" font-weight="700">B</text>
 
-  <!-- XOR Gate -->
+  
   <g transform="translate(180, 20)">
     <rect x="0" y="10" width="80" height="50" rx="6" fill="var(--bg-secondary)" stroke="var(--text-primary)" stroke-width="2"/>
     <text x="40" y="40" dominant-baseline="middle" text-anchor="middle" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="700">XOR</text>
   </g>
 
-  <!-- AND Gate -->
+  
   <g transform="translate(180, 130)">
     <rect x="0" y="10" width="80" height="50" rx="6" fill="var(--bg-secondary)" stroke="var(--text-primary)" stroke-width="2"/>
     <text x="40" y="40" dominant-baseline="middle" text-anchor="middle" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="700">AND</text>
@@ -2122,24 +2121,24 @@ const fullAdderSvg = `
 const dFlopTimingSvg = `
 <div style="display:flex; flex-direction:column; gap:0.5rem; width:100%; align-items:center;">
   <svg viewBox="0 0 400 160" width="100%" height="160" style="background:var(--bg-primary); border-radius:6px; border:1px solid var(--border-color); padding:10px;">
-    <!-- CLK -->
+    
     <text x="15" y="35" fill="var(--text-secondary)" font-family="var(--font-mono)" font-size="0.75rem" font-weight="700">CLK</text>
     <path d="M 50 35 L 100 35 L 100 15 L 150 15 L 150 35 L 200 35 L 200 15 L 250 15 L 250 35 L 300 35 L 300 15 L 350 15" fill="none" stroke="var(--text-primary)" stroke-width="2"/>
-    <!-- Rising edge arrows -->
+    
     <path d="M 100 30 L 100 18 L 97 22 M 100 18 L 103 22" fill="none" stroke="var(--color-cyan)" stroke-width="1.5"/>
     <path d="M 200 30 L 200 18 L 197 22 M 200 18 L 203 22" fill="none" stroke="var(--color-cyan)" stroke-width="1.5"/>
     <path d="M 300 30 L 300 18 L 297 22 M 300 18 L 303 22" fill="none" stroke="var(--color-cyan)" stroke-width="1.5"/>
 
-    <!-- D Input -->
+    
     <text x="15" y="85" fill="var(--text-secondary)" font-family="var(--font-mono)" font-size="0.75rem" font-weight="700">D</text>
     <path d="M 50 90 L 130 90 L 130 65 L 230 65 L 230 90 L 350 90" fill="none" stroke="var(--text-secondary)" stroke-width="2"/>
 
-    <!-- Q Output -->
-    <text x="15" y="135" fill="var(--text-secondary)" font-family="var(--font-mono)" font-size="0.75rem" font-weight="700">Q</text>
-    <!-- Latches D at rising edge: 100 (D=0 -> Q=0), 200 (D=1 -> Q=1), 300 (D=0 -> Q=0) -->
-    <path d="M 50 140 L 200 140 L 200 115 L 300 115 L 300 140 L 350 140" fill="none" stroke="var(--color-success)" stroke-width="2"/>
     
-    <!-- Dotted trigger indicator lines -->
+    <text x="15" y="135" fill="var(--text-secondary)" font-family="var(--font-mono)" font-size="0.75rem" font-weight="700">Q</text>
+    
+    <path d="M 50 140 L 200 140 L 200 115 L 300 115 L 300 140 L 350 140" fill="none" stroke="var(--color-success)" stroke-width="2"/>
+
+    
     <line x1="100" y1="15" x2="100" y2="145" stroke="var(--border-color)" stroke-dasharray="3,3"/>
     <line x1="200" y1="15" x2="200" y2="145" stroke="var(--border-color)" stroke-dasharray="3,3"/>
     <line x1="300" y1="15" x2="300" y2="145" stroke="var(--border-color)" stroke-dasharray="3,3"/>
@@ -3119,7 +3118,7 @@ window.updateTheoryGuide = function (name) {
   if (!card || !body) return;
 
   activeChallengeTemplate = name;
-  challengePassed = false; // Reset challenge pass flag for this template
+  challengePassed = false; 
 
   if (!guide) {
     body.innerHTML = `

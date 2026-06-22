@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIC Decoder</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI, sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:650px;
+    background:#fff;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#666;
+    margin-bottom:25px;
+}
+
+.input-area{
+    display:flex;
+    gap:10px;
+}
+
+input{
+    flex:1;
+    padding:14px;
+    border:2px solid #ddd;
+    border-radius:12px;
+    font-size:16px;
+}
+
+input:focus{
+    outline:none;
+    border-color:#2563eb;
+}
+
+button{
+    border:none;
+    background:#2563eb;
+    color:white;
+    padding:14px 20px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+.error{
+    color:#dc2626;
+    margin-top:15px;
+    font-weight:bold;
+}
+
+.results{
+    display:none;
+    margin-top:25px;
+}
+
+.card{
+    background:#f8fafc;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:10px;
+}
+
+.label{
+    font-weight:600;
+    color:#555;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>NIC Decoder</h1>
+    <p class="subtitle">
+        Decode Birth Date, Gender and Year from NIC Number
+    </p>
+
+    <div class="input-area">
+        <input type="text" id="nic" placeholder="Enter NIC Number">
+        <button onclick="decodeNIC()">Decode</button>
+    </div>
+
+    <div id="error" class="error"></div>
+
+    <div id="results" class="results">
+
+        <div class="card">
+            <span class="label">NIC Type:</span>
+            <span id="nicType"></span>
+        </div>
+
+        <div class="card">
+            <span class="label">Year of Birth:</span>
+            <span id="year"></span>
+        </div>
+
+        <div class="card">
+            <span class="label">Gender:</span>
+            <span id="gender"></span>
+        </div>
+
+        <div class="card">
+            <span class="label">Day Code:</span>
+            <span id="dayCode"></span>
+        </div>
+
+        <div class="card">
+            <span class="label">Date of Birth:</span>
+            <span id="dob"></span>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function getBirthDate(year, dayNumber){
+
+    const date = new Date(year, 0, 1);
+
+    const monthDays = [31,29,31,30,31,30,31,31,30,31,30,31];
+
+    let month = 0;
+    let day = dayNumber;
+
+    while(day > monthDays[month]){
+        day -= monthDays[month];
+        month++;
+    }
+
+    date.setMonth(month);
+    date.setDate(day);
+
+    return date.toLocaleDateString("en-GB",{
+        day:"numeric",
+        month:"long",
+        year:"numeric"
+    });
+}
+function decodeNIC(){
+
+    const nic = document.getElementById("nic").value.trim();
+
+    const error = document.getElementById("error");
+    const results = document.getElementById("results");
+
+    error.innerHTML = "";
+    results.style.display = "none";
+
+    let year;
+    let dayCode;
+    let nicType;
+
+    // NEW NIC
+    if(/^\d{12}$/.test(nic)){
+
+        nicType = "New NIC (12 Digits)";
+        year = parseInt(nic.substring(0,4));
+        dayCode = parseInt(nic.substring(4,7));
+    }
+
+    // OLD NIC
+    else if(/^\d{9}[VvXx]$/.test(nic)){
+
+        nicType = "Old NIC (10 Characters)";
+
+        let yy = parseInt(nic.substring(0,2));
+
+        if(yy <= new Date().getFullYear() % 100)
+            year = 2000 + yy;
+        else
+            year = 1900 + yy;
+
+        dayCode = parseInt(nic.substring(2,5));
+    }
+
+    else{
+
+        error.innerHTML =
+            "Invalid NIC. Enter a valid 10-character or 12-digit NIC.";
+
+        return;
+    }
+
+    let gender = "Male";
+
+    if(dayCode > 500){
+        gender = "Female";
+        dayCode -= 500;
+    }
+
+    const actualDayCode = dayCode;
+
+    const maxDays = 366;
+
+    if(dayCode < 1 || dayCode > maxDays){
+
+        error.innerHTML =
+            "Invalid day code found in NIC.";
+
+        return;
+    }
+
+    const birthDate = getBirthDate(year, dayCode);
+
+    document.getElementById("nicType").innerText = nicType;
+    document.getElementById("year").innerText = year;
+    document.getElementById("gender").innerText = gender;
+    document.getElementById("dayCode").innerText = actualDayCode;
+    document.getElementById("dob").innerText = birthDate;
+
+    results.style.display = "block";
+}
+
+document.getElementById("nic").addEventListener("keypress", function(e){
+    if(e.key === "Enter"){
+        decodeNIC();
+    }
+});
+
+</script>
+
+</body>
+</html>

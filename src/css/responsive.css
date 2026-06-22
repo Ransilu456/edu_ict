@@ -22,7 +22,6 @@
   box-sizing: border-box;
 }
 
-
 .app-quiz-modal-box {
   max-width: 580px;
   width: 95%;
@@ -125,7 +124,6 @@
   color: var(--color-cyan);
 }
 
-
 .quiz-modal-opts {
   display: flex;
   flex-direction: column;
@@ -175,8 +173,6 @@
   color: var(--color-error);
 }
 
-
-
 .course-map-view {
   overflow-y: auto !important;
   display: none;
@@ -208,7 +204,6 @@
   outline-offset: 3px;
 }
 
-
 .course-map-node.available {
   border-color: var(--color-indigo);
   background: linear-gradient(135deg, rgba(124, 94, 242, 0.1), rgba(28, 176, 246, 0.1));
@@ -226,7 +221,6 @@
   transform: scale(0.96);
 }
 
-
 .course-map-node.completed {
   border-color: var(--color-success);
   background: linear-gradient(135deg, rgba(88, 204, 2, 0.2), rgba(16, 185, 129, 0.2));
@@ -238,7 +232,6 @@
   width: 36px;
   height: 36px;
 }
-
 
 .course-map-node.locked {
   border-color: var(--border-color);
@@ -264,7 +257,6 @@
   line-height: 1;
 }
 
-
 .course-map-label {
   display: flex;
   flex-direction: column;
@@ -288,7 +280,6 @@
   color: var(--text-primary);
   max-width: 120px;
 }
-
 
 .course-map-daily-limit {
   display: flex;
@@ -322,8 +313,6 @@
   font-size: 0.9rem;
   margin: 0;
 }
-
-
 
 .course-unlock-modal-backdrop {
   position: fixed;
@@ -518,7 +507,6 @@
   border-color: var(--color-error);
 }
 
-
 .quiz-modal-input-wrap {
   margin-bottom: 1.5rem;
   width: 100%;
@@ -550,7 +538,6 @@
   border-color: var(--color-error);
   background: rgba(244, 63, 94, 0.05);
 }
-
 
 .quiz-modal-summary-icon {
   font-size: 3.5rem;
@@ -597,7 +584,6 @@
   min-width: 150px;
 }
 
-
 .quiz-modal-summary-icon {
   display: flex;
   justify-content: center;
@@ -639,7 +625,6 @@
 .feedback-text-container {
   flex: 1;
 }
-
 
 .template-grid {
   display: flex;
@@ -749,7 +734,6 @@
   height: 1px;
   background: var(--border-color);
 }
-
 
 .sandbox-learning-card {
   position: absolute;
@@ -920,9 +904,8 @@
   color: var(--color-success);
 }
 
-
 @media (max-width: 479px) {
-  
+
   header {
     padding: 0.75rem;
     gap: 0.5rem;
@@ -955,12 +938,10 @@
     height: 12px;
   }
 
-  
   .header-badge {
     font-size: 0.85rem;
   }
 
-  
   h1 {
     font-size: clamp(1.3rem, 5vw, 1.8rem);
   }
@@ -973,12 +954,10 @@
     font-size: clamp(1rem, 4vw, 1.3rem);
   }
 
-  
   body {
     padding: 0;
   }
 
-  
   main {
     padding: 0.75rem;
   }
@@ -987,7 +966,6 @@
     padding: 0.75rem;
   }
 
-  
   .hero-section {
     padding: 1rem 0.75rem;
     gap: 1.5rem;
@@ -1052,7 +1030,6 @@
     opacity: 0.3; 
   }
 
-  
   .home-features-grid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
@@ -1084,7 +1061,6 @@
     padding: 0.2rem 0.5rem;
   }
 
-  
   .course-view {
     flex-direction: column;
     height: auto;
@@ -1114,7 +1090,6 @@
     font-size: 0.85rem;
   }
 
-  
   .course-map-header {
     padding: 0.75rem;
   }
@@ -1140,7 +1115,6 @@
     font-size: 0.9rem;
   }
 
-  
   .explorer-grid-layout {
     grid-template-columns: 1fr;
   }
@@ -1152,7 +1126,6 @@
     border-bottom: 1px solid var(--border-color);
   }
 
-  
   .sn-container {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -1170,7 +1143,6 @@
     width: 100%;
   }
 
-  
   .enc-params-grid {
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 0.75rem;
@@ -1181,7 +1153,6 @@
     max-height: 100px;
   }
 
-  
   .modal {
     padding: 1rem;
     max-width: 90vw;
@@ -1198,7 +1169,6 @@
     width: 100%;
   }
 
-  
   button {
     min-height: 44px;
     min-width: 44px;
@@ -1209,14 +1179,12 @@
     height: 40px;
   }
 
-  
   .lesson-select {
     width: 100%;
     padding: 0.75rem;
     font-size: 0.9rem;
   }
 
-  
   .util-card {
     padding: 1rem;
     border-radius: 10px;
@@ -1230,12 +1198,10 @@
     font-size: 0.9rem;
   }
 
-  
   .progress-bar {
     height: 6px;
   }
 
-  
   table {
     font-size: 0.8rem;
   }
@@ -1244,7 +1210,6 @@
     padding: 0.4rem 0.3rem;
   }
 }
-
 
 @media (min-width: 480px) and (max-width: 639px) {
   header {
@@ -1332,7 +1297,6 @@
   }
 }
 
-
 @media (min-width: 640px) and (max-width: 767px) {
   header {
     padding: 0.85rem 1.25rem;
@@ -1412,9 +1376,8 @@
   }
 }
 
-
 @media (max-width: 768px) {
-  
+
   header {
     flex-direction: row;
     gap: 1rem;
@@ -1494,9 +1457,8 @@
   }
 }
 
-
 @media (min-width: 769px) and (max-width: 1279px) {
-  
+
   nav {
     display: flex;
   }
@@ -1542,7 +1504,6 @@
     font-size: 2.2rem;
   }
 }
-
 
 @media (min-width: 1280px) {
   nav {
@@ -1595,7 +1556,6 @@
   }
 }
 
-
 @media (orientation: landscape) and (max-height: 500px) {
   header {
     padding: 0.5rem 1rem;
@@ -1624,7 +1584,6 @@
     height: calc(100vh - 150px);
   }
 }
-
 
 @media (min-width: 640px) and (max-width: 1023px) {
   .course-view {
@@ -1669,7 +1628,6 @@
     height: auto;
   }
 }
-
 
 @media (max-width: 639px) {
   .course-view {
@@ -1745,14 +1703,12 @@
     line-height: 1.3;
   }
 
-  
   .simulation-canvas {
     aspect-ratio: 4 / 3;
     height: auto;
     max-width: 100%;
   }
 
-  
   .lesson-progress {
     margin-top: 1rem;
     padding: 0.75rem;
@@ -1763,7 +1719,6 @@
     min-height: 8px;
   }
 
-  
   .back-to-map-btn {
     padding: 0.65rem 1rem;
     font-size: 0.85rem;
@@ -1771,7 +1726,6 @@
     margin-top: 0.75rem;
   }
 }
-
 
 @media (max-width: 479px) {
   .course-left {
@@ -1943,7 +1897,6 @@
   }
 }
 
-
 #custom-alert-box {
   width: 90%;
   max-width: 420px;
@@ -1966,7 +1919,6 @@
   }
 }
 
-
 @media (max-width: 479px) {
   .enc-canvas {
     height: 80px !important;
@@ -1981,7 +1933,6 @@
     overflow-x: auto;
   }
 }
-
 
 @media (max-width: 479px) {
   .course-map-container svg {
@@ -1998,7 +1949,6 @@
     font-size: 0.75rem !important;
   }
 }
-
 
 @media (max-width: 767px) {
   .explorer-gate-btn {
@@ -2299,7 +2249,6 @@
   font-size: 0.9rem;
 }
 
-
 .cm-stats-row {
   display: flex;
   gap: 0.75rem;
@@ -2348,7 +2297,6 @@
   font-weight: 600;
 }
 
-
 .cm-master-progress {
   background: var(--bg-secondary);
   border: 1.5px solid var(--border-color);
@@ -2380,13 +2328,11 @@
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-
 .cm-path-container {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
-
 
 .cm-section {
   display: flex;
@@ -2454,7 +2400,6 @@
   border-color: transparent;
 }
 
-
 .cm-nodes-row {
   display: flex;
   align-items: center;
@@ -2464,7 +2409,6 @@
   scrollbar-width: none;
 }
 .cm-nodes-row::-webkit-scrollbar { display: none; }
-
 
 .cm-connector {
   flex: 1;
@@ -2480,7 +2424,6 @@
   background: currentColor;
 }
 
-
 .cm-section-connector {
   width: 4px;
   height: 40px;
@@ -2494,7 +2437,6 @@
   background: var(--color-indigo);
 }
 
-
 .cm-node-wrap {
   display: flex;
   flex-direction: column;
@@ -2502,7 +2444,6 @@
   gap: 0.6rem;
   flex-shrink: 0;
 }
-
 
 .cm-node-btn {
   width: 64px;
@@ -2562,7 +2503,6 @@
   line-height: 1;
 }
 
-
 .cm-node-label {
   display: flex;
   flex-direction: column;
@@ -2592,7 +2532,6 @@
   opacity: 0.45;
 }
 
-
 .cm-tip-card {
   display: flex;
   align-items: center;
@@ -2619,7 +2558,6 @@
 .cm-tip-text strong {
   color: var(--text-primary);
 }
-
 
 .cm-complete-card {
   display: flex;
@@ -2654,9 +2592,6 @@
   padding: 0.75rem 2rem !important;
 }
 
-
-
-
 @media (max-width: 768px) {
   header {
     padding: 0.6rem 1rem;
@@ -2677,7 +2612,6 @@
     height: 34px;
   }
 
-  
   .course-view {
     flex-direction: column;
     height: auto;
@@ -2706,7 +2640,6 @@
     font-size: 0.88rem;
   }
 
-  
   .course-map-view {
     height: auto;
     min-height: calc(100vh - 140px);
@@ -2737,7 +2670,6 @@
     padding: 0.5rem 0.65rem;
   }
 
-  
   .explorer-view {
     flex-direction: column;
     height: auto;
@@ -2779,7 +2711,6 @@
     width: 100%;
   }
 
-  
   .enc-container {
     padding: 0.75rem;
   }
@@ -2825,9 +2756,6 @@
     display: none;
   }
 
-
-
-  
   .util-view-header {
     padding: 1rem;
   }
@@ -2836,7 +2764,6 @@
     font-size: 1.4rem;
   }
 
-  
   .app-quiz-modal-box {
     max-width: 95vw !important;
     width: 95vw !important;
@@ -2856,21 +2783,18 @@
     font-size: 1rem;
   }
 
-  
   .success-modal {
     max-width: 94vw !important;
     width: 94vw !important;
     padding: 1.5rem !important;
   }
 
-  
   .progress-bar-container {
     flex-wrap: wrap;
     gap: 0.4rem;
     margin-bottom: 1rem;
   }
 }
-
 
 @media (max-width: 480px) {
   .cm-node-btn {
@@ -2908,7 +2832,6 @@
     font-size: 0.9rem;
   }
 
-  
   .progress-bar-container {
     gap: 0.35rem;
   }
@@ -2917,13 +2840,11 @@
     font-size: 1.2rem;
   }
 
-  
   .course-right {
     height: 220px;
     min-height: 220px;
   }
 
-  
   .quiz-option {
     padding: 0.65rem 0.85rem;
     font-size: 0.85rem;
@@ -2935,14 +2856,12 @@
     font-size: 0.7rem;
   }
 
-  
   .btn-primary, .btn-secondary {
     padding: 0.75rem 1rem;
     font-size: 0.88rem;
     border-radius: 12px;
   }
 
-  
   .nodes-container {
     gap: 2.5rem;
   }
@@ -2958,7 +2877,6 @@
     font-size: 0.9rem;
   }
 }
-
 
 .lesson-select {
   background: var(--bg-secondary);
@@ -2979,12 +2897,10 @@
   border-color: var(--color-indigo);
 }
 
-
 .course-map-view {
   overflow-y: auto;
   overflow-x: hidden;
 }
-
 
 @media (max-width: 600px) {
   .app-quiz-modal-box {
@@ -3005,9 +2921,6 @@
     padding: 0;
   }
 }
-
-
-
 
 @media (max-width: 500px) {
   header .logo span {
@@ -3031,13 +2944,11 @@
   }
 }
 
-
 @media (max-width: 768px) {
   main {
     padding-bottom: 75px !important; 
   }
 
-  
   .course-view {
     flex-direction: column !important;
     overflow-y: auto !important;
@@ -3055,7 +2966,6 @@
     background: var(--bg-secondary) !important;
   }
 
-  
   .explorer-view {
     flex-direction: column !important;
     overflow-y: auto !important;
@@ -3106,10 +3016,6 @@
   }
 }
 
-
-
-
-
 .course-map-page {
   display: flex;
   flex-direction: column;
@@ -3118,7 +3024,6 @@
   gap: 0;
   min-height: 100%;
 }
-
 
 .cm-stats-bar {
   display: flex;
@@ -3206,7 +3111,6 @@
   text-align: right;
 }
 
-
 .cm-vertical-path {
   display: flex;
   flex-direction: column;
@@ -3215,7 +3119,6 @@
   max-width: 560px;
   gap: 0;
 }
-
 
 .cm-cat-banner {
   width: 100%;
@@ -3254,7 +3157,6 @@
   border: 1px solid var(--border-color);
 }
 
-
 .cm-node-row {
   display: flex;
   width: 100%;
@@ -3267,7 +3169,6 @@
 .cm-side-right  .cm-vnode-wrap { align-self: flex-end;   margin-right: 10%; flex-direction: row-reverse; }
 .cm-side-center .cm-vnode-wrap { align-self: center;                         flex-direction: row; }
 
-
 .cm-vert-connector {
   width: 4px;
   height: 40px;
@@ -3279,14 +3180,12 @@
 
 .cm-vert-connector.done { background: var(--color-success); }
 
-
 .cm-vnode-wrap {
   display: flex;
   align-items: center;
   gap: 0.85rem;
   padding: 0.35rem 0;
 }
-
 
 .cm-vnode-btn {
   width: 68px;
@@ -3311,14 +3210,12 @@
 
 .cm-vnode-icon { font-size: 1.7rem; line-height: 1; }
 
-
 .cm-pulse { animation: cmPulse 2s ease-in-out infinite; }
 
 @keyframes cmPulse {
   0%, 100% { box-shadow: 0 5px 0 rgba(0,0,0,0.2), 0 0 0 0 rgba(88,204,2,0); }
   50%       { box-shadow: 0 5px 0 rgba(0,0,0,0.2), 0 0 0 10px rgba(88,204,2,0.15); }
 }
-
 
 .cm-vnode-card {
   background: var(--bg-secondary);
@@ -3369,7 +3266,6 @@
 .cm-badge-done  { background: rgba(88,204,2,0.15);  color: #58cc02; }
 .cm-badge-start { background: rgba(28,176,246,0.15); color: #1cb0f6; }
 .cm-badge-lock  { background: var(--bg-tertiary);    color: var(--text-muted); }
-
 
 .cm-tip-card {
   display: flex;
@@ -3437,7 +3333,6 @@
   font-size: 1rem !important;
 }
 
-
 @media (max-width: 560px) {
   .cm-stats-bar    { gap: 0.4rem; padding: 0.6rem 0.5rem; }
   .cm-stat-pill    { padding: 0.3rem 0.65rem; }
@@ -3448,7 +3343,6 @@
   .cm-vnode-card { min-width: 120px; max-width: 155px; padding: 0.5rem 0.75rem; }
   .cm-vnode-card-title { font-size: 0.8rem; }
 }
-
 
 .touch-drag-ghost {
   position: fixed;
@@ -3472,9 +3366,6 @@
   from { opacity: 0; transform: scale(0.85); }
   to   { opacity: 0.92; transform: scale(1.08); }
 }
-
-
-
 
 .sandbox-node {
   touch-action: none;
@@ -3618,48 +3509,28 @@
     right: 0.5rem;
   }
 
-  .template-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    width: 100%;
-  }
-
-  .template-card {
-    display: flex;
-    padding: 0.25rem 0.4rem;
-    min-height: 26px;
-    font-size: 0.6rem;
-    gap: 0.3rem;
-    flex-shrink: 0;
-  }
-
-  .template-card-desc {
+  .template-grid,
+  .template-card,
+  .template-section-divider {
     display: none;
   }
 
-  .template-load-icon {
-    width: 9px;
-    height: 9px;
-  }
-
-  .template-section-divider {
-    font-size: 0.55rem;
-    padding: 0.15rem 0;
+  .toolbox-section:has(.template-grid) {
+    display: none;
   }
 }
 
 @media (max-width: 420px) {
   .sandbox-toolbox {
-    max-height: 40vh;
-    padding: 0.4rem 0.5rem;
-    gap: 0.35rem;
+    max-height: 30vh;
+    padding: 0.35rem 0.4rem;
+    gap: 0.3rem;
   }
 
   .toolbox-item {
     padding: 0.2rem 0.35rem;
     font-size: 0.6rem;
-    min-height: 26px;
+    min-height: 24px;
   }
 
   .toolbox-item svg {
@@ -3668,7 +3539,8 @@
   }
 
   .sandbox-workspace {
-    min-height: 140px;
+    min-height: 55vh;
+    flex: 1;
   }
 
   .sandbox-btn {
@@ -3677,10 +3549,6 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .sandbox-btn span {
-    display: none !important;
   }
 
   .sandbox-btn svg {
@@ -3694,19 +3562,17 @@
   }
 
   .sandbox-node {
-    min-width: 64px;
+    min-width: 56px;
+  }
+
+  .sandbox-node .gate-type-label {
+    font-size: 0.55rem;
   }
 
   .sandbox-toolbar {
-    top: 0.25rem;
-    right: 0.25rem;
-    gap: 0.15rem;
-    max-width: calc(100% - 0.5rem);
-  }
-
-  .template-card {
-    padding: 0.2rem 0.35rem;
-    min-height: 22px;
-    font-size: 0.55rem;
+    top: 0.2rem;
+    right: 0.2rem;
+    gap: 0.1rem;
+    max-width: calc(100% - 0.4rem);
   }
 }

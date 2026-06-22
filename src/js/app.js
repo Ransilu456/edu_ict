@@ -45,10 +45,10 @@ function initInterfaceMode() {
 
 function setInterfaceMode(mode) {
   localStorage.setItem('logicQuest_interfaceMode', mode);
-  
+
   const classicBtn = document.getElementById('header-mode-classic-btn');
   const proBtn = document.getElementById('header-mode-pro-btn');
-  
+
   if (mode === 'professional') {
     document.documentElement.classList.add('professional-mode');
     if (classicBtn) classicBtn.classList.remove('active');
@@ -59,7 +59,6 @@ function setInterfaceMode(mode) {
     if (proBtn) proBtn.classList.remove('active');
   }
 
-  // Update Settings UI radio selection if setting elements are initialized
   const radios = document.getElementsByName('settings-interface-mode');
   if (radios.length) {
     radios.forEach(r => {
@@ -67,7 +66,6 @@ function setInterfaceMode(mode) {
     });
   }
 
-  // Re-render course map to reflect Classic (Duolingo map) or Pro (LMS syllabus) layout
   if (window.renderCourseMap) {
     window.renderCourseMap();
   }

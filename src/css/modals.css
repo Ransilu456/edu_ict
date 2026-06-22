@@ -63,7 +63,6 @@
   font-size: 0.95rem;
 }
 
-
 .saved-circuit-row {
   display: flex;
   justify-content: space-between;
@@ -97,7 +96,6 @@
   cursor: pointer;
   padding: 0 0.25rem;
 }
-
 
 @keyframes fadeIn {
   from {
@@ -173,7 +171,6 @@
   }
 }
 
-
 .confetti {
   position: absolute;
   width: 6px;
@@ -195,7 +192,6 @@
     opacity: 0;
   }
 }
-
 
 @media (max-width: 1024px) {
   .course-view {

@@ -9,7 +9,7 @@ function generateUUID() {
 }
 
 function todayStr() {
-  return new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+  return new Date().toISOString().slice(0, 10); 
 }
 let _cache = null;
 
@@ -25,7 +25,7 @@ export const UserService = {
   async load() {
     const userId = this.getUserId();
     _cache = this._loadFromLocal(userId);
-    this._updateStreak(); // recalculate streak on load
+    this._updateStreak(); 
     this._saveToLocal(_cache);
     return _cache;
   },

@@ -1,53 +1,47 @@
-/* LogicQuest Professional Mode Theme Styling */
 
-/* Cool Slate Palette Variables */
 :root.professional-mode {
   --font-sans: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-header: 'Poppins', 'Outfit', sans-serif;
-  
-  --bg-primary: #f8fafc;     /* slate 50 */
-  --bg-secondary: #ffffff;   /* white */
-  --bg-tertiary: #f1f5f9;    /* slate 100 */
-  --border-color: #e2e8f0;   /* slate 200 */
+
+  --bg-primary: #f8fafc;     
+  --bg-secondary: #ffffff;   
+  --bg-tertiary: #f1f5f9;    
+  --border-color: #e2e8f0;   
   --bg-mobile: #f8fafc;
-  
-  --text-primary: #0f172a;   /* slate 900 */
-  --text-secondary: #475569; /* slate 600 */
-  --text-muted: #94a3b8;     /* slate 400 */
-  
-  --color-indigo: #2563eb;   /* tech blue */
+
+  --text-primary: #0f172a;   
+  --text-secondary: #475569; 
+  --text-muted: #94a3b8;     
+
+  --color-indigo: #2563eb;   
   --color-indigo-glow: rgba(37, 99, 235, 0.05);
-  --color-cyan: #0ea5e9;     /* sky blue */
+  --color-cyan: #0ea5e9;     
   --color-cyan-glow: rgba(14, 165, 233, 0.05);
-  
-  --color-success: #10b981;   /* emerald 500 */
-  --color-error: #ef4444;     /* red 500 */
-  --color-amber: #f59e0b;     /* amber 500 */
+
+  --color-success: #10b981;   
+  --color-error: #ef4444;     
+  --color-amber: #f59e0b;     
 }
 
 :root.dark-theme.professional-mode {
-  --bg-primary: #0f172a;     /* slate 900 */
-  --bg-secondary: #1e293b;   /* slate 800 */
-  --bg-tertiary: #0f172a;    /* slate 900 */
-  --border-color: #334155;   /* slate 700 */
+  --bg-primary: #0f172a;     
+  --bg-secondary: #1e293b;   
+  --bg-tertiary: #0f172a;    
+  --border-color: #334155;   
   --bg-mobile: transparent;
-  
-  --text-primary: #f8fafc;   /* slate 50 */
-  --text-secondary: #cbd5e1; /* slate 300 */
-  --text-muted: #64748b;     /* slate 500 */
-  
-  --color-indigo: #3b82f6;   /* sky blue */
+
+  --text-primary: #f8fafc;   
+  --text-secondary: #cbd5e1; 
+  --text-muted: #64748b;     
+
+  --color-indigo: #3b82f6;   
   --color-cyan: #38bdf8;
-  
+
   --color-success: #34d399;
   --color-error: #f87171;
   --color-amber: #fbbf24;
 }
 
-/* Global Overrides */
-/* Dot grid is intentionally kept only in sandbox workspace (.sandbox-workspace in sandbox.css) */
-
-/* Hide Gamification Badges */
 .professional-mode header .header-badge.keys,
 .professional-mode header .header-badge.energy,
 .professional-mode header #restart-course,
@@ -58,7 +52,6 @@
   display: none !important;
 }
 
-/* Header & Navigation Cleanup */
 .professional-mode header {
   border-bottom: 1px solid var(--border-color);
   padding: 0.65rem 2rem;
@@ -105,7 +98,6 @@
   transform: none;
 }
 
-/* Interface Mode Toggle Styling */
 .mode-pill-toggle {
   display: flex;
   background: var(--bg-tertiary);
@@ -137,12 +129,10 @@
   border: 1px solid rgba(0,0,0,0.02);
 }
 
-/* Settings View Mode Toggle UI */
 .settings-mode-card {
   margin-top: 1rem;
 }
 
-/* Professional Hero Section */
 .professional-mode .hero-section {
   padding: 5rem 2rem;
   gap: 4rem;
@@ -249,7 +239,6 @@
   filter: drop-shadow(0 4px 20px rgba(37, 99, 235, 0.08));
 }
 
-/* Home Features Section */
 .professional-mode .home-features-section {
   padding: 3.5rem 2rem;
 }
@@ -268,7 +257,6 @@
   gap: 1rem;
 }
 
-/* Feature Cards — Professional Clean */
 .professional-mode .feature-card {
   border: 1px solid var(--border-color);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
@@ -338,7 +326,6 @@
   display: none;
 }
 
-/* Professional Progress Mini Bar */
 .professional-mode .progress-mini-bar-wrap {
   gap: 0.6rem;
 }
@@ -356,7 +343,6 @@
   transition: width 0.5s ease;
 }
 
-/* Professional Syllabus View */
 .syllabus-view-container {
   width: 100%;
   max-width: 800px;
@@ -544,7 +530,6 @@
   opacity: 0.5;
 }
 
-/* Flat Course View Panel */
 .professional-mode .course-left {
   padding: 1.5rem;
 }
@@ -693,6 +678,7 @@
 .professional-mode .btn-primary,
 .professional-mode #cta-btn {
   background: var(--color-indigo);
+  color: white;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(99,102,241,0.2);
   font-weight: 600;
@@ -719,7 +705,6 @@
   cursor: not-allowed;
 }
 
-/* Professional Sandbox Elements */
 .professional-mode .sandbox-toolbox {
   border-right: 1px solid var(--border-color);
   background: var(--bg-secondary);
@@ -753,7 +738,6 @@
   box-shadow: 0 0 0 2px var(--color-indigo-glow);
 }
 
-/* Zoom Toolbar controls styling */
 .zoom-controls {
   display: flex;
   align-items: center;
@@ -771,14 +755,13 @@
   text-align: center;
 }
 
-/* Touch targets adjustments for mobile devices */
 @media (max-width: 768px) {
   .sandbox-port {
     width: 14px;
     height: 14px;
     border-radius: 50%;
   }
-  
+
   .sandbox-port::after {
     width: 36px;
     height: 36px;

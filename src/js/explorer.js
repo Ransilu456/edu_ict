@@ -12,7 +12,7 @@ let activeExplorerGateIdx = 0;
 function initGateExplorer() {
   initExplorer();
   renderExplorerGate();
-  
+
   window.addEventListener('resize', () => {
     drawExplorerWires();
   });
@@ -28,7 +28,7 @@ function initExplorer() {
   const sidebar = document.getElementById("explorer-sidebar");
   if (!sidebar) return;
   sidebar.innerHTML = "";
-  
+
   gatesCatalog.forEach((gate, idx) => {
     const btn = document.createElement("button");
     btn.className = `gate-card-button ${idx === activeExplorerGateIdx ? 'active' : ''}`;
@@ -50,10 +50,10 @@ function initExplorer() {
 function renderExplorerGate() {
   const gate = gatesCatalog[activeExplorerGateIdx];
   if (!gate) return;
-  
+
   document.getElementById("exp-gate-title").innerText = `${gate.name} Gate Explorer`;
   document.getElementById("exp-gate-desc").innerText = gate.desc;
-  
+
   const simBox = document.getElementById("explorer-sim-box");
   simBox.innerHTML = `
     <svg class="wires-svg" id="exp-wires-svg"></svg>
@@ -70,11 +70,11 @@ function renderExplorerGate() {
         </div>
         ` : ''}
       </div>
-      
+
       <div class="node-column">
         <div class="gate-badge" id="exp-gate-badge">${gate.symbol}</div>
       </div>
-      
+
       <div class="node-column">
         <div class="input-node-wrapper">
           <div class="output-node" id="exp-out-y">0</div>
@@ -83,7 +83,7 @@ function renderExplorerGate() {
       </div>
     </div>
   `;
-  
+
   const inputs = simBox.querySelectorAll(".exp-input");
   inputs.forEach(input => {
     input.addEventListener("click", () => {
@@ -93,11 +93,11 @@ function renderExplorerGate() {
       evaluateExplorerGate();
     });
   });
-  
+
   renderTruthTable(gate);
-  
+
   renderTransistorCircuitDetails(gate.name);
-  
+
   const univCard = document.getElementById("exp-universality-desc");
   if (univCard) {
     if (gate.universal) {
@@ -127,7 +127,7 @@ function renderExplorerGate() {
       univCard.style.display = "none";
     }
   }
-  
+
   evaluateExplorerGate();
 }
 
@@ -135,9 +135,9 @@ function evaluateExplorerGate() {
   const gate = gatesCatalog[activeExplorerGateIdx];
   const inA = document.getElementById("exp-in-a")?.classList.contains("active") ? 1 : 0;
   const inB = document.getElementById("exp-in-b")?.classList.contains("active") ? 1 : 0;
-  
+
   let output = 0;
-  
+
   switch(gate.name) {
     case "AND": output = (inA && inB) ? 1 : 0; break;
     case "OR": output = (inA || inB) ? 1 : 0; break;
@@ -147,10 +147,10 @@ function evaluateExplorerGate() {
     case "XOR": output = (inA !== inB) ? 1 : 0; break;
     case "XNOR": output = (inA === inB) ? 1 : 0; break;
   }
-  
+
   const outNode = document.getElementById("exp-out-y");
   const gateBadge = document.getElementById("exp-gate-badge");
-  
+
   if (outNode) {
     outNode.innerText = output;
     if (output === 1) {
@@ -161,9 +161,9 @@ function evaluateExplorerGate() {
       if (gateBadge) gateBadge.classList.remove("active-gate");
     }
   }
-  
+
   drawExplorerWires();
-  
+
   highlightTruthTableRow(inA, inB);
 }
 
@@ -171,15 +171,15 @@ function drawExplorerWires() {
   const svg = document.getElementById("exp-wires-svg");
   if (!svg) return;
   svg.innerHTML = "";
-  
+
   const gate = gatesCatalog[activeExplorerGateIdx];
   const gateBadge = document.getElementById("exp-gate-badge");
   const outNode = document.getElementById("exp-out-y");
-  
+
   const nodeA = document.getElementById("exp-in-a");
   if (!nodeA) return;
   const isAActive = nodeA.classList.contains("active");
-  
+
   if (gate.name === "NOT") {
     createBezierWire(svg, nodeA, gateBadge, isAActive);
   } else {
@@ -189,32 +189,32 @@ function drawExplorerWires() {
     createBezierWire(svg, nodeA, gateBadge, isAActive, 0.45, 0.25);
     createBezierWire(svg, nodeB, gateBadge, isBActive, 0.55, 0.75);
   }
-  
+
   const isOutActive = outNode.classList.contains("active");
   createBezierWire(svg, gateBadge, outNode, isOutActive);
 }
 
 function createBezierWire(svgContainer, startEl, endEl, isActive, startPctY = 0.5, endPctY = 0.5) {
   if (!startEl || !endEl) return;
-  
+
   const containerRect = svgContainer.getBoundingClientRect();
   const startRect = startEl.getBoundingClientRect();
   const endRect = endEl.getBoundingClientRect();
-  
+
   const x1 = (startRect.left + startRect.width) - containerRect.left;
   const y1 = (startRect.top + startRect.height * startPctY) - containerRect.top;
   const x2 = endRect.left - containerRect.left;
   const y2 = (endRect.top + endRect.height * endPctY) - containerRect.top;
-  
+
   const dx = Math.abs(x2 - x1) * 0.5;
   const pathData = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
-  
+
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute("d", pathData);
   path.className.baseVal = isActive ? "wire active" : "wire";
-  
+
   svgContainer.appendChild(path);
-  
+
   if (isActive) {
     const pulsePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
     pulsePath.setAttribute("d", pathData);
@@ -227,7 +227,7 @@ function renderTruthTable(gate) {
   const table = document.getElementById("exp-truth-table");
   if (!table) return;
   table.innerHTML = "";
-  
+
   const headerTr = document.createElement("tr");
   if (gate.name === "NOT") {
     headerTr.innerHTML = "<th>Input A</th><th>Output Y</th>";
@@ -235,11 +235,11 @@ function renderTruthTable(gate) {
     headerTr.innerHTML = "<th>Input A</th><th>Input B</th><th>Output Y</th>";
   }
   table.appendChild(headerTr);
-  
+
   gate.truthTable.forEach(row => {
     const tr = document.createElement("tr");
     tr.className = "truth-table-row";
-    
+
     if (gate.name === "NOT") {
       const a = row[0];
       const y = row[1];
@@ -260,29 +260,29 @@ function renderTruthTable(gate) {
         <td><span class="${y ? 'val-high' : 'val-low'}">${y}</span></td>
       `;
     }
-    
+
     tr.addEventListener("click", () => {
       window.playSound('toggle');
       const inANode = document.getElementById("exp-in-a");
       const inBNode = document.getElementById("exp-in-b");
-      
+
       const targetA = row[0];
       if (inANode) {
         if (targetA === 1) inANode.classList.add("active");
         else inANode.classList.remove("active");
         inANode.innerText = targetA;
       }
-      
+
       if (gate.name !== "NOT" && inBNode) {
         const targetB = row[1];
         if (targetB === 1) inBNode.classList.add("active");
         else inBNode.classList.remove("active");
         inBNode.innerText = targetB;
       }
-      
+
       evaluateExplorerGate();
     });
-    
+
     table.appendChild(tr);
   });
 }
@@ -290,10 +290,10 @@ function renderTruthTable(gate) {
 function highlightTruthTableRow(inA, inB) {
   const rows = document.querySelectorAll(".truth-table-row");
   const gate = gatesCatalog[activeExplorerGateIdx];
-  
+
   rows.forEach(row => {
     const rowA = parseInt(row.getAttribute("data-in-a"));
-    
+
     if (gate.name === "NOT") {
       if (rowA === inA) row.classList.add("active-row");
       else row.classList.remove("active-row");
@@ -309,7 +309,7 @@ function renderTransistorCircuitDetails(gateName) {
   const container = document.getElementById("exp-transistor-desc");
   if (!container) return;
   let explanation = "";
-  
+
   switch(gateName) {
     case "NOT":
       explanation = `<strong>Transistor Level Architecture:</strong><br>A NOT gate is built with <strong>1 Transistor</strong>. The collector pin is tied to VCC via a load resistor and serves as the Output. The input drives the base pin. When Input is 0, the transistor blocks current, leaving Output pulled High (1). When Input is 1, the transistor conducts current directly to Ground, making Output Low (0).`;
@@ -333,7 +333,7 @@ function renderTransistorCircuitDetails(gateName) {
       explanation = `<strong>Transistor Level Architecture:</strong><br>An XNOR gate is the invert of XOR. In CMOS logic, it also requires <strong>4 to 6 Transistors</strong> in a bridge network. It conducts voltage to the output terminal when inputs A and B are matching (both 0 or both 1), creating a logical equivalency checker.`;
       break;
   }
-  
+
   container.innerHTML = explanation;
 }
 

@@ -84,7 +84,6 @@ export function initSettingsView() {
     });
   });
 
-  // Interface Mode radio settings init
   const currentMode = localStorage.getItem('logicQuest_interfaceMode') || 'classic';
   const modeRadios = document.getElementsByName('settings-interface-mode');
   modeRadios.forEach(radio => {
@@ -147,7 +146,7 @@ export function initSettingsView() {
         if (window.updateXPDisplay) window.updateXPDisplay();
         if (window.syncCompletionState) window.syncCompletionState();
         if (window.syncCourseProgression) window.syncCourseProgression();
-        
+
         updateExportCode();
         if (importInput) importInput.value = '';
 
@@ -179,7 +178,7 @@ export function initSettingsView() {
       }
     });
   });
-  // Stats grid was removed from HTML to clean up the interface
+
   applyLanguage(currentMedium);
 }
 
@@ -219,7 +218,6 @@ function applyLanguage(lang) {
   setText('settings-card-danger-title', dict.dangerTitle);
   setText('settings-card-danger-sub', dict.dangerSub);
 
-  // Localization for Interface Mode selectors
   setText('settings-card-mode-title', dict.interfaceModeTitle);
   setText('settings-card-mode-sub', dict.interfaceModeSub);
   setText('settings-mode-classic-label', dict.classicModeLabel);

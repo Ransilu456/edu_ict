@@ -276,15 +276,12 @@ function renderProfessionalSyllabus(container) {
   container.innerHTML = '';
   container.className = 'course-map-page professional-syllabus-view';
 
-  // Create syllabus container
   const wrap = document.createElement('div');
   wrap.className = 'syllabus-view-container';
 
-  // Create header progress info
   const header = document.createElement('div');
   header.className = 'syllabus-header';
-  
-  // Clean language support
+
   const currentLang = localStorage.getItem('logicQuest_medium') || 'en';
   const titleText = currentLang === 'si' ? 'විෂය මාලා දළ විශ්ලේෂණය' : 'Curriculum Overview';
   const progressText = currentLang === 'si' ? 'සම්පූර්ණ ප්‍රගතිය' : 'Overall Progress';
@@ -308,7 +305,6 @@ function renderProfessionalSyllabus(container) {
   `;
   wrap.appendChild(header);
 
-  // Render categories as syllabus modules
   categories.forEach((cat, catIdx) => {
     const catCompleted = cat.lessons.filter(id => completedLessons.has(id)).length;
     const modulePct = Math.round((catCompleted / cat.lessons.length) * 100);
@@ -316,7 +312,6 @@ function renderProfessionalSyllabus(container) {
     const modCard = document.createElement('div');
     modCard.className = 'syllabus-module-card';
 
-    // Collapsible header
     const modHeader = document.createElement('div');
     modHeader.className = 'syllabus-module-header';
     modHeader.innerHTML = `
@@ -339,9 +334,8 @@ function renderProfessionalSyllabus(container) {
 
     const lessonsList = document.createElement('div');
     lessonsList.className = 'syllabus-lessons-list';
-    lessonsList.style.display = 'block'; // defaults to expanded
+    lessonsList.style.display = 'block'; 
 
-    // Bind toggle collapse
     modHeader.addEventListener('click', () => {
       const isCollapsed = lessonsList.style.display === 'none';
       lessonsList.style.display = isCollapsed ? 'block' : 'none';

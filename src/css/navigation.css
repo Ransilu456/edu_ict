@@ -23,7 +23,6 @@ header {
   letter-spacing: -0.02em;
 }
 
-
 .logo-icon-container {
   display: flex;
   align-items: center;
@@ -161,7 +160,6 @@ nav {
   box-shadow: 0 0px 0 transparent;
 }
 
-
 main {
   flex: 1;
   display: flex;
@@ -184,7 +182,6 @@ main {
   z-index: 1;
 }
 
-
 .view-panel:not(.active) {
   visibility: hidden;
   height: 0;
@@ -192,19 +189,17 @@ main {
   overflow: hidden;
 }
 
-
 home-view {
   flex: 1;
   display: none;
   flex-direction: column;
   overflow: hidden;
-  
+
 }
 
 home-view .home-view.active {
   display: flex;
 }
-
 
 home-view:has(.home-view.active) {
   display: flex;

@@ -376,7 +376,7 @@ function runDecoder() {
       info = `IEEE 802.3 Manchester: ${raw.length} encoded → ${decoded.length} data bits`;
     } else if (scheme === 'diff-manchester') {
       if (raw.length % 2 !== 0) { showDecErr('Differential Manchester bits must be even length.'); return; }
-      let lastLevel = '0'; // assume initial state is 0/low
+      let lastLevel = '0'; 
       for (let i=0; i<raw.length; i+=2) {
         const b1 = raw[i];
         const b2 = raw[i+1];

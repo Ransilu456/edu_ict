@@ -1,5 +1,4 @@
 
-
 .home-view {
   display: flex;
   flex-direction: column;
@@ -658,12 +657,10 @@
     right: 1rem;
   }
 
-  
   .hero-floating-gates {
     opacity: 0.1;
   }
 
-  
   .progress-mini-bar-track {
     height: 12px;
   }
