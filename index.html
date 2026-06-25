@@ -8,7 +8,8 @@
   <link rel="icon" type="image/png" href="/favicon.png">
   <meta name="description"
     content="Master digital logic, subnetting, and signal encoding for A/L ICT. Interactive simulations, circuit builder, and quiz challenges.">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="src/css/style.css">
   <link rel="stylesheet" href="src/css/home-view.css">
 </head>
@@ -1060,7 +1061,7 @@
               <path d="M9 17V7l5 5-5 5" />
             </svg> <span>Gate: Box</span>
           </button>
-         <!-- <div class="zoom-controls">
+          <!-- <div class="zoom-controls">
             <button class="sandbox-btn" id="sandbox-zoom-out" title="Zoom Out">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="5" y1="12" x2="19" y2="12" />
@@ -1849,186 +1850,191 @@
       </div>
     </section>
 
-    <section class="view-panel settings-view" id="settings-view">
-      <div class="settings-hero">
-        <div class="settings-hero-icon">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3" />
-            <path
-              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+<section class="view-panel settings-view" id="settings-view">
+
+  <div class="settings-both">
+  <div class="settings-hero">
+    <div class="settings-hero-icon">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3" />
+        <path
+          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+      </svg>
+    </div>
+    <div>
+      <h1 class="settings-hero-title" id="settings-title">Settings &amp; Progress</h1>
+      <p class="settings-hero-sub" id="settings-subtitle">Configure your study options and back up learning progress.</p>
+    </div>
+  </div>
+
+  <div class="settings-container">
+
+    <div class="settings-card" id="settings-card-profile">
+      <div class="settings-card-head">
+        <div class="ss-icon is-icon-profile">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
           </svg>
         </div>
         <div>
-          <h1 class="settings-hero-title" id="settings-title">Settings &amp; Progress</h1>
-          <p class="settings-hero-sub" id="settings-subtitle">Configure your study options and back up learning progress.</p>
+          <span class="settings-card-title" id="settings-card-profile-title">User Profile</span>
+          <span class="settings-card-sub" id="settings-card-profile-sub">Set your display name</span>
         </div>
       </div>
-
-      <div class="settings-container">
-
-        <div class="settings-card" id="settings-card-profile">
-          <div class="settings-card-head">
-            <div class="ss-icon is-icon-profile">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-            </div>
-            <div>
-              <span class="settings-card-title" id="settings-card-profile-title">User Profile</span>
-              <span class="settings-card-sub" id="settings-card-profile-sub">Set your display name</span>
-            </div>
-          </div>
-          <div class="settings-card-body">
-            <label class="settings-label" id="settings-label-username">Student Name / Alias</label>
-            <div class="settings-input-row">
-              <input type="text" id="settings-username-input" class="settings-input" placeholder="Enter name...">
-              <button class="settings-btn settings-btn-solid" id="settings-save-profile-btn">Save</button>
-            </div>
-          </div>
+      <div class="settings-card-body">
+        <label class="settings-label" id="settings-label-username">Student Name / Alias</label>
+        <div class="settings-input-row">
+          <input type="text" id="settings-username-input" class="settings-input" placeholder="Enter name...">
+          <button class="settings-btn settings-btn-solid" id="settings-save-profile-btn">Save</button>
         </div>
+      </div>
+    </div>
 
-        <div class="settings-card" id="settings-card-medium">
-          <div class="settings-card-head">
-            <div class="ss-icon is-icon-medium">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-              </svg>
-            </div>
-            <div>
-              <span class="settings-card-title" id="settings-card-medium-title">Learning Medium</span>
-              <span class="settings-card-sub" id="settings-card-medium-sub">Choose your A/L study language</span>
-            </div>
-          </div>
-          <div class="settings-card-body">
-            <div class="settings-radio-group">
-              <label class="settings-radio">
-                <input type="radio" name="settings-medium" value="en" checked>
-                <span class="settings-radio-dot"></span>
-                <span class="settings-radio-label-text" lang="en">English Medium</span>
-              </label>
-              <label class="settings-radio">
-                <input type="radio" name="settings-medium" value="si">
-                <span class="settings-radio-dot"></span>
-                <span class="settings-radio-label-text" lang="si">සිංහල මාධ්‍යය</span>
-              </label>
-            </div>
-          </div>
+    <div class="settings-card" id="settings-card-medium">
+      <div class="settings-card-head">
+        <div class="ss-icon is-icon-medium">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </svg>
         </div>
-
-        <div class="settings-card" id="settings-card-interface-mode">
-          <div class="settings-card-head">
-            <div class="ss-icon is-icon-mode">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                <line x1="8" y1="21" x2="16" y2="21" />
-                <line x1="12" y1="17" x2="12" y2="21" />
-              </svg>
-            </div>
-            <div>
-              <span class="settings-card-title" id="settings-card-mode-title">Interface Theme</span>
-              <span class="settings-card-sub" id="settings-card-mode-sub">Select learning layout style</span>
-            </div>
-          </div>
-          <div class="settings-card-body">
-            <div class="settings-radio-group">
-              <label class="settings-radio">
-                <input type="radio" name="settings-interface-mode" value="classic" checked>
-                <span class="settings-radio-dot"></span>
-                <span class="settings-radio-label-text" id="settings-mode-classic-label">Classic Mode (Gamified)</span>
-              </label>
-              <label class="settings-radio">
-                <input type="radio" name="settings-interface-mode" value="professional">
-                <span class="settings-radio-dot"></span>
-                <span class="settings-radio-label-text" id="settings-mode-pro-label">Professional Mode (Academic)</span>
-              </label>
-            </div>
-          </div>
+        <div>
+          <span class="settings-card-title" id="settings-card-medium-title">Learning Medium</span>
+          <span class="settings-card-sub" id="settings-card-medium-sub">Choose your A/L study language</span>
         </div>
+      </div>
+      <div class="settings-card-body">
+        <div class="settings-radio-group">
+          <label class="settings-radio">
+            <input type="radio" name="settings-medium" value="en" checked>
+            <span class="settings-radio-dot"></span>
+            <span class="settings-radio-label-text" lang="en">English Medium</span>
+          </label>
+          <label class="settings-radio">
+            <input type="radio" name="settings-medium" value="si">
+            <span class="settings-radio-dot"></span>
+            <span class="settings-radio-label-text" lang="si">සිංහල මාධ්‍යය</span>
+          </label>
+        </div>
+      </div>
+    </div>
 
-        <div class="settings-card" id="settings-card-sync">
-          <div class="settings-card-head">
-            <div class="ss-icon is-icon-sync">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+    <div class="settings-card" id="settings-card-interface-mode">
+      <div class="settings-card-head">
+        <div class="ss-icon is-icon-mode">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
+          </svg>
+        </div>
+        <div>
+          <span class="settings-card-title" id="settings-card-mode-title">Interface Theme</span>
+          <span class="settings-card-sub" id="settings-card-mode-sub">Select learning layout style</span>
+        </div>
+      </div>
+      <div class="settings-card-body">
+        <div class="settings-radio-group">
+          <label class="settings-radio">
+            <input type="radio" name="settings-interface-mode" value="classic" checked>
+            <span class="settings-radio-dot"></span>
+            <span class="settings-radio-label-text" id="settings-mode-classic-label">Classic Mode (Gamified)</span>
+          </label>
+          <label class="settings-radio">
+            <input type="radio" name="settings-interface-mode" value="professional">
+            <span class="settings-radio-dot"></span>
+            <span class="settings-radio-label-text" id="settings-mode-pro-label">Professional Mode (Academic)</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-card" id="settings-card-sync">
+      <div class="settings-card-head">
+        <div class="ss-icon is-icon-sync">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </div>
+        <div>
+          <span class="settings-card-title" id="settings-card-sync-title">Data Sync</span>
+          <span class="settings-card-sub" id="settings-card-sync-sub">Transfer progress between devices</span>
+        </div>
+      </div>
+      <div class="settings-card-body">
+        <div class="settings-sync-layout">
+          <div class="settings-sync-col">
+            <label class="settings-label" id="settings-label-export">Export Code</label>
+            <textarea id="settings-export-code" class="settings-code-area" readonly onclick="this.select()"></textarea>
+            <button class="settings-btn settings-btn-outline" id="settings-copy-code-btn">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              Copy Code
+            </button>
+          </div>
+          <div class="settings-sync-arrow">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--text-muted)" stroke-width="2">
+              <polyline points="5 12 19 12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </div>
+          <div class="settings-sync-col">
+            <label class="settings-label" id="settings-label-import">Import Code</label>
+            <input type="text" id="settings-import-code" class="settings-input" placeholder="Paste sync code...">
+            <button class="settings-btn settings-btn-solid" id="settings-import-code-btn">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
-            </div>
-            <div>
-              <span class="settings-card-title" id="settings-card-sync-title">Data Sync</span>
-              <span class="settings-card-sub" id="settings-card-sync-sub">Transfer progress between devices</span>
-            </div>
-          </div>
-          <div class="settings-card-body">
-            <div class="settings-sync-layout">
-              <div class="settings-sync-col">
-                <label class="settings-label" id="settings-label-export">Export Code</label>
-                <textarea id="settings-export-code" class="settings-code-area" readonly onclick="this.select()"></textarea>
-                <button class="settings-btn settings-btn-outline" id="settings-copy-code-btn">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="9" y="9" width="13" height="13" rx="2" />
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                  </svg>
-                  Copy Code
-                </button>
-              </div>
-              <div class="settings-sync-arrow">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--text-muted)" stroke-width="2">
-                  <polyline points="5 12 19 12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </div>
-              <div class="settings-sync-col">
-                <label class="settings-label" id="settings-label-import">Import Code</label>
-                <input type="text" id="settings-import-code" class="settings-input" placeholder="Paste sync code...">
-                <button class="settings-btn settings-btn-solid" id="settings-import-code-btn">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                  </svg>
-                  Import
-                </button>
-              </div>
-            </div>
+              Import
+            </button>
           </div>
         </div>
-
-        <div class="settings-card settings-card-danger" id="settings-card-danger">
-          <div class="settings-card-head">
-            <div class="ss-icon is-icon-danger">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                <line x1="12" y1="9" x2="12" y2="13" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
-              </svg>
-            </div>
-            <div>
-              <span class="settings-card-title is-text-error" id="settings-card-danger-title">Danger Zone</span>
-              <span class="settings-card-sub" id="settings-card-danger-sub">Irreversible actions</span>
-            </div>
-          </div>
-          <div class="settings-card-body">
-            <div class="settings-danger-row">
-              <div>
-                <div class="settings-danger-title">Reset all progress</div>
-                <div class="settings-danger-desc">All XP, keys, and lesson data will be lost</div>
-              </div>
-              <button class="settings-btn settings-btn-danger" id="settings-reset-btn">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="1 4 1 10 7 10" />
-                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-                </svg>
-                Reset
-              </button>
-            </div>
-          </div>
-        </div>
-
       </div>
-    </section>
+    </div>
+
+    <div class="settings-card settings-card-danger" id="settings-card-danger">
+      <div class="settings-card-head">
+        <div class="ss-icon is-icon-danger">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </div>
+        <div>
+          <span class="settings-card-title is-text-error" id="settings-card-danger-title">Danger Zone</span>
+          <span class="settings-card-sub" id="settings-card-danger-sub">Irreversible actions</span>
+        </div>
+      </div>
+      <div class="settings-card-body">
+        <div class="settings-danger-row">
+          <div>
+            <div class="settings-danger-title">Reset all progress</div>
+            <div class="settings-danger-desc">All XP, keys, and lesson data will be lost</div>
+          </div>
+          <button class="settings-btn settings-btn-danger" id="settings-reset-btn">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+            </svg>
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </div>
+
+</section>
+
 
   </main>
 
