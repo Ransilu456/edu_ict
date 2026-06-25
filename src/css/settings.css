@@ -1,14 +1,17 @@
-
 .settings-view {
   overflow-y: auto !important;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-direction: column;
 }
 
 .settings-hero {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 1.25rem 1.5rem 0.35rem;
   max-width: 720px;
+  padding: 3rem;
   margin: 0 auto;
 }
 
@@ -16,13 +19,13 @@
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--color-indigo-glow), rgba(99,102,241,0.08));
+  background: linear-gradient(135deg, var(--color-indigo-glow), rgba(99, 102, 241, 0.08));
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   color: var(--color-indigo);
-  border: 1px solid rgba(99,102,241,0.15);
+  border: 1px solid rgba(99, 102, 241, 0.15);
 }
 
 .settings-hero-title {
@@ -56,12 +59,12 @@
   border-radius: 16px;
   padding: 1.15rem 1.35rem;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .settings-card:hover {
   border-color: var(--text-muted);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   transform: translateY(-1px);
 }
 
@@ -106,13 +109,34 @@
   flex-shrink: 0;
 }
 
-.is-icon-profile { color: #818cf8; background: rgba(99,102,241,0.12); }
-.is-icon-medium { color: #10b981; background: rgba(16,185,129,0.12); }
-.is-icon-mode { color: #8b5cf6; background: rgba(139,92,246,0.12); }
-.is-icon-sync { color: #06b6d4; background: rgba(6,182,212,0.12); }
-.is-icon-danger { color: #ef4444; background: rgba(239,68,68,0.12); }
+.is-icon-profile {
+  color: #818cf8;
+  background: rgba(99, 102, 241, 0.12);
+}
 
-.is-text-error { color: #ef4444 !important; }
+.is-icon-medium {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.is-icon-mode {
+  color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.12);
+}
+
+.is-icon-sync {
+  color: #06b6d4;
+  background: rgba(6, 182, 212, 0.12);
+}
+
+.is-icon-danger {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.is-text-error {
+  color: #ef4444 !important;
+}
 
 .settings-label {
   font-size: 0.82rem;
@@ -185,7 +209,7 @@
 .settings-btn-solid:hover {
   opacity: 0.9;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99,102,241,0.25);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
 
 .settings-btn-danger {
@@ -242,12 +266,12 @@
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.settings-radio input[type="radio"]:checked + .settings-radio-dot {
+.settings-radio input[type="radio"]:checked+.settings-radio-dot {
   border-color: var(--color-indigo);
   box-shadow: 0 0 0 3px var(--color-indigo-glow);
 }
 
-.settings-radio input[type="radio"]:checked + .settings-radio-dot::after {
+.settings-radio input[type="radio"]:checked+.settings-radio-dot::after {
   content: "";
   width: 10px;
   height: 10px;
@@ -255,7 +279,7 @@
   background: var(--color-indigo);
 }
 
-.settings-radio input[type="radio"]:checked ~ .settings-radio-label-text {
+.settings-radio input[type="radio"]:checked~.settings-radio-label-text {
   color: var(--color-indigo);
   font-weight: 600;
 }
