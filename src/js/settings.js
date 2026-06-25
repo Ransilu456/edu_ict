@@ -1,5 +1,7 @@
 import UserService from './user-service.js';
 
+const NOTO_SINHALA = "'Noto Sans Sinhala', sans-serif";
+
 const LANG_DICT = {
   en: {
     title: "Settings & Progress Sync",
@@ -27,25 +29,24 @@ const LANG_DICT = {
     interfaceModeTitle: "Interface Theme",
     interfaceModeSub: "Select learning layout style",
     classicModeLabel: "Classic Mode (Gamified)",
-    proModeLabel: "Professional Mode (Academic)",
-    bilingualSuffix: ""
+    proModeLabel: "Professional Mode (Academic)"
   },
   si: {
-    title: "සැකසුම් සහ ප්‍රගති සමමුහුර්තකරණය (Settings & Sync)",
+    title: "සැකසුම් සහ ප්‍රගති සමමුහුර්තකරණය",
     subtitle: "ඔබගේ අධ්‍යයන විකල්ප සකසන්න සහ ඔබගේ ඉගෙනුම් ප්‍රගතිය සුරකින්න හෝ සමමුහුර්ත කරන්න.",
-    profileTitle: "පරිශීලක පැතිකඩ (User Profile)",
+    profileTitle: "පරිශීලක පැතිකඩ",
     profileSub: "ඔබගේ නම සකසන්න",
-    usernameLabel: "ශිෂ්‍යයාගේ නම / අන්වර්ථ නාමය (Student Name)",
-    mediumTitle: "ඉගෙනුම් මාධ්‍යය (Learning Medium)",
+    usernameLabel: "ශිෂ්‍යයාගේ නම / අන්වර්ථ නාමය",
+    mediumTitle: "ඉගෙනුම් මාධ්‍යය",
     mediumSub: "ඔබගේ උ/පෙළ ඉගෙනුම් භාෂාව තෝරන්න",
-    syncTitle: "දත්ත සමමුහුර්තකරණය (Data Synchronisation)",
+    syncTitle: "දත්ත සමමුහුර්තකරණය",
     syncSub: "ජංගම දුරකථනය සහ පරිගණකය අතර ප්‍රගතිය හුවමාරු කරගන්න",
-    exportLabel: "ප්‍රගති කේතය අපනයනය කරන්න (Export Code)",
-    importLabel: "ප්‍රගති කේතය ආනයනය කරන්න (Import Code)",
-    dangerTitle: "අන්තරාදායක කලාපය (Danger Zone)",
+    exportLabel: "ප්‍රගති කේතය අපනයනය කරන්න",
+    importLabel: "ප්‍රගති කේතය ආනයනය කරන්න",
+    dangerTitle: "අන්තරාදායක කලාපය",
     dangerSub: "ඔබගේ ඉගෙනුම් ජයග්‍රහණ ස්ථිරවම මකා දමන ක්‍රියා",
     saveBtn: "සුරකින්න",
-    copyBtn: "සමමුහුර්ත කේතය පිටපත් කරන්න",
+    copyBtn: "කේතය පිටපත් කරන්න",
     importBtn: "ආනයනය කර ප්‍රතිස්ථාපනය කරන්න",
     resetBtn: "සියල්ල මුල සිට ආරම්භ කරන්න",
     alertSave: "පැතිකඩ සාර්ථකව සුරකින ලදී!",
@@ -53,11 +54,10 @@ const LANG_DICT = {
     alertImportSuccess: "ප්‍රගතිය සාර්ථකව ආනයනය කර සමමුහුර්ත කරන ලදී!",
     alertImportError: "වලංගු නොවන සමමුහුර්ත කේතයකි.",
     alertResetConfirm: "ඔබට සියලු ප්‍රගතිය මකා දැමීමට අවශ්‍ය බව සහතිකද? මෙය ආපසු හැරවිය නොහැක.",
-    interfaceModeTitle: "අතුරුමුහුණත් තේමාව (Interface Theme)",
+    interfaceModeTitle: "අතුරුමුහුණත් තේමාව",
     interfaceModeSub: "ඉගෙනුම් පිරිසැලසුම් විලාසය තෝරන්න",
-    classicModeLabel: "ක්ලැසික් ප්‍රකාරය (Classic Mode)",
-    proModeLabel: "වෘත්තීය ප්‍රකාරය (Professional Mode)",
-    bilingualSuffix: " (Sinhala Medium)"
+    classicModeLabel: "සම්භාව්‍ය ප්‍රකාරය",
+    proModeLabel: "වෘත්තීය ප්‍රකාරය"
   }
 };
 
@@ -201,8 +201,17 @@ function updateExportCode() {
 function applyLanguage(lang) {
   const dict = LANG_DICT[lang];
   if (!dict) return;
-  const setHtml = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
   const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+
+  document.documentElement.lang = lang === 'si' ? 'si' : 'en';
+
+  if (lang === 'si') {
+    document.documentElement.style.setProperty('--font-sans', NOTO_SINHALA);
+    document.documentElement.style.setProperty('--font-header', NOTO_SINHALA);
+  } else {
+    document.documentElement.style.removeProperty('--font-sans');
+    document.documentElement.style.removeProperty('--font-header');
+  }
 
   setText('settings-title', dict.title);
   setText('settings-subtitle', dict.subtitle);
@@ -228,28 +237,21 @@ function applyLanguage(lang) {
 
   const copyBtn = document.getElementById('settings-copy-code-btn');
   if (copyBtn) {
-    copyBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>${dict.copyBtn}`;
+    copyBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="is-vam-mr6"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>${dict.copyBtn}`;
   }
 
   const importBtn = document.getElementById('settings-import-code-btn');
   if (importBtn) {
-    importBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>${dict.importBtn}`;
+    importBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="is-vam-mr6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>${dict.importBtn}`;
   }
 
   const resetBtn = document.getElementById('settings-reset-btn');
   if (resetBtn) {
-    resetBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>${dict.resetBtn}`;
-  }
-  const subnetTitle = document.querySelector('.subnetting-view .util-view-title');
-  if (subnetTitle) {
-    if (lang === 'si') subnetTitle.innerHTML = 'සබ්නෙටින් මාස්ටර් <span style="font-size:1.2rem; opacity:0.8; font-weight:normal">(Subnetting Master)</span>';
-    else subnetTitle.textContent = 'Subnetting Master';
+    resetBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="is-vam-mr6"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>${dict.resetBtn}`;
   }
 
-  const signalTitle = document.querySelector('.encoder-view .util-view-title');
-  if (signalTitle) {
-    if (lang === 'si') signalTitle.innerHTML = 'සංඥා කේතන විද්‍යාගාරය <span style="font-size:1.2rem; opacity:0.8; font-weight:normal">(Signal Encoding Lab)</span>';
-    else signalTitle.textContent = 'Signal Encoding Lab';
-  }
+  document.querySelectorAll('.settings-radio-label-text[lang="si"]').forEach(el => {
+    el.style.fontFamily = lang === 'si' ? NOTO_SINHALA : '';
+  });
 }
 window.initSettingsView = initSettingsView;

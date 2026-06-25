@@ -466,6 +466,12 @@ function renderNodeDOM(node) {
   const header = document.createElement('div');
   header.className = 'sandbox-node-header';
   header.innerText = node.label;
+  // In realistic (ANSI) gate mode, hide header text for pure logic gate types
+  const pureGateTypes = ['not','and','or','nand','nor','xor','xnor'];
+  const gateStyle = window.__gateStyle || localStorage.getItem('sandboxGateStyle') || 'box';
+  if (gateStyle === 'realistic' && pureGateTypes.includes(node.type)) {
+    header.style.display = 'none';
+  }
   el.appendChild(header);
   const body = document.createElement('div');
   body.className = 'sandbox-node-body';
@@ -614,7 +620,7 @@ function renderNodeBody(node, body) {
 
     case 'd-flop': {
       body.innerHTML = `
-        <div class="compound-body-grid" style="font-size:0.72rem;font-family:var(--font-mono);padding:2px 6px;">
+        <div class="compound-body-grid" class="is-mono-label">
           <div class="cb-row"><span class="cb-pin">D</span><span class="cb-name">DFF</span><span class="cb-pin out-pin">Q</span></div>
           <div class="cb-row" style="margin-top:2px;"><span class="cb-pin">CLK</span><span></span><span></span></div>
         </div>`;
@@ -633,7 +639,7 @@ function renderNodeBody(node, body) {
 
     case 'half-adder': {
       body.innerHTML = `
-        <div class="compound-body-grid" style="font-size:0.72rem;font-family:var(--font-mono);padding:2px 6px;">
+        <div class="compound-body-grid" class="is-mono-label">
           <div class="cb-row"><span class="cb-pin">A</span><span class="cb-name">½ ADD</span><span class="cb-pin out-pin">S</span></div>
           <div class="cb-row"><span class="cb-pin">B</span><span></span><span class="cb-pin out-pin">C</span></div>
         </div>`;
@@ -652,7 +658,7 @@ function renderNodeBody(node, body) {
 
     case 'full-adder': {
       body.innerHTML = `
-        <div class="compound-body-grid" style="font-size:0.72rem;font-family:var(--font-mono);padding:2px 6px;">
+        <div class="compound-body-grid" class="is-mono-label">
           <div class="cb-row"><span class="cb-pin">A</span><span class="cb-name">FULL ADD</span><span class="cb-pin out-pin">S</span></div>
           <div class="cb-row"><span class="cb-pin">B</span><span></span><span class="cb-pin out-pin">Cout</span></div>
           <div class="cb-row"><span class="cb-pin">Cin</span><span></span><span></span></div>
@@ -1094,8 +1100,9 @@ function drawWiringPreview(e) {
 
   updateSandboxWires();   
 
-  const dx = Math.abs(x2 - x1) * 0.5;
-  const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+  const dir = x2 >= x1 ? 1 : -1;
+  const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
+  const d = `M ${x1} ${y1} C ${x1 + dir * dx} ${y1}, ${x2 - dir * dx} ${y2}, ${x2} ${y2}`;
 
   const prev = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   prev.setAttribute('d', d);
@@ -1143,8 +1150,9 @@ function updateSandboxWires() {
         ? (wire.fromPortIdx === 0 ? srcNode.outputState : srcNode.outputState2) === 1
         : false;
 
-    const dx = Math.abs(x2 - x1) * 0.5;
-    const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+    const dir = x2 >= x1 ? 1 : -1;
+    const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
+    const d = `M ${x1} ${y1} C ${x1 + dir * dx} ${y1}, ${x2 - dir * dx} ${y2}, ${x2} ${y2}`;
     const hitTarget = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     hitTarget.setAttribute('d', d);
     hitTarget.setAttribute('stroke', 'transparent');
@@ -2029,7 +2037,7 @@ function exportCircuitJSON() {
 }
 const showToast = window.showToast;
 const halfAdderSvg = `
-<svg viewBox="0 0 400 220" width="100%" height="220" style="background:var(--bg-primary); border-radius:6px; border:1px solid var(--border-color); padding:10px;">
+<svg viewBox="0 0 400 220" width="100%" height="220" class="is-box">
   <text x="30" y="55" fill="var(--text-primary)" font-family="var(--font-mono)" font-weight="700">A</text>
   <text x="30" y="165" fill="var(--text-primary)" font-family="var(--font-mono)" font-weight="700">B</text>
 
@@ -2062,7 +2070,7 @@ const halfAdderSvg = `
 `;
 
 const fullAdderSvg = `
-<svg viewBox="0 0 540 280" width="100%" height="280" style="background:var(--bg-primary); border-radius:6px; border:1px solid var(--border-color); padding:10px;">
+<svg viewBox="0 0 540 280" width="100%" height="280" class="is-box">
   <text x="25" y="55" fill="var(--text-primary)" font-family="var(--font-mono)" font-weight="700">A</text>
   <text x="25" y="105" fill="var(--text-primary)" font-family="var(--font-mono)" font-weight="700">B</text>
   <text x="25" y="215" fill="var(--text-primary)" font-family="var(--font-mono)" font-weight="700">Cin</text>
@@ -2120,7 +2128,7 @@ const fullAdderSvg = `
 
 const dFlopTimingSvg = `
 <div style="display:flex; flex-direction:column; gap:0.5rem; width:100%; align-items:center;">
-  <svg viewBox="0 0 400 160" width="100%" height="160" style="background:var(--bg-primary); border-radius:6px; border:1px solid var(--border-color); padding:10px;">
+  <svg viewBox="0 0 400 160" width="100%" height="160" class="is-box">
     
     <text x="15" y="35" fill="var(--text-secondary)" font-family="var(--font-mono)" font-size="0.75rem" font-weight="700">CLK</text>
     <path d="M 50 35 L 100 35 L 100 15 L 150 15 L 150 35 L 200 35 L 200 15 L 250 15 L 250 35 L 300 35 L 300 15 L 350 15" fill="none" stroke="var(--text-primary)" stroke-width="2"/>
@@ -2144,7 +2152,7 @@ const dFlopTimingSvg = `
     <line x1="300" y1="15" x2="300" y2="145" stroke="var(--border-color)" stroke-dasharray="3,3"/>
   </svg>
   <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.25rem; line-height:1.4; text-align:center;">
-    A <strong>D Flip-Flop</strong> captures the state of the Data input (D) only on the <strong>rising edge</strong> of the Clock signal (CLK transition 0 to 1, highlighted in <span style="color:var(--color-cyan);">cyan</span>). Output (Q) holds this state until next rising edge.
+    A <strong>D Flip-Flop</strong> captures the state of the Data input (D) only on the <strong>rising edge</strong> of the Clock signal (CLK transition 0 to 1, highlighted in <span class="is-text-cyan">cyan</span>). Output (Q) holds this state until next rising edge.
   </p>
 </div>
 `;
@@ -2157,28 +2165,28 @@ const sevenSegMapHtml = `
   <table style="width:100%; border-collapse:collapse; font-size:0.78rem; text-align:center;">
     <thead>
       <tr style="border-bottom:2px solid var(--border-color); background:var(--bg-tertiary);">
-        <th style="padding:4px;">Hex</th>
-        <th style="padding:4px;">Binary</th>
-        <th style="padding:4px;">Segments</th>
+        <th class="is-p4">Hex</th>
+        <th class="is-p4">Binary</th>
+        <th class="is-p4">Segments</th>
       </tr>
     </thead>
     <tbody>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">0</td><td style="padding:4px;">0000</td><td style="padding:4px; color:var(--color-success);">a, b, c, d, e, f</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">1</td><td style="padding:4px;">0001</td><td style="padding:4px; color:var(--color-success);">b, c</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">2</td><td style="padding:4px;">0010</td><td style="padding:4px; color:var(--color-success);">a, b, d, e, g</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">3</td><td style="padding:4px;">0011</td><td style="padding:4px; color:var(--color-success);">a, b, c, d, g</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">4</td><td style="padding:4px;">0100</td><td style="padding:4px; color:var(--color-success);">b, c, f, g</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">5</td><td style="padding:4px;">0101</td><td style="padding:4px; color:var(--color-success);">a, c, d, f, g</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">6</td><td style="padding:4px;">0110</td><td style="padding:4px; color:var(--color-success);">a, c, d, e, f, g</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">7</td><td style="padding:4px;">0111</td><td style="padding:4px; color:var(--color-success);">a, b, c</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">8</td><td style="padding:4px;">1000</td><td style="padding:4px; color:var(--color-success);">a, b, c, d, e, f, g</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">9</td><td style="padding:4px;">1001</td><td style="padding:4px; color:var(--color-success);">a, b, c, d, f, g</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">A</td><td style="padding:4px;">1010</td><td style="padding:4px; color:var(--color-success);">a, b, c, e, f, g</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">b</td><td style="padding:4px;">1011</td><td style="padding:4px; color:var(--color-success);">c, d, e, f, g</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">C</td><td style="padding:4px;">1100</td><td style="padding:4px; color:var(--color-success);">a, d, e, f</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">d</td><td style="padding:4px;">1101</td><td style="padding:4px; color:var(--color-success);">b, c, d, e, g</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">E</td><td style="padding:4px;">1110</td><td style="padding:4px; color:var(--color-success);">a, d, e, f, g</td></tr>
-      <tr style="border-bottom:1px solid var(--border-color);"><td style="padding:4px; font-weight:700;">F</td><td style="padding:4px;">1111</td><td style="padding:4px; color:var(--color-success);">a, e, f, g</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">0</td><td class="is-p4">0000</td><td class="is-p4-success">a, b, c, d, e, f</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">1</td><td class="is-p4">0001</td><td class="is-p4-success">b, c</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">2</td><td class="is-p4">0010</td><td class="is-p4-success">a, b, d, e, g</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">3</td><td class="is-p4">0011</td><td class="is-p4-success">a, b, c, d, g</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">4</td><td class="is-p4">0100</td><td class="is-p4-success">b, c, f, g</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">5</td><td class="is-p4">0101</td><td class="is-p4-success">a, c, d, f, g</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">6</td><td class="is-p4">0110</td><td class="is-p4-success">a, c, d, e, f, g</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">7</td><td class="is-p4">0111</td><td class="is-p4-success">a, b, c</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">8</td><td class="is-p4">1000</td><td class="is-p4-success">a, b, c, d, e, f, g</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">9</td><td class="is-p4">1001</td><td class="is-p4-success">a, b, c, d, f, g</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">A</td><td class="is-p4">1010</td><td class="is-p4-success">a, b, c, e, f, g</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">b</td><td class="is-p4">1011</td><td class="is-p4-success">c, d, e, f, g</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">C</td><td class="is-p4">1100</td><td class="is-p4-success">a, d, e, f</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">d</td><td class="is-p4">1101</td><td class="is-p4-success">b, c, d, e, g</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">E</td><td class="is-p4">1110</td><td class="is-p4-success">a, d, e, f, g</td></tr>
+      <tr class="is-border-b"><td class="is-p4-bold">F</td><td class="is-p4">1111</td><td class="is-p4-success">a, e, f, g</td></tr>
     </tbody>
   </table>
 </div>

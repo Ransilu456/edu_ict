@@ -1,0 +1,57 @@
+.is-vam-mr6 {
+    vertical-align: middle;
+    margin-right: 6px
+}
+
+.is-p4-bold {
+    padding: 4px;
+    font-weight: 700;
+}
+
+.is-p4 {
+    padding: 4px;
+}
+
+.is-btn-pill {
+    padding: .6rem 1.2rem;
+    font-size: .9rem
+}
+
+.is-box {
+    background: var(--bg-primary);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    padding: 10px;
+}
+
+.is-mono-label {
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    padding: 2px 6px;
+}
+
+.is-text-cyan {
+    color: var(--color-cyan);
+}
+
+.is-code-tag {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    background: var(--bg-primary);
+    padding: 2px 4px;
+    border-radius: 3px;
+    border: 1px solid var(--border-color);
+}
+
+.is-p4-success {
+    padding: 4px;
+    color: var(--color-success);
+}
+
+.is-border-b {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.is-text-muted {
+    color: var(--text-muted)
+}

@@ -266,6 +266,85 @@ These laws help <strong>simplify logic circuits</strong>, reducing the number of
       explanation: 'J=1, K=1 is the TOGGLE mode — the output flips from 0→1 or 1→0 on each clock edge.',
     },
   },
+  {
+    id: 16,
+    title: 'Universal Gates',
+    text: `<strong>NAND</strong> and <strong>NOR</strong> gates are called <strong>Universal Gates</strong> because any other logic gate (AND, OR, NOT) can be constructed using only combinations of NAND or NOR gates.<br><br>
+• <strong>NAND Gate</strong> = NOT AND (Output is 0 only when both inputs are 1)<br>
+• <strong>NOR Gate</strong> = NOT OR (Output is 1 only when both inputs are 0)<br><br>
+This universal property makes them cheaper and easier to manufacture in large quantities.`,
+    type: 'universal-gates',
+    icon: '🔮',
+    quiz: {
+      question: 'Which of the following gates is considered a <strong>Universal Gate</strong>?',
+      options: ['AND Gate', 'NAND Gate', 'XOR Gate', 'NOT Gate'],
+      correctIndex: 1,
+      explanation: 'NAND and NOR gates are universal gates because they can be combined to implement any other Boolean function without other gate types.',
+    },
+  },
+  {
+    id: 17,
+    title: 'Karnaugh Maps (K-Maps)',
+    text: `A <strong>Karnaugh Map (K-Map)</strong> is a graphical tool used to simplify Boolean algebra expressions without using complex laws.<br><br>
+• For 2 variables (A, B), it uses a <strong>2x2 grid</strong> of 4 cells representing minterms.<br>
+• Adjacent cells containing <strong>1</strong>s are grouped in powers of 2 (1, 2, 4, 8).<br>
+• Grouping cells simplifies terms by eliminating variables that change state (e.g. B changing from 0 to 1).`,
+    type: 'k-map',
+    icon: '📐',
+    quiz: {
+      question: 'What is the size of groups we should look for when grouping cells in a K-Map?',
+      options: ['Any consecutive size (e.g. 1, 2, 3, 4)', 'Only powers of 2 (e.g. 1, 2, 4, 8)', 'Odd numbers only (e.g. 1, 3, 5)', 'Prime numbers only (e.g. 2, 3, 5)'],
+      correctIndex: 1,
+      explanation: 'K-Map groups must always be powers of 2 (1, 2, 4, 8, etc.) to mathematically simplify Boolean variables.',
+    },
+  },
+  {
+    id: 18,
+    title: 'Multiplexers (MUX)',
+    text: `A <strong>Multiplexer (MUX)</strong> is a combinational circuit that selects one of many input signals and routes it to a single output line.<br><br>
+• It acts as a data selector controlled by <strong>Select (S)</strong> lines.<br>
+• A 2-to-1 MUX has 2 inputs (I0, I1), 1 select line (S), and 1 output (Y).<br>
+• When S=0, output Y follows input I0. When S=1, output Y follows input I1.`,
+    type: 'multiplexer',
+    icon: '🔧',
+    quiz: {
+      question: 'In a 2-to-1 Multiplexer, if Select line S is set to 1, what will the Output Y equal?',
+      options: ['Input I0', 'Input I1', 'Always 0', 'Always 1'],
+      correctIndex: 1,
+      explanation: 'When select S=1, the multiplexer routes input I1 to the output Y.',
+    },
+  },
+  {
+    id: 19,
+    title: 'Transmission Media',
+    text: `Data communication uses <strong>Transmission Media</strong> to carry signals between networking nodes. These are categorized into:<br><br>
+• <strong>Guided Media (Wired)</strong>: Physical pathways like Twisted Pair (copper, cheap, 100m limit), Coaxial (cable TV, shielded), and Fibre Optic (transmits light, immune to EMI, high bandwidth/distance).<br>
+• <strong>Unguided Media (Wireless)</strong>: Air/space pathways using Radio waves, Microwaves (line-of-sight), and Satellites.`,
+    type: 'transmission-media',
+    icon: '📡',
+    quiz: {
+      question: 'Which transmission medium is immune to electromagnetic interference (EMI) and offers the highest bandwidth?',
+      options: ['Unshielded Twisted Pair (UTP)', 'Coaxial Cable', 'Fibre Optic Cable', 'Shielded Twisted Pair (STP)'],
+      correctIndex: 2,
+      explanation: 'Fibre Optic Cable transmits light pulses through glass threads, making it immune to electromagnetic interference (EMI) and allowing massive bandwidth over long distances.',
+    },
+  },
+  {
+    id: 20,
+    title: 'Network Devices',
+    text: `Networking nodes require dedicated <strong>Network Devices</strong> to communicate and bridge networks:<br><br>
+• <strong>Hub</strong>: Operates at Layer 1 (Physical). Broadcasts all traffic to all ports (high collisions).<br>
+• <strong>Switch</strong>: Operates at Layer 2 (Data Link). Directs traffic to destination MAC addresses.<br>
+• <strong>Router</strong>: Operates at Layer 3 (Network). Forwards packets across different networks using IP routing.`,
+    type: 'network-devices',
+    icon: '🧱',
+    quiz: {
+      question: 'Which device forwards frames selectively based on destination MAC addresses at Layer 2 of the OSI model?',
+      options: ['Hub', 'Switch', 'Router', 'Repeater'],
+      correctIndex: 1,
+      explanation: 'A Switch operates at Layer 2 (Data Link layer) and uses a MAC address table to forward frames selectively to the correct destination port.',
+    },
+  },
 ];
 let currentLessonIdx = 0;
 let selectedOptionIdx = null;
@@ -463,9 +542,16 @@ function renderVisualSimulation(type) {
     case 'gate-not':
     case 'gate-and':
     case 'gate-or':
-    case 'gate-xor':         renderGateSim(pane, type);  break;
+    case 'gate-xor':
+    case 'gate-nand':
+    case 'gate-nor':         renderGateSim(pane, type);  break;
     case 'half-adder':       renderHalfAdderSim(pane);   break;
     case 'full-adder':       renderFullAdderSim(pane);   break;
+    case 'universal-gates':  renderUniversalGatesSim(pane); break;
+    case 'k-map':            renderKMapSim(pane);        break;
+    case 'multiplexer':      renderMuxSim(pane);         break;
+    case 'transmission-media': renderTransmissionMediaSim(pane); break;
+    case 'network-devices':  renderNetworkDevicesSim(pane); break;
     case 'info-card':        renderInfoCard(pane);        break;
     case 'osi-explorer':     renderOSIExplorer(pane);     break;
     case 'course-complete':  renderCourseComplete(pane);  break;
@@ -595,6 +681,8 @@ function evaluateGate(type) {
   if (type === 'gate-and')  out = a && b ? 1 : 0;
   if (type === 'gate-or')   out = a || b ? 1 : 0;
   if (type === 'gate-xor')  out = a !== b ? 1 : 0;
+  if (type === 'gate-nand') out = !(a && b) ? 1 : 0;
+  if (type === 'gate-nor')  out = !(a || b) ? 1 : 0;
   setOutput('node-out-y', out);
   const badge = document.getElementById('course-gate-badge');
   badge?.classList.toggle('active-gate', out === 1);
@@ -650,11 +738,11 @@ function renderFullAdderSim(pane) {
           <div class="input-node-wrapper"><div class="node-label">Cin</div><div class="input-node course-input" id="node-in-cin">0</div></div>
         </div>
         <div class="node-column" style="gap:1.5rem">
-          <div class="gate-badge" id="fa-xor1" style="padding:.6rem 1.2rem;font-size:.9rem">XOR 1</div>
-          <div class="gate-badge" id="fa-and1" style="padding:.6rem 1.2rem;font-size:.9rem">AND 1</div>
-          <div class="gate-badge" id="fa-xor2" style="padding:.6rem 1.2rem;font-size:.9rem">XOR 2</div>
-          <div class="gate-badge" id="fa-and2" style="padding:.6rem 1.2rem;font-size:.9rem">AND 2</div>
-          <div class="gate-badge" id="fa-or"   style="padding:.6rem 1.2rem;font-size:.9rem">OR</div>
+          <div class="gate-badge" id="fa-xor1" class="is-btn-pill">XOR 1</div>
+          <div class="gate-badge" id="fa-and1" class="is-btn-pill">AND 1</div>
+          <div class="gate-badge" id="fa-xor2" class="is-btn-pill">XOR 2</div>
+          <div class="gate-badge" id="fa-and2" class="is-btn-pill">AND 2</div>
+          <div class="gate-badge" id="fa-or"   class="is-btn-pill">OR</div>
         </div>
         <div class="node-column" style="gap:4rem">
           <div class="input-node-wrapper"><div class="output-node" id="node-out-sum">0</div><div class="node-label">SUM</div></div>
@@ -881,6 +969,442 @@ function spawnConfetti() {
   el.style.animationDuration = dur + 's';
   box.appendChild(el);
   setTimeout(() => el.remove(), dur * 1000);
+}
+
+function renderUniversalGatesSim(pane) {
+  pane.innerHTML = `
+    <div class="simulation-canvas" style="display:flex; flex-direction:column; gap:1rem; align-items:center; width:100%; min-height:190px; justify-content:center">
+      <div class="mode-pill-toggle" style="margin-bottom:0.5rem">
+        <button class="mode-toggle-btn active" id="ug-nand-btn">NAND Gate</button>
+        <button class="mode-toggle-btn" id="ug-nor-btn">NOR Gate</button>
+      </div>
+      <div class="nodes-container" style="width:100%; justify-content:center; gap:2.5rem">
+        <div class="node-column">
+          <div class="input-node-wrapper"><div class="node-label">A</div><div class="input-node course-input" id="ug-in-a">0</div></div>
+          <div class="input-node-wrapper"><div class="node-label">B</div><div class="input-node course-input" id="ug-in-b">0</div></div>
+        </div>
+        <div class="node-column">
+          <div class="gate-badge" id="ug-gate-badge" style="width:75px">NAND</div>
+        </div>
+        <div class="node-column">
+          <div class="input-node-wrapper">
+            <div class="output-node" id="ug-out-y">1</div>
+            <div class="node-label">Y</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  let currentGate = 'nand';
+  const btnNand = document.getElementById('ug-nand-btn');
+  const btnNor = document.getElementById('ug-nor-btn');
+  const badge = document.getElementById('ug-gate-badge');
+  const inA = document.getElementById('ug-in-a');
+  const inB = document.getElementById('ug-in-b');
+  const outY = document.getElementById('ug-out-y');
+
+  function update() {
+    const valA = inA.classList.contains('active') ? 1 : 0;
+    const valB = inB.classList.contains('active') ? 1 : 0;
+    let result = 0;
+    if (currentGate === 'nand') {
+      result = !(valA && valB) ? 1 : 0;
+    } else {
+      result = !(valA || valB) ? 1 : 0;
+    }
+    outY.textContent = result;
+    outY.classList.toggle('active', result === 1);
+    badge.classList.toggle('active-gate', result === 1);
+  }
+
+  [inA, inB].forEach(inp => {
+    inp.addEventListener('click', () => {
+      if (window.playSound) window.playSound('toggle');
+      inp.classList.toggle('active');
+      inp.textContent = inp.classList.contains('active') ? '1' : '0';
+      update();
+    });
+  });
+
+  btnNand.addEventListener('click', () => {
+    if (window.playSound) window.playSound('click');
+    currentGate = 'nand';
+    btnNand.classList.add('active');
+    btnNor.classList.remove('active');
+    badge.textContent = 'NAND';
+    update();
+  });
+
+  btnNor.addEventListener('click', () => {
+    if (window.playSound) window.playSound('click');
+    currentGate = 'nor';
+    btnNor.classList.add('active');
+    btnNand.classList.remove('active');
+    badge.textContent = 'NOR';
+    update();
+  });
+
+  update();
+}
+
+function renderKMapSim(pane) {
+  pane.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:1rem; align-items:center; width:100%; max-width:320px; padding:0.5rem">
+      <div style="font-family:var(--font-header); font-weight:800; font-size:0.9rem; color:var(--text-muted)">Interactive 2-Variable K-Map</div>
+      
+      <div style="display:grid; grid-template-columns: 40px repeat(2, 60px); grid-template-rows: 40px repeat(2, 60px); gap:4px; align-items:center; text-align:center; font-family:var(--font-header); font-weight:700">
+        <div></div>
+        <div style="color:var(--color-indigo)">B = 0</div>
+        <div style="color:var(--color-indigo)">B = 1</div>
+        
+        <div style="color:var(--color-indigo)">A = 0</div>
+        <button class="kmap-cell" id="kcell-00" style="height:60px; border:2px solid var(--border-color); background:var(--bg-secondary); color:var(--text-primary); font-size:1.25rem; font-weight:bold; border-radius:8px; cursor:pointer; transition:all 0.15s">0</button>
+        <button class="kmap-cell" id="kcell-01" style="height:60px; border:2px solid var(--border-color); background:var(--bg-secondary); color:var(--text-primary); font-size:1.25rem; font-weight:bold; border-radius:8px; cursor:pointer; transition:all 0.15s">0</button>
+        
+        <div style="color:var(--color-indigo)">A = 1</div>
+        <button class="kmap-cell" id="kcell-10" style="height:60px; border:2px solid var(--border-color); background:var(--bg-secondary); color:var(--text-primary); font-size:1.25rem; font-weight:bold; border-radius:8px; cursor:pointer; transition:all 0.15s">0</button>
+        <button class="kmap-cell" id="kcell-11" style="height:60px; border:2px solid var(--border-color); background:var(--bg-secondary); color:var(--text-primary); font-size:1.25rem; font-weight:bold; border-radius:8px; cursor:pointer; transition:all 0.15s">0</button>
+      </div>
+
+      <div style="width:100%; background:var(--bg-secondary); border:1px solid var(--border-color); padding:0.75rem; border-radius:8px; text-align:center; margin-top:0.5rem">
+        <div style="font-size:0.75rem; color:var(--text-muted); font-weight:bold">SIMPLIFIED BOOLEAN EXPRESSION</div>
+        <div id="kmap-expr" style="font-family:var(--font-mono); font-size:1.25rem; font-weight:800; color:var(--color-indigo); margin-top:4px">0</div>
+      </div>
+    </div>`;
+
+  const cells = {
+    '00': document.getElementById('kcell-00'),
+    '01': document.getElementById('kcell-01'),
+    '10': document.getElementById('kcell-10'),
+    '11': document.getElementById('kcell-11')
+  };
+
+  const exprEl = document.getElementById('kmap-expr');
+
+  function updateKMap() {
+    const m0 = cells['00'].textContent === '1';
+    const m1 = cells['01'].textContent === '1';
+    const m2 = cells['10'].textContent === '1';
+    const m3 = cells['11'].textContent === '1';
+
+    Object.keys(cells).forEach(k => {
+      const active = cells[k].textContent === '1';
+      cells[k].style.borderColor = active ? 'var(--color-indigo)' : 'var(--border-color)';
+      cells[k].style.background = active ? 'var(--color-indigo-glow, rgba(99,102,241,0.15))' : 'var(--bg-secondary)';
+      cells[k].style.boxShadow = active ? '0 0 8px rgba(99,102,241,0.3)' : 'none';
+    });
+
+    let expr = '0';
+    if (m0 && m1 && m2 && m3) expr = '1';
+    else if (m0 && m1 && m2) expr = "A' + B'";
+    else if (m0 && m1 && m3) expr = "A' + B";
+    else if (m0 && m2 && m3) expr = "A + B'";
+    else if (m1 && m2 && m3) expr = "A + B";
+    else if (m0 && m1) expr = "A'";
+    else if (m2 && m3) expr = "A";
+    else if (m0 && m2) expr = "B'";
+    else if (m1 && m3) expr = "B";
+    else if (m0 && m3) expr = "A'B' + AB";
+    else if (m1 && m2) expr = "A'B + AB'";
+    else if (m0) expr = "A'B'";
+    else if (m1) expr = "A'B";
+    else if (m2) expr = "AB'";
+    else if (m3) expr = "AB";
+
+    exprEl.textContent = expr;
+  }
+
+  Object.keys(cells).forEach(k => {
+    cells[k].addEventListener('click', () => {
+      if (window.playSound) window.playSound('toggle');
+      cells[k].textContent = cells[k].textContent === '0' ? '1' : '0';
+      updateKMap();
+    });
+  });
+
+  updateKMap();
+}
+
+function renderMuxSim(pane) {
+  pane.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:0.75rem; align-items:center; width:100%; max-width:320px; padding:0.5rem">
+      <div style="font-family:var(--font-header); font-weight:800; font-size:0.9rem; color:var(--text-muted)">2-to-1 Multiplexer (MUX)</div>
+      
+      <div style="display:flex; align-items:center; gap:1.5rem; background:var(--bg-secondary); border:1px solid var(--border-color); padding:1rem; border-radius:12px; width:100%; position:relative; min-height:140px">
+        <div style="display:flex; flex-direction:column; gap:1.5rem">
+          <div class="input-node-wrapper">
+            <div class="node-label">I0</div>
+            <div class="input-node course-input" id="mux-i0">0</div>
+          </div>
+          <div class="input-node-wrapper">
+            <div class="node-label">I1</div>
+            <div class="input-node course-input" id="mux-i1">0</div>
+          </div>
+        </div>
+        
+        <div style="width:70px; height:120px; border:2.5px solid var(--border-color); background:var(--bg-primary); clip-path: polygon(0% 0%, 100% 20%, 100% 80%, 0% 100%); display:flex; align-items:center; justify-content:center; font-family:var(--font-header); font-weight:800; font-size:1.1rem; color:var(--text-secondary)">
+          MUX
+        </div>
+
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1">
+          <div class="input-node-wrapper">
+            <div class="output-node" id="mux-out">0</div>
+            <div class="node-label">Y</div>
+          </div>
+        </div>
+        
+        <div style="position:absolute; bottom:-1.25rem; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center">
+          <div class="input-node course-input" id="mux-sel" style="padding:0.15rem 0.4rem; font-size:0.75rem; min-height:22px; min-width:22px">0</div>
+          <div class="node-label" style="font-size:0.65rem; margin-top:2px">SELECT (S)</div>
+        </div>
+      </div>
+      
+      <div style="font-size:0.72rem; color:var(--text-muted); text-align:center; margin-top:1rem">
+        If S = 0, Y follows I0.<br>If S = 1, Y follows I1.
+      </div>
+    </div>`;
+
+  const i0 = document.getElementById('mux-i0');
+  const i1 = document.getElementById('mux-i1');
+  const sel = document.getElementById('mux-sel');
+  const out = document.getElementById('mux-out');
+
+  function updateMux() {
+    const valI0 = i0.classList.contains('active') ? 1 : 0;
+    const valI1 = i1.classList.contains('active') ? 1 : 0;
+    const valSel = sel.classList.contains('active') ? 1 : 0;
+
+    const result = valSel === 0 ? valI0 : valI1;
+    out.textContent = result;
+    out.classList.toggle('active', result === 1);
+
+    i0.parentElement.style.opacity = valSel === 0 ? '1' : '0.4';
+    i1.parentElement.style.opacity = valSel === 1 ? '1' : '0.4';
+  }
+
+  [i0, i1, sel].forEach(inp => {
+    inp.addEventListener('click', () => {
+      if (window.playSound) window.playSound('toggle');
+      inp.classList.toggle('active');
+      inp.textContent = inp.classList.contains('active') ? '1' : '0';
+      updateMux();
+    });
+  });
+
+  updateMux();
+}
+
+function renderTransmissionMediaSim(pane) {
+  pane.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:0.75rem; align-items:center; width:100%; max-width:380px; padding:0.5rem">
+      <div style="font-family:var(--font-header); font-weight:800; font-size:0.85rem; color:var(--text-muted)">Compare Guided & Unguided Media</div>
+      
+      <div style="display:flex; gap:0.35rem; width:100%; overflow-x:auto; scrollbar-width:none">
+        <button class="mode-toggle-btn active" id="tm-tp-btn" style="font-size:0.7rem; padding:0.35rem 0.5rem">Twisted Pair</button>
+        <button class="mode-toggle-btn" id="tm-coax-btn" style="font-size:0.7rem; padding:0.35rem 0.5rem">Coaxial</button>
+        <button class="mode-toggle-btn" id="tm-fiber-btn" style="font-size:0.7rem; padding:0.35rem 0.5rem">Fibre Optic</button>
+        <button class="mode-toggle-btn" id="tm-wireless-btn" style="font-size:0.7rem; padding:0.35rem 0.5rem">Wireless</button>
+      </div>
+      
+      <div style="width:100%; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:12px; padding:1rem; min-height:160px; display:flex; flex-direction:column; gap:0.5rem">
+        <h4 id="tm-title" style="color:var(--color-indigo); font-size:1rem; margin:0">Twisted Pair Cable</h4>
+        <div style="display:grid; grid-template-columns: 80px 1fr; gap:0.25rem 0.5rem; font-size:0.78rem">
+          <strong class="is-text-muted">Syllabus:</strong> <span id="tm-syllabus">Guided (Wired)</span>
+          <strong class="is-text-muted">Bandwidth:</strong> <span id="tm-bw">Up to 10 Gbps (Cat 6a)</span>
+          <strong class="is-text-muted">Distance:</strong> <span id="tm-dist">100 meters limit</span>
+          <strong class="is-text-muted">Features:</strong> <span id="tm-features">Inexpensive, flexible, sensitive to EMI. UTP/STP types.</span>
+        </div>
+        <div id="tm-graphic" style="display:flex; justify-content:center; align-items:center; height:40px; margin-top:0.5rem; font-size:1.8rem">
+          🔌
+        </div>
+      </div>
+    </div>`;
+
+  const info = {
+    tp: {
+      title: 'Twisted Pair Cable (UTP / STP)',
+      syllabus: 'Guided (Wired)',
+      bw: 'Up to 10 Gbps (Cat 6a)',
+      dist: '100 meters (maximum segment)',
+      features: 'Consists of pairs of copper wires twisted together to reduce electromagnetic interference (EMI). Used extensively in LANs.',
+      graphic: '🔌'
+    },
+    coax: {
+      title: 'Coaxial Cable',
+      syllabus: 'Guided (Wired)',
+      bw: 'Up to 100 Mbps',
+      dist: 'Up to 500 meters',
+      features: 'Has a central copper conductor surrounded by insulation, shielding, and outer jacket. Highly resistant to EMI. Used in cable TV.',
+      graphic: '📺'
+    },
+    fiber: {
+      title: 'Fibre Optic Cable',
+      syllabus: 'Guided (Wired)',
+      bw: '100+ Gbps (extremely high)',
+      dist: 'Tens of kilometers',
+      features: 'Transmits data as light pulses through glass or plastic cores. Immune to EMI, lowest latency, highest security, expensive.',
+      graphic: '⚡'
+    },
+    wireless: {
+      title: 'Wireless Media (Radio, Micro, Sat)',
+      syllabus: 'Unguided (Wireless)',
+      bw: 'Varies (up to 1+ Gbps)',
+      dist: 'Global (via satellites)',
+      features: 'Uses electromagnetic waves (Radio, Microwave, Infrared) to transmit signals through the air. Susceptible to weather.',
+      graphic: '📡'
+    }
+  };
+
+  const btnTp = document.getElementById('tm-tp-btn');
+  const btnCoax = document.getElementById('tm-coax-btn');
+  const btnFiber = document.getElementById('tm-fiber-btn');
+  const btnWireless = document.getElementById('tm-wireless-btn');
+
+  const titleEl = document.getElementById('tm-title');
+  const sylEl = document.getElementById('tm-syllabus');
+  const bwEl = document.getElementById('tm-bw');
+  const distEl = document.getElementById('tm-dist');
+  const featEl = document.getElementById('tm-features');
+  const graphEl = document.getElementById('tm-graphic');
+
+  const btns = [btnTp, btnCoax, btnFiber, btnWireless];
+
+  function showMedia(key) {
+    btns.forEach(b => b.classList.remove('active'));
+    document.getElementById(`tm-${key}-btn`).classList.add('active');
+    const data = info[key];
+    titleEl.textContent = data.title;
+    sylEl.textContent = data.syllabus;
+    bwEl.textContent = data.bw;
+    distEl.textContent = data.dist;
+    featEl.textContent = data.features;
+    graphEl.textContent = data.graphic;
+  }
+
+  btnTp.addEventListener('click', () => { if(window.playSound) window.playSound('click'); showMedia('tp'); });
+  btnCoax.addEventListener('click', () => { if(window.playSound) window.playSound('click'); showMedia('coax'); });
+  btnFiber.addEventListener('click', () => { if(window.playSound) window.playSound('click'); showMedia('fiber'); });
+  btnWireless.addEventListener('click', () => { if(window.playSound) window.playSound('click'); showMedia('wireless'); });
+}
+
+function renderNetworkDevicesSim(pane) {
+  pane.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:0.5rem; align-items:center; width:100%; max-width:380px; padding:0.5rem">
+      <div style="font-family:var(--font-header); font-weight:800; font-size:0.85rem; color:var(--text-muted)">Network Devices Simulation</div>
+      
+      <div style="display:flex; gap:0.35rem; width:100%">
+        <button class="mode-toggle-btn active" id="nd-hub-btn" style="flex:1; font-size:0.75rem; padding:0.35rem 0">Hub</button>
+        <button class="mode-toggle-btn" id="nd-switch-btn" style="flex:1; font-size:0.75rem; padding:0.35rem 0">Switch</button>
+      </div>
+
+      <div style="position:relative; width:100%; height:130px; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:12px; overflow:hidden">
+        <div id="nd-node-src" style="position:absolute; left:20px; top:50px; width:30px; height:30px; border-radius:50%; background:var(--color-indigo); display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.75rem; font-weight:bold">A</div>
+        
+        <div id="nd-node-device" style="position:absolute; left:50%; top:50px; transform:translateX(-50%); width:60px; height:30px; border:2px solid var(--border-color); background:var(--bg-primary); border-radius:6px; display:flex; align-items:center; justify-content:center; color:var(--text-primary); font-size:0.75rem; font-weight:bold">HUB</div>
+        
+        <div id="nd-node-dst1" style="position:absolute; right:20px; top:20px; width:30px; height:30px; border-radius:50%; background:var(--bg-tertiary); border:1.5px solid var(--border-color); display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:0.75rem; font-weight:bold">B</div>
+        <div id="nd-node-dst2" style="position:absolute; right:20px; top:80px; width:30px; height:30px; border-radius:50%; background:var(--bg-tertiary); border:1.5px solid var(--border-color); display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:0.75rem; font-weight:bold">C</div>
+
+        <div id="nd-packet1" style="position:absolute; width:8px; height:8px; background:var(--color-success); border-radius:50%; display:none; z-index:10"></div>
+        <div id="nd-packet2" style="position:absolute; width:8px; height:8px; background:var(--color-success); border-radius:50%; display:none; z-index:10"></div>
+      </div>
+      
+      <button class="btn-primary" id="nd-send-btn" style="padding:0.4rem 1rem; font-size:0.8rem; font-family:var(--font-header); font-weight:700">Send Packet A → B</button>
+      
+      <div id="nd-explanation" style="font-size:0.75rem; color:var(--text-secondary); text-align:center; padding:0 0.5rem; min-height:36px">
+        A Hub broadcast inputs to ALL ports. It operates at Physical Layer (Layer 1).
+      </div>
+    </div>`;
+
+  const btnHub = document.getElementById('nd-hub-btn');
+  const btnSwitch = document.getElementById('nd-switch-btn');
+  const btnSend = document.getElementById('nd-send-btn');
+  const deviceNode = document.getElementById('nd-node-device');
+  const expEl = document.getElementById('nd-explanation');
+
+  const p1 = document.getElementById('nd-packet1');
+  const p2 = document.getElementById('nd-packet2');
+
+  let currentMode = 'hub';
+  let isAnimating = false;
+
+  btnHub.addEventListener('click', () => {
+    if(window.playSound) window.playSound('click');
+    currentMode = 'hub';
+    btnHub.classList.add('active');
+    btnSwitch.classList.remove('active');
+    deviceNode.textContent = 'HUB';
+    expEl.textContent = 'A Hub broadcasts inputs to ALL ports. It operates at Physical Layer (Layer 1) and causes high collision risk.';
+  });
+
+  btnSwitch.addEventListener('click', () => {
+    if(window.playSound) window.playSound('click');
+    currentMode = 'switch';
+    btnSwitch.classList.add('active');
+    btnHub.classList.remove('active');
+    deviceNode.textContent = 'SWITCH';
+    expEl.textContent = 'A Switch forwards packets ONLY to the destination MAC port. It operates at Data Link Layer (Layer 2) for collision-free routing.';
+  });
+
+  btnSend.addEventListener('click', () => {
+    if (isAnimating) return;
+    if(window.playSound) window.playSound('click');
+    isAnimating = true;
+    btnSend.disabled = true;
+
+    const srcX = 35, srcY = 65;
+    const devX = 190, devY = 65;
+    const dst1X = 330, dst1Y = 35;
+    const dst2X = 330, dst2Y = 95;
+
+    p1.style.display = 'block';
+    p1.style.left = `${srcX}px`;
+    p1.style.top = `${srcY}px`;
+
+    animatePacket(p1, srcX, srcY, devX, devY, 600, () => {
+      if (currentMode === 'hub') {
+        p2.style.display = 'block';
+        p2.style.left = `${devX}px`;
+        p2.style.top = `${devY}px`;
+        
+        animatePacket(p1, devX, devY, dst1X, dst1Y, 600);
+        animatePacket(p2, devX, devY, dst2X, dst2Y, 600, () => {
+          endAnim();
+        });
+      } else {
+        animatePacket(p1, devX, devY, dst1X, dst1Y, 600, () => {
+          endAnim();
+        });
+      }
+    });
+  });
+
+  function animatePacket(packet, x1, y1, x2, y2, duration, callback) {
+    const start = performance.now();
+    function frame(time) {
+      let progress = (time - start) / duration;
+      if (progress > 1) progress = 1;
+      const curX = x1 + (x2 - x1) * progress;
+      const curY = y1 + (y2 - y1) * progress;
+      packet.style.left = `${curX}px`;
+      packet.style.top = `${curY}px`;
+      if (progress < 1) {
+        requestAnimationFrame(frame);
+      } else if (callback) {
+        callback();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function endAnim() {
+    setTimeout(() => {
+      p1.style.display = 'none';
+      p2.style.display = 'none';
+      btnSend.disabled = false;
+      isAnimating = false;
+    }, 400);
+  }
 }
 
 window.drawCourseWires = drawCourseWires;

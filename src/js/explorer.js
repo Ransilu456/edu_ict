@@ -104,22 +104,22 @@ function renderExplorerGate() {
       univCard.style.display = "block";
       if (gate.name === "NAND") {
         univCard.innerHTML = `
-          <strong style="color:var(--color-cyan);">Gate Universality: NAND Gate</strong><br>
+          <strong class="is-text-cyan">Gate Universality: NAND Gate</strong><br>
           NAND is a <strong>universal logic gate</strong>, meaning any other boolean logic function (NOT, AND, OR, NOR, XOR, XNOR) can be implemented using <em>only</em> NAND gates:
           <ul style="margin-left:1.25rem; margin-top:0.5rem; display:flex; flex-direction:column; gap:0.35rem; font-size:0.85rem; color:var(--text-secondary);">
-            <li><strong>NOT Gate:</strong> Connect both inputs of a NAND gate together: <br><code style="font-family:var(--font-mono); font-size:0.8rem; background:var(--bg-primary); padding:2px 4px; border-radius:3px; border:1px solid var(--border-color);">Y = A NAND A</code></li>
-            <li><strong>AND Gate:</strong> Feed NAND into a NOT inverter configuration: <br><code style="font-family:var(--font-mono); font-size:0.8rem; background:var(--bg-primary); padding:2px 4px; border-radius:3px; border:1px solid var(--border-color);">Y = (A NAND B) NAND (A NAND B)</code></li>
-            <li><strong>OR Gate:</strong> Invert both inputs first before feeding into NAND: <br><code style="font-family:var(--font-mono); font-size:0.8rem; background:var(--bg-primary); padding:2px 4px; border-radius:3px; border:1px solid var(--border-color);">Y = (A NAND A) NAND (B NAND B)</code></li>
+            <li><strong>NOT Gate:</strong> Connect both inputs of a NAND gate together: <br><code class="is-code-tag">Y = A NAND A</code></li>
+            <li><strong>AND Gate:</strong> Feed NAND into a NOT inverter configuration: <br><code class="is-code-tag">Y = (A NAND B) NAND (A NAND B)</code></li>
+            <li><strong>OR Gate:</strong> Invert both inputs first before feeding into NAND: <br><code class="is-code-tag">Y = (A NAND A) NAND (B NAND B)</code></li>
           </ul>
         `;
       } else if (gate.name === "NOR") {
         univCard.innerHTML = `
-          <strong style="color:var(--color-cyan);">Gate Universality: NOR Gate</strong><br>
+          <strong class="is-text-cyan">Gate Universality: NOR Gate</strong><br>
           NOR is a <strong>universal logic gate</strong>, meaning any other boolean logic function (NOT, OR, AND, NAND, XOR, XNOR) can be implemented using <em>only</em> NOR gates:
           <ul style="margin-left:1.25rem; margin-top:0.5rem; display:flex; flex-direction:column; gap:0.35rem; font-size:0.85rem; color:var(--text-secondary);">
-            <li><strong>NOT Gate:</strong> Connect both inputs of a NOR gate together: <br><code style="font-family:var(--font-mono); font-size:0.8rem; background:var(--bg-primary); padding:2px 4px; border-radius:3px; border:1px solid var(--border-color);">Y = A NOR A</code></li>
-            <li><strong>OR Gate:</strong> Feed NOR into a NOT inverter configuration: <br><code style="font-family:var(--font-mono); font-size:0.8rem; background:var(--bg-primary); padding:2px 4px; border-radius:3px; border:1px solid var(--border-color);">Y = (A NOR B) NOR (A NOR B)</code></li>
-            <li><strong>AND Gate:</strong> Invert both inputs first before feeding into NOR: <br><code style="font-family:var(--font-mono); font-size:0.8rem; background:var(--bg-primary); padding:2px 4px; border-radius:3px; border:1px solid var(--border-color);">Y = (A NOR A) NOR (B NOR B)</code></li>
+            <li><strong>NOT Gate:</strong> Connect both inputs of a NOR gate together: <br><code class="is-code-tag">Y = A NOR A</code></li>
+            <li><strong>OR Gate:</strong> Feed NOR into a NOT inverter configuration: <br><code class="is-code-tag">Y = (A NOR B) NOR (A NOR B)</code></li>
+            <li><strong>AND Gate:</strong> Invert both inputs first before feeding into NOR: <br><code class="is-code-tag">Y = (A NOR A) NOR (B NOR B)</code></li>
           </ul>
         `;
       }

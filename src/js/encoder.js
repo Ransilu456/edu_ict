@@ -519,10 +519,10 @@ function initBandwidthCalc() {
     if (resEl) {
       resEl.innerHTML = `
         <div style="display:grid;grid-template-columns:1.3fr 1.7fr;gap:5px 10px;font-family:var(--font-mono);font-size:0.85rem;">
-          <span style="color:var(--text-muted)">Bandwidth (B):</span>       <strong>${formatHz(bw)}</strong>
-          <span style="color:var(--text-muted)">Signal Levels (M):</span>   <strong>${M}</strong>
-          <span style="color:var(--text-muted)">Bits per baud:</span>        <strong>${Math.log2(M).toFixed(2)} bits (log₂${M})</strong>
-          <span style="color:var(--text-muted)">SNR:</span>                  <strong>${snr > 0 ? snr : 'Not specified'}</strong>
+          <span class="is-text-muted">Bandwidth (B):</span>       <strong>${formatHz(bw)}</strong>
+          <span class="is-text-muted">Signal Levels (M):</span>   <strong>${M}</strong>
+          <span class="is-text-muted">Bits per baud:</span>        <strong>${Math.log2(M).toFixed(2)} bits (log₂${M})</strong>
+          <span class="is-text-muted">SNR:</span>                  <strong>${snr > 0 ? snr : 'Not specified'}</strong>
         </div>
         <hr style="margin:0.75rem 0; border-color:var(--border-color);">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
@@ -691,8 +691,8 @@ function enc_checkChallengeAnswer() {
     }
   });
 
-  const CHECK_ICON = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg>`;
-  const CROSS_ICON = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  const CHECK_ICON = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="is-vam-mr6"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const CROSS_ICON = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="is-vam-mr6"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
 
   if (isCorrect) {
     if (window.playSound) window.playSound('success');

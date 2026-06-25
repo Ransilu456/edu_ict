@@ -209,13 +209,13 @@ export function sn_calculateIpSubnet() {
       <span style="color:var(--color-cyan);font-size:0.8rem">Block: ${magic}</span>
     </div>
     <div style="display:grid;grid-template-columns:1.4fr 1.6fr;gap:4px 8px;font-family:var(--font-mono);font-size:0.82rem;">
-      <span style="color:var(--text-muted)">Subnet Mask:</span>       <strong style="color:#a78bfa">${info.mask}</strong>
-      <span style="color:var(--text-muted)">Wildcard Mask:</span>     <strong style="color:#f59e0b">${info.wildcard}</strong>
-      <span style="color:var(--text-muted)">Network Address:</span>   <strong style="color:var(--color-cyan)">${net.join('.')}</strong>
-      <span style="color:var(--text-muted)">First Usable Host:</span> <span>${first.join('.')}</span>
-      <span style="color:var(--text-muted)">Last Usable Host:</span>  <span>${last.join('.')}</span>
-      <span style="color:var(--text-muted)">Broadcast Address:</span> <strong style="color:#818cf8">${brd.join('.')}</strong>
-      <span style="color:var(--text-muted)">Usable Hosts:</span>      <span style="color:#10b981">${info.hosts.toLocaleString()}</span>
+      <span class="is-text-muted">Subnet Mask:</span>       <strong style="color:#a78bfa">${info.mask}</strong>
+      <span class="is-text-muted">Wildcard Mask:</span>     <strong style="color:#f59e0b">${info.wildcard}</strong>
+      <span class="is-text-muted">Network Address:</span>   <strong style="color:var(--color-cyan)">${net.join('.')}</strong>
+      <span class="is-text-muted">First Usable Host:</span> <span>${first.join('.')}</span>
+      <span class="is-text-muted">Last Usable Host:</span>  <span>${last.join('.')}</span>
+      <span class="is-text-muted">Broadcast Address:</span> <strong style="color:#818cf8">${brd.join('.')}</strong>
+      <span class="is-text-muted">Usable Hosts:</span>      <span style="color:#10b981">${info.hosts.toLocaleString()}</span>
     </div>`;
   document.querySelectorAll('.sn-block-item').forEach(el => el.classList.remove('sn-active-block'));
   const active = document.getElementById(`sn-block-${netOct}`);
@@ -492,8 +492,8 @@ function sn_checkAnswer() {
   const isCorrect = answersMatch(field.value, q.answer);
   if (field) field.disabled = true;
 
-  const CHECK = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg>`;
-  const CROSS = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  const CHECK = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="is-vam-mr6"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const CROSS = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="is-vam-mr6"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
 
   if (isCorrect) {
     if (window.playSound) window.playSound('success');

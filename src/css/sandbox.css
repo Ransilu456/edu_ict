@@ -262,15 +262,15 @@
 
 .node-delete-btn {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 18px;
-  height: 18px;
+  top: -7px;
+  right: -7px;
+  width: 16px;
+  height: 16px;
   background: var(--color-error);
   color: #fff;
   border: none;
   border-radius: 50%;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 700;
   display: none;
   align-items: center;
@@ -279,6 +279,12 @@
   z-index: 15;
   line-height: 1;
   pointer-events: auto;
+  transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.node-delete-btn:hover {
+  background: #c0392b;
+  transform: scale(1.15);
 }
 
 .sandbox-node:hover .node-delete-btn,

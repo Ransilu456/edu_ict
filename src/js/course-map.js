@@ -1,6 +1,6 @@
 import UserService from './user-service.js';
 
-const TOTAL_LESSONS = 16;
+const TOTAL_LESSONS = 21;
 
 export const lessonMetadata = [
   { id: 0,  title: 'The Binary Code',       level: 1, category: 'Fundamentals', icon: '⚡', color: '#58cc02', desc: 'Voltage & Binary States' },
@@ -19,13 +19,18 @@ export const lessonMetadata = [
   { id: 13, title: 'Number Systems',        level: 2, category: 'Fundamentals', icon: '🔢', color: '#58cc02', desc: 'Binary, Octal & Hex' },
   { id: 14, title: 'Boolean Algebra',       level: 3, category: 'Logic Gates',  icon: '📐', color: '#1cb0f6', desc: 'Laws & Simplification' },
   { id: 15, title: 'Flip Flops',            level: 5, category: 'Circuits',     icon: '🔄', color: '#ff9600', desc: 'SR, D & JK Sequential' },
+  { id: 16, title: 'Universal Gates',       level: 3, category: 'Logic Gates',  icon: '🔮', color: '#1cb0f6', desc: 'NAND & NOR Gate logic' },
+  { id: 17, title: 'Karnaugh Maps',         level: 3, category: 'Logic Gates',  icon: '📐', color: '#1cb0f6', desc: 'Simplifying Logic visually' },
+  { id: 18, title: 'Multiplexers',          level: 4, category: 'Circuits',     icon: '🔧', color: '#ff9600', desc: 'Data Selectors (MUX)' },
+  { id: 19, title: 'Transmission Media',    level: 6, category: 'Networking',   icon: '📡', color: '#a855f7', desc: 'Wired & Wireless path details' },
+  { id: 20, title: 'Network Devices',       level: 6, category: 'Networking',   icon: '🧱', color: '#a855f7', desc: 'Hubs, Switches & Routers' },
 ];
 
 const categories = [
   { name: 'Fundamentals', icon: '⚡', color: '#58cc02', bg: 'rgba(88,204,2,0.1)',    border: 'rgba(88,204,2,0.3)',    lessons: [0, 1, 13] },
-  { name: 'Logic Gates',  icon: '🔮', color: '#1cb0f6', bg: 'rgba(28,176,246,0.1)',  border: 'rgba(28,176,246,0.3)',  lessons: [2, 3, 4, 5, 14] },
-  { name: 'Circuits',     icon: '🔧', color: '#ff9600', bg: 'rgba(255,150,0,0.1)',   border: 'rgba(255,150,0,0.3)',   lessons: [6, 7, 15] },
-  { name: 'Networking',   icon: '📡', color: '#a855f7', bg: 'rgba(168,85,247,0.1)',  border: 'rgba(168,85,247,0.3)',  lessons: [8, 9, 10, 11] },
+  { name: 'Logic Gates',  icon: '🔮', color: '#1cb0f6', bg: 'rgba(28,176,246,0.1)',  border: 'rgba(28,176,246,0.3)',  lessons: [2, 3, 4, 5, 14, 16, 17] },
+  { name: 'Circuits',     icon: '🔧', color: '#ff9600', bg: 'rgba(255,150,0,0.1)',   border: 'rgba(255,150,0,0.3)',   lessons: [6, 7, 15, 18] },
+  { name: 'Networking',   icon: '📡', color: '#a855f7', bg: 'rgba(168,85,247,0.1)',  border: 'rgba(168,85,247,0.3)',  lessons: [8, 9, 10, 11, 19, 20] },
   { name: 'Mastery',      icon: '🏆', color: '#7c5ef2', bg: 'rgba(124,94,242,0.1)',  border: 'rgba(124,94,242,0.3)',  lessons: [12] },
 ];
 let completedLessons = new Set();
@@ -38,12 +43,10 @@ function getCompletedCount() {
   return completedLessons.size;
 }
 function canAccessLesson(idx) {
-  if (idx === 0) return true;
-  if (idx === 13) return completedLessons.has(1);
-  if (idx === 14) return completedLessons.has(5);
-  if (idx === 15) return completedLessons.has(7);
-  if (idx <= 2) return true;
-  return completedLessons.has(idx - 1);
+  const order = [0, 1, 13, 2, 3, 4, 5, 14, 16, 17, 6, 7, 15, 18, 8, 9, 10, 11, 19, 20, 12];
+  const pos = order.indexOf(idx);
+  if (pos <= 0) return true;
+  return completedLessons.has(order[pos - 1]);
 }
 
 export function markLessonComplete(lessonIdx) {
