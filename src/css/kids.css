@@ -1,0 +1,605 @@
+/* 
+ * LogicQuest — Kids Mode Theme (Duolingo / Playful Style)
+ * Enabled when root html element has the class `.kids-mode`
+ */
+
+:root.kids-mode {
+  --transition-normal: 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); /* bouncy transitions */
+}
+
+/* --- Dotted Grid Background --- */
+.kids-mode body,
+.kids-mode main,
+.kids-mode .view-panel,
+.kids-mode .sandbox-workspace {
+  background-color: var(--bg-primary);
+  background-image: radial-gradient(var(--border-color) 2.5px, transparent 2.5px);
+  background-size: 24px 24px;
+}
+
+/* --- Typography --- */
+.kids-mode,
+.kids-mode h1,
+.kids-mode h2,
+.kids-mode h3,
+.kids-mode h4,
+.kids-mode button,
+.kids-mode input,
+.kids-mode label {
+  font-family: var(--font-header) !important;
+}
+
+/* --- Bubbly 3D Cards --- */
+.kids-mode .feature-card,
+.kids-mode .lesson-card,
+.kids-mode .settings-card,
+.kids-mode .util-card,
+.kids-mode .truth-table-card,
+.kids-mode .transistor-details-card,
+.kids-mode .learning-card-body,
+.kids-mode .success-modal {
+  border: 2px solid var(--border-color) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 6px 0 var(--border-color) !important;
+  background-color: var(--bg-secondary) !important;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+/* --- Bubbly 3D Buttons & Click Transforms --- */
+.kids-mode .btn-primary,
+.kids-mode .hero-cta-primary,
+.kids-mode .sn-btn,
+.kids-mode .enc-btn,
+.kids-mode .settings-btn-solid,
+.kids-mode #cta-btn,
+.kids-mode #quiz-modal-cta-btn {
+  background: var(--color-indigo) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 16px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 0.9rem 1.6rem !important;
+  box-shadow: 0 5px 0 #189fd9 !important; /* Blue 3D shadow */
+  transition: transform 0.1s, box-shadow 0.1s !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  transform: translateY(0);
+}
+
+.kids-mode .btn-primary:active,
+.kids-mode .hero-cta-primary:active,
+.kids-mode .sn-btn:active,
+.kids-mode .enc-btn:active,
+.kids-mode .settings-btn-solid:active,
+.kids-mode #cta-btn:active,
+.kids-mode #quiz-modal-cta-btn:active {
+  transform: translateY(4px) !important;
+  box-shadow: 0 1px 0 #189fd9 !important;
+}
+
+/* Override green success buttons (like Duolingo continue) */
+.kids-mode .btn-primary.success,
+.kids-mode #settings-save-profile-btn,
+.kids-mode #settings-import-code-btn,
+.kids-mode #close-success-modal,
+.kids-mode .kids-btn-green {
+  background: var(--color-success) !important;
+  box-shadow: 0 5px 0 #46a302 !important; /* Green 3D shadow */
+}
+
+.kids-mode .btn-primary.success:active,
+.kids-mode #settings-save-profile-btn:active,
+.kids-mode #settings-import-code-btn:active,
+.kids-mode #close-success-modal:active,
+.kids-mode .kids-btn-green:active {
+  transform: translateY(4px) !important;
+  box-shadow: 0 1px 0 #46a302 !important;
+}
+
+/* Secondary outline buttons */
+.kids-mode .btn-secondary,
+.kids-mode .hero-cta-secondary,
+.kids-mode .settings-btn-outline,
+.kids-mode .settings-btn-danger,
+.kids-mode .btn-secondary:not(.disabled) {
+  background: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 16px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  padding: 0.8rem 1.5rem !important;
+  box-shadow: 0 5px 0 var(--border-color) !important;
+  transition: transform 0.1s, box-shadow 0.1s !important;
+  cursor: pointer !important;
+}
+
+.kids-mode .btn-secondary:active,
+.kids-mode .hero-cta-secondary:active,
+.kids-mode .settings-btn-outline:active,
+.kids-mode .settings-btn-danger:active {
+  transform: translateY(4px) !important;
+  box-shadow: 0 1px 0 var(--border-color) !important;
+}
+
+/* --- Header / Navigation overrides --- */
+.kids-mode header {
+  border-bottom: 3px solid var(--border-color) !important;
+  padding: 1rem 2rem !important;
+  background-color: var(--bg-secondary) !important;
+}
+
+.kids-mode .logo span {
+  color: var(--color-indigo) !important;
+  font-size: 1.5rem !important;
+  font-weight: 900 !important;
+}
+
+.kids-mode nav.desktop-nav {
+  background: var(--bg-primary) !important;
+  border: 2px solid var(--border-color) !important;
+  box-shadow: 0 4px 0 var(--border-color) !important;
+  border-radius: 20px !important;
+}
+
+.kids-mode .nav-tab {
+  border-radius: 14px !important;
+  font-weight: 800 !important;
+}
+
+.kids-mode .nav-tab.active {
+  background: var(--bg-secondary) !important;
+  border: 2px solid var(--text-primary) !important;
+  box-shadow: 0 4px 0 var(--text-primary) !important;
+  transform: translateY(-2px) !important;
+}
+
+.kids-mode .nav-tab.active:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 0px 0 transparent !important;
+}
+
+/* Kids stats pill header */
+.kids-mode .header-badge.energy {
+  border-radius: 20px !important;
+  border: 2px solid #ffd43b !important;
+  background: var(--bg-secondary) !important;
+  color: #ff9600 !important;
+  font-weight: 900 !important;
+  box-shadow: 0 4px 0 #ffd43b !important;
+}
+
+/* Theme / Audio icon buttons */
+.kids-mode .btn-icon {
+  border-radius: 14px !important;
+  border: 2px solid var(--border-color) !important;
+  box-shadow: 0 4px 0 var(--border-color) !important;
+}
+
+.kids-mode .btn-icon:active {
+  transform: translateY(3px) !important;
+  box-shadow: none !important;
+}
+
+/* --- Kids Profile Dashboard grid --- */
+.kids-mode .kids-profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.kids-mode .kids-avatar-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin-bottom: 1rem;
+}
+
+.kids-mode .kids-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4px solid var(--color-indigo);
+  background-color: var(--bg-secondary);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  object-fit: cover;
+}
+
+.kids-mode .kids-avatar-pencil {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  background-color: var(--color-indigo);
+  color: white;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.kids-mode .kids-avatar-pencil:hover {
+  transform: scale(1.1);
+}
+
+.kids-mode .kids-profile-name {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.kids-mode .kids-profile-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.kids-mode .kids-progress-panel {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.kids-mode .kids-progress-row {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  padding: 0.85rem 1.25rem;
+  box-shadow: 0 4px 0 var(--border-color);
+}
+
+.kids-mode .kids-progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.kids-mode .kids-progress-bar-outer {
+  height: 16px;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.kids-mode .kids-progress-bar-inner {
+  height: 100%;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #3fc0ff, #1cb0f6);
+  transition: width 0.4s ease;
+}
+
+.kids-mode .kids-progress-bar-inner.purple {
+  background: linear-gradient(90deg, #a78bfa, #7c5ef2);
+}
+
+/* Grid layout for preferences (2x2) */
+.kids-mode .kids-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.kids-mode .kids-grid-card {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 20px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 5px 0 var(--border-color);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.kids-mode .kids-grid-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-indigo);
+  box-shadow: 0 7px 0 var(--color-indigo);
+}
+
+.kids-mode .kids-grid-icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.kids-mode .kids-grid-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.kids-mode .kids-grid-value {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+/* Danger Zone dashboard style */
+.kids-mode .kids-danger-zone {
+  border: 2px dashed #ff4b4b !important;
+  background: rgba(255, 75, 75, 0.03) !important;
+  border-radius: 20px;
+  padding: 1.5rem;
+  width: 100%;
+}
+
+/* --- Duolingo Path Map Overrides --- */
+.kids-mode .cm-vertical-path {
+  padding: 2rem 0;
+}
+
+.kids-mode .cm-vnode-btn {
+  width: 72px !important;
+  height: 72px !important;
+  border-radius: 50% !important;
+  border: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.kids-mode .cm-vnode-btn.completed {
+  background: var(--color-success) !important;
+  box-shadow: 0 7px 0 #46a302 !important;
+}
+
+.kids-mode .cm-vnode-btn.available {
+  background: var(--color-indigo) !important;
+  box-shadow: 0 7px 0 #189fd9 !important;
+}
+
+.kids-mode .cm-vnode-btn:active {
+  transform: translateY(6px) !important;
+  box-shadow: 0 1px 0 transparent !important;
+}
+
+.kids-mode .cm-vnode-card {
+  border: 2px solid var(--border-color) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 0 var(--border-color) !important;
+  padding: 1rem !important;
+  background-color: var(--bg-secondary) !important;
+}
+
+.kids-mode .cm-vnode-card.available {
+  border-color: var(--color-indigo) !important;
+  box-shadow: 0 4px 0 var(--color-indigo) !important;
+}
+
+.kids-mode .cm-vnode-card.completed {
+  border-color: var(--color-success) !important;
+  box-shadow: 0 4px 0 var(--color-success) !important;
+}
+
+/* --- Kids Tips Box (Did you know) --- */
+.kids-mode .kids-tip-box {
+  background-color: #58cc0220 !important;
+  border: 2px solid #58cc02 !important;
+  border-radius: 24px !important;
+  box-shadow: 0 5px 0 #58cc02 !important;
+  padding: 1.25rem;
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.kids-mode .kids-tip-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid #58cc02;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.kids-mode .kids-tip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.kids-mode .kids-tip-title {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #46a302;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kids-mode .kids-tip-text {
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+/* --- Subnetting Island layout --- */
+.kids-mode .subnet-island-graphic {
+  background: radial-gradient(circle, #e0f2fe 0%, #bae6fd 100%);
+  border: 2px solid #0284c7;
+  box-shadow: 0 6px 0 #0284c7;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 320px;
+  height: 200px;
+  margin: 0 auto 1.5rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kids-mode .subnet-island {
+  width: 130px;
+  height: 130px;
+  background-color: #58cc02;
+  border: 3px solid #3c8200;
+  box-shadow: inset 0 -6px 0 #3c8200, 0 8px 0 rgba(2, 132, 199, 0.3);
+  border-radius: 36px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  animation: floatIsland 4s ease-in-out infinite;
+}
+
+.kids-mode .subnet-island-tree {
+  position: absolute;
+  top: -18px;
+  left: 20px;
+  font-size: 2rem;
+}
+
+.kids-mode .subnet-island-text {
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.kids-mode .subnet-island-icon {
+  font-size: 2.2rem;
+  margin-bottom: 2px;
+}
+
+@keyframes floatIsland {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(2deg); }
+}
+
+/* --- Sandbox Toy Box Drawer --- */
+.kids-mode .sandbox-toolbox {
+  border: 2px solid var(--border-color) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 6px 0 var(--border-color) !important;
+  background-color: var(--bg-secondary) !important;
+  margin-bottom: 1rem;
+}
+
+.kids-mode .toolbox-item {
+  border-radius: 12px !important;
+  border: 2.5px solid var(--border-color) !important;
+  box-shadow: 0 4px 0 var(--border-color) !important;
+  background-color: var(--bg-primary) !important;
+  font-weight: 700 !important;
+}
+
+.kids-mode .toolbox-item:hover {
+  border-color: var(--color-indigo) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 0 var(--color-indigo-glow) !important;
+}
+
+.kids-mode .toolbox-item:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 transparent !important;
+}
+
+/* Toy Box puzzle-like logic gates */
+.kids-mode .sandbox-node {
+  border-radius: 16px !important;
+  border: 3px solid #3c3c3c !important;
+  box-shadow: 0 6px 0 #3c3c3c !important;
+  font-weight: 800 !important;
+}
+
+.kids-mode .sandbox-node.selected {
+  border-color: var(--color-indigo) !important;
+  box-shadow: 0 6px 0 var(--color-indigo) !important;
+}
+
+/* Mobile bottom nav redesign */
+.kids-mode .mobile-navbar {
+  background-color: var(--bg-secondary) !important;
+  border-top: 3px solid var(--border-color) !important;
+  height: 70px !important;
+}
+
+.kids-mode .mobile-nav-btn {
+  font-weight: 800 !important;
+  font-size: 0.72rem !important;
+}
+
+.kids-mode .mobile-nav-btn.active {
+  color: var(--color-indigo) !important;
+}
+
+.kids-mode .mobile-nav-btn.active svg {
+  transform: scale(1.15) translateY(-2px);
+  color: var(--color-indigo) !important;
+}
+
+/* --- Kids Signal Lab elements --- */
+.kids-mode .kids-bit-btn {
+  background: var(--bg-secondary);
+  border: 2.5px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 5px 0 var(--border-color);
+  width: 56px;
+  height: 56px;
+  font-size: 1.4rem;
+  font-weight: 900;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.kids-mode .kids-bit-btn.active {
+  background: var(--color-indigo);
+  border-color: #189fd9;
+  color: white;
+  box-shadow: 0 5px 0 #127fac;
+}
+
+.kids-mode .kids-bit-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 transparent;
+}
+
+.kids-mode .kids-bit-sub {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.kids-mode .kids-bit-btn.active .kids-bit-sub {
+  color: #e0f2fe;
+}
