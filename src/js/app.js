@@ -56,6 +56,12 @@ function setInterfaceMode(mode) {
   document.documentElement.classList.toggle('professional-mode', mode === 'professional');
   document.documentElement.classList.toggle('kids-mode', mode === 'kids');
 
+  // Update header toggle buttons
+  const classicBtn = document.getElementById('header-mode-classic-btn');
+  const proBtn = document.getElementById('header-mode-pro-btn');
+  if (classicBtn) classicBtn.classList.toggle('active', mode === 'classic');
+  if (proBtn) proBtn.classList.toggle('active', mode === 'professional');
+
   const radios = document.getElementsByName('settings-interface-mode');
   if (radios.length) {
     radios.forEach(r => { r.checked = (r.value === mode); });
