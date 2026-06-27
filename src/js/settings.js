@@ -659,7 +659,137 @@ export function applyLanguage(lang) {
 }
 
 export function initSettingsView() {
+  if (window._settingsInitialized) return;
+  window._settingsInitialized = true;
 
+  const usernameInput = document.getElementById('settings-username-input');
+  if (!usernameInput) return;
+
+  const currentName = localStorage.getItem('logicQuest_username') || 'A/L Student';
+  usernameInput.value = currentName;
+
+  /* ── Language radios ── */
+  const langRadios = document.getElementsByName('settings-medium');
+  const currentLang = localStorage.getItem('logicQuest_medium') || 'en';
+  langRadios.forEach(r => {
+    r.checked = (r.value === currentLang);
+    r.addEventListener('change', () => {
+      if (!r.checked) return;
+      localStorage.setItem('logicQuest_medium', r.value);
+      applyLanguage(r.value);
+      if (window.playSound) window.playSound('click');
+    });
+  });
+
+  /* ── Interface mode radios ── */
+  const modeRadios = document.getElementsByName('settings-interface-mode');
+  const currentMode = localStorage.getItem('logicQuest_interfaceMode') || 'classic';
+  modeRadios.forEach(r => {
+    r.checked = (r.value === currentMode);
+    r.addEventListener('change', () => {
+      if (!r.checked) return;
+      if (window.playSound) window.playSound('click');
+      if (window.setInterfaceMode) window.setInterfaceMode(r.value);
+    });
+  });
+
+  /* ── Save profile ── */
+  document.getElementById('settings-save-profile-btn')?.addEventListener('click', () => {
+    const name = usernameInput.value.trim() || 'A/L Student';
+    localStorage.setItem('logicQuest_username', name);
+    window.showToast(t('alert_saved'));
+    if (window.playSound) window.playSound('success');
+  });
+
+  updateExportCode();
+
+  /* ── Copy code ── */
+  document.getElementById('settings-copy-code-btn')?.addEventListener('click', () => {
+    const ta = document.getElementById('settings-export-code');
+    if (!ta) return;
+    ta.select();
+    navigator.clipboard.writeText(ta.value).then(() => {
+      window.showToast(t('alert_copied'));
+      if (window.playSound) window.playSound('success');
+    });
+  });
+
+  /* ── Import code ── */
+  document.getElementById('settings-import-code-btn')?.addEventListener('click', async () => {
+    const inp = document.getElementById('settings-import-code');
+    const code = inp ? inp.value.trim() : '';
+    if (!code) return;
+    try {
+      const raw = atob(code);
+      const parsed = JSON.parse(raw);
+      if (!parsed || !parsed.user_id) throw new Error();
+      localStorage.setItem('logicQuest_state', raw);
+      if (parsed.username) {
+        localStorage.setItem('logicQuest_username', parsed.username);
+        usernameInput.value = parsed.username;
+      }
+      if (parsed.medium) {
+        localStorage.setItem('logicQuest_medium', parsed.medium);
+        langRadios.forEach(r => { r.checked = (r.value === parsed.medium); });
+        applyLanguage(parsed.medium);
+      }
+      if (parsed.interfaceMode) {
+        localStorage.setItem('logicQuest_interfaceMode', parsed.interfaceMode);
+        modeRadios.forEach(r => { r.checked = (r.value === parsed.interfaceMode); });
+        if (window.setInterfaceMode) window.setInterfaceMode(parsed.interfaceMode);
+      }
+      const us = await import('./user-service.js');
+      const UserService = us.default;
+      await UserService.refresh();
+      if (window.updateXPDisplay) window.updateXPDisplay();
+      if (window.syncCompletionState) window.syncCompletionState();
+      if (window.syncCourseProgression) window.syncCourseProgression();
+      updateExportCode();
+      if (inp) inp.value = '';
+      window.showToast(t('alert_import_ok'));
+      if (window.playSound) window.playSound('success');
+    } catch (_) {
+      window.showAlert(t('alert_import_err'), 'Error');
+      if (window.playSound) window.playSound('error');
+    }
+  });
+
+  /* ── Reset ── */
+  document.getElementById('settings-reset-btn')?.addEventListener('click', () => {
+    window.showConfirm(t('alert_reset_confirm'), async (ok) => {
+      if (!ok) return;
+      const us = await import('./user-service.js');
+      const UserService = us.default;
+      await UserService.reset();
+      localStorage.removeItem('logicQuest_username');
+      localStorage.removeItem('logicQuest_medium');
+      localStorage.removeItem('logicQuest_interfaceMode');
+      usernameInput.value = 'A/L Student';
+      langRadios.forEach(r => { r.checked = (r.value === 'en'); });
+      modeRadios.forEach(r => { r.checked = (r.value === 'classic'); });
+      applyLanguage('en');
+      if (window.setInterfaceMode) window.setInterfaceMode('classic');
+      updateExportCode();
+      if (window.updateXPDisplay) window.updateXPDisplay();
+      if (window.playSound) window.playSound('success');
+      location.reload();
+    });
+  });
+
+  function updateExportCode() {
+    const ta = document.getElementById('settings-export-code');
+    if (!ta) return;
+    const rawState = localStorage.getItem('logicQuest_state') || '{}';
+    try {
+      const parsed = JSON.parse(rawState);
+      parsed.username = localStorage.getItem('logicQuest_username') || 'A/L Student';
+      parsed.medium = localStorage.getItem('logicQuest_medium') || 'en';
+      parsed.interfaceMode = localStorage.getItem('logicQuest_interfaceMode') || 'classic';
+      ta.value = btoa(JSON.stringify(parsed));
+    } catch (_) {
+      ta.value = btoa(rawState);
+    }
+  }
 };
 
 export default { t, applyLanguage, getCurrentLang, TRANSLATIONS, initSettingsView };

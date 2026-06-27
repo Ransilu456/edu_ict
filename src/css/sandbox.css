@@ -175,6 +175,11 @@
   transition: border-color var(--transition-fast);
 }
 
+.sandbox-node.multi-selected {
+  outline: 2px dashed #818cf8;
+  outline-offset: 2px;
+  box-shadow: 0 0 12px rgba(129,140,248,0.3);
+}
 .sandbox-node.selected {
   border-color: var(--text-primary);
 }

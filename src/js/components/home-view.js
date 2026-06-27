@@ -1,6 +1,6 @@
 import UserService from '../user-service.js';
 
-const TOTAL_LESSONS = 9;
+const TOTAL_LESSONS = 21;
 
 class HomeView extends HTMLElement {
   connectedCallback() {

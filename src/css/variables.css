@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Sinhala:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Sinhala:wght@300;400;500;600;700&family=Nunito:wght@400;500;600;700;800;900&display=swap');
 
 :root {
   --bg-primary: #faf6eb;
@@ -58,6 +58,45 @@
   --color-success: #63e203;
   --color-error: #ff4d4d;
   --color-amber: #ffb13b;
+}
+
+:root.kids-mode {
+  --font-sans: 'Nunito', 'Poppins', sans-serif;
+  --font-header: 'Nunito', 'Outfit', sans-serif;
+
+  --kids-bg: #fff8e1;
+  --kids-card-bg: #ffffff;
+  --kids-border: #ffd54f;
+  --kids-shadow: 0 8px 0 rgba(255, 213, 79, 0.4);
+  --kids-btn-primary: #58cc02;
+  --kids-btn-primary-shadow: 0 6px 0 #3fa000;
+  --kids-btn-secondary: #ff9600;
+  --kids-btn-secondary-shadow: 0 6px 0 #cc7800;
+  --kids-btn-danger: #ff4b4b;
+  --kids-btn-danger-shadow: 0 6px 0 #cc3c3c;
+  --kids-accent: #1cb0f6;
+  --kids-accent-shadow: 0 6px 0 #0d8bcc;
+  --kids-dot: rgba(255, 213, 79, 0.15);
+  --kids-text: #3c3c3c;
+  --kids-text-light: #777777;
+}
+
+:root.dark-theme.kids-mode {
+  --kids-bg: #1a1a2e;
+  --kids-card-bg: #252540;
+  --kids-border: #ffb300;
+  --kids-shadow: 0 8px 0 rgba(255, 179, 0, 0.3);
+  --kids-btn-primary: #58cc02;
+  --kids-btn-primary-shadow: 0 6px 0 #3fa000;
+  --kids-btn-secondary: #ff9600;
+  --kids-btn-secondary-shadow: 0 6px 0 #cc7800;
+  --kids-btn-danger: #ff4b4b;
+  --kids-btn-danger-shadow: 0 6px 0 #cc3c3c;
+  --kids-accent: #1cb0f6;
+  --kids-accent-shadow: 0 6px 0 #0d8bcc;
+  --kids-dot: rgba(255, 179, 0, 0.1);
+  --kids-text: #f5f4f7;
+  --kids-text-light: #bbb8c4;
 }
 
 * {

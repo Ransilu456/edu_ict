@@ -92,6 +92,17 @@
         </svg>
         <span data-i18n="nav_signal">Signal Lab</span>
       </button>
+      <button class="nav-tab" data-target="network-devices-view" title="Network Devices Lab">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="2" width="20" height="20" rx="3" />
+          <circle cx="12" cy="12" r="3" />
+          <line x1="12" y1="9" x2="12" y2="5" />
+          <line x1="12" y1="15" x2="12" y2="19" />
+          <line x1="9" y1="12" x2="5" y2="12" />
+          <line x1="15" y1="12" x2="19" y2="12" />
+        </svg>
+        <span>Network</span>
+      </button>
       <button class="nav-tab" data-target="settings-view" title="Settings & Sync">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3" />
@@ -187,6 +198,17 @@
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
       </svg>
       <span data-i18n="nav_signal">Signal</span>
+    </button>
+    <button class="mobile-nav-btn" data-target="network-devices-view" title="Network Lab">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="2" width="20" height="20" rx="3" />
+        <circle cx="12" cy="12" r="3" />
+        <line x1="12" y1="9" x2="12" y2="5" />
+        <line x1="12" y1="15" x2="12" y2="19" />
+        <line x1="9" y1="12" x2="5" y2="12" />
+        <line x1="15" y1="12" x2="19" y2="12" />
+      </svg>
+      <span>Network</span>
     </button>
     <button class="mobile-nav-btn" data-target="settings-view" title="Settings & Sync">
       <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
@@ -667,6 +689,13 @@
             </svg>
             <span>Text Label</span>
           </div>
+          <div class="toolbox-item" data-type="op-amp" draggable="true" title="Op-Amp Comparator">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="4,2 22,12 4,22" />
+              <text x="13" y="16" text-anchor="middle" font-size="10" fill="currentColor">∞</text>
+            </svg>
+            <span>Op-Amp</span>
+          </div>
         </div>
 
         <div class="toolbox-section">
@@ -749,6 +778,72 @@
               <polygon points="12,8 18,12 12,16" />
             </svg>
             <span>Transistor</span>
+          </div>
+          <div class="toolbox-item" data-type="diode" draggable="true" title="Diode (p-n junction)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="10,4 22,12 10,20" />
+              <line x1="22" y1="4" x2="22" y2="20" />
+              <line x1="2" y1="12" x2="10" y2="12" />
+            </svg>
+            <span>Diode</span>
+          </div>
+          <div class="toolbox-item" data-type="zener" draggable="true" title="Zener Diode">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="10,4 22,12 10,20" />
+              <line x1="22" y1="4" x2="22" y2="20" />
+              <line x1="24" y1="6" x2="20" y2="6" />
+              <line x1="24" y1="10" x2="22" y2="10" />
+              <line x1="2" y1="12" x2="10" y2="12" />
+            </svg>
+            <span>Zener</span>
+          </div>
+          <div class="toolbox-item" data-type="ldr" draggable="true" title="Light Dependent Resistor">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="6" y="6" width="10" height="12" rx="2" />
+              <line x1="2" y1="12" x2="6" y2="12" />
+              <line x1="16" y1="12" x2="22" y2="12" />
+              <polyline points="8,10 10,12 12,9 14,12 16,10" stroke="#fbbf24" />
+            </svg>
+            <span>LDR</span>
+          </div>
+          <div class="toolbox-item" data-type="thermistor" draggable="true" title="Thermistor">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="6" y="6" width="10" height="12" rx="2" />
+              <line x1="2" y1="12" x2="6" y2="12" />
+              <line x1="16" y1="12" x2="22" y2="12" />
+              <path d="M9 9l2 3-2 3" stroke="#ef4444" />
+              <path d="M13 9l2 3-2 3" stroke="#ef4444" />
+            </svg>
+            <span>Thermistor</span>
+          </div>
+          <div class="toolbox-item" data-type="potentiometer" draggable="true" title="Potentiometer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="4" y="10" width="14" height="4" rx="1" />
+              <line x1="2" y1="12" x2="4" y2="12" />
+              <line x1="18" y1="12" x2="22" y2="12" />
+              <circle cx="11" cy="6" r="2" fill="#fbbf24" />
+              <line x1="11" y1="6" x2="11" y2="10" />
+            </svg>
+            <span>Potentiometer</span>
+          </div>
+          <div class="toolbox-item" data-type="capacitor" draggable="true" title="Capacitor">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="2" y1="12" x2="9" y2="12" />
+              <line x1="9" y1="6" x2="9" y2="18" stroke-width="3" />
+              <line x1="13" y1="6" x2="13" y2="18" stroke-width="3" />
+              <line x1="13" y1="12" x2="22" y2="12" />
+            </svg>
+            <span>Capacitor</span>
+          </div>
+          <div class="toolbox-item" data-type="relay" draggable="true" title="Electromagnetic Relay">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="4" y="6" width="10" height="12" rx="2" />
+              <path d="M5 9l2-2 2 2 2-2 2 2" />
+              <line x1="2" y1="12" x2="4" y2="12" />
+              <polyline points="18,8 20,16 22,8" stroke-dasharray="2,2" />
+              <line x1="22" y1="12" x2="22" y2="12" />
+            </svg>
+            <span>Relay</span>
           </div>
         </div>
 
@@ -1003,6 +1098,92 @@
                 <polyline points="9 18 15 12 9 6" />
               </svg>
             </div>
+            <div class="template-card" id="tpl-diode" draggable="true" data-template-name="diode-circuit"
+              onclick="window.loadSandboxTemplate('diode-circuit')" title="Diode Forward Bias">
+              <div class="template-card-icon" style="background:rgba(34,211,165,0.15);color:#22d3a5"><svg
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="10,4 22,12 10,20" />
+                  <line x1="22" y1="4" x2="22" y2="20" />
+                </svg></div>
+              <div class="template-card-info">
+                <div class="template-card-name">Diode Circuit</div>
+                <div class="template-card-desc">Forward bias demo</div>
+              </div>
+              <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+            <div class="template-card" id="tpl-ldr" draggable="true" data-template-name="ldr-divider"
+              onclick="window.loadSandboxTemplate('ldr-divider')" title="LDR Voltage Divider">
+              <div class="template-card-icon" style="background:rgba(251,191,36,0.15);color:#fbbf24"><svg
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="6" y="6" width="10" height="12" rx="2" />
+                  <polyline points="8,10 10,12 12,9 14,12 16,10" stroke="#fbbf24" />
+                </svg></div>
+              <div class="template-card-info">
+                <div class="template-card-name">LDR Sensor</div>
+                <div class="template-card-desc">Light-dependent resistor</div>
+              </div>
+              <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+            <div class="template-card" id="tpl-cap" draggable="true" data-template-name="capacitor-timing"
+              onclick="window.loadSandboxTemplate('capacitor-timing')" title="Capacitor Charging">
+              <div class="template-card-icon" style="background:rgba(129,140,248,0.15);color:#818cf8"><svg
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="8" y1="6" x2="8" y2="18" stroke-width="3" />
+                  <line x1="14" y1="6" x2="14" y2="18" stroke-width="3" />
+                  <path d="M10 10 Q 14 8 18 10" />
+                  <path d="M10 14 Q 14 12 18 14" />
+                </svg></div>
+              <div class="template-card-info">
+                <div class="template-card-name">Capacitor RC</div>
+                <div class="template-card-desc">Charging &amp; timing</div>
+              </div>
+              <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+            <div class="template-card" id="tpl-opamp" draggable="true" data-template-name="op-amp-comparator"
+              onclick="window.loadSandboxTemplate('op-amp-comparator')" title="Op-Amp Comparator">
+              <div class="template-card-icon" style="background:rgba(34,211,165,0.15);color:#22d3a5"><svg
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="4,2 22,12 4,22" />
+                  <text x="13" y="16" text-anchor="middle" font-size="10" fill="currentColor">∞</text>
+                </svg></div>
+              <div class="template-card-info">
+                <div class="template-card-name">Op-Amp Comp.</div>
+                <div class="template-card-desc">Comparator with LED</div>
+              </div>
+              <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+            <div class="template-card" id="tpl-sensor" draggable="true" data-template-name="sensor-demo"
+              onclick="window.loadSandboxTemplate('sensor-demo')" title="Analog Sensor Demo">
+              <div class="template-card-icon" style="background:rgba(34,211,165,0.15);color:#22d3a5"><svg
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="4" width="16" height="6" rx="1" />
+                  <rect x="4" y="14" width="16" height="6" rx="1" />
+                  <line x1="6" y1="8" x2="10" y2="8" stroke-width="3" />
+                  <line x1="6" y1="18" x2="14" y2="18" stroke-width="3" />
+                  <circle cx="18" cy="7" r="1" fill="currentColor" />
+                  <circle cx="18" cy="17" r="1" fill="currentColor" />
+                </svg></div>
+              <div class="template-card-info">
+                <div class="template-card-name">Sensor Demo</div>
+                <div class="template-card-desc">Analog threshold sensor</div>
+              </div>
+              <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -1054,6 +1235,18 @@
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
             </svg> <span>Theory Guide</span>
+          </button>
+          <button class="sandbox-btn" id="sandbox-create-ic" title="Select 2+ components (Shift+click) to create an IC">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="8" height="8" rx="1" />
+              <rect x="13" y="3" width="8" height="8" rx="1" />
+              <rect x="3" y="13" width="8" height="8" rx="1" />
+              <rect x="13" y="13" width="8" height="8" rx="1" />
+              <line x1="11" y1="7" x2="13" y2="7" />
+              <line x1="7" y1="11" x2="7" y2="13" />
+              <line x1="17" y1="11" x2="17" y2="13" />
+              <line x1="11" y1="17" x2="13" y2="17" />
+            </svg> <span>Create IC</span>
           </button>
           <button class="sandbox-btn" id="sandbox-gate-style-btn" title="Toggle Gate Style (Box / ANSI Symbol)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1146,6 +1339,19 @@
           </div>
           <div style="display:flex;justify-content:flex-end;margin-top:1rem">
             <button class="btn-secondary" id="cancel-load-btn" style="flex:0;padding:.6rem 1.25rem">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="success-modal-overlay" id="ic-create-modal" style="display:none">
+        <div class="success-modal" style="max-width:400px;padding:2rem;text-align:left">
+          <h2 class="success-modal-title" style="font-size:1.2rem;margin-bottom:1rem">Create Custom IC</h2>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.75rem">Name your new Integrated Circuit. It will replace selected components with a single IC node.</p>
+          <input type="text" id="ic-name-input" placeholder="e.g. My Adder, Full Adder, …"
+            style="width:100%;padding:.6rem .75rem;border-radius:5px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-sans);font-size:.95rem;margin-bottom:1rem;outline:none">
+          <div style="display:flex;gap:.5rem;justify-content:flex-end">
+            <button class="btn-secondary" id="cancel-ic-btn" style="flex:0;padding:.6rem 1.25rem">Cancel</button>
+            <button class="btn-primary" id="confirm-ic-btn" style="flex:0;padding:.6rem 1.5rem">Create IC</button>
           </div>
         </div>
       </div>
@@ -1849,6 +2055,10 @@
       </div>
       </div>
     </section>
+
+<section class="view-panel network-devices-view">
+  <div class="nd-lab-container" id="nd-lab-container"></div>
+</section>
 
 <section class="view-panel settings-view" id="settings-view">
 

@@ -3,9 +3,10 @@ import './course.js';
 import './course-map.js';
 import './explorer.js';
 import './sandbox.js';
-import { initSettingsView }            from './settings.js';
+import { initSettingsView, applyLanguage } from './settings.js';
 import { initSubnetting }              from './subnetting.js';
 import { initEncoder, refreshEncoderCanvases } from './encoder.js';
+import { initNetworkDevices } from './network-devices.js';
 import UserService from './user-service.js';
 import './components/home-view.js';
 if (document.readyState === 'loading') {
@@ -16,9 +17,15 @@ if (document.readyState === 'loading') {
 
 function boot() {
   initInterfaceMode();
+  initGlobalLanguage();
   setupViewNavigation();
   if (window.syncCompletionState) window.syncCompletionState();
   setTimeout(() => UserService.recordSession(), 500);
+}
+
+function initGlobalLanguage() {
+  const savedLang = localStorage.getItem('logicQuest_medium') || 'en';
+  applyLanguage(savedLang);
 }
 
 function initInterfaceMode() {
@@ -46,24 +53,12 @@ function initInterfaceMode() {
 function setInterfaceMode(mode) {
   localStorage.setItem('logicQuest_interfaceMode', mode);
 
-  const classicBtn = document.getElementById('header-mode-classic-btn');
-  const proBtn = document.getElementById('header-mode-pro-btn');
-
-  if (mode === 'professional') {
-    document.documentElement.classList.add('professional-mode');
-    if (classicBtn) classicBtn.classList.remove('active');
-    if (proBtn) proBtn.classList.add('active');
-  } else {
-    document.documentElement.classList.remove('professional-mode');
-    if (classicBtn) classicBtn.classList.add('active');
-    if (proBtn) proBtn.classList.remove('active');
-  }
+  document.documentElement.classList.toggle('professional-mode', mode === 'professional');
+  document.documentElement.classList.toggle('kids-mode', mode === 'kids');
 
   const radios = document.getElementsByName('settings-interface-mode');
   if (radios.length) {
-    radios.forEach(r => {
-      r.checked = (r.value === mode);
-    });
+    radios.forEach(r => { r.checked = (r.value === mode); });
   }
 
   if (window.renderCourseMap) {
@@ -145,6 +140,8 @@ function setupViewNavigation() {
         }
       } else if (target === 'settings-view') {
         initSettingsView();
+      } else if (target === 'network-devices-view') {
+        initNetworkDevices();
       }
     });
   });
@@ -156,6 +153,7 @@ function setupViewNavigation() {
     if (window.cleanupCourseMap) window.cleanupCourseMap();
     if (window.cleanupExplorer) window.cleanupExplorer();
     if (window.cleanupSandbox) window.cleanupSandbox();
+    if (window.cleanupNetworkDevices) window.cleanupNetworkDevices();
   }
   window.navigateToView = (targetClass) => {
     const tab = document.querySelector(`.nav-tab[data-target="${targetClass}"]`);

@@ -3,65 +3,137 @@ const lessons = [
   {
     id: 0,
     title: 'The Binary Code',
+    title_si: 'ද්විමය කේතය',
     text: 'Everything inside a computer is represented with just <strong>1</strong>s and <strong>0</strong>s. We call this <strong>Binary</strong>. In electronics, a <strong>1</strong> is a high voltage (e.g. 5V) and a <strong>0</strong> is zero volts (Ground). Toggle the switch to light the bulb!',
+    text_si: 'පරිගණකයක් තුළ ඇති සියල්ල නිරූපණය වන්නේ <strong>1</strong> සහ <strong>0</strong> භාවිතා කරමිනි. අපි මෙය <strong>ද්විමය</strong> ලෙස හඳුන්වමු. ඉලෙක්ට්‍රොනික විද්‍යාවේදී, <strong>1</strong> යනු ඉහළ වෝල්ටීයතාවයක් (උදා: 5V) වන අතර <strong>0</strong> යනු ශුන්‍ය වෝල්ටීයතාවය (බිම්) වේ. බල්බය දැල්වීමට ස්විචය ඔබන්න!',
     type: 'binary-bulb',
-    quiz: {
-      question: 'How does a digital circuit represent the binary value <strong>1</strong> electrically?',
-      options: [
-        'A high voltage level (e.g. 5 V or 3.3 V)',
-        'A low voltage level connected to Ground (0 V)',
-        'A mechanical oscillation inside the transistor',
-        'A random fluctuation of electrons in the wire',
-      ],
-      correctIndex: 0,
-      explanation: 'Binary 1 maps to high voltage (VCC) and binary 0 maps to low voltage (Ground/0 V). This lets us process information electronically.',
-    },
+    quizzes: [
+      {
+        question: 'How does a digital circuit represent the binary value <strong>1</strong> electrically?',
+        question_si: 'ඩිජිටල් පරිපථයක් ද්විමය අගය <strong>1</strong> විද්‍යුත් වශයෙන් නිරූපණය කරන්නේ කෙසේද?',
+        options: [
+          'A high voltage level (e.g. 5 V or 3.3 V)',
+          'A low voltage level connected to Ground (0 V)',
+          'A mechanical oscillation inside the transistor',
+          'A random fluctuation of electrons in the wire',
+        ],
+        options_si: [
+          'ඉහළ වෝල්ටීයතා මට්ටමක් (උදා: 5 V හෝ 3.3 V)',
+          'බිමට (Ground) සම්බන්ධ පහළ වෝල්ටීයතා මට්ටමක් (0 V)',
+          'ට්‍රාන්සිස්ටරය තුළ යාන්ත්‍රික දෝලනයක්',
+          'රැහැනේ ඉලෙක්ට්‍රෝනවල අහඹු උච්චාවචනයක්',
+        ],
+        correctIndex: 0,
+        explanation: 'Binary 1 maps to high voltage (VCC) and binary 0 maps to low voltage (Ground/0 V). This lets us process information electronically.',
+        explanation_si: 'ද්විමය 1 ඉහළ වෝල්ටීයතාවයටත් (VCC), ද්විමය 0 පහළ වෝල්ටීයතාවයටත් (බිම/0 V) සිතියම් ගැසේ. මෙමඟින් තොරතුරු ඉලෙක්ට්‍රොනිකව සැකසීමට හැකි වේ.',
+      },
+      {
+        question: 'What is the decimal equivalent of the binary number <strong>1101</strong>?',
+        question_si: 'ද්විමය සංඛ්‍යාව <strong>1101</strong> හි දශම සමානය කුමක්ද?',
+        options: ['13', '11', '15', '8'],
+        correctIndex: 0,
+        explanation: '1101₂ = 1×8 + 1×4 + 0×2 + 1×1 = 8 + 4 + 0 + 1 = 13₁₀.',
+        explanation_si: '1101₂ = 1×8 + 1×4 + 0×2 + 1×1 = 8 + 4 + 0 + 1 = 13₁₀.',
+      },
+    ],
   },
   {
     id: 1,
     title: 'The Transistor Switch',
+    title_si: 'ට්‍රාන්සිස්ටර් ස්විචය',
     text: 'How do we build logic from voltage? With the <strong>Transistor</strong>. In an NPN transistor, applying HIGH voltage (1) to the <strong>Base (B)</strong> allows current to flow from <strong>Collector (C)</strong> to <strong>Emitter (E)</strong>. Try switching the Base on!',
+    text_si: 'වෝල්ටීයතාවයෙන් තර්කනය ගොඩනඟන්නේ කෙසේද? <strong>ට්‍රාන්සිස්ටරය</strong> සමඟින්. NPN ට්‍රාන්සිස්ටරයක, <strong>පාදයට (B)</strong> ඉහළ වෝල්ටීයතාවයක් (1) යෙදීමෙන් <strong>එකතුකාරකයේ (C)</strong> සිට <strong>විමෝචකයට (E)</strong> ධාරාව ගලා යාමට ඉඩ සලසයි. පාදය සක්‍රිය කර බැලීමට උත්සාහ කරන්න!',
     type: 'transistor-npn',
-    quiz: {
-      question: 'If we apply 0V (Ground) to the base of an NPN transistor, what happens?',
-      options: [
-        'The collector-emitter path is blocked (transistor OFF)',
-        'Maximum current flows freely from collector to emitter',
-        'The transistor oscillates at 60 Hz',
-        'The transistor permanently conducts',
-      ],
-      correctIndex: 0,
-      explanation: 'With 0V at the base, the NPN transistor acts as an open switch — the collector-emitter path is blocked, preventing current flow.',
-    },
+    quizzes: [
+      {
+        question: 'If we apply 0V (Ground) to the base of an NPN transistor, what happens?',
+        question_si: 'අපි NPN ට්‍රාන්සිස්ටරයක පාදයට 0V (බිම) යෙදුවහොත් කුමක් සිදුවේද?',
+        options: [
+          'The collector-emitter path is blocked (transistor OFF)',
+          'Maximum current flows freely from collector to emitter',
+          'The transistor oscillates at 60 Hz',
+          'The transistor permanently conducts',
+        ],
+        options_si: [
+          'එකතුකාරක-විමෝචක මාර්ගය අවහිර වේ (ට්‍රාන්සිස්ටරය OFF)',
+          'උපරිම ධාරාව නිදහසේ ගලා යයි',
+          'ට්‍රාන්සිස්ටරය 60 Hz හි දෝලනය වේ',
+          'ට්‍රාන්සිස්ටරය ස්ථිරවම සන්නයනය වේ',
+        ],
+        correctIndex: 0,
+        explanation: 'With 0V at the base, the NPN transistor acts as an open switch — the collector-emitter path is blocked, preventing current flow.',
+        explanation_si: 'පාදයේ 0V විට, NPN ට්‍රාන්සිස්ටරය විවෘත ස්විචයක් ලෙස ක්‍රියා කරයි — එකතුකාරක-විමෝචක මාර්ගය අවහිර වී ධාරා ගලායාම වළක්වයි.',
+      },
+      {
+        question: 'An NPN transistor has three terminals. What are they called?',
+        question_si: 'NPN ට්‍රාන්සිස්ටරයකට පර්යන්ත තුනක් ඇත. ඒවා හඳුන්වන්නේ කුමක්ද?',
+        options: ['Anode, Cathode, Gate', 'Collector, Base, Emitter', 'Source, Drain, Body', 'Input, Output, Control'],
+        correctIndex: 1,
+        explanation: 'The three terminals of an NPN transistor are Collector (C), Base (B), and Emitter (E).',
+        explanation_si: 'NPN ට්‍රාන්සිස්ටරයක පර්යන්ත තුන වන්නේ එකතුකාරකය (C), පාදය (B), සහ විමෝචකය (E) ය.',
+      },
+    ],
   },
   {
     id: 2,
     title: 'The NOT Gate (Inverter)',
+    title_si: 'NOT ගේට්ටුව (ප්‍රතිලෝමකය)',
     text: 'A transistor with a pull-up resistor to VCC creates a <strong>NOT Gate</strong>. When input is 0, transistor is OFF so output is pulled HIGH (1). When input is 1, transistor turns ON pulling output to Ground (0). It <em>inverts</em> the signal.',
+    text_si: 'VCC වෙත pull-up රෙසිස්ටරයක් සහිත ට්‍රාන්සිස්ටරයක් <strong>NOT ගේට්ටුවක්</strong> නිර්මාණය කරයි. ආදානය 0 විට, ට්‍රාන්සිස්ටරය OFF නිසා ප්‍රතිදානය HIGH (1) වෙත ඇදේ. ආදානය 1 විට, ට්‍රාන්සිස්ටරය ON වී ප්‍රතිදානය බිමට (0) ඇදේ. එය සංඥාව <em>ප්‍රතිලෝම</em> කරයි.',
     type: 'gate-not',
-    quiz: {
-      question: 'What is the output of a NOT Gate when the input is 0?',
-      options: ['0 (Low)', '1 (High)', 'Floating / undefined', 'Alternating'],
-      correctIndex: 1,
-      explanation: 'A NOT gate always inverts: input 0 → output 1, input 1 → output 0.',
-    },
+    quizzes: [
+      {
+        question: 'What is the output of a NOT Gate when the input is 0?',
+        question_si: 'NOT ගේට්ටුවක ආදානය 0 විට ප්‍රතිදානය කුමක්ද?',
+        options: ['0 (Low)', '1 (High)', 'Floating / undefined', 'Alternating'],
+        options_si: ['0 (පහළ)', '1 (ඉහළ)', 'පාවෙන / අර්ථ දක්වා නැති', 'ප්‍රත්‍යාවර්ත'],
+        correctIndex: 1,
+        explanation: 'A NOT gate always inverts: input 0 → output 1, input 1 → output 0.',
+        explanation_si: 'NOT ගේට්ටුවක් සැමවිටම ප්‍රතිලෝම කරයි: ආදානය 0 → ප්‍රතිදානය 1, ආදානය 1 → ප්‍රතිදානය 0.',
+      },
+      {
+        question: 'What single logic gate type can you use to build a NOT gate?',
+        question_si: 'NOT ගේට්ටුවක් තැනීමට භාවිතා කළ හැකි තනි ගේට්ටු වර්ගය කුමක්ද?',
+        options: ['AND Gate', 'OR Gate', 'XOR Gate', 'NAND Gate'],
+        correctIndex: 3,
+        explanation: 'A NAND gate with both inputs tied together acts as a NOT gate (inverter).',
+        explanation_si: 'ආදාන දෙකම එකට සම්බන්ධ කළ NAND ගේට්ටුවක් NOT ගේට්ටුවක් (ප්‍රතිලෝමකයක්) ලෙස ක්‍රියා කරයි.',
+      },
+    ],
   },
   {
     id: 3,
     title: 'The AND Gate',
+    title_si: 'AND ගේට්ටුව',
     text: 'An <strong>AND Gate</strong> outputs 1 <em>only</em> when <strong>both</strong> inputs are 1. If either input is 0, the output is 0. Toggle both inputs below to verify the truth table!',
+    text_si: '<strong>AND ගේට්ටුවක්</strong> ප්‍රතිදානය 1 වන්නේ <strong>ආදාන දෙකම</strong> 1 විට පමණි. ඕනෑම ආදානයක් 0 නම්, ප්‍රතිදානය 0 වේ. සත්‍ය වගුව තහවුරු කිරීමට පහත ආදාන දෙකම ටොගල් කරන්න!',
     type: 'gate-and',
-    quiz: {
-      question: 'Under what condition does an AND Gate output 1?',
-      options: ['When at least one input is 1', 'When both inputs are 1', 'When both inputs are 0', 'When inputs are different'],
-      correctIndex: 1,
-      explanation: 'AND requires A AND B both to be HIGH (1) to produce a HIGH output.',
-    },
+    quizzes: [
+      {
+        question: 'Under what condition does an AND Gate output 1?',
+        question_si: 'AND ගේට්ටුවක් 1 ප්‍රතිදානය කරන්නේ කුමන කොන්දේසිය යටතේද?',
+        options: ['When at least one input is 1', 'When both inputs are 1', 'When both inputs are 0', 'When inputs are different'],
+        options_si: ['අවම වශයෙන් එක් ආදානයක් 1 විට', 'ආදාන දෙකම 1 විට', 'ආදාන දෙකම 0 විට', 'ආදාන වෙනස් විට'],
+        correctIndex: 1,
+        explanation: 'AND requires A AND B both to be HIGH (1) to produce a HIGH output.',
+        explanation_si: 'AND සඳහා HIGH (1) ප්‍රතිදානයක් ලබා ගැනීමට A AND B දෙකම HIGH (1) විය යුතුය.',
+      },
+      {
+        question: 'How many rows are in a complete truth table for a 2-input AND Gate?',
+        question_si: 'ආදාන 2ක AND ගේට්ටුවක සම්පූර්ණ සත්‍ය වගුවේ පේළි කීයක් තිබේද?',
+        options: ['2', '3', '4', '8'],
+        correctIndex: 2,
+        explanation: 'A 2-input truth table has 2² = 4 rows covering all combinations: 00, 01, 10, 11.',
+        explanation_si: 'ආදාන 2ක සත්‍ය වගුවක 2² = 4 පේළි ඇත: 00, 01, 10, 11.',
+      },
+    ],
   },
   {
     id: 4,
     title: 'The OR Gate',
+    title_si: 'OR ගේට්ටුව',
     text: 'An <strong>OR Gate</strong> outputs 1 if <strong>one or both</strong> inputs are 1. It only outputs 0 when both inputs are 0. Toggle the inputs to test!',
+    text_si: '<strong>OR ගේට්ටුවක්</strong> ප්‍රතිදානය 1 වන්නේ <strong>එක් හෝ දෙකම</strong> ආදාන 1 නම් පමණි. ආදාන දෙකම 0 විට පමණක් එය 0 ප්‍රතිදානය කරයි. පරීක්ෂා කිරීමට ආදාන ටොගල් කරන්න!',
     type: 'gate-or',
     quiz: {
       question: 'If Input A = 1 and Input B = 0, what does an OR Gate output?',
@@ -73,7 +145,9 @@ const lessons = [
   {
     id: 5,
     title: 'The XOR Gate',
+    title_si: 'XOR ගේට්ටුව',
     text: 'The <strong>XOR (Exclusive OR) Gate</strong> outputs 1 only when inputs are <strong>different</strong>. Same inputs (both 0 or both 1) → output 0. XOR is the core of binary addition!',
+    text_si: '<strong>XOR (විශේෂ OR) ගේට්ටුව</strong> ප්‍රතිදානය 1 වන්නේ ආදාන <strong>වෙනස්</strong> විට පමණි. සමාන ආදාන (0 සහ 0 හෝ 1 සහ 1) → ප්‍රතිදානය 0. XOR ද්විමය එකතු කිරීමේ හරය වේ!',
     type: 'gate-xor',
     quiz: {
       question: 'What is the XOR output when both inputs are 1?',
@@ -85,7 +159,9 @@ const lessons = [
   {
     id: 6,
     title: 'Half Adder',
+    title_si: 'අර්ධ එකතුකාරකය',
     text: 'A <strong>Half Adder</strong> adds two bits (A and B). It produces a <strong>Sum (S)</strong> via XOR and a <strong>Carry (C)</strong> via AND. Example: 1+1 = 10 in binary → Sum=0, Carry=1.',
+    text_si: '<strong>අර්ධ එකතුකාරකයක්</strong> bits දෙකක් (A සහ B) එකතු කරයි. එය XOR හරහා <strong>එකතුව (S)</strong> සහ AND හරහා <strong>උඩුගණනය (C)</strong> නිපදවයි. උදා: 1+1 = 10 ද්විමය → එකතුව=0, උඩුගණනය=1.',
     type: 'half-adder',
     quiz: {
       question: 'If A=1 and B=1, what are the Sum (S) and Carry (C) of a Half Adder?',
@@ -97,7 +173,9 @@ const lessons = [
   {
     id: 7,
     title: 'Full Adder',
+    title_si: 'සම්පූර්ණ එකතුකාරකය',
     text: 'A <strong>Full Adder</strong> handles a Carry-In (Cin) from a previous addition. Built from two Half Adders and an OR gate, it takes A, B, Cin and produces <strong>Sum (S)</strong> and <strong>Carry Out (Cout)</strong>.',
+    text_si: '<strong>සම්පූර්ණ එකතුකාරකයක්</strong> පෙර එකතු කිරීමකින් උඩුගණනය-ඇතුළු (Cin) හසුරුවයි. අර්ධ එකතුකාරක දෙකකින් සහ OR ගේට්ටුවකින් ගොඩනගා ඇති එය, A, B, Cin ගෙන <strong>එකතුව (S)</strong> සහ <strong>උඩුගණනය-පිටත (Cout)</strong> නිපදවයි.',
     type: 'full-adder',
     quiz: {
       question: 'If A=1, B=0, Cin=1, what does the Full Adder output?',
@@ -109,6 +187,7 @@ const lessons = [
   {
     id: 8,
     title: 'Data Communication',
+    title_si: 'දත්ත සන්නිවේදනය',
     text: `<strong>Data communication</strong> is the exchange of data between devices via a transmission medium (wire, fibre, or wireless).<br><br>
 Key concepts:<br>
 • <strong>Simplex</strong> – Data flows in one direction only (e.g. TV broadcast)<br>
@@ -126,6 +205,7 @@ Key concepts:<br>
   {
     id: 9,
     title: 'OSI Model',
+    title_si: 'OSI ආකෘතිය',
     text: `The <strong>OSI (Open Systems Interconnection) Model</strong> defines 7 layers for network communication. Each layer has a specific role:<br><br>
 <strong>7. Application</strong> – User interface (HTTP, FTP, SMTP)<br>
 <strong>6. Presentation</strong> – Data formatting, encryption (SSL/TLS)<br>
@@ -146,6 +226,7 @@ Mnemonic: <em>"All People Seem To Need Data Processing"</em>`,
   {
     id: 10,
     title: 'TCP/IP & Protocols',
+    title_si: 'TCP/IP සහ ප්‍රොටෝකෝල',
     text: `<strong>TCP/IP</strong> is the suite of protocols that powers the Internet. It has 4 layers mapping to the OSI model:<br><br>
 <strong>Application</strong> (OSI 5–7) – HTTP, HTTPS, FTP, SMTP, DNS<br>
 <strong>Transport</strong> (OSI 4) – TCP (reliable) vs UDP (fast, no guarantee)<br>
@@ -164,6 +245,7 @@ Mnemonic: <em>"All People Seem To Need Data Processing"</em>`,
   {
     id: 11,
     title: 'IP Addressing',
+    title_si: 'IP ලිපිනකරණය',
     text: `An <strong>IPv4 address</strong> is 32 bits written as four octets: e.g. <code>192.168.1.1</code>.<br><br>
 <strong>Classes:</strong><br>
 • Class A: 1.0.0.0 – 126.255.255.255 (large networks)<br>
@@ -183,7 +265,9 @@ Mnemonic: <em>"All People Seem To Need Data Processing"</em>`,
   {
     id: 12,
     title: 'Master of ICT!',
+    title_si: 'ICT හි ප්‍රවීණයා!',
     text: 'Incredible! You have mastered everything from transistors to networking protocols — the complete A/L ICT Digital Logic & Data Communication curriculum. You can now build custom circuits in the <strong>Sandbox</strong> and practice subnetting in the <strong>Subnetting Master</strong> tool!',
+    text_si: 'අපූරුයි! ඔබ ට්‍රාන්සිස්ටරවල සිට ජාලකරණ ප්‍රොටෝකෝල දක්වා සියල්ල ප්‍රගුණ කර ඇත — සම්පූර්ණ A/L ICT ඩිජිටල් තර්කනය සහ දත්ත සන්නිවේදන විෂය නිර්දේශය. ඔබට දැන් <strong>සෑන්ඩ්බොක්ස්</strong> හි අභිරුචි පරිපථ ගොඩනගා <strong>සබ්නෙටිං ප්‍රමුඛ</strong> මෙවලමේ පුහුණු විය හැක!',
     type: 'course-complete',
     quiz: {
       question: 'Which device operates at OSI Layer 3 (Network layer) to forward packets between different networks?',
@@ -195,6 +279,7 @@ Mnemonic: <em>"All People Seem To Need Data Processing"</em>`,
   {
     id: 13,
     title: 'Number Systems & Codes',
+    title_si: 'සංඛ්‍යා පද්ධති සහ කේත',
     text: `<strong>Number systems</strong> are the foundation of digital computing. Understanding them is essential for A/L ICT.<br><br>
 <strong>Binary (Base-2)</strong>: uses digits 0,1. Example: 1101₂ = 1×8 + 1×4 + 0×2 + 1×1 = 13₁₀<br><br>
 <strong>Octal (Base-8)</strong>: uses digits 0–7. Each octal digit maps to 3 binary bits.<br>
@@ -215,6 +300,7 @@ Example: 13₁₀ = 0001 0011 (BCD)<br><br>
   {
     id: 14,
     title: 'Boolean Algebra',
+    title_si: 'බූලියන් වීජ ගණිතය',
     text: `<strong>Boolean Algebra</strong> is the mathematical foundation of digital logic circuits. Key laws for A/L ICT:<br><br>
 <strong>Basic Laws:</strong><br>
 • A + 0 = A &nbsp;&nbsp; A · 1 = A<br>
@@ -244,6 +330,7 @@ These laws help <strong>simplify logic circuits</strong>, reducing the number of
   {
     id: 15,
     title: 'Flip Flops',
+    title_si: 'ෆ්ලිප් ෆ්ලොප්',
     text: `<strong>Flip Flops</strong> are sequential logic elements that store 1 bit of data. Unlike logic gates, they have <strong>memory</strong> — output depends on past inputs.<br><br>
 <strong>SR Flip Flop (Set-Reset):</strong><br>
 • S=1, R=0 → Q=1 (SET)<br>
@@ -269,6 +356,7 @@ These laws help <strong>simplify logic circuits</strong>, reducing the number of
   {
     id: 16,
     title: 'Universal Gates',
+    title_si: 'විශ්වීය ගේට්ටු',
     text: `<strong>NAND</strong> and <strong>NOR</strong> gates are called <strong>Universal Gates</strong> because any other logic gate (AND, OR, NOT) can be constructed using only combinations of NAND or NOR gates.<br><br>
 • <strong>NAND Gate</strong> = NOT AND (Output is 0 only when both inputs are 1)<br>
 • <strong>NOR Gate</strong> = NOT OR (Output is 1 only when both inputs are 0)<br><br>
@@ -285,6 +373,7 @@ This universal property makes them cheaper and easier to manufacture in large qu
   {
     id: 17,
     title: 'Karnaugh Maps (K-Maps)',
+    title_si: 'Karnaugh සිතියම් (K-සිතියම්)',
     text: `A <strong>Karnaugh Map (K-Map)</strong> is a graphical tool used to simplify Boolean algebra expressions without using complex laws.<br><br>
 • For 2 variables (A, B), it uses a <strong>2x2 grid</strong> of 4 cells representing minterms.<br>
 • Adjacent cells containing <strong>1</strong>s are grouped in powers of 2 (1, 2, 4, 8).<br>
@@ -301,6 +390,7 @@ This universal property makes them cheaper and easier to manufacture in large qu
   {
     id: 18,
     title: 'Multiplexers (MUX)',
+    title_si: 'බහුකාරක (MUX)',
     text: `A <strong>Multiplexer (MUX)</strong> is a combinational circuit that selects one of many input signals and routes it to a single output line.<br><br>
 • It acts as a data selector controlled by <strong>Select (S)</strong> lines.<br>
 • A 2-to-1 MUX has 2 inputs (I0, I1), 1 select line (S), and 1 output (Y).<br>
@@ -317,6 +407,7 @@ This universal property makes them cheaper and easier to manufacture in large qu
   {
     id: 19,
     title: 'Transmission Media',
+    title_si: 'සම්ප්‍රේෂණ මාධ්‍ය',
     text: `Data communication uses <strong>Transmission Media</strong> to carry signals between networking nodes. These are categorized into:<br><br>
 • <strong>Guided Media (Wired)</strong>: Physical pathways like Twisted Pair (copper, cheap, 100m limit), Coaxial (cable TV, shielded), and Fibre Optic (transmits light, immune to EMI, high bandwidth/distance).<br>
 • <strong>Unguided Media (Wireless)</strong>: Air/space pathways using Radio waves, Microwaves (line-of-sight), and Satellites.`,
@@ -332,6 +423,7 @@ This universal property makes them cheaper and easier to manufacture in large qu
   {
     id: 20,
     title: 'Network Devices',
+    title_si: 'ජාල උපාංග',
     text: `Networking nodes require dedicated <strong>Network Devices</strong> to communicate and bridge networks:<br><br>
 • <strong>Hub</strong>: Operates at Layer 1 (Physical). Broadcasts all traffic to all ports (high collisions).<br>
 • <strong>Switch</strong>: Operates at Layer 2 (Data Link). Directs traffic to destination MAC addresses.<br>
@@ -347,8 +439,44 @@ This universal property makes them cheaper and easier to manufacture in large qu
   },
 ];
 let currentLessonIdx = 0;
+let currentQuestionIdx = 0;
 let selectedOptionIdx = null;
 let quizSubmitted = false;
+
+function getCurrentLang() {
+  return localStorage.getItem('logicQuest_medium') || 'en';
+}
+
+function quizForLesson(lesson, qIdx) {
+  const quiz = lesson.quizzes ? lesson.quizzes[qIdx || currentQuestionIdx] : lesson.quiz;
+  if (!quiz) return null;
+  const lang = getCurrentLang();
+  if (lang === 'si' && quiz.question_si) {
+    return {
+      question: quiz.question_si,
+      options: quiz.options_si || quiz.options,
+      correctIndex: quiz.correctIndex,
+      explanation: quiz.explanation_si || quiz.explanation,
+    };
+  }
+  return quiz;
+}
+
+function lessonText(lesson) {
+  const lang = getCurrentLang();
+  return lang === 'si' && lesson.text_si ? lesson.text_si : lesson.text;
+}
+
+function lessonTitle(lesson) {
+  const lang = getCurrentLang();
+  return lang === 'si' && lesson.title_si ? lesson.title_si : lesson.title;
+}
+
+function totalQuestions(lesson) {
+  if (lesson.quizzes) return lesson.quizzes.length;
+  return lesson.quiz ? 1 : 0;
+}
+
 function initCourse() {
   currentLessonIdx = Math.min(UserService.getCurrentStep(), lessons.length - 1);
 
@@ -359,6 +487,7 @@ function initCourse() {
     if (window.playSound) window.playSound('click');
     if (window.navigateToView) window.navigateToView('course-map-view');
   });
+  window.addEventListener('lq:langchange', () => { initLessonSelect(); renderLesson(); });
   let resizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
@@ -398,7 +527,7 @@ function initLessonSelect() {
   lessons.forEach((l, idx) => {
     const opt = document.createElement('option');
     opt.value = idx;
-    opt.textContent = `${idx + 1}. ${l.title}`;
+    opt.textContent = `${idx + 1}. ${lessonTitle(l)}`;
     sel.appendChild(opt);
   });
   sel.value = currentLessonIdx;
@@ -411,6 +540,7 @@ function initLessonSelect() {
 }
 function renderLesson() {
   const lesson = lessons[currentLessonIdx];
+  currentQuestionIdx = 0;
   selectedOptionIdx = null;
   quizSubmitted = false;
   const sel = document.getElementById('lesson-select');
@@ -428,24 +558,37 @@ function renderLesson() {
   }
   const titleEl = document.getElementById('lesson-title');
   const textEl  = document.getElementById('lesson-text');
-  if (titleEl) titleEl.innerHTML = lesson.title;
-  if (textEl)  textEl.innerHTML  = lesson.text;
+  if (titleEl) titleEl.innerHTML = lessonTitle(lesson);
+  if (textEl)  textEl.innerHTML  = lessonText(lesson);
+  renderQuizForLesson(lesson, 0);
+  renderVisualSimulation(lesson.type);
+  if (window.updateXPDisplay) window.updateXPDisplay();
+}
+
+function renderQuizForLesson(lesson, qIdx) {
+  const quiz = quizForLesson(lesson, qIdx);
+  const total = totalQuestions(lesson);
   const qqEl = document.getElementById('quiz-question');
-  if (qqEl) qqEl.innerHTML = lesson.quiz.question;
-  const qContainer = document.getElementById('quiz-options');
-  if (qContainer) {
-    qContainer.innerHTML = '';
-    lesson.quiz.options.forEach((opt, idx) => {
-      const btn = document.createElement('button');
-      btn.className = 'quiz-option';
-      btn.innerHTML = `
-        <span class="quiz-option-letter">${String.fromCharCode(65 + idx)}</span>
-        <span class="quiz-option-text">${opt}</span>
-      `;
-      btn.addEventListener('click', () => selectQuizOption(idx));
-      qContainer.appendChild(btn);
-    });
+  if (qqEl) {
+    if (total > 1) {
+      qqEl.innerHTML = `<span class="quiz-counter">Question ${qIdx + 1}/${total}</span> ${quiz.question}`;
+    } else {
+      qqEl.innerHTML = quiz.question;
+    }
   }
+  const qContainer = document.getElementById('quiz-options');
+  if (!qContainer) return;
+  qContainer.innerHTML = '';
+  quiz.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.innerHTML = `
+      <span class="quiz-option-letter">${String.fromCharCode(65 + idx)}</span>
+      <span class="quiz-option-text">${opt}</span>
+    `;
+    btn.addEventListener('click', () => selectQuizOption(idx));
+    qContainer.appendChild(btn);
+  });
   const feedback = document.getElementById('quiz-feedback');
   if (feedback) {
     feedback.className = 'feedback-alert';
@@ -457,9 +600,6 @@ function renderLesson() {
     ctaBtn.textContent = 'Check Answer';
     ctaBtn.disabled = true;
   }
-  renderVisualSimulation(lesson.type);
-
-  if (window.updateXPDisplay) window.updateXPDisplay();
 }
 function selectQuizOption(idx) {
   if (quizSubmitted) return;
@@ -478,16 +618,18 @@ document.getElementById('cta-btn')?.addEventListener('click', handleCTA);
 
 function handleCTA() {
   const lesson = lessons[currentLessonIdx];
+  const quiz = quizForLesson(lesson, currentQuestionIdx);
+  const total = totalQuestions(lesson);
   const ctaBtn  = document.getElementById('cta-btn');
   const feedback = document.getElementById('quiz-feedback');
 
   if (!quizSubmitted) {
     quizSubmitted = true;
-    const isCorrect = selectedOptionIdx === lesson.quiz.correctIndex;
+    const isCorrect = selectedOptionIdx === quiz.correctIndex;
 
     document.querySelectorAll('.quiz-option').forEach((opt, idx) => {
       opt.classList.add('disabled');
-      if (idx === lesson.quiz.correctIndex) opt.classList.add('correct');
+      if (idx === quiz.correctIndex) opt.classList.add('correct');
       else if (idx === selectedOptionIdx)    opt.classList.add('incorrect');
     });
 
@@ -495,12 +637,12 @@ function handleCTA() {
       if (window.playSound) window.playSound('success');
       if (feedback) {
         feedback.className = 'feedback-alert success';
-        feedback.innerHTML = `<strong>Correct!</strong> ${lesson.quiz.explanation}`;
+        feedback.innerHTML = `<strong>Correct!</strong> ${quiz.explanation}`;
         feedback.style.display = 'flex';
       }
       const steps = document.querySelectorAll('.progress-step');
       steps[currentLessonIdx]?.classList.add('completed');
-      if (ctaBtn) ctaBtn.textContent = currentLessonIdx === lessons.length - 1 ? 'Finish Course' : 'Continue';
+      if (ctaBtn) ctaBtn.textContent = (currentLessonIdx === lessons.length - 1 && currentQuestionIdx >= total - 1) ? 'Finish Course' : 'Continue';
     } else {
       if (window.playSound) window.playSound('error');
       if (feedback) {
@@ -518,7 +660,12 @@ function handleCTA() {
       });
       if (window.markLessonComplete) window.markLessonComplete(currentLessonIdx);
 
-      if (currentLessonIdx === lessons.length - 1) {
+      if (currentQuestionIdx < total - 1) {
+        currentQuestionIdx++;
+        selectedOptionIdx = null;
+        quizSubmitted = false;
+        renderQuizForLesson(lesson, currentQuestionIdx);
+      } else if (currentLessonIdx === lessons.length - 1) {
         showSuccessModal();
       } else {
         currentLessonIdx++;
