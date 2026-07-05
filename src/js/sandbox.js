@@ -1,3 +1,10 @@
+import { generateExplanations, renderExplanationPanel, toggleExplanationPanel } from './sandbox-explain.js';
+import { showComponentTooltip, hideComponentTooltip, COMPONENT_EDU_DATA } from './component-info.js';
+import { openTruthTableDesigner } from './truth-table-designer.js';
+import { parseBooleanExpression } from './bool-parser.js';
+import { updatePhysicsPanel } from './physics-panel.js';
+import { openLabMode } from './lab-mode.js';
+
 let sandboxNodes = [];
 let sandboxWires = [];
 let activeWiringSource = null;   
@@ -26,6 +33,7 @@ let selectionRectEl = null;
 const MAX_UNDO = 30;
 let undoStack = [];  
 let _ignorePortClick = false; 
+let simSpeed = 1;
 
 function pushUndo() {
   const snapshot = JSON.stringify(serializeLayout());
@@ -193,6 +201,7 @@ window.initSandboxCanvas = function () {
     });
   }
   loadCustomICs();
+  if (window.initICCreator) window.initICCreator();
 };
 function setupToolboxItem(item) {
   const type = item.dataset.type;
@@ -429,8 +438,12 @@ function setupToolbar() {
   document.getElementById('confirm-ic-btn')?.addEventListener('click', () => {
     const name = document.getElementById('ic-name-input').value.trim();
     if (!name) { showAlert('Please enter a name for the IC.'); return; }
-    createICFromSelection(name);
     document.getElementById('ic-create-modal').style.display = 'none';
+    if (window.openICCreatorWizard) {
+      window.openICCreatorWizard(name);
+    } else {
+      createICFromSelection(name);
+    }
   });
   document.getElementById('cancel-ic-btn')?.addEventListener('click', () => {
     document.getElementById('ic-create-modal').style.display = 'none';
@@ -439,6 +452,146 @@ function setupToolbar() {
     if (e.key === 'Enter') document.getElementById('confirm-ic-btn')?.click();
     if (e.key === 'Escape') document.getElementById('ic-create-modal').style.display = 'none';
   });
+
+  const toolbar = document.querySelector('.sandbox-toolbar');
+  if (toolbar) {
+    const explainBtn = document.getElementById('sandbox-explain-btn') || document.createElement('button');
+    if (!document.getElementById('sandbox-explain-btn')) {
+      explainBtn.className = 'sandbox-btn';
+      explainBtn.id = 'sandbox-explain-btn';
+      explainBtn.title = 'Toggle explanation panel';
+      explainBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h10M8 12h10M8 18h6"/><circle cx="4" cy="12" r="2"/></svg> <span>Explain</span>';
+      explainBtn.addEventListener('click', () => {
+        playSound('click');
+        const visible = toggleExplanationPanel();
+        explainBtn.classList.toggle('active', visible);
+      });
+      toolbar.appendChild(explainBtn);
+    }
+
+    const truthDesignerBtn = document.getElementById('sandbox-truth-designer-btn') || document.createElement('button');
+    if (!document.getElementById('sandbox-truth-designer-btn')) {
+      truthDesignerBtn.className = 'sandbox-btn';
+      truthDesignerBtn.id = 'sandbox-truth-designer-btn';
+      truthDesignerBtn.title = 'Open truth table designer';
+      truthDesignerBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg> <span>Designer</span>';
+      truthDesignerBtn.addEventListener('click', () => {
+        playSound('click');
+        openTruthTableDesigner();
+      });
+      toolbar.appendChild(truthDesignerBtn);
+    }
+
+    const booleanBtn = document.getElementById('sandbox-bool-btn') || document.createElement('button');
+    if (!document.getElementById('sandbox-bool-btn')) {
+      booleanBtn.className = 'sandbox-btn';
+      booleanBtn.id = 'sandbox-bool-btn';
+      booleanBtn.title = 'Generate circuit from boolean expression';
+      booleanBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 5h8a4 4 0 0 1 0 8H7z"/><path d="M7 13h8a4 4 0 0 1 0 8H7z"/></svg> <span>Boolean</span>';
+      booleanBtn.addEventListener('click', () => {
+        playSound('click');
+        const expr = window.prompt('Enter a boolean expression (e.g. A+B, A·B, A⊕B, (A+B)·C):');
+        if (!expr) return;
+        try {
+          const layout = parseBooleanExpression(expr);
+          layout.nodes.forEach(n => {
+            n.x += 120;
+            n.y += 40;
+          });
+          layout.nodes.forEach(n => {
+            const def = COMPONENT_DEFS[n.type];
+            if (def) {
+              n.inputsCount = n.inputsCount ?? def.inputs;
+              n.outputsCount = n.outputsCount ?? def.outputs;
+              n.outputState = 0;
+              n.outputState2 = 0;
+              n.inputValues = Array(n.inputsCount).fill(0);
+              n.data = n.data || (def.data ? { ...def.data } : {});
+            }
+          });
+          layout.nodes.forEach(n => { sandboxNodes.push(n); renderNodeDOM(n); });
+          layout.wires.forEach(w => sandboxWires.push(w));
+          evaluateSandbox();
+          showToast('Boolean expression circuit generated ✓');
+        } catch (error) {
+          showAlert(error.message || 'Could not parse that expression.', 'Boolean Parser');
+        }
+      });
+      toolbar.appendChild(booleanBtn);
+    }
+
+    const physicsBtn = document.getElementById('sandbox-physics-btn') || document.createElement('button');
+    if (!document.getElementById('sandbox-physics-btn')) {
+      physicsBtn.className = 'sandbox-btn';
+      physicsBtn.id = 'sandbox-physics-btn';
+      physicsBtn.title = 'Show physics panel';
+      physicsBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 18h16"/><path d="M7 14l3-4 3 2 4-6"/></svg> <span>Physics</span>';
+      physicsBtn.addEventListener('click', () => {
+        playSound('click');
+        const panel = document.getElementById('sandbox-physics-panel');
+        if (panel) {
+          panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+          updatePhysicsPanel(panel, sandboxNodes);
+        }
+      });
+      toolbar.appendChild(physicsBtn);
+    }
+
+    const labBtn = document.getElementById('sandbox-lab-btn') || document.createElement('button');
+    if (!document.getElementById('sandbox-lab-btn')) {
+      labBtn.className = 'sandbox-btn';
+      labBtn.id = 'sandbox-lab-btn';
+      labBtn.title = 'Open lab mode';
+      labBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19h16"/><path d="M7 19V7m5 12V3m5 16v-7"/></svg> <span>Lab</span>';
+      labBtn.addEventListener('click', () => {
+        playSound('click');
+        openLabMode();
+      });
+      toolbar.appendChild(labBtn);
+    }
+    const sep = document.createElement('div');
+    sep.style.cssText = 'width:1px;background:var(--border-color);height:20px';
+    toolbar.appendChild(sep);
+
+    const speedWrap = document.createElement('div');
+    speedWrap.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-muted)';
+    speedWrap.innerHTML = '<span style="white-space:nowrap">Speed</span>';
+    const speedSlider = document.createElement('input');
+    speedSlider.type = 'range';
+    speedSlider.min = '1';
+    speedSlider.max = '8';
+    speedSlider.value = String(simSpeed * 2);
+    speedSlider.step = '1';
+    speedSlider.style.cssText = 'width:48px;height:3px;accent-color:var(--color-cyan)';
+    speedSlider.title = 'Simulation Speed';
+    const speedLabel = document.createElement('span');
+    speedLabel.style.cssText = 'font-family:monospace;font-weight:600;min-width:28px;text-align:right';
+    speedLabel.textContent = '1x';
+    speedSlider.addEventListener('input', () => {
+      const val = parseInt(speedSlider.value);
+      simSpeed = val / 2;
+      speedLabel.textContent = simSpeed >= 1 ? simSpeed + 'x' : '0.' + Math.round(simSpeed * 10) + 'x';
+      if (isSimRunning) startSimulationLoop();
+    });
+    speedWrap.appendChild(speedSlider);
+    speedWrap.appendChild(speedLabel);
+    toolbar.appendChild(speedWrap);
+
+    const sep2 = document.createElement('div');
+    sep2.style.cssText = 'width:1px;background:var(--border-color);height:20px';
+    toolbar.appendChild(sep2);
+
+    const truthBtn = document.createElement('button');
+    truthBtn.className = 'sandbox-btn';
+    truthBtn.id = 'sandbox-truth-table';
+    truthBtn.title = 'Generate Truth Table';
+    truthBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg> <span>Truth Table</span>';
+    truthBtn.addEventListener('click', () => {
+      playSound('click');
+      showTruthTable();
+    });
+    toolbar.appendChild(truthBtn);
+  }
 
   [saveModal, loadModal].forEach(modal => {
     if (!modal) return;
@@ -510,6 +663,19 @@ function renderNodeDOM(node) {
   if (node.type === 'rgb-led') el.classList.add('rgb-led-node');
   if (node.type === 'led-bar') el.classList.add('led-bar-node');
   if (node.type === 'text-label') el.classList.add('node-text-label');
+  if (node.type && node.type.startsWith('custom-ic-')) {
+    el.classList.add('custom-ic-node');
+    const icName = node.data.icName || node.type.slice(9);
+    const def = window.customICs ? window.customICs[icName] : null;
+    if (def) {
+      const P = def.pinCount || 8;
+      const height = (P / 2) * 22 + 30;
+      el.style.width = '140px';
+      el.style.height = `${height}px`;
+    }
+  }
+  const electricSchematicTypes = ['battery','power-supply','resistor','bulb','switch','ammeter','voltmeter','motor','fuse','led-elec','junction','transistor','diode','zener','ldr','thermistor','potentiometer','capacitor','relay'];
+  if (electricSchematicTypes.includes(node.type)) el.classList.add('elec-schematic-node');
   const delBtn = document.createElement('button');
   delBtn.className = 'node-delete-btn';
   delBtn.innerHTML = '&times;';
@@ -519,6 +685,12 @@ function renderNodeDOM(node) {
   const header = document.createElement('div');
   header.className = 'sandbox-node-header';
   header.innerText = node.label;
+  header.addEventListener('mouseenter', (e) => {
+    if (node.type && COMPONENT_EDU_DATA) {
+      showComponentTooltip(node, header);
+    }
+  });
+  header.addEventListener('mouseleave', () => hideComponentTooltip());
   // In realistic (ANSI) gate mode, hide header text for pure logic gate types
   const pureGateTypes = ['not','and','or','nand','nor','xor','xnor'];
   const gateStyle = window.__gateStyle || localStorage.getItem('sandboxGateStyle') || 'box';
@@ -530,8 +702,14 @@ function renderNodeDOM(node) {
   body.className = 'sandbox-node-body';
   renderNodeBody(node, body);
   el.appendChild(body);
-  renderInputPorts(node, el);
-  renderOutputPorts(node, el);
+  if (node.type && node.type.startsWith('custom-ic-')) {
+    if (window.renderCustomICPorts) {
+      window.renderCustomICPorts(node, el);
+    }
+  } else {
+    renderInputPorts(node, el);
+    renderOutputPorts(node, el);
+  }
   const onStartDrag = (e) => {
     if (e.target.closest('.sandbox-port') || e.target.closest('button') || e.target.closest('textarea') || e.target.closest('input')) {
       return;
@@ -542,8 +720,32 @@ function renderNodeDOM(node) {
   el.addEventListener('touchstart', onStartDrag, { passive: false });
   el.addEventListener('click', (e) => {
     if (isDragging) return;
+    const toggleBtn = e.target.closest('[data-toggle]');
+    if (toggleBtn) {
+      e.stopPropagation();
+      const toggleType = toggleBtn.dataset.toggle;
+      const nid = toggleBtn.dataset.nodeId;
+      if (toggleType === 'switch' && window.toggleElectricSwitch) {
+        window.toggleElectricSwitch(nid);
+      } else if (toggleType === 'transistor' && window.toggleElectricTransistor) {
+        window.toggleElectricTransistor(nid);
+      }
+      return;
+    }
     e.stopPropagation();
     selectNode(node.id, e.shiftKey || e.ctrlKey || e.metaKey);
+  });
+  el.addEventListener('dblclick', (e) => {
+    e.stopPropagation();
+    if (node.type && node.type.startsWith('custom-ic-') && window.openICPinManager) {
+      window.openICPinManager(node.id);
+    }
+  });
+
+  // Right-click context menu for multi-input gate types
+  el.addEventListener('contextmenu', (e) => {
+    e.stopPropagation();
+    showSandboxContextMenu(e, node);
   });
 
   (panContainer || workspace).appendChild(el);
@@ -551,23 +753,12 @@ function renderNodeDOM(node) {
 
 function renderNodeBody(node, body) {
   if (node.type && node.type.startsWith('custom-ic-')) {
-    const icName = node.data.icName || node.type.slice(9);
-    const inputs = node.inputsCount || 0;
-    const outputs = node.outputsCount || 0;
-    const label = icName.length > 10 ? icName.slice(0, 10) + '…' : icName;
-    const isHigh = node.outputState === 1;
-    body.innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px;min-width:80px">
-        <div style="font-size:9px;font-weight:700;color:#818cf8;letter-spacing:0.5px;text-align:center">${label}</div>
-        <svg viewBox="0 0 60 40" width="60" height="40">
-          <rect x="0" y="0" width="60" height="40" rx="4" fill="var(--bg-secondary)" stroke="${isHigh ? '#22d3a5' : 'var(--text-muted)'}" stroke-width="1.5" stroke-dasharray="3,2"/>
-          <text x="30" y="24" text-anchor="middle" fill="${isHigh ? '#22d3a5' : 'var(--text-muted)'}" font-size="8" font-family="monospace" font-weight="600">IC</text>
-        </svg>
-        <div style="font-size:7px;color:var(--text-muted);display:flex;gap:6px;width:100%;justify-content:center">
-          <span>↩${inputs}</span>
-          <span>↪${outputs}</span>
-        </div>
-      </div>`;
+    if (window.getCustomICNodeInner) {
+      body.innerHTML = window.getCustomICNodeInner(node);
+    } else {
+      const icName = node.data.icName || node.type.slice(9);
+      body.innerHTML = `<div class="gate-type-label">${icName}</div>`;
+    }
     return;
   }
   switch (node.type) {
@@ -869,6 +1060,7 @@ function renderNodeBody(node, body) {
 
     default: {
       const gateStyle = window.__gateStyle || 'box';
+      const isMultiInputGate = MULTI_INPUT_GATE_TYPES ? MULTI_INPUT_GATE_TYPES.has(node.type) : false;
       if (gateStyle === 'realistic') {
         body.innerHTML = renderGateSVG(node.type);
       } else {
@@ -876,6 +1068,27 @@ function renderNodeBody(node, body) {
         span.className = 'gate-type-label';
         span.innerText = node.type.toUpperCase();
         body.appendChild(span);
+      }
+      // Show input count badge and +/- controls for multi-input gates
+      if (isMultiInputGate && node.inputsCount > 2) {
+        const badge = document.createElement('div');
+        badge.style.cssText = 'font-size:8px;color:var(--color-cyan,#22d3a5);font-weight:700;margin-top:2px;text-align:center;letter-spacing:0.5px';
+        badge.textContent = `${node.inputsCount}-input`;
+        body.appendChild(badge);
+      }
+      if (isMultiInputGate) {
+        const controls = document.createElement('div');
+        controls.style.cssText = 'display:flex;gap:3px;margin-top:3px;justify-content:center';
+        controls.innerHTML = `
+          <button onclick="event.stopPropagation();window.addGateInput('${node.id}')"
+            style="font-size:10px;padding:1px 5px;border-radius:3px;border:1px solid var(--border-color);
+            background:var(--bg-tertiary);color:var(--text-primary);cursor:pointer;line-height:1.2"
+            title="Add input port">+</button>
+          <button onclick="event.stopPropagation();window.removeGateInput('${node.id}')"
+            style="font-size:10px;padding:1px 5px;border-radius:3px;border:1px solid var(--border-color);
+            background:var(--bg-tertiary);color:var(--text-primary);cursor:pointer;line-height:1.2"
+            title="Remove input port">−</button>`;
+        body.appendChild(controls);
       }
     }
   }
@@ -933,12 +1146,12 @@ function renderGateSVG(type) {
 function renderInputPorts(node, el) {
   const count = node.inputsCount;
   if (count === 0) return;
-  const portLabels = getInputPortLabels(node.type);
 
   for (let i = 0; i < count; i++) {
     const port = document.createElement('div');
     port.className = 'sandbox-port port-input';
     port.dataset.portIdx = i;
+    const portLabels = getInputPortLabels(node.type, node.inputsCount);
     port.title = portLabels[i] || `In ${i}`;
     const pct = count === 1
       ? 50
@@ -996,7 +1209,7 @@ function renderOutputPorts(node, el) {
   }
 }
 
-function getInputPortLabels(type) {
+function getInputPortLabels(type, count) {
   switch (type) {
     case 'd-flop': return ['D', 'CLK'];
     case 'half-adder': return ['A', 'B'];
@@ -1004,7 +1217,14 @@ function getInputPortLabels(type) {
     case 'seven-seg': return ['D3 (MSB)', 'D2', 'D1', 'D0 (LSB)'];
     case 'rgb-led': return ['Red (R)', 'Green (G)', 'Blue (B)'];
     case 'led-bar': return ['D3 (MSB)', 'D2', 'D1', 'D0 (LSB)'];
-    default: return ['A', 'B', 'C', 'D'];
+    default: {
+      // Generate A, B, C, ... Z for up to 26, then A0, A1... for more
+      const n = count || 4;
+      return Array.from({ length: n }, (_, i) => {
+        if (i < 26) return String.fromCharCode(65 + i);
+        return 'I' + (i - 26);
+      });
+    }
   }
 }
 
@@ -1181,6 +1401,8 @@ function selectNode(id, shiftKey) {
   deselectAllNodes();
   selectedNodeId = id;
   document.getElementById(id)?.classList.add('selected');
+  const node = sandboxNodes.find(n => n.id === id);
+  if (node) showInspectorForNode(node);
 }
 
 function toggleNodeSelection(id) {
@@ -1362,7 +1584,7 @@ function updateSandboxWires() {
     const isActive = isElectricityCircuit
       ? !!wire.active
       : srcNode
-        ? (wire.fromPortIdx === 0 ? srcNode.outputState : srcNode.outputState2) === 1
+        ? (window.getSourceOutputVal ? window.getSourceOutputVal(srcNode, wire.fromPortIdx) : (wire.fromPortIdx === 0 ? srcNode.outputState : srcNode.outputState2)) === 1
         : false;
 
     const dir = x2 >= x1 ? 1 : -1;
@@ -1445,184 +1667,346 @@ function updateSandboxWires() {
 
 function renderComponentSVG(type, data, nodeId) {
   const c = 'currentColor';
-  const sw = '1.8';
-  const color = (type === 'transistor' || type === 'switch') ? (data && data.on ? '#22d3a5' : '#818cf8') : c;
+  const sw = '2';    // stroke width — thicker for clarity
+  const sw3 = '3';
 
   switch (type) {
-    case 'battery':
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <line x1="4" y1="12" x2="15" y2="12"/>
-        <line x1="15" y1="4" x2="15" y2="20" stroke-width="3"/>
-        <line x1="21" y1="7" x2="21" y2="17" stroke-width="2"/>
-        <line x1="27" y1="12" x2="44" y2="12"/>
-        <text x="10" y="10" font-size="6" fill="var(--color-success)" stroke="none">+</text>
-        <text x="25" y="22" font-size="6" fill="var(--text-muted)" stroke="none">−</text>
-      </svg>`;
-    case 'power-supply':
-      const pv = data && data.voltage ? data.voltage : 12;
-      return `<svg viewBox="0 0 56 24" width="56" height="24" fill="none" stroke="${c}" stroke-width="1.2" stroke-linecap="round">
-        <rect x="4" y="2" width="48" height="20" rx="3" fill="var(--bg-tertiary)" stroke="var(--border-color)"/>
-        <rect x="8" y="5" width="40" height="8" rx="1.5" fill="var(--bg-secondary)" stroke="none"/>
-        <text x="28" y="11.5" text-anchor="middle" font-size="7" fill="#22d3a5" stroke="none" font-weight="700" font-family="monospace">${pv.toFixed(1)}V</text>
-        <line x1="14" y1="17" x2="10" y2="20" stroke="#f87171" stroke-width="1.5"/>
-        <line x1="10" y1="17" x2="14" y2="20" stroke="#f87171" stroke-width="1.5"/>
-        <text x="12" y="22" text-anchor="middle" font-size="5" fill="#f87171" stroke="none">−</text>
-        <line x1="42" y1="17" x2="46" y2="20" stroke="#22d3a5" stroke-width="1.5"/>
-        <line x1="46" y1="17" x2="42" y2="20" stroke="#22d3a5" stroke-width="1.5"/>
-        <text x="44" y="22" text-anchor="middle" font-size="5" fill="#22d3a5" stroke="none">+</text>
-      </svg>`;
-    case 'resistor': {
-      const a = data && data.current > 0.001;
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
-        ${a ? `<polyline points="8,12 11,5 14,19 17,5 20,19 23,5 26,12" stroke="#22d3a5" filter="drop-shadow(0 0 2px #22d3a5)"/>` : ''}
-        <line x1="2" y1="12" x2="8" y2="12"/>
-        <polyline points="8,12 11,5 14,19 17,5 20,19 23,5 26,12"/>
-        <line x1="26" y1="12" x2="46" y2="12"/>
+    // ── Battery ─────────────────────────────────────────────────────────────
+    case 'battery': {
+      const emf = (data && data.emf) ? data.emf : 9;
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
+        <!-- lead wires -->
+        <line x1="2" y1="26" x2="16" y2="26"/>
+        <line x1="64" y1="26" x2="78" y2="26"/>
+        <!-- cell 1: long plate (positive) -->
+        <line x1="16" y1="10" x2="16" y2="42" stroke-width="${sw3}"/>
+        <!-- cell 1: short plate (negative) -->
+        <line x1="26" y1="17" x2="26" y2="35" stroke-width="1.5"/>
+        <!-- connector -->
+        <line x1="26" y1="26" x2="38" y2="26"/>
+        <!-- cell 2: long plate (positive) -->
+        <line x1="38" y1="10" x2="38" y2="42" stroke-width="${sw3}"/>
+        <!-- cell 2: short plate (negative) -->
+        <line x1="48" y1="17" x2="48" y2="35" stroke-width="1.5"/>
+        <!-- connector to right lead -->
+        <line x1="48" y1="26" x2="64" y2="26"/>
+        <!-- labels -->
+        <text x="11" y="9" font-size="9" fill="#22d3a5" stroke="none" font-weight="700">+</text>
+        <text x="51" y="9" font-size="9" fill="#f87171" stroke="none" font-weight="700">−</text>
+        <text x="40" y="48" font-size="8" fill="#22d3a5" stroke="none" font-weight="700" font-family="monospace">${emf}V</text>
       </svg>`;
     }
-    case 'bulb':
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="24" cy="10" r="6"/>
-        <line x1="20" y1="16" x2="20" y2="22"/>
-        <line x1="28" y1="16" x2="28" y2="22"/>
-        <line x1="20" y1="22" x2="28" y2="22"/>
-        <path d="M 22 10 L 24 12 L 26 10" fill="none"/>
+
+    // ── DC Power Supply ──────────────────────────────────────────────────────
+    case 'power-supply': {
+      const pv = (data && data.voltage) ? data.voltage : 12;
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke-linecap="round">
+        <line x1="2" y1="26" x2="14" y2="26" stroke="${c}" stroke-width="${sw}"/>
+        <line x1="66" y1="26" x2="78" y2="26" stroke="${c}" stroke-width="${sw}"/>
+        <rect x="14" y="8" width="52" height="36" rx="5" fill="var(--bg-tertiary)" stroke="var(--border-color)" stroke-width="1.5"/>
+        <rect x="20" y="14" width="40" height="14" rx="2" fill="var(--bg-secondary)" stroke="none"/>
+        <text x="40" y="25" text-anchor="middle" font-size="9" fill="#22d3a5" stroke="none" font-weight="800" font-family="monospace">${pv.toFixed(1)}V DC</text>
+        <!-- terminal dots -->
+        <circle cx="20" cy="36" r="3" fill="#f87171" stroke="none"/>
+        <text x="18" y="47" font-size="7" fill="#f87171" stroke="none" font-weight="700">−</text>
+        <circle cx="60" cy="36" r="3" fill="#22d3a5" stroke="none"/>
+        <text x="57" y="47" font-size="7" fill="#22d3a5" stroke="none" font-weight="700">+</text>
       </svg>`;
-    case 'switch':
+    }
+
+    // ── Resistor (US zigzag) ─────────────────────────────────────────────────
+    case 'resistor': {
+      const active = data && data.current > 0.001;
+      const glowColor = '#fbbf24';
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+        ${active ? `<filter id="glow-r"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>` : ''}
+        <line x1="2" y1="26" x2="12" y2="26"/>
+        <polyline points="12,26 16,14 22,38 28,14 34,38 40,14 46,38 52,14 58,26"
+          ${active ? `stroke="${glowColor}" filter="url(#glow-r)"` : ''}/>
+        ${!active ? `<polyline points="12,26 16,14 22,38 28,14 34,38 40,14 46,38 52,14 58,26"/>` : ''}
+        <line x1="58" y1="26" x2="78" y2="26"/>
+        ${active ? `<text x="35" y="49" text-anchor="middle" font-size="8" fill="${glowColor}" stroke="none" font-weight="700" font-family="monospace">${(data.current*1000).toFixed(1)}mA</text>` : ''}
+      </svg>`;
+    }
+
+    // ── Light Bulb (circle + X filament) ─────────────────────────────────────
+    case 'bulb': {
+      const brightness = (data && data.brightness) || 0;
+      const isOn = brightness > 0.1;
+      const glow = isOn ? `rgba(251,191,36,${0.15 + brightness * 0.35})` : 'transparent';
+      const filCol = isOn ? '#fbbf24' : c;
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
+        ${isOn ? `<circle cx="40" cy="26" r="22" fill="${glow}" stroke="none"/>` : ''}
+        <line x1="2" y1="26" x2="22" y2="26"/>
+        <circle cx="40" cy="26" r="16"/>
+        <!-- X filament -->
+        <line x1="30" y1="17" x2="50" y2="35" stroke="${filCol}" stroke-width="2.2"/>
+        <line x1="50" y1="17" x2="30" y2="35" stroke="${filCol}" stroke-width="2.2"/>
+        <line x1="58" y1="26" x2="78" y2="26"/>
+        ${isOn ? `<text x="40" y="49" text-anchor="middle" font-size="8" fill="#fbbf24" stroke="none" font-weight="700">ON</text>` : ''}
+      </svg>`;
+    }
+
+    // ── Switch (pivoting arm) ────────────────────────────────────────────────
+    case 'switch': {
       const swClosed = data && data.closed;
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${swClosed ? '#22d3a5' : color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="6" cy="12" r="2"/>
-        <circle cx="42" cy="12" r="2"/>
-        <line x1="8" y1="12" x2="24" y2="12"/>
-        <line x1="24" y1="12" x2="36" y2="${swClosed ? '12' : '4'}"/>
+      const sc = swClosed ? '#22d3a5' : '#818cf8';
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${sc}" stroke-width="${sw}" stroke-linecap="round">
+        <line x1="2" y1="26" x2="18" y2="26"/>
+        <!-- left terminal circle -->
+        <circle cx="20" cy="26" r="3" fill="${sc}" stroke="${sc}"/>
+        <!-- pivoting arm -->
+        <line x1="20" y1="26" x2="56" y2="${swClosed ? '26' : '12'}" stroke-width="2.5"/>
+        <!-- right terminal circle -->
+        <circle cx="60" cy="26" r="3" fill="${sc}" stroke="${sc}"/>
+        <line x1="62" y1="26" x2="78" y2="26"/>
+        ${swClosed ? `<!-- closed: small cross indicator -->
+        <text x="40" y="44" text-anchor="middle" font-size="8" fill="#22d3a5" stroke="none" font-weight="700">CLOSED</text>` : `<text x="40" y="44" text-anchor="middle" font-size="8" fill="#818cf8" stroke="none" font-weight="700">OPEN</text>`}
       </svg>`;
-    case 'ammeter':
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}">
-        <circle cx="24" cy="12" r="9"/>
-        <text x="24" y="16" text-anchor="middle" font-size="11" fill="${c}" stroke="none" font-family="serif" font-weight="bold">A</text>
+    }
+
+    // ── Ammeter ──────────────────────────────────────────────────────────────
+    case 'ammeter': {
+      const cur = (data && data.current) || 0;
+      const angle = -60 + Math.min(cur / 2 * 120, 120);
+      const rad = angle * Math.PI / 180;
+      const nx = 40 + 10 * Math.sin(rad), ny = 26 - 10 * Math.cos(rad);
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}">
+        <line x1="2" y1="26" x2="20" y2="26"/>
+        <circle cx="40" cy="26" r="18"/>
+        <!-- meter arc -->
+        <path d="M 26 32 A 14 14 0 0 1 54 32" stroke="var(--text-muted)" stroke-width="1" fill="none"/>
+        <!-- needle -->
+        <line x1="40" y1="26" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#f87171" stroke-width="1.5"/>
+        <circle cx="40" cy="26" r="2" fill="#f87171" stroke="none"/>
+        <text x="40" y="23" text-anchor="middle" font-size="10" fill="${c}" stroke="none" font-weight="800" font-family="sans-serif">A</text>
+        <line x1="60" y1="26" x2="78" y2="26"/>
+        ${cur > 0.001 ? `<text x="40" y="49" text-anchor="middle" font-size="8" fill="#f87171" stroke="none" font-weight="700" font-family="monospace">${cur.toFixed(3)}A</text>` : ''}
       </svg>`;
-    case 'voltmeter':
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}">
-        <circle cx="24" cy="12" r="9"/>
-        <text x="24" y="16" text-anchor="middle" font-size="11" fill="${c}" stroke="none" font-family="serif" font-weight="bold">V</text>
+    }
+
+    // ── Voltmeter ────────────────────────────────────────────────────────────
+    case 'voltmeter': {
+      const v = (data && data.voltage) || 0;
+      const angle2 = -60 + Math.min(v / 20 * 120, 120);
+      const rad2 = angle2 * Math.PI / 180;
+      const nx2 = 40 + 10 * Math.sin(rad2), ny2 = 26 - 10 * Math.cos(rad2);
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}">
+        <line x1="2" y1="26" x2="20" y2="26"/>
+        <circle cx="40" cy="26" r="18"/>
+        <path d="M 26 32 A 14 14 0 0 1 54 32" stroke="var(--text-muted)" stroke-width="1" fill="none"/>
+        <line x1="40" y1="26" x2="${nx2.toFixed(1)}" y2="${ny2.toFixed(1)}" stroke="#818cf8" stroke-width="1.5"/>
+        <circle cx="40" cy="26" r="2" fill="#818cf8" stroke="none"/>
+        <text x="40" y="23" text-anchor="middle" font-size="10" fill="${c}" stroke="none" font-weight="800" font-family="sans-serif">V</text>
+        <line x1="60" y1="26" x2="78" y2="26"/>
+        ${v > 0.01 ? `<text x="40" y="49" text-anchor="middle" font-size="8" fill="#818cf8" stroke="none" font-weight="700" font-family="monospace">${v.toFixed(2)}V</text>` : ''}
       </svg>`;
-    case 'motor':
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}">
-        <circle cx="24" cy="12" r="9"/>
-        <text x="24" y="16" text-anchor="middle" font-size="10" fill="${c}" stroke="none" font-family="serif" font-weight="bold">M</text>
-        <path d="M 30 6 L 34 10 L 30 14" fill="${c}" stroke="none"/>
+    }
+
+    // ── Electric Motor ───────────────────────────────────────────────────────
+    case 'motor': {
+      const spd = (data && data.speed) || 0;
+      const isRunning = spd > 0.01;
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}">
+        <line x1="2" y1="26" x2="20" y2="26"/>
+        <circle cx="40" cy="26" r="18" ${isRunning ? 'stroke="#818cf8"' : ''}/>
+        <text x="40" y="30" text-anchor="middle" font-size="13" fill="${isRunning ? '#818cf8' : c}" stroke="none" font-weight="900" font-family="sans-serif">M</text>
+        ${isRunning ? `<!-- rotating arrows -->
+        <path d="M 50 16 Q 58 20 56 28" stroke="#818cf8" stroke-width="1.5" fill="none"/>
+        <polygon points="56,28 53,22 59,22" fill="#818cf8" stroke="none"/>` : ''}
+        <line x1="60" y1="26" x2="78" y2="26"/>
+        ${isRunning ? `<text x="40" y="49" text-anchor="middle" font-size="8" fill="#818cf8" stroke="none" font-weight="700">RUNNING</text>` : ''}
       </svg>`;
-    case 'fuse':
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <line x1="2" y1="12" x2="10" y2="12"/>
-        <rect x="10" y="6" width="28" height="12" rx="2"/>
-        <line x1="10" y1="12" x2="38" y2="12" stroke="${data && data.blown ? '#f87171' : c}" stroke-width="${data && data.blown ? '2.5' : sw}"/>
-        <line x1="38" y1="12" x2="46" y2="12"/>
+    }
+
+    // ── Fuse ─────────────────────────────────────────────────────────────────
+    case 'fuse': {
+      const blown = data && data.blown;
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
+        <line x1="2" y1="26" x2="14" y2="26"/>
+        <rect x="14" y="16" width="52" height="20" rx="4" ${blown ? 'stroke="#f87171"' : ''}/>
+        ${blown
+          ? `<!-- blown: broken wire -->
+            <line x1="16" y1="26" x2="30" y2="26" stroke="#f87171"/>
+            <line x1="30" y1="26" x2="35" y2="18" stroke="#f87171"/>
+            <line x1="52" y1="26" x2="66" y2="26" stroke="#f87171"/>
+            <text x="40" y="42" text-anchor="middle" font-size="8" fill="#f87171" stroke="none" font-weight="700">BLOWN</text>`
+          : `<line x1="16" y1="26" x2="64" y2="26"/>`}
+        <line x1="66" y1="26" x2="78" y2="26"/>
       </svg>`;
-    case 'led-elec':
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="2" y1="12" x2="12" y2="12"/>
-        <polygon points="12,6 24,6 18,18 12,18 12,6"/>
-        <line x1="24" y1="12" x2="46" y2="12"/>
-        <path d="M 14 4 L 17 7"/>
-        <path d="M 18 6 L 21 9"/>
+    }
+
+    // ── LED (triangle + bar + light rays) ────────────────────────────────────
+    case 'led-elec': {
+      const on = data && data.on;
+      const ledColor = on ? '#22d3a5' : c;
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+        ${on ? `<circle cx="40" cy="26" r="14" fill="rgba(34,211,165,0.12)" stroke="none"/>` : ''}
+        <line x1="2" y1="26" x2="20" y2="26"/>
+        <!-- triangle body -->
+        <polygon points="20,13 20,39 48,26" fill="${on ? 'rgba(34,211,165,0.25)' : 'transparent'}" stroke="${ledColor}"/>
+        <!-- cathode bar -->
+        <line x1="48" y1="12" x2="48" y2="40" stroke="${ledColor}" stroke-width="2.5"/>
+        <line x1="48" y1="26" x2="78" y2="26"/>
+        ${on ? `<!-- light rays -->
+        <line x1="52" y1="16" x2="62" y2="8" stroke="#22d3a5" stroke-width="1.5"/>
+        <line x1="55" y1="21" x2="67" y2="15" stroke="#22d3a5" stroke-width="1.5"/>
+        <line x1="52" y1="36" x2="62" y2="44" stroke="#22d3a5" stroke-width="1.5"/>` : ''}
       </svg>`;
+    }
+
+    // ── Wire Junction ────────────────────────────────────────────────────────
     case 'junction':
-      return `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="${c}" stroke-width="${sw}">
-        <circle cx="12" cy="12" r="5" fill="#fbbf24" stroke="#fbbf24"/>
+      return `<svg viewBox="0 0 40 40" width="40" height="40" fill="none">
+        <line x1="20" y1="4" x2="20" y2="36" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+        <line x1="4" y1="20" x2="36" y2="20" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="20" cy="20" r="5" fill="#fbbf24" stroke="none"/>
       </svg>`;
-    case 'transistor':
+
+    // ── NPN Transistor ───────────────────────────────────────────────────────
+    case 'transistor': {
       const isOn = data && data.on;
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="24" y1="2" x2="24" y2="10"/>
-        <line x1="24" y1="14" x2="24" y2="22"/>
-        <line x1="2" y1="10" x2="24" y2="10"/>
-        <line x1="2" y1="14" x2="24" y2="14"/>
-        <line x1="1" y1="8" x2="1" y2="16" stroke-width="3"/>
-        <polygon points="24,10 30,14 24,18" fill="${isOn ? '#22d3a5' : 'transparent'}" stroke="${color}"/>
-        <text x="4" y="7" font-size="5" fill="var(--text-muted)" stroke="none">B</text>
-        <text x="26" y="7" font-size="5" fill="var(--color-error)" stroke="none">C</text>
-        <text x="26" y="22" font-size="5" fill="var(--color-success)" stroke="none">E</text>
-        <text x="32" y="14" font-size="5" fill="${isOn ? '#22d3a5' : 'var(--text-muted)'}" stroke="none">${isOn ? 'ON' : 'OFF'}</text>
+      const tc = isOn ? '#22d3a5' : '#818cf8';
+      return `<svg viewBox="0 0 80 64" width="80" height="64" fill="none" stroke="${tc}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+        <!-- base lead -->
+        <line x1="2" y1="32" x2="28" y2="32"/>
+        <!-- vertical body line -->
+        <line x1="28" y1="14" x2="28" y2="50" stroke-width="3"/>
+        <!-- collector (top) -->
+        <line x1="28" y1="18" x2="50" y2="10"/>
+        <line x1="50" y1="10" x2="50" y2="2"/>
+        <!-- emitter (bottom) with arrow -->
+        <line x1="28" y1="46" x2="50" y2="54"/>
+        <line x1="50" y1="54" x2="50" y2="62"/>
+        <!-- emitter arrow -->
+        <polygon points="38,43 44,51 30,50" fill="${tc}" stroke="none"/>
+        <!-- labels -->
+        <text x="4" y="30" font-size="8" fill="var(--text-muted)" stroke="none" font-weight="600">B</text>
+        <text x="54" y="8" font-size="8" fill="${isOn ? '#22d3a5' : 'var(--text-muted)'}" stroke="none" font-weight="600">C</text>
+        <text x="54" y="62" font-size="8" fill="${isOn ? '#22d3a5' : 'var(--text-muted)'}" stroke="none" font-weight="600">E</text>
+        ${isOn ? `<text x="40" y="36" text-anchor="middle" font-size="7" fill="#22d3a5" stroke="none" font-weight="700">ON</text>` : ''}
       </svg>`;
-    case 'diode':
+    }
+
+    // ── Diode ────────────────────────────────────────────────────────────────
+    case 'diode': {
       const fwd = data && data.forward;
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="2" y1="12" x2="14" y2="12"/>
-        <polygon points="14,6 28,12 14,18" fill="${fwd ? '#22d3a5' : 'transparent'}" stroke="${c}"/>
-        <line x1="28" y1="12" x2="46" y2="12"/>
-        <line x1="28" y1="6" x2="28" y2="18" stroke-width="2.2"/>
-        <text x="12" y="22" font-size="5" fill="${fwd ? '#22d3a5' : 'var(--text-muted)'}" stroke="none">${fwd ? '→' : '|'}</text>
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="2" y1="26" x2="22" y2="26"/>
+        <polygon points="22,12 22,40 54,26" fill="${fwd ? 'rgba(34,211,165,0.2)' : 'transparent'}" stroke="${c}"/>
+        <line x1="54" y1="11" x2="54" y2="41" stroke-width="2.5"/>
+        <line x1="54" y1="26" x2="78" y2="26"/>
+        ${fwd ? `<text x="40" y="49" text-anchor="middle" font-size="8" fill="#22d3a5" stroke="none" font-weight="700">FORWARD ✓</text>` : ''}
       </svg>`;
-    case 'zener':
+    }
+
+    // ── Zener Diode ──────────────────────────────────────────────────────────
+    case 'zener': {
       const zfwd = data && data.forward;
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="2" y1="12" x2="14" y2="12"/>
-        <polygon points="14,6 28,12 14,18" fill="${zfwd ? '#22d3a5' : 'transparent'}" stroke="${c}"/>
-        <line x1="28" y1="6" x2="28" y2="18" stroke-width="2.2"/>
-        <line x1="30" y1="8" x2="36" y2="8"/>
-        <line x1="30" y1="10" x2="34" y2="10"/>
-        <line x1="34" y1="16" x2="30" y2="16"/>
-        <line x1="36" y1="12" x2="46" y2="12"/>
-        <text x="14" y="10" font-size="4" fill="#fbbf24" stroke="none">${(data && data.zenerVoltage) || '5.1'}V</text>
+      const zv = (data && data.zenerVoltage) || 5.1;
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="2" y1="26" x2="22" y2="26"/>
+        <polygon points="22,13 22,39 52,26" fill="${zfwd ? 'rgba(251,191,36,0.2)' : 'transparent'}" stroke="${c}"/>
+        <!-- zener bar with bent ends -->
+        <line x1="52" y1="12" x2="52" y2="40" stroke-width="2.5"/>
+        <line x1="52" y1="12" x2="58" y2="12"/>
+        <line x1="52" y1="40" x2="46" y2="40"/>
+        <line x1="52" y1="26" x2="78" y2="26"/>
+        <text x="40" y="49" text-anchor="middle" font-size="8" fill="#fbbf24" stroke="none" font-weight="700">${zv.toFixed(1)}V</text>
       </svg>`;
-    case 'ldr':
-      const lvl = data ? data.lightLevel || 50 : 50;
-      const ldrR = data ? data.R || 10000 : 10000;
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <line x1="2" y1="12" x2="10" y2="12"/>
-        <rect x="10" y="5" width="18" height="14" rx="2" fill="rgba(251,191,36,${lvl/200})"/>
-        <polyline points="12,8 15,11 18,8 21,11 24,8" stroke="#fbbf24"/>
-        <line x1="28" y1="12" x2="46" y2="12"/>
-        <text x="19" y="23" font-size="4" fill="var(--text-muted)" stroke="none">${ldrR > 1000 ? (ldrR/1000).toFixed(0)+'k' : ldrR.toFixed(0)}Ω</text>
+    }
+
+    // ── LDR ──────────────────────────────────────────────────────────────────
+    case 'ldr': {
+      const lvl = data ? (data.lightLevel || 50) : 50;
+      const ldrR = data ? (data.R || 10000) : 10000;
+      const ldrRStr = ldrR > 1000 ? (ldrR/1000).toFixed(0)+'kΩ' : ldrR.toFixed(0)+'Ω';
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
+        <line x1="2" y1="26" x2="14" y2="26"/>
+        <!-- resistor box -->
+        <rect x="14" y="12" width="30" height="28" rx="4" fill="rgba(251,191,36,${lvl/200})"/>
+        <polyline points="16,18 20,24 24,18 28,24 32,18 36,24 40,18" stroke="#fbbf24" stroke-width="1.8"/>
+        <text x="29" y="35" text-anchor="middle" font-size="7" fill="#fbbf24" stroke="none" font-weight="600">${ldrRStr}</text>
+        <!-- light arrows -->
+        <line x1="18" y1="4" x2="24" y2="10" stroke="#fbbf24" stroke-width="1.5"/>
+        <polygon points="24,10 19,10 22,5" fill="#fbbf24" stroke="none"/>
+        <line x1="28" y1="2" x2="34" y2="8" stroke="#fbbf24" stroke-width="1.5"/>
+        <polygon points="34,8 29,8 32,3" fill="#fbbf24" stroke="none"/>
+        <line x1="44" y1="26" x2="78" y2="26"/>
       </svg>`;
-    case 'thermistor':
-      const temp = data ? data.temperature || 25 : 25;
-      const tR = data ? data.R || 10000 : 10000;
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <line x1="2" y1="12" x2="10" y2="12"/>
-        <rect x="10" y="5" width="18" height="14" rx="2" fill="rgba(239,68,68,${temp/100})"/>
-        <path d="M 14 8 L 16 12 L 14 16" stroke="#ef4444"/>
-        <path d="M 18 8 L 20 12 L 18 16" stroke="#ef4444"/>
-        <path d="M 22 8 L 24 12 L 22 16" stroke="#ef4444"/>
-        <line x1="28" y1="12" x2="46" y2="12"/>
-        <text x="19" y="23" font-size="4" fill="var(--text-muted)" stroke="none">${tR > 1000 ? (tR/1000).toFixed(0)+'k' : tR.toFixed(0)}Ω</text>
+    }
+
+    // ── Thermistor ───────────────────────────────────────────────────────────
+    case 'thermistor': {
+      const tmp = data ? (data.temperature || 25) : 25;
+      const tR = data ? (data.R || 10000) : 10000;
+      const tRStr = tR > 1000 ? (tR/1000).toFixed(0)+'kΩ' : tR.toFixed(0)+'Ω';
+      const heat = Math.min(tmp / 100, 1);
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
+        <line x1="2" y1="26" x2="14" y2="26"/>
+        <rect x="14" y="12" width="30" height="28" rx="4" fill="rgba(239,68,68,${heat * 0.4})"/>
+        <text x="29" y="28" text-anchor="middle" font-size="10" fill="#ef4444" stroke="none" font-weight="800">NTC</text>
+        <text x="29" y="38" text-anchor="middle" font-size="7" fill="var(--text-muted)" stroke="none">${tmp.toFixed(0)}°C</text>
+        <!-- T arrow diagonal -->
+        <line x1="40" y1="6" x2="40" y2="14" stroke="#ef4444" stroke-width="1.5"/>
+        <polygon points="40,6 36,12 44,12" fill="#ef4444" stroke="none"/>
+        <line x1="44" y1="26" x2="78" y2="26"/>
       </svg>`;
-    case 'potentiometer':
-      const wp = data ? data.wiperPos || 50 : 50;
-      const totalR = data ? data.totalR || 1000 : 1000;
-      const pR = data ? data.R || 500 : 500;
-      const wiperX = 16 + (wp / 100) * 16;
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <line x1="2" y1="12" x2="10" y2="12"/>
-        <rect x="10" y="9" width="20" height="6" rx="1" fill="rgba(251,191,36,0.15)"/>
-        <line x1="12" y1="12" x2="28" y2="12"/>
-        <circle cx="${wiperX}" cy="6" r="2.5" fill="#fbbf24" stroke="#fbbf24"/>
-        <line x1="${wiperX}" y1="6" x2="${wiperX}" y2="12" stroke-dasharray="1.5,1.5"/>
-        <line x1="30" y1="12" x2="46" y2="12"/>
-        <text x="15" y="22" font-size="4" fill="var(--text-muted)" stroke="none">${pR}Ω</text>
+    }
+
+    // ── Potentiometer ────────────────────────────────────────────────────────
+    case 'potentiometer': {
+      const wp = data ? (data.wiperPos || 50) : 50;
+      const pR = data ? (data.R || 500) : 500;
+      const wiperX = 14 + (wp / 100) * 30;
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
+        <line x1="2" y1="26" x2="14" y2="26"/>
+        <rect x="14" y="20" width="52" height="12" rx="2" fill="rgba(251,191,36,0.1)" stroke="${c}" stroke-width="1.5"/>
+        <polyline points="14,26 20,18 26,34 32,18 38,34 44,18 50,34 56,18 62,18 66,26"/>
+        <!-- wiper -->
+        <line x1="${wiperX}" y1="20" x2="${wiperX}" y2="8" stroke="#fbbf24" stroke-width="2" stroke-dasharray="2,2"/>
+        <polygon points="${wiperX},8 ${wiperX-4},14 ${wiperX+4},14" fill="#fbbf24" stroke="none"/>
+        <line x1="66" y1="26" x2="78" y2="26"/>
+        <text x="40" y="48" text-anchor="middle" font-size="8" fill="#fbbf24" stroke="none" font-weight="600">${pR}Ω</text>
       </svg>`;
-    case 'capacitor':
-      const cv = data ? data.voltage || 0 : 0;
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <line x1="2" y1="12" x2="18" y2="12"/>
-        <line x1="18" y1="6" x2="18" y2="18" stroke-width="3"/>
-        <line x1="22" y1="6" x2="22" y2="18" stroke-width="3"/>
-        <line x1="22" y1="12" x2="46" y2="12"/>
-        <path d="M 30 10 Q 34 8 38 10" fill="none" stroke="#818cf8" opacity="${cv > 0.1 ? 0.8 : 0.2}"/>
-        <path d="M 32 14 Q 36 12 40 14" fill="none" stroke="#818cf8" opacity="${cv > 0.1 ? 0.8 : 0.2}"/>
-        <text x="22" y="6" font-size="4" fill="var(--text-muted)" stroke="none">${cv > 0.1 ? cv.toFixed(1)+'V' : ''}</text>
+    }
+
+    // ── Capacitor ────────────────────────────────────────────────────────────
+    case 'capacitor': {
+      const cv = data ? (data.voltage || 0) : 0;
+      const pct = Math.min(cv / 20, 1);
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
+        <line x1="2" y1="26" x2="30" y2="26"/>
+        <!-- plate 1 (positive) -->
+        <line x1="30" y1="10" x2="30" y2="42" stroke-width="3.5"/>
+        <!-- plate 2 (negative) -->
+        <line x1="40" y1="10" x2="40" y2="42" stroke-width="3.5"/>
+        <line x1="40" y1="26" x2="78" y2="26"/>
+        <!-- charge indicator -->
+        ${cv > 0.5 ? `<rect x="30" y="16" width="${pct*10}" height="20" fill="rgba(129,140,248,${pct*0.4})" stroke="none"/>` : ''}
+        <text x="35" y="8" text-anchor="middle" font-size="8" fill="#818cf8" stroke="none" font-weight="700">${cv > 0.1 ? cv.toFixed(1)+'V' : ''}</text>
+        <text x="70" y="44" font-size="7" fill="var(--text-muted)" stroke="none">${(data && data.capacitance) ? data.capacitance+'µF' : ''}</text>
       </svg>`;
-    case 'relay':
+    }
+
+    // ── Relay ─────────────────────────────────────────────────────────────────
+    case 'relay': {
       const ce = data && data.coilEnergized;
-      return `<svg viewBox="0 0 48 24" width="48" height="24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <line x1="2" y1="12" x2="10" y2="12"/>
-        <rect x="10" y="5" width="14" height="14" rx="2" fill="${ce ? 'rgba(34,211,165,0.15)' : 'transparent'}"/>
-        <path d="M 12 8 L 14 6 L 16 8 L 18 6 L 20 8 L 22 6" stroke="${ce ? '#22d3a5' : c}"/>
-        <path d="M 28 8 L 32 16 L 36 8 L 40 16 L 44 8" fill="none" stroke="${ce ? '#22d3a5' : 'var(--text-muted)'}" stroke-dasharray="${ce ? 'none' : '2,2'}"/>
-        <line x1="44" y1="12" x2="46" y2="12"/>
-        <text x="17" y="22" font-size="4" fill="${ce ? '#22d3a5' : 'var(--text-muted)'}" stroke="none">${ce ? 'ON' : 'OFF'}</text>
+      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
+        <!-- coil section -->
+        <line x1="2" y1="40" x2="12" y2="40"/>
+        <rect x="12" y="32" width="24" height="16" rx="3" fill="${ce ? 'rgba(34,211,165,0.15)' : 'transparent'}" stroke="${ce ? '#22d3a5' : 'var(--text-muted)'}"/>
+        <path d="M 14 40 L 16 34 L 20 46 L 24 34 L 28 46 L 32 34" stroke="${ce ? '#22d3a5' : 'var(--text-muted)'}" stroke-width="1.5"/>
+        <line x1="36" y1="40" x2="46" y2="40"/>
+        <!-- switch section -->
+        <circle cx="50" cy="26" r="2.5" fill="${ce ? '#22d3a5' : 'var(--text-muted)'}" stroke="none"/>
+        <line x1="50" y1="26" x2="68" y2="${ce ? '26' : '16'}" stroke="${ce ? '#22d3a5' : 'var(--text-muted)'}" stroke-width="2.5"/>
+        <circle cx="70" cy="26" r="2.5" fill="${ce ? '#22d3a5' : 'var(--text-muted)'}" stroke="none"/>
+        <line x1="72" y1="26" x2="78" y2="26" stroke="${ce ? '#22d3a5' : c}"/>
+        <text x="40" y="16" text-anchor="middle" font-size="8" fill="${ce ? '#22d3a5' : 'var(--text-muted)'}" stroke="none" font-weight="700">${ce ? '⚡ ON' : 'OFF'}</text>
       </svg>`;
+    }
+
     default:
       return '';
   }
@@ -1700,11 +2084,12 @@ function getElectricityNodeInner(node) {
   if (t === 'switch') {
     const closed = d.closed || false;
     return `${svg}
-      <button onclick="window.toggleElectricSwitch && window.toggleElectricSwitch('${node.id}')"
+      <button
+        onclick="event.stopPropagation();window.toggleElectricSwitch('${node.id}')"
         style="padding:3px 10px;border-radius:3px;border:1px solid ${closed ? '#22d3a5' : '#9ba3c7'};
         background:${closed ? 'rgba(34,211,165,0.15)' : 'transparent'};color:${closed ? '#22d3a5' : '#9ba3c7'};
         font-weight:600;cursor:pointer;font-size:10px;transition:all 0.2s">
-        ${closed ? 'CLOSED' : 'OPEN'}</button>`;
+        ${closed ? 'CLOSED ■' : 'OPEN ○'}</button>`;
   }
 
   if (t === 'ammeter') {
@@ -1760,11 +2145,12 @@ function getElectricityNodeInner(node) {
   if (t === 'transistor') {
     const on = d.on || false;
     return `${svg}
-      <button onclick="window.toggleElectricTransistor && window.toggleElectricTransistor('${node.id}')"
+      <button
+        onclick="event.stopPropagation();window.toggleElectricTransistor('${node.id}')"
         style="padding:2px 8px;border-radius:3px;border:1px solid ${on ? '#22d3a5' : '#9ba3c7'};
         background:${on ? 'rgba(34,211,165,0.15)' : 'transparent'};color:${on ? '#22d3a5' : '#9ba3c7'};
         font-weight:600;cursor:pointer;font-size:9px;transition:all 0.2s">
-        Base: ${on ? 'HIGH' : 'LOW'}</button>`;
+        Base: ${on ? 'HIGH ▲' : 'LOW ▼'}</button>`;
   }
 
   if (t === 'diode') {
@@ -1873,31 +2259,31 @@ function getElectricityNodeInner(node) {
   return '';
 }
 
-function hasDirectedCycle(batteryId, adj) {
+function findSeriesCycle(startId, adj) {
   const visited = new Set();
-  const stack = [...(adj[batteryId] || [])];
-  while (stack.length) {
-    const node = stack.pop();
-    if (node === batteryId) return true;
-    if (visited.has(node)) continue;
-    visited.add(node);
-    (adj[node] || []).forEach(n => { if (!visited.has(n)) stack.push(n); });
+  visited.add(startId);
+  function dfs(current, parent) {
+    for (const nb of (adj[current] || [])) {
+      if (nb === startId && nb !== parent) return true;
+      if (!visited.has(nb)) {
+        visited.add(nb);
+        if (dfs(nb, current)) return true;
+      }
+    }
+    return false;
+  }
+  for (const nb of (adj[startId] || [])) {
+    visited.add(nb);
+    if (dfs(nb, startId)) return true;
   }
   return false;
 }
 
 function evaluateElectricity() {
-  const electricityTypes = ['battery','resistor','bulb','switch','ammeter','voltmeter','motor','fuse','led-elec','junction','transistor','diode','zener','ldr','thermistor','potentiometer','capacitor','relay'];
+  const electricityTypes = ['battery','resistor','bulb','switch','ammeter','voltmeter','motor','fuse','led-elec','junction','transistor','diode','zener','ldr','thermistor','potentiometer','capacitor','relay','power-supply'];
   const elecNodes = sandboxNodes.filter(n => electricityTypes.includes(n.type));
-  const dirAdj = {};
-  elecNodes.forEach(n => { dirAdj[n.id] = []; });
-  sandboxWires.forEach(w => {
-    const src = sandboxNodes.find(n => n.id === w.fromNodeId);
-    if (!src || !dirAdj[w.fromNodeId] || !dirAdj[w.toNodeId]) return;
-    if (src.type === 'switch' && !src.data.closed) return;
-    if (src.type === 'transistor' && !src.data.on) return;
-    dirAdj[w.fromNodeId].push(w.toNodeId);
-  });
+  if (elecNodes.length === 0) return;
+
   const undirAdj = {};
   elecNodes.forEach(n => { undirAdj[n.id] = []; });
   sandboxWires.forEach(w => {
@@ -1906,6 +2292,7 @@ function evaluateElectricity() {
       undirAdj[w.toNodeId].push(w.fromNodeId);
     }
   });
+
   const visited = new Set();
   const subcircuits = [];
   elecNodes.forEach(n => {
@@ -1923,40 +2310,55 @@ function evaluateElectricity() {
     }
     if (cluster.length) subcircuits.push(cluster);
   });
+
   sandboxWires.forEach(w => { w.active = false; delete w.potentialLabel; delete w.currentLabel; });
   elecNodes.forEach(n => { n.outputState = 0; });
-  subcircuits.forEach(cluster => {
-    const batteries = cluster.filter(n => n.type === 'battery');
-    const powerSupplies = cluster.filter(n => n.type === 'power-supply');
-    const resistors = cluster.filter(n => n.type === 'resistor');
-    const switches  = cluster.filter(n => n.type === 'switch');
-    const bulbs     = cluster.filter(n => n.type === 'bulb');
-    const leds      = cluster.filter(n => n.type === 'led-elec');
-    const ammeters  = cluster.filter(n => n.type === 'ammeter');
-    const voltmeters= cluster.filter(n => n.type === 'voltmeter');
-    const motors    = cluster.filter(n => n.type === 'motor');
-    const fuses     = cluster.filter(n => n.type === 'fuse');
-    const transistor = cluster.filter(n => n.type === 'transistor');
 
-    const diodes = cluster.filter(n => n.type === 'diode');
-    const zeners = cluster.filter(n => n.type === 'zener');
-    const ldrs = cluster.filter(n => n.type === 'ldr');
-    const thermistors = cluster.filter(n => n.type === 'thermistor');
-    const potentiometers = cluster.filter(n => n.type === 'potentiometer');
-    const capacitors = cluster.filter(n => n.type === 'capacitor');
-    const relays = cluster.filter(n => n.type === 'relay');
+  subcircuits.forEach(cluster => {
+    const clusterIds = new Set(cluster.map(nd => nd.id));
+    const voltageSources = cluster.filter(n => n.type === 'battery' || n.type === 'power-supply');
+    const switches = cluster.filter(n => n.type === 'switch');
+    const diodes   = cluster.filter(n => n.type === 'diode');
+    const zeners   = cluster.filter(n => n.type === 'zener');
+    const relays   = cluster.filter(n => n.type === 'relay');
+    const transistors = cluster.filter(n => n.type === 'transistor');
+    const fuses    = cluster.filter(n => n.type === 'fuse');
 
     const anyOpen = switches.some(s => !s.data.closed);
-    const anyDiodeBlocked = diodes.some(nd => !nd.data.forward);
-    const anyZenerBlocked = zeners.some(nd => !nd.data.forward);
+    const anyDiodeBlocked = diodes.some(d => !d.data.forward);
+    const anyZenerBlocked = zeners.some(z => !z.data.forward);
     const anyRelayOpen = relays.some(r => !r.data.coilEnergized);
-    const anyTransistorOff = transistor.some(t => !t.data.on);
-    const voltageSources = [...batteries, ...powerSupplies];
-    const hasLoop = batteries.some(b => hasDirectedCycle(b.id, dirAdj)) || powerSupplies.some(p => hasDirectedCycle(p.id, dirAdj));
-    const circuitActive = !anyOpen && !anyRelayOpen && voltageSources.length > 0 && !anyDiodeBlocked && !anyZenerBlocked && !anyTransistorOff && hasLoop;
+    const anyTransistorOff = transistors.some(t => !t.data.on);
+    const anyFuseBlown = fuses.some(f => f.data.blown);
 
-    const totalEMF = batteries.reduce((sum, b) => sum + (b.data.emf || 9), 0)
-                   + powerSupplies.reduce((sum, p) => sum + (p.data.voltage || 12), 0);
+    const hasLoop = voltageSources.some(vs => findSeriesCycle(vs.id, undirAdj));
+
+    const circuitActive = voltageSources.length > 0 && !anyOpen && !anyDiodeBlocked
+      && !anyZenerBlocked && !anyRelayOpen && !anyTransistorOff && !anyFuseBlown && hasLoop;
+
+    if (!circuitActive) {
+      cluster.forEach(n => {
+        n.outputState = 0;
+        if (n.type === 'bulb') n.data.brightness = 0;
+        else if (n.type === 'led-elec') n.data.on = false;
+        else if (n.type === 'motor') n.data.speed = 0;
+        else if (n.type === 'ammeter') n.data.current = 0;
+        else if (n.type === 'voltmeter') n.data.voltage = 0;
+        else if (n.type === 'fuse') { /* keep blown state */ }
+        else if (n.type === 'capacitor') {
+          n.data.charge = Math.max(0, (n.data.charge || 0) - 0.01);
+          n.data.voltage = n.data.charge / ((n.data.capacitance || 100) / 1000000);
+        }
+        else if (n.type === 'relay') n.data.coilEnergized = false;
+      });
+      return;
+    }
+
+    const totalEMF = voltageSources.reduce((sum, vs) => {
+      if (vs.type === 'battery') return sum + (vs.data.emf || 9);
+      return sum + (vs.data.voltage || 12);
+    }, 0);
+
     const totalR = cluster.reduce((sum, n) => {
       if (n.type === 'resistor') return sum + (n.data.R !== undefined ? parseFloat(n.data.R) : 10);
       if (n.type === 'bulb') return sum + 10;
@@ -1971,159 +2373,86 @@ function evaluateElectricity() {
       if (n.type === 'potentiometer') return sum + (n.data.R !== undefined ? parseFloat(n.data.R) : 500);
       if (n.type === 'capacitor') return sum + 1;
       if (n.type === 'relay') return sum + 10;
+      if (n.type === 'battery') return sum + 0.5;
+      if (n.type === 'power-supply') return sum + 0.5;
+      if (n.type === 'junction') return sum + 0.01;
       return sum;
-    }, 0) || 1;
+    }, 0);
 
-    const current = circuitActive ? totalEMF / totalR : 0;
-    const clusterIds = new Set(cluster.map(nd => nd.id));
+    const current = totalEMF / Math.max(totalR, 0.1);
+
+    cluster.forEach(n => { n.outputState = 1; });
+
     sandboxWires.forEach(w => {
       if (clusterIds.has(w.fromNodeId) && clusterIds.has(w.toNodeId)) {
-        w.active = circuitActive;
+        w.active = true;
+        w.potentialLabel = totalEMF.toFixed(1) + 'V';
+        w.currentLabel = current.toFixed(3) + 'A';
       }
     });
-    cluster.forEach(n => { n.outputState = circuitActive ? 1 : 0; });
 
-    const nodePotentials = {};
-    cluster.forEach(n => {
-      nodePotentials[n.id] = { input: 0, output: 0 };
-    });
-
-    if (circuitActive && voltageSources.length > 0) {
-      const vs = voltageSources[0];
-      nodePotentials[vs.id] = { input: 0, output: totalEMF };
-
-      let currentId = vs.id;
-      const visitedInLoop = new Set();
-      while (true) {
-        const nextId = (dirAdj[currentId] || []).find(nid => {
-          const nd = sandboxNodes.find(n => n.id === nid);
-          return nd && nd.type !== 'voltmeter' && !visitedInLoop.has(nid) && cluster.some(c => c.id === nid);
-        });
-        if (!nextId || nextId === vs.id) break;
-
-        const nextNode = sandboxNodes.find(n => n.id === nextId);
-        visitedInLoop.add(nextId);
-
-        const prevPot = nodePotentials[currentId].output;
-        let R_comp = 0;
-        if (nextNode.type === 'resistor') R_comp = (nextNode.data.R !== undefined ? parseFloat(nextNode.data.R) : 10);
-        else if (nextNode.type === 'bulb') R_comp = 10;
-        else if (nextNode.type === 'motor') R_comp = 15;
-        else if (nextNode.type === 'led-elec') R_comp = 5;
-        else if (nextNode.type === 'ammeter') R_comp = 0.1;
-        else if (nextNode.type === 'fuse') R_comp = 0.1;
-        else if (nextNode.type === 'diode') R_comp = 0.5;
-        else if (nextNode.type === 'zener') R_comp = 0.5;
-        else if (nextNode.type === 'ldr') R_comp = (nextNode.data.R !== undefined ? parseFloat(nextNode.data.R) : 10000);
-        else if (nextNode.type === 'thermistor') R_comp = (nextNode.data.R !== undefined ? parseFloat(nextNode.data.R) : 10000);
-        else if (nextNode.type === 'potentiometer') R_comp = (nextNode.data.R !== undefined ? parseFloat(nextNode.data.R) : 500);
-        else if (nextNode.type === 'capacitor') R_comp = 1;
-        else if (nextNode.type === 'relay') R_comp = 10;
-
-        let extraDrop = 0;
-        if (nextNode.type === 'diode') extraDrop = 0.7;
-        if (nextNode.type === 'zener') extraDrop = nextNode.data.zenerVoltage || 5.1;
-        const nextPot = Math.max(0, prevPot - current * R_comp - extraDrop);
-        nodePotentials[nextId] = { input: prevPot, output: nextPot };
-
-        currentId = nextId;
-      }
-    }
-
-    if (circuitActive) {
-      sandboxWires.forEach(w => {
-        if (clusterIds.has(w.fromNodeId) && clusterIds.has(w.toNodeId)) {
-          const srcPot = nodePotentials[w.fromNodeId];
-          if (srcPot) {
-            w.potentialLabel = srcPot.output.toFixed(1) + 'V';
-            w.currentLabel = current.toFixed(3) + 'A';
-          }
-        }
-      });
-    }
-
-    ammeters.forEach(n => { n.data.current = current; updateNodeVisuals(n); });
-
-    voltmeters.forEach(v => {
-      let p0 = 0;
-      let p1 = 0;
-      sandboxWires.forEach(w => {
-        if (w.toNodeId === v.id) {
-          const srcPot = nodePotentials[w.fromNodeId];
-          if (srcPot) {
-            if (w.toPortIdx === 0) {
-              p0 = srcPot.output;
-            } else if (w.toPortIdx === 1) {
-              p1 = srcPot.output;
-            }
-          }
-        }
-      });
-      v.data.voltage = Math.abs(p0 - p1);
-      updateNodeVisuals(v);
-    });
+    // CRITICAL FIX: declare cluster-local filter arrays used below
+    const resistors      = cluster.filter(n => n.type === 'resistor');
+    const bulbs          = cluster.filter(n => n.type === 'bulb');
+    const leds           = cluster.filter(n => n.type === 'led-elec');
+    const motors         = cluster.filter(n => n.type === 'motor');
+    const ammeters       = cluster.filter(n => n.type === 'ammeter');
+    const voltmeters     = cluster.filter(n => n.type === 'voltmeter');
+    const ldrs           = cluster.filter(n => n.type === 'ldr');
+    const thermistors    = cluster.filter(n => n.type === 'thermistor');
+    const potentiometers = cluster.filter(n => n.type === 'potentiometer');
+    const capacitors     = cluster.filter(n => n.type === 'capacitor');
 
     resistors.forEach(n => {
+      const R = n.data.R !== undefined ? parseFloat(n.data.R) : 10;
       n.data.current = current;
-      n.data.voltageDrop = current * (n.data.R !== undefined ? parseFloat(n.data.R) : 10);
-      updateNodeVisuals(n);
+      n.data.voltageDrop = current * R;
     });
-
     bulbs.forEach(n => {
       const bulbV = current * 10;
-      n.data.brightness = circuitActive ? Math.min(bulbV / 6, 1) : 0;
-      updateNodeVisuals(n);
+      n.data.brightness = Math.min(bulbV / 6, 1);
     });
-
-    leds.forEach(n => { n.data.on = circuitActive && current > 0.01; updateNodeVisuals(n); });
-    motors.forEach(n => { n.data.speed = current; updateNodeVisuals(n); });
-    fuses.forEach(n => { n.data.blown = current > 0.5; updateNodeVisuals(n); });
-
-    diodes.forEach(n => { n.data.forward = circuitActive; updateNodeVisuals(n); });
-    zeners.forEach(n => {
-      n.data.forward = circuitActive;
-      const nodePot = nodePotentials[n.id];
-      if (nodePot && n.data.forward) {
-        n.data.voltage = Math.min(nodePot.input || 0, n.data.zenerVoltage || 5.1);
-      }
-      updateNodeVisuals(n);
+    leds.forEach(n => { n.data.on = current > 0.01; });
+    motors.forEach(n => { n.data.speed = current; });
+    fuses.forEach(n => { n.data.blown = current > 0.5; });
+    ammeters.forEach(n => { n.data.current = current; });
+    voltmeters.forEach(n => {
+      const wiresToV = sandboxWires.filter(w => w.toNodeId === n.id);
+      let p0 = 0, p1 = 0;
+      wiresToV.forEach(w => {
+        const srcPot = w.fromNodeId === voltageSources[0].id ? totalEMF : 0;
+        if (w.toPortIdx === 0) p0 = srcPot;
+        else if (w.toPortIdx === 1) p1 = srcPot;
+      });
+      n.data.voltage = Math.abs(p0 - p1);
     });
+    diodes.forEach(n => { n.data.forward = true; });
+    zeners.forEach(n => { n.data.forward = true; n.data.voltage = Math.min(totalEMF, n.data.zenerVoltage || 5.1); });
     ldrs.forEach(n => {
       const lvl = n.data.lightLevel || 50;
       n.data.R = 1000000 * (1 - lvl / 100) + 100 * (lvl / 100);
       n.data.current = current;
-      updateNodeVisuals(n);
     });
     thermistors.forEach(n => {
       const temp = n.data.temperature || 25;
       n.data.R = 50000 * Math.exp(-0.05 * temp);
       n.data.current = current;
-      updateNodeVisuals(n);
     });
     potentiometers.forEach(n => {
       const wp = n.data.wiperPos || 50;
       n.data.R = (wp / 100) * (n.data.totalR || 1000);
       n.data.current = current;
-      updateNodeVisuals(n);
     });
     capacitors.forEach(n => {
-      if (circuitActive) {
-        const dt = 0.08;
-        const tau = (n.data.R || 1) * (n.data.capacitance || 100) / 1000000;
-        const targetCharge = (n.data.capacitance || 100) * totalEMF / 1000000;
-        const prevCharge = n.data.charge || 0;
-        n.data.charge = prevCharge + (targetCharge - prevCharge) * dt / (tau + dt);
-        n.data.voltage = n.data.charge / ((n.data.capacitance || 100) / 1000000);
-      } else {
-        n.data.charge = Math.max(0, (n.data.charge || 0) - 0.01);
-        n.data.voltage = n.data.charge / ((n.data.capacitance || 100) / 1000000);
-      }
-      updateNodeVisuals(n);
+      const dt = 0.08;
+      const cap = n.data.capacitance || 100;
+      const tau = (n.data.R || 1) * cap / 1000000;
+      const targetCharge = cap * totalEMF / 1000000;
+      const prevCharge = n.data.charge || 0;
+      n.data.charge = prevCharge + (targetCharge - prevCharge) * dt / (tau + dt);
+      n.data.voltage = n.data.charge / (cap / 1000000);
     });
-    relays.forEach(n => {
-      n.data.coilEnergized = circuitActive && current > 0.02;
-      updateNodeVisuals(n);
-    });
+    relays.forEach(n => { n.data.coilEnergized = current > 0.02; });
   });
 }
 window.updateElectricProp = function (nodeId, prop, value) {
@@ -2216,86 +2545,131 @@ function evaluateSandbox() {
 
     if (!changed) break;
   }
+
+  // ── Logic-Electricity Bridge ──────────────────────────────────────────────
+  // Digital gate outputs drive electricity switches and transistors.
+  // This allows circuits like: Toggle Switch → Electricity Switch → Battery → Bulb
+  {
+    const digitalTypes = new Set(['input','clock','not','and','or','nand','nor','xor','xnor',
+      'd-flop','half-adder','full-adder','output','rgb-led','buzzer','led-bar',
+      'seven-seg','sensor','op-amp']);
+    const bridgeTargets = new Set(['switch', 'transistor']);
+    let bridgeChanged = false;
+    sandboxWires.forEach(wire => {
+      const from = sandboxNodes.find(n => n.id === wire.fromNodeId);
+      const to   = sandboxNodes.find(n => n.id === wire.toNodeId);
+      if (!from || !to) return;
+      if (digitalTypes.has(from.type) && bridgeTargets.has(to.type)) {
+        const signal = wire.fromPortIdx === 0 ? from.outputState : (from.outputState2 || 0);
+        if (to.type === 'switch') {
+          const prev = to.data.closed;
+          to.data.closed = signal === 1;
+          if (prev !== to.data.closed) bridgeChanged = true;
+        }
+        if (to.type === 'transistor') {
+          const prev = to.data.on;
+          to.data.on = signal === 1;
+          if (prev !== to.data.on) bridgeChanged = true;
+        }
+      }
+    });
+    // If bridge changed any state, re-run electricity evaluation
+    if (bridgeChanged) {
+      evaluateElectricity();
+    }
+  }
+
   sandboxNodes.forEach(node => updateNodeVisuals(node));
   updateSandboxWires();
+  updateNodeInspector();
   if (window.checkTheoryChallenge) window.checkTheoryChallenge();
 }
 window.evaluateSandbox = evaluateSandbox;
 
 function computeNodeOutput(node) {
   if (node.type && node.type.startsWith('custom-ic-')) {
-    const icName = node.data.icName || node.type.slice(9);
-    const icDef = customICs[icName];
-    if (!icDef || icDef.nodes.length === 0) { node.outputState = 0; node.outputState2 = 0; return; }
-    const tmpNodes = icDef.nodes.map(n => ({
-      ...n, outputState: n.type === 'input' ? 0 : (n.outputState || 0),
-      outputState2: n.outputState2 || 0,
-      inputValues: Array(n.inputsCount).fill(0), prevClockState: 0
-    }));
-    const tmpNodeMap = {};
-    tmpNodes.forEach(n => tmpNodeMap[n.id] = n);
-    icDef.inputPorts.forEach((portId, idx) => {
-      const tn = tmpNodeMap[portId];
-      if (tn) tn.outputState = node.inputValues[idx] || 0;
-    });
-    const tmpWires = icDef.wires.map(w => ({ ...w }));
-    for (let iter = 0; iter < 30; iter++) {
-      let changed = false;
-      tmpNodes.forEach(n => {
-        if (n.type === 'input' || n.type === 'clock' || n.type === 'text-label' || n.type.startsWith('custom-ic-')) return;
-        const prev = [...n.inputValues];
-        n.inputValues = Array(n.inputsCount).fill(0);
-        tmpWires.forEach(w => {
-          if (w.toNodeId !== n.id) return;
-          const src = tmpNodeMap[w.fromNodeId];
-          if (!src) return;
-          const val = w.fromPortIdx === 0 ? src.outputState : src.outputState2;
-          if (w.toPortIdx < n.inputsCount) n.inputValues[w.toPortIdx] = val;
-        });
-        if (n.type === 'sensor') { return; }
-        const pA = n.inputValues[0] || 0, pB = n.inputValues[1] || 0, pC = n.inputValues[2] || 0;
-        switch (n.type) {
-          case 'output': n.outputState = pA ? 1 : 0; break;
-          case 'buzzer': n.outputState = pA ? 1 : 0; break;
-          case 'not': n.outputState = pA ? 0 : 1; break;
-          case 'and': n.outputState = (pA && pB) ? 1 : 0; break;
-          case 'or': n.outputState = (pA || pB) ? 1 : 0; break;
-          case 'nand': n.outputState = !(pA && pB) ? 1 : 0; break;
-          case 'nor': n.outputState = !(pA || pB) ? 1 : 0; break;
-          case 'xor': n.outputState = (!!pA !== !!pB) ? 1 : 0; break;
-          case 'xnor': n.outputState = (!!pA === !!pB) ? 1 : 0; break;
-          case 'd-flop': {
-            const clk = pB ? 1 : 0;
-            if (clk === 1 && n.prevClockState === 0) n.outputState = pA ? 1 : 0;
-            n.prevClockState = clk;
-            break;
-          }
-          case 'half-adder': n.outputState = (!!pA !== !!pB) ? 1 : 0; n.outputState2 = (pA && pB) ? 1 : 0; break;
-          case 'full-adder': {
-            const s1 = (!!pA !== !!pB); const c1 = (pA && pB);
-            n.outputState = (s1 !== !!pC) ? 1 : 0; n.outputState2 = (c1 || (s1 && pC)) ? 1 : 0;
-            break;
-          }
-          case 'rgb-led': n.outputState = pA ? 1 : 0; n.outputState2 = pB ? 1 : 0; n._blueState = pC ? 1 : 0; break;
-          case 'led-bar': n.outputState = pA ? 1 : 0; break;
-          case 'seven-seg': break;
-          case 'op-amp': n.outputState = (pA > pB) ? 1 : 0; break;
-        }
-        if (n.outputState !== prev[0] || n.outputState2 !== (prev[1] || 0)) changed = true;
+    if (window.evaluateCustomIC) {
+      window.evaluateCustomIC(node);
+    } else {
+      const icName = node.data.icName || node.type.slice(9);
+      const icDef = customICs[icName];
+      if (!icDef || icDef.nodes.length === 0) { node.outputState = 0; node.outputState2 = 0; return; }
+      const tmpNodes = icDef.nodes.map(n => ({
+        ...n, outputState: n.type === 'input' ? 0 : (n.outputState || 0),
+        outputState2: n.outputState2 || 0,
+        inputValues: Array(n.inputsCount).fill(0), prevClockState: 0
+      }));
+      const tmpNodeMap = {};
+      tmpNodes.forEach(n => tmpNodeMap[n.id] = n);
+      icDef.inputPorts.forEach((portId, idx) => {
+        const tn = tmpNodeMap[portId];
+        if (tn) tn.outputState = node.inputValues[idx] || 0;
       });
-      if (!changed) break;
-    }
-    node.outputState = 0; node.outputState2 = 0;
-    icDef.outputPorts.forEach((portId, idx) => {
-      const tn = tmpNodeMap[portId];
-      if (tn) {
-        if (idx === 0) node.outputState = tn.outputState;
-        else if (idx === 1) node.outputState2 = tn.outputState;
+      const tmpWires = icDef.wires.map(w => ({ ...w }));
+      for (let iter = 0; iter < 30; iter++) {
+        let changed = false;
+        tmpNodes.forEach(n => {
+          if (n.type === 'input' || n.type === 'clock' || n.type === 'text-label' || n.type.startsWith('custom-ic-')) return;
+          const prev = [...n.inputValues];
+          n.inputValues = Array(n.inputsCount).fill(0);
+          tmpWires.forEach(w => {
+            if (w.toNodeId !== n.id) return;
+            const src = tmpNodeMap[w.fromNodeId];
+            if (!src) return;
+            const val = w.fromPortIdx === 0 ? src.outputState : src.outputState2;
+            if (w.toPortIdx < n.inputsCount) n.inputValues[w.toPortIdx] = val;
+          });
+          if (n.type === 'sensor') { return; }
+          const pA = n.inputValues[0] || 0, pB = n.inputValues[1] || 0, pC = n.inputValues[2] || 0;
+          switch (n.type) {
+            case 'output': n.outputState = pA ? 1 : 0; break;
+            case 'buzzer': n.outputState = pA ? 1 : 0; break;
+            case 'not': n.outputState = pA ? 0 : 1; break;
+            case 'and': n.outputState = (pA && pB) ? 1 : 0; break;
+            case 'or': n.outputState = (pA || pB) ? 1 : 0; break;
+            case 'nand': n.outputState = !(pA && pB) ? 1 : 0; break;
+            case 'nor': n.outputState = !(pA || pB) ? 1 : 0; break;
+            case 'xor': n.outputState = (!!pA !== !!pB) ? 1 : 0; break;
+            case 'xnor': n.outputState = (!!pA === !!pB) ? 1 : 0; break;
+            case 'd-flop': {
+              const clk = pB ? 1 : 0;
+              if (clk === 1 && n.prevClockState === 0) n.outputState = pA ? 1 : 0;
+              n.prevClockState = clk;
+              break;
+            }
+            case 'half-adder': n.outputState = (!!pA !== !!pB) ? 1 : 0; n.outputState2 = (pA && pB) ? 1 : 0; break;
+            case 'full-adder': {
+              const s1 = (!!pA !== !!pB); const c1 = (pA && pB);
+              n.outputState = (s1 !== !!pC) ? 1 : 0; n.outputState2 = (c1 || (s1 && pC)) ? 1 : 0;
+              break;
+            }
+            case 'rgb-led': n.outputState = pA ? 1 : 0; n.outputState2 = pB ? 1 : 0; n._blueState = pC ? 1 : 0; break;
+            case 'led-bar': n.outputState = pA ? 1 : 0; break;
+            case 'seven-seg': break;
+            case 'op-amp': n.outputState = (pA > pB) ? 1 : 0; break;
+          }
+          if (n.outputState !== prev[0] || n.outputState2 !== (prev[1] || 0)) changed = true;
+        });
+        if (!changed) break;
       }
-    });
+      node.outputState = 0; node.outputState2 = 0;
+      icDef.outputPorts.forEach((portId, idx) => {
+        const tn = tmpNodeMap[portId];
+        if (tn) {
+          if (idx === 0) node.outputState = tn.outputState;
+          else if (idx === 1) node.outputState2 = tn.outputState;
+        }
+      });
+    }
     return;
   }
-  const [a, b, c] = node.inputValues;
+  const iv = node.inputValues;
+  const a = iv[0], b = iv[1], c = iv[2];
+
+  // Multi-input gate evaluation helpers
+  const allHigh  = () => iv.every(v => !!v);
+  const anyHigh  = () => iv.some(v => !!v);
+  const xorParity = () => (iv.filter(v => !!v).length % 2 === 1) ? 1 : 0;
 
   switch (node.type) {
     case 'output':
@@ -2316,23 +2690,26 @@ function computeNodeOutput(node) {
     case 'not':
       node.outputState = a ? 0 : 1;
       break;
+    // ── Multi-input gates use reduce logic ───────────────────────────────
     case 'and':
-      node.outputState = (a && b) ? 1 : 0;
+      node.outputState = allHigh() ? 1 : 0;
       break;
     case 'or':
-      node.outputState = (a || b) ? 1 : 0;
+      node.outputState = anyHigh() ? 1 : 0;
       break;
     case 'nand':
-      node.outputState = !(a && b) ? 1 : 0;
+      node.outputState = allHigh() ? 0 : 1;
       break;
     case 'nor':
-      node.outputState = !(a || b) ? 1 : 0;
+      node.outputState = anyHigh() ? 0 : 1;
       break;
     case 'xor':
-      node.outputState = (!!a !== !!b) ? 1 : 0;
+      // XOR parity rule: output HIGH if ODD number of inputs are HIGH
+      node.outputState = xorParity();
       break;
     case 'xnor':
-      node.outputState = (!!a === !!b) ? 1 : 0;
+      // XNOR: output HIGH if EVEN number of inputs are HIGH
+      node.outputState = xorParity() ? 0 : 1;
       break;
 
     case 'op-amp':
@@ -2368,6 +2745,131 @@ function computeNodeOutput(node) {
       updateSevenSeg(node);
       break;
   }
+}
+
+// ── Multi-input gate management ────────────────────────────────────────────────
+const MULTI_INPUT_GATE_TYPES = new Set(['and','or','nand','nor','xor','xnor']);
+const MAX_GATE_INPUTS = 32;
+const MIN_GATE_INPUTS = 2;
+
+function addGateInput(nodeId) {
+  const node = sandboxNodes.find(n => n.id === nodeId);
+  if (!node || !MULTI_INPUT_GATE_TYPES.has(node.type)) return;
+  if (node.inputsCount >= MAX_GATE_INPUTS) { showToast(`Maximum ${MAX_GATE_INPUTS} inputs reached.`); return; }
+  pushUndo();
+  node.inputsCount++;
+  node.inputValues = Array(node.inputsCount).fill(0);
+  // Remove any wires that targeted ports that no longer make sense (none needed — just grow)
+  const el = document.getElementById(nodeId);
+  if (el) {
+    // Remove old input ports, re-render
+    el.querySelectorAll('.port-input').forEach(p => p.remove());
+    renderInputPorts(node, el);
+    // Auto-resize height
+    updateGateNodeHeight(el, node.inputsCount);
+  }
+  evaluateSandbox();
+  playSound('click');
+  showToast(`Input added → ${node.inputsCount} inputs`);
+}
+
+function removeGateInput(nodeId) {
+  const node = sandboxNodes.find(n => n.id === nodeId);
+  if (!node || !MULTI_INPUT_GATE_TYPES.has(node.type)) return;
+  if (node.inputsCount <= MIN_GATE_INPUTS) { showToast(`Minimum ${MIN_GATE_INPUTS} inputs required.`); return; }
+  pushUndo();
+  const removedIdx = node.inputsCount - 1;
+  node.inputsCount--;
+  node.inputValues = Array(node.inputsCount).fill(0);
+  // Remove wires connected to the removed port
+  sandboxWires = sandboxWires.filter(w => !(w.toNodeId === nodeId && w.toPortIdx === removedIdx));
+  const el = document.getElementById(nodeId);
+  if (el) {
+    el.querySelectorAll('.port-input').forEach(p => p.remove());
+    renderInputPorts(node, el);
+    updateGateNodeHeight(el, node.inputsCount);
+  }
+  evaluateSandbox();
+  playSound('click');
+  showToast(`Input removed → ${node.inputsCount} inputs`);
+}
+window.addGateInput = addGateInput;
+window.removeGateInput = removeGateInput;
+
+function updateGateNodeHeight(el, inputsCount) {
+  // Each input port needs at least 22px, minimum 80px
+  const minH = Math.max(80, inputsCount * 22 + 20);
+  el.style.minHeight = minH + 'px';
+}
+
+// ── Right-click context menu ──────────────────────────────────────────────────
+let _sbCtxMenu = null;
+function showSandboxContextMenu(e, node) {
+  e.preventDefault();
+  hideSandboxContextMenu();
+  if (!MULTI_INPUT_GATE_TYPES.has(node.type)) return;
+
+  const menu = document.createElement('div');
+  menu.className = 'sb-context-menu';
+  menu.style.cssText = `position:fixed;left:${e.clientX}px;top:${e.clientY}px;z-index:9999;
+    background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:8px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.4);min-width:180px;overflow:hidden;`;
+
+  const items = [
+    {
+      icon: '➕', label: `Add Input (now ${node.inputsCount})`,
+      action: () => addGateInput(node.id),
+      disabled: node.inputsCount >= MAX_GATE_INPUTS
+    },
+    {
+      icon: '➖', label: `Remove Input (now ${node.inputsCount})`,
+      action: () => removeGateInput(node.id),
+      disabled: node.inputsCount <= MIN_GATE_INPUTS
+    },
+    { separator: true },
+    {
+      icon: '📋', label: 'Show Inspector',
+      action: () => { selectNode(node.id); }
+    },
+    {
+      icon: '🗑️', label: 'Delete Gate',
+      action: () => deleteNode(node.id)
+    }
+  ];
+
+  items.forEach(item => {
+    if (item.separator) {
+      const sep = document.createElement('div');
+      sep.style.cssText = 'height:1px;background:var(--border-color);margin:4px 0';
+      menu.appendChild(sep);
+      return;
+    }
+    const btn = document.createElement('button');
+    btn.style.cssText = `display:flex;align-items:center;gap:8px;width:100%;padding:8px 14px;
+      background:transparent;border:none;color:var(--text-primary);font-size:0.8rem;
+      cursor:${item.disabled ? 'not-allowed' : 'pointer'};opacity:${item.disabled ? '0.4' : '1'};
+      font-family:var(--font-body);text-align:left;`;
+    btn.innerHTML = `<span>${item.icon}</span><span>${item.label}</span>`;
+    if (!item.disabled) {
+      btn.addEventListener('mouseenter', () => btn.style.background = 'var(--bg-tertiary)');
+      btn.addEventListener('mouseleave', () => btn.style.background = 'transparent');
+      btn.addEventListener('click', () => { hideSandboxContextMenu(); item.action(); });
+    }
+    menu.appendChild(btn);
+  });
+
+  document.body.appendChild(menu);
+  _sbCtxMenu = menu;
+
+  // Auto-close on outside click
+  setTimeout(() => {
+    document.addEventListener('click', hideSandboxContextMenu, { once: true });
+    document.addEventListener('contextmenu', hideSandboxContextMenu, { once: true });
+  }, 10);
+}
+
+function hideSandboxContextMenu() {
+  if (_sbCtxMenu) { _sbCtxMenu.remove(); _sbCtxMenu = null; }
 }
 
 function updateNodeVisuals(node) {
@@ -2479,6 +2981,35 @@ function updateNodeVisuals(node) {
       el.classList.toggle('elec-active', node.outputState === 1);
       break;
     }
+    default: {
+      if (node.type && node.type.startsWith('custom-ic-')) {
+        const body = el.querySelector('.sandbox-node-body');
+        if (body && window.getCustomICNodeInner) {
+          body.innerHTML = window.getCustomICNodeInner(node);
+        }
+        el.querySelectorAll('.sandbox-port').forEach(p => {
+          const pinType = p.dataset.pinType;
+          const portIdx = parseInt(p.dataset.portIdx);
+          let val = 0;
+          const icName = node.data.icName || node.type.slice(9);
+          const def = window.customICs[icName];
+          if (def) {
+            if (pinType === 'input') {
+              val = node.inputValues[portIdx] || 0;
+            } else if (pinType === 'output') {
+              val = node.outputStates ? (node.outputStates[portIdx] || 0) : (portIdx === 0 ? node.outputState : node.outputState2);
+            } else if (pinType === 'power') {
+              val = node.inputValues[def.inputs] || 0;
+            } else if (pinType === 'ground') {
+              val = node.inputValues[def.inputs + 1] || 0;
+            }
+          }
+          p.classList.toggle('active-port', val === 1);
+          p.style.backgroundColor = val === 1 ? '#22d3a5' : val === 0 ? '#475569' : '#f97316';
+        });
+      }
+      break;
+    }
   }
 }
 
@@ -2518,6 +3049,283 @@ function updateLedBar(node) {
   }
 }
 
+function getOutputNodes() {
+  return sandboxNodes.filter(n => n.type === 'output' || n.type === 'rgb-led' || n.type === 'led-bar');
+}
+
+function getInputNodes() {
+  return sandboxNodes.filter(n => n.type === 'input');
+}
+
+function getDigitalGates() {
+  return sandboxNodes.filter(n => ['not','and','or','nand','nor','xor','xnor','d-flop','half-adder','full-adder','seven-seg'].includes(n.type));
+}
+
+function isDigitalCircuit() {
+  const electricityTypes = ['battery','resistor','bulb','switch','ammeter','voltmeter','motor','fuse','led-elec','junction','transistor','diode','zener','ldr','thermistor','potentiometer','capacitor','relay','power-supply'];
+  return sandboxNodes.length > 0 && !sandboxNodes.some(n => electricityTypes.includes(n.type));
+}
+
+window.showTruthTable = function () {
+  if (!isDigitalCircuit()) {
+    showAlert('Truth tables are available for digital logic circuits only. Remove electricity components to generate a truth table.', 'Digital Circuits Only');
+    return;
+  }
+  const inputs = getInputNodes();
+  const outputs = getOutputNodes();
+  const gates = getDigitalGates();
+  const allOutputs = [...outputs, ...gates.filter(n => n.outputsCount > 0)];
+
+  if (inputs.length === 0) {
+    showAlert('Add at least one Toggle Switch (input) to generate a truth table.', 'No Inputs');
+    return;
+  }
+  if (outputs.length === 0 && gates.length === 0) {
+    showAlert('Add at least one output (LED) or gate to see results.', 'No Outputs');
+    return;
+  }
+
+  const n = Math.min(inputs.length, 6);
+  const totalRows = 1 << n;
+  const savedStates = inputs.map(inp => inp.outputState);
+
+  const modal = document.getElementById('logic-modal');
+  const title = document.getElementById('logic-modal-title');
+  const content = document.getElementById('logic-modal-content');
+  if (!modal || !title || !content) return;
+
+  title.textContent = 'Truth Table';
+
+  const inputLabels = inputs.slice(0, n).map((inp, i) => String.fromCharCode(65 + i));
+  const outputEntries = [];
+  outputs.forEach(out => {
+    const parent = sandboxNodes.find(n => n.id === out.id);
+    const lbl = parent ? parent.label : 'Output';
+    if (out.type === 'output') outputEntries.push({ id: out.id, label: lbl, port: 0 });
+    if (out.type === 'rgb-led') {
+      outputEntries.push({ id: out.id, label: lbl + '(R)', port: 0 });
+      outputEntries.push({ id: out.id, label: lbl + '(G)', port: 1 });
+      outputEntries.push({ id: out.id, label: lbl + '(B)', port: 2 });
+    }
+  });
+  gates.forEach(g => {
+    if (g.outputsCount > 0) {
+      outputEntries.push({ id: g.id, label: g.label + '(Y)', port: 0 });
+    }
+    if (g.outputsCount > 1) {
+      outputEntries.push({ id: g.id, label: g.label + '(C)', port: 1 });
+    }
+  });
+
+  const hasLedBar = outputs.some(n => n.type === 'led-bar');
+  let binaryDisplay = '';
+
+  const headerCells = [...inputLabels];
+  outputEntries.forEach(e => headerCells.push(e.label));
+  const ths = headerCells.map(h => `<th>${h}</th>`).join('');
+
+  let rowsHtml = '';
+  for (let row = 0; row < totalRows; row++) {
+    for (let i = 0; i < n; i++) {
+      inputs[i].outputState = (row >> (n - 1 - i)) & 1;
+    }
+    evaluateSandbox();
+    const tds = [];
+    for (let i = 0; i < n; i++) {
+      tds.push(`<td>${inputs[i].outputState}</td>`);
+    }
+    outputEntries.forEach(e => {
+      const outNode = sandboxNodes.find(nd => nd.id === e.id);
+      const val = e.port === 0 ? (outNode ? outNode.outputState : 0) : (e.port === 1 ? (outNode ? outNode.outputState2 : 0) : (outNode ? outNode._blueState : 0));
+      tds.push(`<td>${val}</td>`);
+    });
+    if (hasLedBar) {
+      const ledBars = outputs.filter(n => n.type === 'led-bar');
+      const bits = [];
+      ledBars.forEach(lb => {
+        for (let p = 0; p < 4; p++) {
+          bits.push(lb.inputValues[p] || 0);
+        }
+      });
+      const binStr = bits.join('');
+      const dec = bits.length > 0 ? parseInt(binStr, 2) : 0;
+      binaryDisplay = `<div style="margin-top:0.5rem;padding:0.5rem;background:var(--bg-tertiary);border-radius:4px;font-family:monospace;font-size:0.8rem;border:1px solid var(--border-color)">
+        <strong>Binary:</strong> ${binStr || '—'} &nbsp;|&nbsp; <strong>Decimal:</strong> ${bits.length > 0 ? dec : '—'} &nbsp;|&nbsp; <strong>Hex:</strong> ${bits.length > 0 ? '0x' + dec.toString(16).toUpperCase() : '—'}
+      </div>`;
+    }
+    rowsHtml += `<tr>${tds.join('')}</tr>`;
+  }
+
+  for (let i = 0; i < n; i++) {
+    inputs[i].outputState = savedStates[i];
+  }
+  evaluateSandbox();
+
+  const ledBin = getOutputBinaryDisplay();
+
+  content.innerHTML = `
+    <div style="width:100%;max-height:400px;overflow:auto">
+      <table class="learning-table" style="width:100%;font-size:0.78rem">
+        <thead><tr>${ths}</tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+      ${binaryDisplay}
+      ${ledBin}
+      <div style="margin-top:1rem;font-size:0.75rem;color:var(--text-muted);text-align:center">
+        ${totalRows} row${totalRows > 1 ? 's' : ''} &middot; ${n} input${n > 1 ? 's' : ''}, ${outputEntries.length} output${outputEntries.length > 1 ? 's' : ''}
+      </div>
+    </div>`;
+  modal.style.display = 'flex';
+};
+
+function getOutputBinaryDisplay() {
+  const outputs = getOutputNodes();
+  const plainLeds = outputs.filter(n => n.type === 'output');
+  if (plainLeds.length < 2) return '';
+  const bits = plainLeds.map(led => led.outputState);
+  const binStr = bits.join('');
+  const dec = parseInt(binStr, 2);
+  return `<div style="margin-top:0.5rem;padding:0.5rem;background:var(--bg-tertiary);border-radius:4px;font-family:monospace;font-size:0.8rem;border:1px solid var(--border-color)">
+    <strong>LED Binary:</strong> ${binStr} &nbsp;|&nbsp; <strong>Decimal:</strong> ${dec} &nbsp;|&nbsp; <strong>Hex:</strong> 0x${dec.toString(16).toUpperCase()}
+  </div>`;
+}
+
+function showInspectorForNode(node) {
+  const card = document.getElementById('sandbox-learning-card');
+  const body = document.getElementById('learning-card-body');
+  if (!card || !body) return;
+
+  const t = node.type;
+  const d = node.data || {};
+  const inpVals = node.inputValues || [];
+  const outVal = node.outputState;
+  const outVal2 = node.outputState2;
+  const inpStrs = inpVals.map((v, i) => `<span class="insp-port inp">I${i}:<b>${v}</b></span>`).join('');
+
+  let detail = '';
+  const valHtml = `<div class="insp-values">${inpStrs} <span class="insp-port out">OUT:<b>${outVal}</b></span>${node.outputsCount > 1 ? ` <span class="insp-port out">OUT2:<b>${outVal2}</b></span>` : ''}</div>`;
+
+  switch (t) {
+    case 'input': detail = `<div class="insp-row"><span>State</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`; break;
+    case 'clock': detail = `<div class="insp-row"><span>Phase</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal ? 'HIGH' : 'LOW'}</span></div>`; break;
+    case 'output': detail = `<div class="insp-row"><span>LED</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal ? 'ON' : 'OFF'}</span></div>`; break;
+    case 'rgb-led': {
+      const r = outVal, g = outVal2, b = node._blueState || 0;
+      detail = `<div class="insp-row"><span>Red</span><span class="insp-badge ${r ? 'on' : 'off'}">${r ? 'HIGH' : 'LOW'}</span></div>
+        <div class="insp-row"><span>Green</span><span class="insp-badge ${g ? 'on' : 'off'}">${g ? 'HIGH' : 'LOW'}</span></div>
+        <div class="insp-row"><span>Blue</span><span class="insp-badge ${b ? 'on' : 'off'}">${b ? 'HIGH' : 'LOW'}</span></div>`;
+      const colorName = r && g && b ? 'White' : r && g ? 'Yellow' : r && b ? 'Magenta' : g && b ? 'Cyan' : r ? 'Red' : g ? 'Green' : b ? 'Blue' : 'Off';
+      detail += `<div class="insp-row"><span>Color</span><span style="color:${r||g||b ? '#22d3a5' : 'var(--text-muted)'}">${colorName}</span></div>`;
+      break;
+    }
+    case 'buzzer': detail = `<div class="insp-row"><span>State</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal ? 'BUZZ' : 'SILENT'}</span></div>`; break;
+    case 'not': case 'and': case 'or': case 'nand': case 'nor': case 'xor': case 'xnor':
+      detail = `<div class="insp-row"><span>Inputs</span><span>${inpVals.join(', ')}</span></div>
+        <div class="insp-row"><span>Output</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`; break;
+    case 'd-flop': detail = `<div class="insp-row"><span>D</span><span>${inpVals[0] || 0}</span></div>
+      <div class="insp-row"><span>CLK</span><span>${inpVals[1] || 0}</span></div>
+      <div class="insp-row"><span>Q</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`; break;
+    case 'half-adder': case 'full-adder': {
+      const labels = t === 'half-adder' ? ['A','B'] : ['A','B','Cin'];
+      let rows = labels.map((l, i) => `<div class="insp-row"><span>${l}</span><span>${inpVals[i] || 0}</span></div>`).join('');
+      rows += `<div class="insp-row"><span>Sum</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>
+        <div class="insp-row"><span>Carry</span><span class="insp-badge ${outVal2 ? 'on' : 'off'}">${outVal2}</span></div>`;
+      detail = rows; break;
+    }
+    case 'seven-seg': {
+      const val = (inpVals[3] << 3) | (inpVals[2] << 2) | (inpVals[1] << 1) | inpVals[0];
+      detail = `<div class="insp-row"><span>Value</span><span style="font-weight:700;font-size:1.1rem">${val}</span></div>
+        <div class="insp-row"><span>Binary</span><span style="font-family:monospace">${inpVals.slice(0,4).map(v => v || 0).join('')}</span></div>`; break;
+    }
+    case 'led-bar': {
+      const vals = [inpVals[0] || 0, inpVals[1] || 0, inpVals[2] || 0, inpVals[3] || 0];
+      const dec = (vals[3] << 3) | (vals[2] << 2) | (vals[1] << 1) | vals[0];
+      detail = `<div class="insp-row"><span>Bits</span><span style="font-family:monospace">${vals.join('')}</span></div>
+        <div class="insp-row"><span>Decimal</span><span style="font-weight:700">${dec}</span></div>
+        <div class="insp-row"><span>Hex</span><span style="font-weight:700">0x${dec.toString(16).toUpperCase()}</span></div>`; break;
+    }
+    case 'battery': detail = `<div class="insp-row"><span>EMF</span><span style="color:#22d3a5;font-weight:600">${d.emf || 9}V</span></div>
+      <div class="insp-row"><span>Output</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal ? 'ACTIVE' : 'OFF'}</span></div>`; break;
+    case 'resistor': {
+      const R = d.R || 10;
+      const cur = d.current || 0;
+      const vDrop = d.voltageDrop || 0;
+      detail = `<div class="insp-row"><span>Resistance</span><span style="color:#fbbf24;font-weight:600">${R}Ω</span></div>
+        <div class="insp-row"><span>Current</span><span style="color:#f87171">${cur.toFixed(3)}A</span></div>
+        <div class="insp-row"><span>Voltage Drop</span><span style="color:#22d3a5">${vDrop.toFixed(2)}V</span></div>
+        <div class="insp-row"><span>Power</span><span style="color:#818cf8">${(cur * vDrop).toFixed(3)}W</span></div>`; break;
+    }
+    case 'bulb': {
+      const bri = d.brightness || 0;
+      detail = `<div class="insp-row"><span>Brightness</span><span style="color:#fbbf24">${(bri * 100).toFixed(0)}%</span></div>
+        <div class="insp-row"><span>State</span><span class="insp-badge ${bri > 0.1 ? 'on' : 'off'}">${bri > 0.7 ? 'BRIGHT' : bri > 0.3 ? 'DIM' : 'OFF'}</span></div>`; break;
+    }
+    case 'switch': detail = `<div class="insp-row"><span>Contact</span><span class="insp-badge ${d.closed ? 'on' : 'off'}">${d.closed ? 'CLOSED' : 'OPEN'}</span></div>`; break;
+    case 'ammeter': detail = `<div class="insp-row"><span>Current</span><span style="color:#f87171;font-weight:600">${(d.current || 0).toFixed(3)}A</span></div>`; break;
+    case 'voltmeter': detail = `<div class="insp-row"><span>Voltage</span><span style="color:#22d3a5;font-weight:600">${(d.voltage || 0).toFixed(2)}V</span></div>`; break;
+    case 'motor': detail = `<div class="insp-row"><span>Speed</span><span style="color:#fbbf24;font-weight:600">${(d.speed || 0).toFixed(0)} RPM</span></div>
+      <div class="insp-row"><span>State</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal ? 'RUNNING' : 'STOPPED'}</span></div>`; break;
+    case 'fuse': detail = `<div class="insp-row"><span>Status</span><span class="insp-badge ${d.blown ? 'off' : 'on'}">${d.blown ? 'BLOWN' : 'OK'}</span></div>`; break;
+    case 'led-elec': detail = `<div class="insp-row"><span>LED</span><span class="insp-badge ${d.on ? 'on' : 'off'}">${d.on ? 'ON' : 'OFF'}</span></div>`; break;
+    case 'transistor': detail = `<div class="insp-row"><span>Base</span><span class="insp-badge ${d.on ? 'on' : 'off'}">${d.on ? 'HIGH' : 'LOW'}</span></div>`; break;
+    case 'diode': detail = `<div class="insp-row"><span>Bias</span><span class="insp-badge ${d.forward ? 'on' : 'off'}">${d.forward ? 'FORWARD' : 'REVERSE'}</span></div>`; break;
+    case 'zener': {
+      const zv = d.zenerVoltage || 5.1;
+      detail = `<div class="insp-row"><span>Bias</span><span class="insp-badge ${d.forward ? 'on' : 'off'}">${d.forward ? 'FORWARD' : 'REVERSE'}</span></div>
+        <div class="insp-row"><span>Zener Voltage</span><span style="color:#fbbf24;font-weight:600">${zv}V</span></div>`; break;
+    }
+    case 'ldr': detail = `<div class="insp-row"><span>Light Level</span><span style="color:#fbbf24">${d.lightLevel || 50}%</span></div>
+      <div class="insp-row"><span>Resistance</span><span style="color:#818cf8">${(d.R || 10000) > 1000 ? ((d.R || 10000) / 1000).toFixed(0) + 'k' : (d.R || 10000).toFixed(0)}Ω</span></div>`; break;
+    case 'thermistor': detail = `<div class="insp-row"><span>Temperature</span><span style="color:#ef4444">${d.temperature || 25}°C</span></div>
+      <div class="insp-row"><span>Resistance</span><span style="color:#818cf8">${(d.R || 10000) > 1000 ? ((d.R || 10000) / 1000).toFixed(0) + 'k' : (d.R || 10000).toFixed(0)}Ω</span></div>`; break;
+    case 'potentiometer': {
+      const pos = d.wiperPos || 50;
+      const pR = d.R || 500;
+      detail = `<div class="insp-row"><span>Wiper</span><span style="color:#fbbf24">${pos}%</span></div>
+        <div class="insp-row"><span>Resistance</span><span style="color:#818cf8">${pR}Ω</span></div>`; break;
+    }
+    case 'capacitor': detail = `<div class="insp-row"><span>Voltage</span><span style="color:#22d3a5">${(d.voltage || 0).toFixed(2)}V</span></div>
+      <div class="insp-row"><span>Charge</span><span style="color:#818cf8">${((d.charge || 0) * 100).toFixed(0)}%</span></div>`; break;
+    case 'relay': detail = `<div class="insp-row"><span>Coil</span><span class="insp-badge ${d.coilEnergized ? 'on' : 'off'}">${d.coilEnergized ? 'ENERGIZED' : 'OFF'}</span></div>`; break;
+    case 'op-amp': detail = `<div class="insp-row"><span>V+</span><span>${inpVals[0] || 0}</span></div>
+      <div class="insp-row"><span>V-</span><span>${inpVals[1] || 0}</span></div>
+      <div class="insp-row"><span>Output</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`; break;
+    case 'text-label': detail = `<div class="insp-row"><span>Text</span><span style="font-style:italic">${node.labelText || '(empty)'}</span></div>`; break;
+    default:
+      if (t && t.startsWith('custom-ic-')) {
+        detail = `<div class="insp-row"><span>IC</span><span style="color:#818cf8;font-weight:600">${d.icName || t.slice(9)}</span></div>
+          <div class="insp-row"><span>Inputs/Outputs</span><span>${node.inputsCount} / ${node.outputsCount}</span></div>
+          <div class="insp-row"><span>Output</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`;
+      } else {
+        detail = `<div class="insp-row"><span>Output</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`;
+      }
+  }
+
+  const category = COMPONENT_DEFS[t] ? COMPONENT_DEFS[t].category : '';
+
+  card.style.display = 'flex';
+  card.classList.remove('collapsed');
+
+  body.innerHTML = `
+    <div class="inspector-header">
+      <div class="inspector-type">${category ? `<span class="insp-cat">${category}</span>` : ''} <span class="insp-type">${t}</span></div>
+      <div class="inspector-title">${node.label}</div>
+    </div>
+    <div class="inspector-section">${detail}</div>
+    ${node.inputsCount > 0 || node.outputsCount > 0 ? `<div class="inspector-section-title">Ports</div><div class="insp-values">${inpStrs} <span class="insp-port out">OUT:<b>${outVal}</b></span>${node.outputsCount > 1 ? ` <span class="insp-port out">OUT2:<b>${outVal2}</b></span>` : ''}</div>` : ''}
+    <div class="inspector-footer">
+      <span style="color:var(--text-muted)">ID: ${node.id}</span>
+      <span style="color:var(--text-muted)">Pos: ${node.x}, ${node.y}</span>
+    </div>`;
+};
+
+function updateNodeInspector() {
+  if (selectedNodeId) {
+    const node = sandboxNodes.find(n => n.id === selectedNodeId);
+    if (node) showInspectorForNode(node);
+  }
+}
+
 function updateSevenSeg(node) {
   const val = (node.inputValues[3] << 3) | (node.inputValues[2] << 2)
     | (node.inputValues[1] << 1) | node.inputValues[0];
@@ -2549,9 +3357,12 @@ function startSimulationLoop() {
   if (simInterval) clearInterval(simInterval);
   if (clockInterval) clearInterval(clockInterval);
 
+  const baseInterval = Math.round(80 / simSpeed);
+  const clockIntervalMs = Math.round(1000 / simSpeed);
+
   simInterval = setInterval(() => {
     if (isSimRunning) evaluateSandbox();
-  }, 80);
+  }, Math.max(16, baseInterval));
 
   clockInterval = setInterval(() => {
     if (!isSimRunning) return;
@@ -2559,7 +3370,7 @@ function startSimulationLoop() {
     sandboxNodes.forEach(n => {
       if (n.type === 'clock') n.outputState = clockTick;
     });
-  }, 1000);
+  }, Math.max(50, clockIntervalMs));
 }
 
 function stopSimulationLoop() {
@@ -2599,10 +3410,22 @@ function loadCustomICs() {
       }
     }
     Object.keys(stored).forEach(name => {
-      const def = stored[name];
+      let def = stored[name];
+      if (window.upgradeICDefinition) {
+        def = window.upgradeICDefinition(def, name);
+        stored[name] = def;
+      }
       customICs[name] = def;
-      COMPONENT_DEFS[`custom-ic-${name}`] = { inputs: def.inputs, outputs: def.outputs, label: name, category: 'Custom ICs', data: { icName: name } };
+      const actualInputs = def.inputs + (def.strictTTL ? 2 : 0);
+      COMPONENT_DEFS[`custom-ic-${name}`] = { 
+        inputs: actualInputs, 
+        outputs: def.outputs, 
+        label: name, 
+        category: 'Custom ICs', 
+        data: { icName: name } 
+      };
     });
+    localStorage.setItem('logicQuest_ics', JSON.stringify(stored));
     if (section) {
       const container = section.querySelector('.toolbox-items');
       if (container) {

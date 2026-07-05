@@ -2,6 +2,7 @@ import './common.js';
 import './course.js';
 import './course-map.js';
 import './explorer.js';
+import './ic-creator.js';
 import './sandbox.js';
 import { initSettingsView, applyLanguage } from './settings.js';
 import { initSubnetting }              from './subnetting.js';

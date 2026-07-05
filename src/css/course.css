@@ -297,9 +297,9 @@
 .btn-primary {
   flex: 2;
   background: linear-gradient(90deg, #6b82ff 0%, #d883ff 50%, #ffaf5c 100%);
-  color: #1a1a1a !important;
+  color: #1a1a1a ;
   border: none;
-  padding: 0.85rem 1.6rem;
+  padding: 10px 20px;
   border-radius: 16px;
   font-family: var(--font-header);
   font-size: 0.98rem;

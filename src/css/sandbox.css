@@ -119,6 +119,9 @@
   border: 1px solid var(--border-color);
   z-index: 20;
   align-items: center;
+  flex-wrap: wrap;
+  max-width: min(84%, 920px);
+  justify-content: flex-end;
 }
 
 .sandbox-btn {
@@ -153,9 +156,45 @@
   color: var(--color-success);
 }
 
+.sandbox-btn.active {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
 .sandbox-btn.btn-play.running {
   background: var(--text-primary);
   color: var(--bg-primary);
+}
+
+.sandbox-floating-panel {
+  position: absolute;
+  right: 0.75rem;
+  z-index: 18;
+  width: min(320px, calc(100% - 1.5rem));
+  max-height: min(280px, calc(100vh - 8rem));
+  overflow: auto;
+  background: color-mix(in srgb, var(--bg-secondary) 92%, transparent);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.16);
+  backdrop-filter: blur(10px);
+  padding: 0.75rem;
+}
+
+#sandbox-explain-panel {
+  top: 4.4rem;
+}
+
+#sandbox-physics-panel {
+  top: 11rem;
+}
+
+#sandbox-lab-panel {
+  left: 0.75rem;
+  right: auto;
+  top: 4.4rem;
+  width: min(320px, calc(100% - 1.5rem));
 }
 
 .sandbox-node {
@@ -299,6 +338,19 @@
 
 .sandbox-node.compound-node {
   min-width: 120px;
+}
+
+.sandbox-node.elec-schematic-node {
+  min-width: 130px;
+  min-height: 105px;
+  padding: 0.5rem;
+}
+
+.sandbox-node.elec-schematic-node .sandbox-node-body {
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
 }
 
 .sandbox-node.seven-seg-node {
@@ -559,6 +611,165 @@
   display: flex;
 }
 
+.comp-tooltip {
+  position: fixed;
+  z-index: 999;
+  max-width: 240px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.6rem 0.7rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--text-primary);
+  pointer-events: none;
+}
+
+.sandbox-explain-empty,
+.physics-panel-card,
+.lab-card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.6rem 0.7rem;
+  background: var(--bg-primary);
+}
+
+.sandbox-explain-item {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sandbox-explain-item:last-child {
+  border-bottom: none;
+}
+
+.sandbox-explain-item.active {
+  color: var(--text-primary);
+}
+
+.sandbox-explain-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+  margin-top: 0.32rem;
+  flex-shrink: 0;
+}
+
+.sandbox-explain-item.inactive .sandbox-explain-dot {
+  background: var(--color-cyan);
+}
+
+.physics-panel-title,
+.lab-title {
+  font-family: var(--font-header);
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.truth-designer-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+}
+
+.truth-designer-controls select {
+  margin-left: 0.25rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.truth-designer-grid {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.truth-designer-header,
+.truth-designer-row {
+  display: grid;
+  grid-template-columns: 32px repeat(4, 1fr);
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.truth-designer-header > div,
+.truth-designer-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.truth-cell {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 0.3rem;
+  cursor: pointer;
+}
+
+.sandbox-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2,6,23,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 80;
+  padding: 1rem;
+}
+
+.sandbox-modal {
+  width: min(720px, 100%);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 20px 48px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+
+.sandbox-modal-header,
+.sandbox-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sandbox-modal-footer {
+  border-top: 1px solid var(--border-color);
+  border-bottom: none;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.sandbox-modal-close {
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.sandbox-modal-body {
+  padding: 1rem;
+}
+
 .label-textarea {
   background: transparent;
   border: none;
@@ -590,5 +801,157 @@
 
 .lesson-select:hover {
   border-color: var(--text-muted);
+}
+
+.inspector-header {
+  margin-bottom: 0.4rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.inspector-title {
+  font-family: var(--font-header);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.inspector-type {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 0.1rem;
+}
+
+.insp-cat {
+  background: var(--bg-tertiary);
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  color: var(--color-cyan);
+  font-weight: 600;
+}
+
+.inspector-section-title {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 0.3rem;
+  margin-bottom: 0.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inspector-section {
+  margin-bottom: 0.15rem;
+}
+
+.insp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.12rem 0;
+  font-size: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.insp-row:last-child { border-bottom: none; }
+
+.insp-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+}
+
+.insp-port {
+  font-size: 0.65rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  background: var(--bg-tertiary);
+  font-family: monospace;
+}
+.insp-port.inp { color: var(--color-indigo); }
+.insp-port.out { color: var(--color-success); }
+.insp-port b { font-weight: 700; }
+
+.inspector-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.3rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.62rem;
+}
+
+.insp-badge {
+  padding: 0.05rem 0.4rem;
+  border-radius: 3px;
+  font-weight: 600;
+  font-size: 0.7rem;
+}
+.insp-badge.on { background: rgba(34,211,165,0.15); color: #22d3a5; }
+.insp-badge.off { background: rgba(148,163,184,0.12); color: var(--text-muted); }
+
+/* Custom IC Styles */
+.custom-ic-node {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.custom-ic-node .sandbox-node-header {
+  display: none !important;
+}
+
+.custom-ic-node .node-delete-btn {
+  top: 10px !important;
+  right: 12px !important;
+  z-index: 5;
+}
+
+.sandbox-port.port-input.active-port,
+.sandbox-port.port-output.active-port {
+  box-shadow: 0 0 8px #22d3a5 !important;
+}
+
+/* Custom IC Drag-Reorder Modal Rows */
+.pin-config-row {
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.pin-config-row:hover {
+  background: var(--bg-secondary) !important;
+  border-color: var(--color-cyan) !important;
+}
+
+/* IC Tooltips and Highlights */
+.ic-pin-tooltip {
+  pointer-events: none;
+  animation: tooltipFade 0.15s ease-out;
+}
+
+@keyframes tooltipFade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ndPulse {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+
+/* Favorite Icon styling in toolbox */
+.custom-ic-toolbox-item:hover .ic-item-actions {
+  opacity: 1 !important;
+}
+
+.favorite-ic-btn:hover {
+  color: #fbbf24 !important;
+}
+
+.ic-editor-banner button:hover {
+  filter: brightness(1.15);
 }
 

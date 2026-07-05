@@ -8,6 +8,7 @@ export const TRANSLATIONS = {
     nav_subnetting: "Subnetting",
     nav_signal: "Signal Lab",
     nav_settings: "Settings",
+    nav_network: "Network",
     nav_subnet_short: "Subnet",
     nav_signal_short: "Signal",
 
@@ -109,6 +110,15 @@ export const TRANSLATIONS = {
     tool_led_elec: "LED",
     tool_junction: "Wire Junction",
     tool_transistor: "NPN Transistor",
+    tool_power_supply: "DC Power Supply",
+    tool_diode: "Diode",
+    tool_zener: "Zener Diode",
+    tool_ldr: "LDR (Light Dependent Resistor)",
+    tool_thermistor: "Thermistor",
+    tool_potentiometer: "Potentiometer",
+    tool_capacitor: "Capacitor",
+    tool_relay: "Relay",
+    tool_op_amp: "Operational Amplifier (Op-Amp)",
 
     /* ── Templates ── */
     tpl_not_name: "NOT Inverter",
@@ -319,6 +329,7 @@ export const TRANSLATIONS = {
     nav_subnetting: "සබ්නෙටිං",
     nav_signal: "සංඥා රසායනාගාරය",
     nav_settings: "සැකසුම්",
+    nav_network: "ජාලකරණය",
     nav_subnet_short: "සබ්නෙට්",
     nav_signal_short: "සංඥා",
 
@@ -420,6 +431,15 @@ export const TRANSLATIONS = {
     tool_led_elec: "LED",
     tool_junction: "රැහැන් සන්ධිය",
     tool_transistor: "NPN ට්‍රාන්සිස්ටරය",
+    tool_power_supply: "DC බල සැපයුම",
+    tool_diode: "ඩයෝඩය",
+    tool_zener: "ශීනර් ඩයෝඩය",
+    tool_ldr: "LDR (ආලෝක සංවේදී ප්‍රතිරෝධකය)",
+    tool_thermistor: "තාපකය (Thermistor)",
+    tool_potentiometer: "විභවමානය (Potentiometer)",
+    tool_capacitor: "ධාරිත්‍රකය (Capacitor)",
+    tool_relay: "රිලේ (Relay)",
+    tool_op_amp: "සංසන්දකය (Op-Amp)",
 
     /* ── Templates ── */
     tpl_not_name: "NOT ප්‍රතිලෝමකය",

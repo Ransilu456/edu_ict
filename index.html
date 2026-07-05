@@ -101,7 +101,7 @@
           <line x1="9" y1="12" x2="5" y2="12" />
           <line x1="15" y1="12" x2="19" y2="12" />
         </svg>
-        <span>Network</span>
+        <span data-i18n="nav_network">Network</span>
       </button>
       <button class="nav-tab" data-target="settings-view" title="Settings & Sync">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
@@ -1277,6 +1277,10 @@
           <input type="file" id="sandbox-import-file" accept=".json" style="display:none">
         </div>
 
+        <div class="sandbox-floating-panel" id="sandbox-explain-panel" style="display:none;"></div>
+        <div class="sandbox-floating-panel sandbox-physics-panel" id="sandbox-physics-panel" style="display:none;"></div>
+        <div class="sandbox-floating-panel sandbox-lab-panel" id="sandbox-lab-panel" style="display:none;"></div>
+
         <div class="sandbox-learning-card collapsed" id="sandbox-learning-card" style="display: none;">
           <div class="learning-card-header" id="learning-card-header">
             <span>
@@ -1301,6 +1305,39 @@
             <div style="text-align:center;padding:2rem 0;color:var(--text-muted);">
               Select or drag a template circuit to view theory and challenges here!
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sandbox-modal-overlay" id="truth-table-designer-modal" style="display:none;">
+        <div class="sandbox-modal">
+          <div class="sandbox-modal-header">
+            <h3>Truth Table Designer</h3>
+            <button class="sandbox-modal-close" id="truth-designer-close-btn" type="button">&times;</button>
+          </div>
+          <div class="sandbox-modal-body">
+            <div class="truth-designer-controls">
+              <label>
+                Inputs
+                <select id="truth-input-count">
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                </select>
+              </label>
+              <label>
+                Outputs
+                <select id="truth-output-count">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                </select>
+              </label>
+            </div>
+            <div id="truth-table-designer-grid"></div>
+          </div>
+          <div class="sandbox-modal-footer">
+            <button class="sandbox-btn" id="truth-designer-cancel-btn" type="button">Cancel</button>
+            <button class="btn-primary" id="truth-designer-apply-btn" type="button">Apply to Sandbox</button>
           </div>
         </div>
       </div>
@@ -1346,10 +1383,11 @@
       <div class="success-modal-overlay" id="ic-create-modal" style="display:none">
         <div class="success-modal" style="max-width:400px;padding:2rem;text-align:left">
           <h2 class="success-modal-title" style="font-size:1.2rem;margin-bottom:1rem">Create Custom IC</h2>
-          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.75rem">Name your new Integrated Circuit. It will replace selected components with a single IC node.</p>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.75rem">Name your new Integrated
+            Circuit. It will replace selected components with a single IC node.</p>
           <input type="text" id="ic-name-input" placeholder="e.g. My Adder, Full Adder, …"
             style="width:100%;padding:.6rem .75rem;border-radius:5px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-sans);font-size:.95rem;margin-bottom:1rem;outline:none">
-          <div style="display:flex;gap:.5rem;justify-content:flex-end">
+          <div style="display:flex;gap:.5rem; justify-content:flex-end; height: 50px;">
             <button class="btn-secondary" id="cancel-ic-btn" style="flex:0;padding:.6rem 1.25rem">Cancel</button>
             <button class="btn-primary" id="confirm-ic-btn" style="flex:0;padding:.6rem 1.5rem">Create IC</button>
           </div>
@@ -2056,270 +2094,292 @@
       </div>
     </section>
 
-<section class="view-panel network-devices-view">
-  <div class="nd-lab-container" id="nd-lab-container"></div>
-</section>
+    <section class="view-panel network-devices-view">
+      <div class="nd-lab-container" id="nd-lab-container"></div>
+    </section>
 
-<section class="view-panel settings-view" id="settings-view">
+    <section class="view-panel settings-view" id="settings-view">
 
-  <div class="settings-both">
-  
-  <!-- Standard/Classic Settings Hero -->
-  <div class="settings-hero">
-    <div class="settings-hero-icon">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="3" />
-        <path
-          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-      </svg>
-    </div>
-    <div>
-      <h1 class="settings-hero-title" id="settings-title" data-i18n="settings_title">Settings &amp; Progress</h1>
-      <p class="settings-hero-sub" id="settings-subtitle" data-i18n="settings_subtitle">Configure your study options and back up learning progress.</p>
-    </div>
-  </div>
+      <div class="settings-both">
 
-  <div class="settings-container">
-
-    <!-- Kids Mode Profile Dashboard (Visually replaces profile card, medium, mode headers) -->
-    <div class="kids-profile-section kids-only" style="display:none">
-      <div class="kids-avatar-container">
-        <img class="kids-avatar-img" src="assets/max_avatar.png" alt="Max avatar">
-        <div class="kids-avatar-pencil" id="kids-avatar-pencil-btn" title="Change Avatar">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-          </svg>
-        </div>
-      </div>
-      <h2 class="kids-profile-name" id="kids-username-display">Chief Scientist Max</h2>
-      <div class="kids-profile-title" id="kids-user-title">Level 14 Quantum Explorer</div>
-      
-      <div class="kids-progress-panel">
-        <div class="kids-progress-row">
-          <div class="kids-progress-header">
-            <span data-i18n="kids_energy_label">⚡ ENERGY (XP)</span>
-            <span id="kids-xp-text">450 / 600 XP</span>
-          </div>
-          <div class="kids-progress-bar-outer">
-            <div class="kids-progress-bar-inner" id="kids-xp-bar-fill" style="width: 75%"></div>
-          </div>
-        </div>
-        
-        <div class="kids-progress-row">
-          <div class="kids-progress-header">
-            <span data-i18n="kids_goal_label">🎓 LESSON GOAL</span>
-            <span id="kids-goal-text">4 / 5 Lessons</span>
-          </div>
-          <div class="kids-progress-bar-outer">
-            <div class="kids-progress-bar-inner purple" id="kids-goal-bar-fill" style="width: 80%"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="kids-settings-grid">
-        <div class="kids-grid-card" id="kids-card-lang">
-          <div class="kids-grid-icon">🌐</div>
-          <div class="kids-grid-label" data-i18n="kids_grid_lang">Language</div>
-          <div class="kids-grid-value" id="kids-val-lang">English</div>
-        </div>
-        <div class="kids-grid-card" id="kids-card-theme">
-          <div class="kids-grid-icon">☀️</div>
-          <div class="kids-grid-label" data-i18n="kids_grid_theme">Theme Mode</div>
-          <div class="kids-grid-value" id="kids-val-theme">LIGHT</div>
-        </div>
-        <div class="kids-grid-card" id="kids-card-sfx">
-          <div class="kids-grid-icon">🔊</div>
-          <div class="kids-grid-label" data-i18n="kids_grid_sfx">Sound FX</div>
-          <div class="kids-grid-value" id="kids-val-sfx">ENABLED</div>
-        </div>
-        <div class="kids-grid-card" id="kids-card-alerts">
-          <div class="kids-grid-icon">🔔</div>
-          <div class="kids-grid-label" data-i18n="kids_grid_alerts">Interface</div>
-          <div class="kids-grid-value" id="kids-val-alerts">KIDS</div>
-        </div>
-      </div>
-      
-      <button class="btn-primary kids-btn-green" id="kids-backup-btn" style="width:100%; max-width:320px; font-size:1.05rem; padding:12px; margin-bottom: 2rem">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle; margin-right:4px">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-          <polyline points="17 21 17 13 7 13 7 21"/>
-          <polyline points="7 3 7 8 15 8"/>
-        </svg>
-        <span data-i18n="kids_backup_label">Backup My Progress</span>
-      </button>
-    </div>
-
-    <!-- General Settings Cards -->
-    <div class="settings-card" id="settings-card-profile">
-      <div class="settings-card-head">
-        <div class="ss-icon is-icon-profile">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-        </div>
-        <div>
-          <span class="settings-card-title" id="settings-card-profile-title" data-i18n="profile_title">User Profile</span>
-          <span class="settings-card-sub" id="settings-card-profile-sub" data-i18n="profile_sub">Set your display name</span>
-        </div>
-      </div>
-      <div class="settings-card-body">
-        <label class="settings-label" id="settings-label-username" data-i18n="username_label">Student Name / Alias</label>
-        <div class="settings-input-row">
-          <input type="text" id="settings-username-input" class="settings-input" placeholder="Enter name...">
-          <button class="settings-btn settings-btn-solid" id="settings-save-profile-btn" data-i18n="btn_save_profile">Save</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-card" id="settings-card-medium">
-      <div class="settings-card-head">
-        <div class="ss-icon is-icon-medium">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-          </svg>
-        </div>
-        <div>
-          <span class="settings-card-title" id="settings-card-medium-title" data-i18n="medium_title">Learning Medium</span>
-          <span class="settings-card-sub" id="settings-card-medium-sub" data-i18n="medium_sub">Choose your A/L study language</span>
-        </div>
-      </div>
-      <div class="settings-card-body">
-        <div class="settings-radio-group">
-          <label class="settings-radio">
-            <input type="radio" name="settings-medium" value="en" checked>
-            <span class="settings-radio-dot"></span>
-            <span class="settings-radio-label-text" lang="en">English Medium</span>
-          </label>
-          <label class="settings-radio">
-            <input type="radio" name="settings-medium" value="si">
-            <span class="settings-radio-dot"></span>
-            <span class="settings-radio-label-text" lang="si">සිංහල මාධ්‍යය</span>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-card" id="settings-card-interface-mode">
-      <div class="settings-card-head">
-        <div class="ss-icon is-icon-mode">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-            <line x1="8" y1="21" x2="16" y2="21" />
-            <line x1="12" y1="17" x2="12" y2="21" />
-          </svg>
-        </div>
-        <div>
-          <span class="settings-card-title" id="settings-card-mode-title" data-i18n="mode_title">Interface Theme</span>
-          <span class="settings-card-sub" id="settings-card-mode-sub" data-i18n="mode_sub">Select learning layout style</span>
-        </div>
-      </div>
-      <div class="settings-card-body">
-        <div class="settings-radio-group">
-          <label class="settings-radio">
-            <input type="radio" name="settings-interface-mode" value="classic" checked>
-            <span class="settings-radio-dot"></span>
-            <span class="settings-radio-label-text" id="settings-mode-classic-label" data-i18n="classic_label">Classic Mode (Gamified)</span>
-          </label>
-          <label class="settings-radio">
-            <input type="radio" name="settings-interface-mode" value="professional">
-            <span class="settings-radio-dot"></span>
-            <span class="settings-radio-label-text" id="settings-mode-pro-label" data-i18n="pro_label">Professional Mode (Academic)</span>
-          </label>
-          <label class="settings-radio">
-            <input type="radio" name="settings-interface-mode" value="kids">
-            <span class="settings-radio-dot"></span>
-            <span class="settings-radio-label-text" id="settings-mode-kids-label" data-i18n="kids_label">Kids Mode (Playful)</span>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-card" id="settings-card-sync">
-      <div class="settings-card-head">
-        <div class="ss-icon is-icon-sync">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-        </div>
-        <div>
-          <span class="settings-card-title" id="settings-card-sync-title" data-i18n="sync_title">Data Sync</span>
-          <span class="settings-card-sub" id="settings-card-sync-sub" data-i18n="sync_sub">Transfer progress between devices</span>
-        </div>
-      </div>
-      <div class="settings-card-body">
-        <div class="settings-sync-layout">
-          <div class="settings-sync-col">
-            <label class="settings-label" id="settings-label-export" data-i18n="export_label">Export Code</label>
-            <textarea id="settings-export-code" class="settings-code-area" readonly onclick="this.select()"></textarea>
-            <button class="settings-btn settings-btn-outline" id="settings-copy-code-btn">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" />
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-              </svg>
-              <span data-i18n="btn_copy_code">Copy Code</span>
-            </button>
-          </div>
-          <div class="settings-sync-arrow">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--text-muted)" stroke-width="2">
-              <polyline points="5 12 19 12" />
-              <polyline points="12 5 19 12 12 19" />
+        <!-- Standard/Classic Settings Hero -->
+        <div class="settings-hero">
+          <div class="settings-hero-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
             </svg>
           </div>
-          <div class="settings-sync-col">
-            <label class="settings-label" id="settings-label-import" data-i18n="import_label">Import Code</label>
-            <input type="text" id="settings-import-code" class="settings-input" placeholder="Paste sync code...">
-            <button class="settings-btn settings-btn-solid" id="settings-import-code-btn">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              <span data-i18n="btn_import_code">Import</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-card settings-card-danger" id="settings-card-danger">
-      <div class="settings-card-head">
-        <div class="ss-icon is-icon-danger">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-            <line x1="12" y1="9" x2="12" y2="13" />
-            <line x1="12" y1="17" x2="12.01" y2="17" />
-          </svg>
-        </div>
-        <div>
-          <span class="settings-card-title is-text-error" id="settings-card-danger-title" data-i18n="danger_title">Danger Zone</span>
-          <span class="settings-card-sub" id="settings-card-danger-sub" data-i18n="danger_sub">Irreversible actions</span>
-        </div>
-      </div>
-      <div class="settings-card-body">
-        <div class="settings-danger-row">
           <div>
-            <div class="settings-danger-title" data-i18n="danger_reset_title">Reset all progress</div>
-            <div class="settings-danger-desc" data-i18n="danger_reset_desc">All XP, keys, and lesson data will be lost</div>
+            <h1 class="settings-hero-title" id="settings-title" data-i18n="settings_title">Settings &amp; Progress</h1>
+            <p class="settings-hero-sub" id="settings-subtitle" data-i18n="settings_subtitle">Configure your study
+              options and back up learning progress.</p>
           </div>
-          <button class="settings-btn settings-btn-danger" id="settings-reset-btn">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="1 4 1 10 7 10" />
-              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-            </svg>
-            <span data-i18n="btn_reset">Reset</span>
-          </button>
+        </div>
+
+        <div class="settings-container">
+
+          <!-- Kids Mode Profile Dashboard (Visually replaces profile card, medium, mode headers) -->
+          <div class="kids-profile-section kids-only" style="display:none">
+            <div class="kids-avatar-container">
+              <img class="kids-avatar-img" src="assets/max_avatar.png" alt="Max avatar">
+              <div class="kids-avatar-pencil" id="kids-avatar-pencil-btn" title="Change Avatar">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3">
+                  <path
+                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </div>
+            </div>
+            <h2 class="kids-profile-name" id="kids-username-display">Chief Scientist Max</h2>
+            <div class="kids-profile-title" id="kids-user-title">Level 14 Quantum Explorer</div>
+
+            <div class="kids-progress-panel">
+              <div class="kids-progress-row">
+                <div class="kids-progress-header">
+                  <span data-i18n="kids_energy_label">⚡ ENERGY (XP)</span>
+                  <span id="kids-xp-text">450 / 600 XP</span>
+                </div>
+                <div class="kids-progress-bar-outer">
+                  <div class="kids-progress-bar-inner" id="kids-xp-bar-fill" style="width: 75%"></div>
+                </div>
+              </div>
+
+              <div class="kids-progress-row">
+                <div class="kids-progress-header">
+                  <span data-i18n="kids_goal_label">🎓 LESSON GOAL</span>
+                  <span id="kids-goal-text">4 / 5 Lessons</span>
+                </div>
+                <div class="kids-progress-bar-outer">
+                  <div class="kids-progress-bar-inner purple" id="kids-goal-bar-fill" style="width: 80%"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kids-settings-grid">
+              <div class="kids-grid-card" id="kids-card-lang">
+                <div class="kids-grid-icon">🌐</div>
+                <div class="kids-grid-label" data-i18n="kids_grid_lang">Language</div>
+                <div class="kids-grid-value" id="kids-val-lang">English</div>
+              </div>
+              <div class="kids-grid-card" id="kids-card-theme">
+                <div class="kids-grid-icon">☀️</div>
+                <div class="kids-grid-label" data-i18n="kids_grid_theme">Theme Mode</div>
+                <div class="kids-grid-value" id="kids-val-theme">LIGHT</div>
+              </div>
+              <div class="kids-grid-card" id="kids-card-sfx">
+                <div class="kids-grid-icon">🔊</div>
+                <div class="kids-grid-label" data-i18n="kids_grid_sfx">Sound FX</div>
+                <div class="kids-grid-value" id="kids-val-sfx">ENABLED</div>
+              </div>
+              <div class="kids-grid-card" id="kids-card-alerts">
+                <div class="kids-grid-icon">🔔</div>
+                <div class="kids-grid-label" data-i18n="kids_grid_alerts">Interface</div>
+                <div class="kids-grid-value" id="kids-val-alerts">KIDS</div>
+              </div>
+            </div>
+
+            <button class="btn-primary kids-btn-green" id="kids-backup-btn"
+              style="width:100%; max-width:320px; font-size:1.05rem; padding:12px; margin-bottom: 2rem">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
+                style="vertical-align:middle; margin-right:4px">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                <polyline points="17 21 17 13 7 13 7 21" />
+                <polyline points="7 3 7 8 15 8" />
+              </svg>
+              <span data-i18n="kids_backup_label">Backup My Progress</span>
+            </button>
+          </div>
+
+          <!-- General Settings Cards -->
+          <div class="settings-card" id="settings-card-profile">
+            <div class="settings-card-head">
+              <div class="ss-icon is-icon-profile">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div>
+                <span class="settings-card-title" id="settings-card-profile-title" data-i18n="profile_title">User
+                  Profile</span>
+                <span class="settings-card-sub" id="settings-card-profile-sub" data-i18n="profile_sub">Set your display
+                  name</span>
+              </div>
+            </div>
+            <div class="settings-card-body">
+              <label class="settings-label" id="settings-label-username" data-i18n="username_label">Student Name /
+                Alias</label>
+              <div class="settings-input-row">
+                <input type="text" id="settings-username-input" class="settings-input" placeholder="Enter name...">
+                <button class="settings-btn settings-btn-solid" id="settings-save-profile-btn"
+                  data-i18n="btn_save_profile">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card" id="settings-card-medium">
+            <div class="settings-card-head">
+              <div class="ss-icon is-icon-medium">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path
+                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+              </div>
+              <div>
+                <span class="settings-card-title" id="settings-card-medium-title" data-i18n="medium_title">Learning
+                  Medium</span>
+                <span class="settings-card-sub" id="settings-card-medium-sub" data-i18n="medium_sub">Choose your A/L
+                  study language</span>
+              </div>
+            </div>
+            <div class="settings-card-body">
+              <div class="settings-radio-group">
+                <label class="settings-radio">
+                  <input type="radio" name="settings-medium" value="en" checked>
+                  <span class="settings-radio-dot"></span>
+                  <span class="settings-radio-label-text" lang="en">English Medium</span>
+                </label>
+                <label class="settings-radio">
+                  <input type="radio" name="settings-medium" value="si">
+                  <span class="settings-radio-dot"></span>
+                  <span class="settings-radio-label-text" lang="si">සිංහල මාධ්‍යය</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card" id="settings-card-interface-mode">
+            <div class="settings-card-head">
+              <div class="ss-icon is-icon-mode">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+              </div>
+              <div>
+                <span class="settings-card-title" id="settings-card-mode-title" data-i18n="mode_title">Interface
+                  Theme</span>
+                <span class="settings-card-sub" id="settings-card-mode-sub" data-i18n="mode_sub">Select learning layout
+                  style</span>
+              </div>
+            </div>
+            <div class="settings-card-body">
+              <div class="settings-radio-group">
+                <label class="settings-radio">
+                  <input type="radio" name="settings-interface-mode" value="classic" checked>
+                  <span class="settings-radio-dot"></span>
+                  <span class="settings-radio-label-text" id="settings-mode-classic-label"
+                    data-i18n="classic_label">Classic Mode (Gamified)</span>
+                </label>
+                <label class="settings-radio">
+                  <input type="radio" name="settings-interface-mode" value="professional">
+                  <span class="settings-radio-dot"></span>
+                  <span class="settings-radio-label-text" id="settings-mode-pro-label"
+                    data-i18n="pro_label">Professional Mode (Academic)</span>
+                </label>
+                <label class="settings-radio">
+                  <input type="radio" name="settings-interface-mode" value="kids">
+                  <span class="settings-radio-dot"></span>
+                  <span class="settings-radio-label-text" id="settings-mode-kids-label" data-i18n="kids_label">Kids Mode
+                    (Playful)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card" id="settings-card-sync">
+            <div class="settings-card-head">
+              <div class="ss-icon is-icon-sync">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              </div>
+              <div>
+                <span class="settings-card-title" id="settings-card-sync-title" data-i18n="sync_title">Data Sync</span>
+                <span class="settings-card-sub" id="settings-card-sync-sub" data-i18n="sync_sub">Transfer progress
+                  between devices</span>
+              </div>
+            </div>
+            <div class="settings-card-body">
+              <div class="settings-sync-layout">
+                <div class="settings-sync-col">
+                  <label class="settings-label" id="settings-label-export" data-i18n="export_label">Export Code</label>
+                  <textarea id="settings-export-code" class="settings-code-area" readonly
+                    onclick="this.select()"></textarea>
+                  <button class="settings-btn settings-btn-outline" id="settings-copy-code-btn">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" />
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                    <span data-i18n="btn_copy_code">Copy Code</span>
+                  </button>
+                </div>
+                <div class="settings-sync-arrow">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--text-muted)"
+                    stroke-width="2">
+                    <polyline points="5 12 19 12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </div>
+                <div class="settings-sync-col">
+                  <label class="settings-label" id="settings-label-import" data-i18n="import_label">Import Code</label>
+                  <input type="text" id="settings-import-code" class="settings-input" placeholder="Paste sync code...">
+                  <button class="settings-btn settings-btn-solid" id="settings-import-code-btn">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    <span data-i18n="btn_import_code">Import</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card settings-card-danger" id="settings-card-danger">
+            <div class="settings-card-head">
+              <div class="ss-icon is-icon-danger">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+              </div>
+              <div>
+                <span class="settings-card-title is-text-error" id="settings-card-danger-title"
+                  data-i18n="danger_title">Danger Zone</span>
+                <span class="settings-card-sub" id="settings-card-danger-sub" data-i18n="danger_sub">Irreversible
+                  actions</span>
+              </div>
+            </div>
+            <div class="settings-card-body">
+              <div class="settings-danger-row">
+                <div>
+                  <div class="settings-danger-title" data-i18n="danger_reset_title">Reset all progress</div>
+                  <div class="settings-danger-desc" data-i18n="danger_reset_desc">All XP, keys, and lesson data will be
+                    lost</div>
+                </div>
+                <button class="settings-btn settings-btn-danger" id="settings-reset-btn">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="1 4 1 10 7 10" />
+                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                  </svg>
+                  <span data-i18n="btn_reset">Reset</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-    </div>
 
-  </div>
-  </div>
-
-</section>
+    </section>
 
 
   </main>

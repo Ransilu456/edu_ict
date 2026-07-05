@@ -1,129 +1,267 @@
+/* ===================================================================
+   KIDS MODE (PLAYFUL DUOLINGO-STYLE DESIGN SYSTEM)
+   =================================================================== */
+
 .kids-mode {
-  --bg-primary: var(--kids-bg);
-  --bg-secondary: var(--kids-card-bg);
-  --text-primary: var(--kids-text);
-  --text-secondary: var(--kids-text-light);
+  --bg-primary: #f0f7ff;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e0f2fe;
+  --border-color: #cbd5e1;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  
+  --color-indigo: #1cb0f6;
+  --color-indigo-glow: rgba(28, 176, 246, 0.15);
+  --color-success: #58cc02;
+  --color-success-glow: rgba(88, 204, 2, 0.15);
+  --color-error: #ff4b4b;
+  --color-error-glow: rgba(255, 75, 75, 0.15);
+  --color-high: #58cc02;
+  --color-low: #cbd5e1;
+  
+  font-family: 'Noto Sans Sinhala', 'Inter', system-ui, -apple-system, sans-serif !important;
 }
 
+/* Global Animations & Transitions */
+.kids-mode * {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              box-shadow 0.2s ease, 
+              background-color 0.2s ease,
+              border-color 0.2s ease;
+}
+
+/* Playful Dotted Background for Canvas/Workspace */
+.kids-mode .sandbox-workspace, 
+.kids-mode .nd-svg-wrap, 
+.kids-mode .explorer-canvas,
+.kids-mode .sub-map-container {
+  background-color: #f0f9ff !important;
+  background-image: radial-gradient(#bae6fd 2.5px, transparent 2.5px) !important;
+  background-size: 24px 24px !important;
+}
+
+/* Sleek Bubble Headers */
+.kids-mode header {
+  background: #ffffff !important;
+  border-bottom: 4px solid #e2e8f0 !important;
+  box-shadow: 0 4px 0 rgba(226, 232, 240, 0.3) !important;
+  height: 64px !important;
+}
+
+.kids-mode .logo span {
+  color: #1cb0f6 !important;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  text-shadow: 2px 2px 0px rgba(28, 176, 246, 0.1);
+}
+
+/* Duolingo 3D Navigation Tabs */
+.kids-mode .nav-tab {
+  border-radius: 12px !important;
+  margin: 0 0.25rem !important;
+  border: 2px solid transparent !important;
+  padding: 0.5rem 0.85rem !important;
+  font-weight: 800 !important;
+  color: #64748b !important;
+  transform: translateY(-2px);
+}
+
+.kids-mode .nav-tab:hover {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+  transform: translateY(-4px);
+}
+
+.kids-mode .nav-tab.active {
+  background: #e0f2fe !important;
+  border: 2px solid #38bdf8 !important;
+  box-shadow: 0 4px 0 #0284c7 !important;
+  color: #0369a1 !important;
+  transform: translateY(-2px);
+}
+
+.kids-mode .nav-tab:active {
+  transform: translateY(2px);
+  box-shadow: none !important;
+}
+
+/* 3D Pressable Bubble Buttons */
+.kids-mode button,
+.kids-mode .sandbox-btn,
+.kids-mode .nd-send-btn,
+.kids-mode .nd-host-btn,
+.kids-mode .crypto-btn,
+.kids-mode .parity-action-btn,
+.kids-mode .mode-toggle-btn {
+  border-radius: 16px !important;
+  border: 2px solid #222222 !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.6rem 1.2rem;
+  box-shadow: 0 4px 0 #222222 !important;
+  transform: translateY(-3px);
+  cursor: pointer;
+  background: #ffffff;
+}
+
+.kids-mode button:hover,
+.kids-mode .sandbox-btn:hover,
+.kids-mode .nd-send-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 0 #222222 !important;
+}
+
+.kids-mode button:active,
+.kids-mode .sandbox-btn:active,
+.kids-mode .nd-send-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 0px 0 #222222 !important;
+}
+
+/* Color Coding for 3D buttons */
+.kids-mode .nd-send-btn, 
+.kids-mode .btn-play.running,
+.kids-mode .settings-btn-solid {
+  background: #58cc02 !important;
+  color: #ffffff !important;
+  border-color: #3fa000 !important;
+  box-shadow: 0 4px 0 #3fa000 !important;
+}
+
+.kids-mode .nd-send-btn:hover,
+.kids-mode .settings-btn-solid:hover {
+  box-shadow: 0 6px 0 #3fa000 !important;
+}
+
+.kids-mode .nd-send-btn:active,
+.kids-mode .settings-btn-solid:active {
+  box-shadow: 0 0px 0 #3fa000 !important;
+}
+
+/* Playful Rounded Cards & Sidebars */
+.kids-mode .sandbox-toolbox,
+.kids-mode .nd-left,
+.kids-mode .settings-card,
+.kids-mode .nd-card,
+.kids-mode .explorer-toolbox {
+  border: 3px solid #cbd5e1 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 0 rgba(203, 213, 225, 0.4) !important;
+  background: #ffffff !important;
+  padding: 1.25rem !important;
+  margin: 0.5rem;
+}
+
+.kids-mode .sandbox-toolbox {
+  margin: 0 !important;
+  border-radius: 0 20px 20px 0 !important;
+  border-left: none !important;
+}
+
+/* Bubble Nodes in Sandbox */
+.kids-mode .sandbox-node {
+  border: 3.5px solid #475569 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 6px 0 #475569 !important;
+  background: #ffffff !important;
+  padding: 0.65rem !important;
+  transform: scale(1.02);
+}
+
+.kids-mode .sandbox-node:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 8px 0 #475569 !important;
+}
+
+.kids-mode .sandbox-node.selected {
+  border-color: #1cb0f6 !important;
+  box-shadow: 0 6px 0 #0284c7 !important;
+}
+
+/* Rainbow Highlight for Active Electrical components in Kids Mode */
+.kids-mode .sandbox-node.elec-active {
+  border-color: #58cc02 !important;
+  box-shadow: 0 8px 0 #3fa000 !important;
+  animation: kidsElecBounce 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes kidsElecBounce {
+  0% { transform: translateY(0) scale(1.02); }
+  100% { transform: translateY(-4px) scale(1.04); }
+}
+
+/* Fun Stickers for Categories in Toolbox */
+.kids-mode .toolbox-section-title::before {
+  content: "✨ ";
+}
+.kids-mode .toolbox-section-title[data-category="Inputs"]::before { content: "🎮 "; }
+.kids-mode .toolbox-section-title[data-category="Gates"]::before { content: "🧩 "; }
+.kids-mode .toolbox-section-title[data-category="Outputs"]::before { content: "💡 "; }
+.kids-mode .toolbox-section-title[data-category="Electricity"]::before { content: "⚡ "; }
+.kids-mode .toolbox-section-title[data-category="Templates"]::before { content: "📚 "; }
+
+/* Toolbox Item Styling */
+.kids-mode .toolbox-item {
+  border-radius: 12px !important;
+  border: 2px solid #cbd5e1 !important;
+  background: #ffffff !important;
+  font-weight: 700 !important;
+  margin-bottom: 0.25rem;
+}
+
+.kids-mode .toolbox-item:hover {
+  border-color: #818cf8 !important;
+  background: #f5f3ff !important;
+  transform: translateX(4px);
+}
+
+/* Duolingo XP Energy Bar */
+.kids-mode .xp-bar-wrap {
+  border-radius: 12px !important;
+  height: 18px !important;
+  border: 2.5px solid #222222 !important;
+  box-shadow: 0 3px 0 #222222 !important;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.kids-mode .xp-bar-fill {
+  background: linear-gradient(90deg, #ffc700, #ff9600) !important;
+  border-radius: 8px !important;
+}
+
+/* Switch & Transistor toggle custom buttons in Kids Mode */
+.kids-mode button[onclick*="toggleElectricSwitch"],
+.kids-mode button[onclick*="toggleElectricTransistor"] {
+  border-radius: 10px !important;
+  border: 2px solid #222222 !important;
+  padding: 2px 6px !important;
+  box-shadow: 0 3px 0 #222222 !important;
+  font-size: 0.65rem !important;
+}
+
+.kids-mode button[onclick*="toggleElectricSwitch"]:active,
+.kids-mode button[onclick*="toggleElectricTransistor"]:active {
+  transform: translateY(2px) !important;
+  box-shadow: none !important;
+}
+
+/* Settings elements */
 .kids-mode .settings-view {
-  background: var(--kids-bg);
+  background: #f0f7ff !important;
 }
 
 .kids-mode .settings-card {
-  border: 3px solid var(--kids-border);
-  border-radius: 20px;
-  box-shadow: var(--kids-shadow);
-  background: var(--kids-card-bg);
-  padding: 1.35rem 1.5rem;
+  border: 3px solid #cbd5e1 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 0 rgba(203, 213, 225, 0.3) !important;
+  background: #ffffff !important;
+  padding: 1.35rem 1.5rem !important;
 }
 
 .kids-mode .settings-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 0 rgba(255, 213, 79, 0.3);
-}
-
-.kids-mode .settings-hero-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--kids-btn-primary);
-  color: #fff;
-  border: 3px solid #3fa000;
-  box-shadow: 0 4px 0 #3fa000;
-}
-
-.kids-mode .ss-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-}
-
-.kids-mode .settings-radio {
-  border: 2px solid var(--kids-border);
-  border-radius: 14px;
-  padding: 12px 16px;
-}
-
-.kids-mode .settings-radio:hover {
-  border-color: var(--kids-btn-primary);
-  background: rgba(88, 204, 2, 0.05);
-}
-
-.kids-mode .settings-radio-dot {
-  border-width: 3px;
-}
-
-.kids-mode .settings-btn {
-  border-radius: 14px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  padding: 0.65rem 1.3rem;
-}
-
-.kids-mode .settings-btn-outline {
-  border: 3px solid var(--kids-border);
-  background: var(--kids-card-bg);
-}
-
-.kids-mode .settings-btn-outline:hover {
-  border-color: var(--kids-btn-secondary);
-  background: rgba(255, 150, 0, 0.05);
-}
-
-.kids-mode .settings-btn-solid {
-  background: var(--kids-btn-primary);
-  border: 3px solid #3fa000;
-  box-shadow: var(--kids-btn-primary-shadow);
-  color: #fff;
-  transform: translateY(-2px);
-}
-
-.kids-mode .settings-btn-solid:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 0 #3fa000;
-}
-
-.kids-mode .settings-btn-solid:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 #3fa000;
-}
-
-.kids-mode .settings-btn-danger {
-  background: var(--kids-btn-danger);
-  border: 3px solid #cc3c3c;
-  box-shadow: var(--kids-btn-danger-shadow);
-  color: #fff;
-  transform: translateY(-2px);
-}
-
-.kids-mode .settings-btn-danger:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 0 #cc3c3c;
-}
-
-.kids-mode .settings-btn-danger:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 #cc3c3c;
-}
-
-.kids-mode .settings-input {
-  border: 2px solid var(--kids-border);
-  border-radius: 14px;
-  padding: 0.7rem 1rem;
-}
-
-.kids-mode .settings-code-area {
-  border: 2px solid var(--kids-border);
-  border-radius: 14px;
-}
-
-.kids-mode .settings-danger-row {
-  border: 2px solid rgba(255, 75, 75, 0.25);
-  border-radius: 14px;
-}
-
-.kids-mode .settings-sync-arrow {
-  border: 2px solid var(--kids-border);
-  background: var(--kids-card-bg);
+  box-shadow: 0 10px 0 rgba(28, 176, 246, 0.2) !important;
 }

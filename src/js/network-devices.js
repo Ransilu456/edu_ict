@@ -79,6 +79,32 @@ function buildNDLayout() {
         </div>
         <div class="nd-card"><div class="nd-card-title">${I.search} Device Info</div><div class="nd-info-content" id="nd-info-content"></div></div>
         <div class="nd-card"><div class="nd-card-title">${I.brain} MAC Table</div><div class="nd-table-content" id="nd-table-content"><em style="color:var(--text-muted)">No activity yet</em></div></div>
+        <!-- Topology Legend -->
+        <div class="nd-card" style="margin-top:auto">
+          <div class="nd-card-title">${I.key} Topology Legend</div>
+          <div class="nd-legend-content" style="font-size:0.65rem; color:var(--text-secondary); display:flex; flex-direction:column; gap:0.25rem; line-height: 1.3;">
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+              <span style="display:inline-block; width:16px; height:0px; border-top:2.5px dashed var(--border-color)"></span>
+              <span>Inactive Cable Link</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+              <span style="display:inline-block; width:16px; height:0px; border-top:2.5px solid var(--color-success)"></span>
+              <span>Active Packet Link</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+              <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background:rgba(129,140,248,0.1); border:1px solid #818cf8"></span>
+              <span>Hub (L1 Physical Broadcast)</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+              <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background:rgba(34,211,165,0.1); border:1px solid #22d3a5"></span>
+              <span>Switch (L2 Data Link Forward)</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+              <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background:rgba(251,191,36,0.1); border:1px solid #fbbf24"></span>
+              <span>Router (L3 Network Route)</span>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="nd-right">
         <div class="nd-svg-wrap">
@@ -89,37 +115,81 @@ function buildNDLayout() {
               <linearGradient id="ndGradRouter" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient>
             </defs>
             <!-- Cables -->
-            <line class="nd-line" x1="60" y1="50" x2="170" y2="130"/>
-            <line class="nd-line" x1="60" y1="230" x2="170" y2="150"/>
-            <line class="nd-line" x1="240" y1="130" x2="350" y2="50"/>
-            <line class="nd-line" x1="240" y1="150" x2="350" y2="230"/>
+            <line class="nd-line" id="nd-line-pc-a" x1="60" y1="50" x2="170" y2="130"/>
+            <line class="nd-line" id="nd-line-pc-b" x1="60" y1="230" x2="170" y2="150"/>
+            <line class="nd-line" id="nd-line-pc-c" x1="240" y1="130" x2="350" y2="50"/>
+            <line class="nd-line" id="nd-line-pc-d" x1="240" y1="150" x2="350" y2="230"/>
+
             <!-- Host A -->
-            <rect class="nd-host-bg" x="30" y="25" width="50" height="50" rx="8"/>
-            <text class="nd-host-label" x="55" y="48" text-anchor="middle">A</text>
-            <text class="nd-host-mac" x="55" y="60" text-anchor="middle">AA:AA:AA:AA:AA:01</text>
-            <text class="nd-host-ip" x="55" y="68" text-anchor="middle">192.168.1.10</text>
+            <g class="nd-host-group" id="host-pc-a" style="cursor:pointer;" onclick="window.selectNDDevice('pc-a')">
+              <rect class="nd-host-bg" x="30" y="25" width="50" height="50" rx="8"/>
+              <!-- Desktop computer schematic design -->
+              <rect x="40" y="32" width="30" height="20" rx="2" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.2"/>
+              <line x1="55" y1="52" x2="55" y2="58" stroke="#818cf8" stroke-width="2"/>
+              <line x1="50" y1="58" x2="60" y2="58" stroke="#818cf8" stroke-width="2"/>
+              <circle cx="43" cy="36" r="1.5" fill="#22d3a5"/>
+              <text class="nd-host-label" x="55" y="46" text-anchor="middle">A</text>
+              <text class="nd-host-mac" x="55" y="62" text-anchor="middle">AA:AA:AA:AA:AA:01</text>
+              <text class="nd-host-ip" x="55" y="69" text-anchor="middle">192.168.1.10</text>
+            </g>
+
             <!-- Host B -->
-            <rect class="nd-host-bg" x="30" y="205" width="50" height="50" rx="8"/>
-            <text class="nd-host-label" x="55" y="228" text-anchor="middle">B</text>
-            <text class="nd-host-mac" x="55" y="240" text-anchor="middle">AA:AA:AA:AA:AA:02</text>
-            <text class="nd-host-ip" x="55" y="248" text-anchor="middle">192.168.1.20</text>
+            <g class="nd-host-group" id="host-pc-b" style="cursor:pointer;" onclick="window.selectNDDevice('pc-b')">
+              <rect class="nd-host-bg" x="30" y="205" width="50" height="50" rx="8"/>
+              <rect x="40" y="212" width="30" height="20" rx="2" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.2"/>
+              <line x1="55" y1="232" x2="55" y2="238" stroke="#818cf8" stroke-width="2"/>
+              <line x1="50" y1="238" x2="60" y2="238" stroke="#818cf8" stroke-width="2"/>
+              <circle cx="43" cy="216" r="1.5" fill="#22d3a5"/>
+              <text class="nd-host-label" x="55" y="226" text-anchor="middle">B</text>
+              <text class="nd-host-mac" x="55" y="242" text-anchor="middle">AA:AA:AA:AA:AA:02</text>
+              <text class="nd-host-ip" x="55" y="249" text-anchor="middle">192.168.1.20</text>
+            </g>
+
             <!-- Host C -->
-            <rect class="nd-host-bg" x="325" y="25" width="50" height="50" rx="8"/>
-            <text class="nd-host-label" x="350" y="48" text-anchor="middle">C</text>
-            <text class="nd-host-mac" x="350" y="60" text-anchor="middle">AA:AA:AA:AA:AA:03</text>
-            <text class="nd-host-ip" x="350" y="68" text-anchor="middle">192.168.2.10</text>
+            <g class="nd-host-group" id="host-pc-c" style="cursor:pointer;" onclick="window.selectNDDevice('pc-c')">
+              <rect class="nd-host-bg" x="325" y="25" width="50" height="50" rx="8"/>
+              <rect x="335" y="32" width="30" height="20" rx="2" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.2"/>
+              <line x1="350" y1="52" x2="350" y2="58" stroke="#818cf8" stroke-width="2"/>
+              <line x1="345" y1="58" x2="355" y2="58" stroke="#818cf8" stroke-width="2"/>
+              <circle cx="338" cy="36" r="1.5" fill="#22d3a5"/>
+              <text class="nd-host-label" x="350" y="46" text-anchor="middle">C</text>
+              <text class="nd-host-mac" x="350" y="62" text-anchor="middle">AA:AA:AA:AA:AA:03</text>
+              <text class="nd-host-ip" x="350" y="69" text-anchor="middle">192.168.2.10</text>
+            </g>
+
             <!-- Host D -->
-            <rect class="nd-host-bg" x="325" y="205" width="50" height="50" rx="8"/>
-            <text class="nd-host-label" x="350" y="228" text-anchor="middle">D</text>
-            <text class="nd-host-mac" x="350" y="240" text-anchor="middle">AA:AA:AA:AA:AA:04</text>
-            <text class="nd-host-ip" x="350" y="248" text-anchor="middle">192.168.2.20</text>
+            <g class="nd-host-group" id="host-pc-d" style="cursor:pointer;" onclick="window.selectNDDevice('pc-d')">
+              <rect class="nd-host-bg" x="325" y="205" width="50" height="50" rx="8"/>
+              <rect x="335" y="212" width="30" height="20" rx="2" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.2"/>
+              <line x1="350" y1="232" x2="350" y2="238" stroke="#818cf8" stroke-width="2"/>
+              <line x1="345" y1="238" x2="355" y2="238" stroke="#818cf8" stroke-width="2"/>
+              <circle cx="338" cy="216" r="1.5" fill="#22d3a5"/>
+              <text class="nd-host-label" x="350" y="226" text-anchor="middle">D</text>
+              <text class="nd-host-mac" x="350" y="242" text-anchor="middle">AA:AA:AA:AA:AA:04</text>
+              <text class="nd-host-ip" x="350" y="249" text-anchor="middle">192.168.2.20</text>
+            </g>
+
             <!-- Central Device -->
-            <rect class="nd-dev-box hub" id="nd-devbox" x="175" y="115" width="60" height="50" rx="8"/>
-            <text class="nd-dev-label" id="nd-devlabel" x="205" y="143" text-anchor="middle">HUB</text>
-            <!-- Animation dots -->
-            <circle class="nd-dot" id="nd-dot1" cx="-20" cy="-20" r="5" display="none"/>
-            <circle class="nd-dot" id="nd-dot2" cx="-20" cy="-20" r="5" display="none"/>
-            <circle class="nd-dot" id="nd-dot3" cx="-20" cy="-20" r="5" display="none"/>
+            <g id="nd-center-g" style="cursor:pointer;" onclick="window.selectNDDevice('central')">
+              <rect class="nd-dev-box hub" id="nd-devbox" x="175" y="115" width="60" height="50" rx="8"/>
+              <g id="nd-dev-icon-overlay"></g>
+              <text class="nd-dev-label" id="nd-devlabel" x="205" y="157" text-anchor="middle">HUB</text>
+            </g>
+
+            <!-- Animation Packets (envelope design) -->
+            <g class="nd-packet" id="nd-dot1" transform="translate(-20, -20)" display="none">
+              <rect x="-8" y="-6" width="16" height="12" rx="2" fill="#10b981" stroke="#fff" stroke-width="0.8"/>
+              <path d="M-8,-6 L0,0 L8,-6" stroke="#fff" stroke-width="0.8" fill="none"/>
+            </g>
+            <g class="nd-packet" id="nd-dot2" transform="translate(-20, -20)" display="none">
+              <rect x="-8" y="-6" width="16" height="12" rx="2" fill="#10b981" stroke="#fff" stroke-width="0.8"/>
+              <path d="M-8,-6 L0,0 L8,-6" stroke="#fff" stroke-width="0.8" fill="none"/>
+            </g>
+            <g class="nd-packet" id="nd-dot3" transform="translate(-20, -20)" display="none">
+              <rect x="-8" y="-6" width="16" height="12" rx="2" fill="#10b981" stroke="#fff" stroke-width="0.8"/>
+              <path d="M-8,-6 L0,0 L8,-6" stroke="#fff" stroke-width="0.8" fill="none"/>
+            </g>
+
             <text class="nd-crash" id="nd-crash" x="205" y="270" text-anchor="middle" display="none">! COLLISION !</text>
           </svg>
         </div>
@@ -305,6 +375,7 @@ function resetNetLab() {
   netState.animating = false; netState.macTable = {}; netState.colCnt = 0;
   el('nd-log-list').innerHTML = '';
   el('nd-table-content').innerHTML = '<em style="color:var(--text-muted)">No activity yet</em>';
+  clearLinks();
   updateNetUI();
   setDevInfo();
 }
@@ -312,15 +383,114 @@ function resetNetLab() {
 function updateNetUI() {
   const d = netState.device;
   const box = el('nd-devbox');
-  box.classList.remove('hub', 'switch', 'router');
-  box.classList.add(d);
-  box.style.fill = d === 'hub' ? 'rgba(129,140,248,0.08)' : d === 'switch' ? 'rgba(34,211,165,0.08)' : 'rgba(251,191,36,0.08)';
-  el('nd-devlabel').textContent = d.toUpperCase();
+  if (box) {
+    box.className = `nd-dev-box ${d}`;
+    box.style.fill = d === 'hub' ? 'rgba(129,140,248,0.08)' : d === 'switch' ? 'rgba(34,211,165,0.08)' : 'rgba(251,191,36,0.08)';
+  }
+  const lbl = el('nd-devlabel');
+  if (lbl) lbl.textContent = d.toUpperCase();
+  
+  // High fidelity switch/hub/router SVG overlays
+  const overlay = el('nd-dev-icon-overlay');
+  if (overlay) {
+    if (d === 'hub') {
+      overlay.innerHTML = `
+        <!-- Hub rack chassis -->
+        <rect x="185" y="122" width="40" height="16" rx="2" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.2"/>
+        <line x1="190" y1="130" x2="220" y2="130" stroke="#818cf8" stroke-width="1" stroke-dasharray="1.5,1.5"/>
+        <circle cx="195" cy="130" r="2.2" fill="#818cf8"/>
+        <circle cx="205" cy="130" r="2.2" fill="#818cf8"/>
+        <circle cx="215" cy="130" r="2.2" fill="#818cf8"/>
+        <circle cx="221" cy="126" r="1" fill="#22d3a5"/>
+      `;
+    } else if (d === 'switch') {
+      overlay.innerHTML = `
+        <!-- Switch rack chassis with dynamic port LEDs -->
+        <rect x="185" y="122" width="40" height="16" rx="2" fill="#111827" stroke="#22d3a5" stroke-width="1.2"/>
+        <circle cx="192" cy="130" r="1.5" fill="#22d3a5" style="animation: ndPulse 0.3s infinite alternate;"/>
+        <circle cx="197" cy="130" r="1.5" fill="#10b981"/>
+        <circle cx="202" cy="130" r="1.5" fill="#22d3a5" style="animation: ndPulse 0.4s infinite alternate;"/>
+        <circle cx="207" cy="130" r="1.5" fill="#10b981"/>
+        <circle cx="212" cy="130" r="1.5" fill="#22d3a5" style="animation: ndPulse 0.5s infinite alternate;"/>
+        <circle cx="217" cy="130" r="1.5" fill="#22d3a5"/>
+        <circle cx="222" cy="130" r="1.5" fill="#10b981"/>
+      `;
+    } else { // router
+      overlay.innerHTML = `
+        <!-- Router disc/arrows -->
+        <circle cx="205" cy="130" r="13" fill="#1e1b4b" stroke="#fbbf24" stroke-width="1.5"/>
+        <path d="M 197 130 L 213 130 M 205 122 L 205 138" stroke="#fbbf24" stroke-width="1.2" stroke-linecap="round"/>
+        <polygon points="194,130 199,127 199,133" fill="#fbbf24"/>
+        <polygon points="216,130 211,127 211,133" fill="#fbbf24"/>
+        <polygon points="205,119 202,124 208,124" fill="#fbbf24"/>
+        <polygon points="205,141 202,136 208,136" fill="#fbbf24"/>
+      `;
+    }
+  }
+
   hideDots();
-  el('nd-crash').style.display = 'none';
+  const cr = el('nd-crash');
+  if (cr) cr.style.display = 'none';
 }
 
-function hideDots() { ['nd-dot1','nd-dot2','nd-dot3'].forEach(id => { const e=el(id); if(e){e.style.display='none';e.setAttribute('cx',-20);e.setAttribute('cy',-20);} }); }
+function hideDots() {
+  ['nd-dot1','nd-dot2','nd-dot3'].forEach(id => {
+    const e = el(id);
+    if (e) {
+      e.style.display = 'none';
+      if (e.tagName.toLowerCase() === 'circle') {
+        e.setAttribute('cx', -20);
+        e.setAttribute('cy', -20);
+      } else {
+        e.setAttribute('transform', 'translate(-20, -20)');
+      }
+    }
+  });
+}
+
+function highlightLink(hostId, isActive) {
+  const line = el(`nd-line-${hostId}`);
+  if (line) {
+    if (isActive) line.classList.add('send');
+    else line.classList.remove('send');
+  }
+}
+
+function clearLinks() {
+  ['pc-a', 'pc-b', 'pc-c', 'pc-d'].forEach(id => highlightLink(id, false));
+}
+
+window.selectNDDevice = function(id) {
+  if (window.playSound) window.playSound('click');
+  
+  // Highlight clicked card visual border
+  document.querySelectorAll('.nd-host-group, #nd-center-g').forEach(g => {
+    g.querySelector('rect')?.setAttribute('stroke-width', '1.2');
+  });
+  
+  if (id === 'central') {
+    const centralG = el('nd-center-g');
+    centralG?.querySelector('rect')?.setAttribute('stroke-width', '2.5');
+    setDevInfo();
+  } else {
+    const hostG = el(`host-${id}`);
+    hostG?.querySelector('rect')?.setAttribute('stroke-width', '2.5');
+    const h = gh(id);
+    if (h) {
+      el('nd-info-content').innerHTML = `
+        <div style="border-left: 3px solid var(--color-indigo); padding-left: 8px; font-family:var(--font-header);">
+          <strong style="font-size: 0.82rem; color: var(--text-primary); display:block; margin-bottom:0.2rem;">Host ${h.label} Device</strong>
+          <div style="display:flex; flex-direction:column; gap:0.2rem; font-size:0.68rem; margin-top:0.25rem;">
+            <span><strong style="color:var(--text-secondary)">MAC:</strong> <code style="color:var(--color-success); font-family:var(--font-mono);">${h.mac}</code></span>
+            <span><strong style="color:var(--text-secondary)">IP:</strong> <code style="color:var(--color-indigo); font-family:var(--font-mono);">${h.ip}</code></span>
+            <span><strong style="color:var(--text-secondary)">Subnet:</strong> <code style="font-family:var(--font-mono);">${h.sub}/24</code></span>
+            <span><strong style="color:var(--text-secondary)">Status:</strong> <span style="color:#22d3a5; font-weight:700;">ONLINE ✓</span></span>
+          </div>
+        </div>
+      `;
+    }
+  }
+};
 
 function updateHostOptions() {
   ['nd-src-options','nd-dst-options'].forEach(containerId => {
@@ -337,6 +507,7 @@ function updateHostOptions() {
         if (isSrc) netState.src = h.id; else netState.dst = h.id;
         c.querySelectorAll('.nd-host-btn').forEach(x => x.classList.remove('active'));
         b.classList.add('active');
+        window.selectNDDevice(h.id);
       });
       c.appendChild(b);
     });
@@ -345,9 +516,9 @@ function updateHostOptions() {
 
 function setDevInfo() {
   const info = {
-    hub: `<strong>Hub (Layer 1 \u2014 Physical)</strong><br>\u2022 Broadcasts to ALL ports<br>\u2022 No MAC learning<br>\u2022 High collision risk<br>\u2022 Shares bandwidth across all devices`,
-    switch: `<strong>Switch (Layer 2 \u2014 Data Link)</strong><br>\u2022 Forwards selectively by MAC address<br>\u2022 Learns MAC addresses dynamically<br>\u2022 Each port = separate collision domain<br>\u2022 Full bandwidth per device`,
-    router: `<strong>Router (Layer 3 \u2014 Network)</strong><br>\u2022 Routes between different subnets<br>\u2022 Uses IP addresses + routing table<br>\u2022 Connects 192.168.1.x \u2194 192.168.2.x<br>\u2022 Operates at the Network Layer`
+    hub: `<strong>Hub (Layer 1 &mdash; Physical)</strong><br>\u2022 Broadcasts incoming frames to ALL ports<br>\u2022 Does not build a MAC Address lookup table<br>\u2022 Shared medium = high probability of collisions<br>\u2022 Splits overall network bandwidth between hosts`,
+    switch: `<strong>Switch (Layer 2 &mdash; Data Link)</strong><br>\u2022 Selectively forwards frames by matching destination MAC<br>\u2022 Learns source MAC addresses dynamically from traffic<br>\u2022 Each port operates as a separate collision domain<br>\u2022 Guarantees full dedicated bandwidth per host link`,
+    router: `<strong>Router (Layer 3 &mdash; Network)</strong><br>\u2022 Forwards packets between different IP subnets<br>\u2022 Resolves paths via routing table lookups<br>\u2022 Interfaces: 192.168.1.x (Port A) &harr; 192.168.2.x (Port B)<br>\u2022 Operates at the Layer 3 Network boundary`
   };
   el('nd-info-content').innerHTML = info[netState.device] || info.hub;
 }
@@ -364,7 +535,7 @@ function log(msg, cls) {
     const tc = el('nd-table-content');
     if (tc) {
       tc.innerHTML = Object.entries(netState.macTable)
-        .map(([mac, host]) => `<div class="mac-entry"><span class="mac-host">${host}</span><span class="mac-addr">${mac}</span></div>`)
+        .map(([mac, host]) => `<div class="mac-entry"><span class="mac-host">Host ${host}</span><span class="mac-addr">${mac}</span></div>`)
         .join('');
     }
   }
@@ -378,15 +549,27 @@ function animDot(dotId, x1, y1, x2, y2, ms, cb) {
   function f(t) {
     if (netState.abort) { hideDots(); if (cb) cb(); return; }
     let p = Math.min((t - t0) / ms, 1);
-    dot.setAttribute('cx', x1 + (x2 - x1) * p);
-    dot.setAttribute('cy', y1 + (y2 - y1) * p);
+    const currX = x1 + (x2 - x1) * p;
+    const currY = y1 + (y2 - y1) * p;
+    if (dot.tagName.toLowerCase() === 'circle') {
+      dot.setAttribute('cx', currX);
+      dot.setAttribute('cy', currY);
+    } else {
+      dot.setAttribute('transform', `translate(${currX}, ${currY})`);
+    }
     if (p < 1) requestAnimationFrame(f); else if (cb) cb();
   }
   requestAnimationFrame(f);
 }
 
+
 function endAnim() {
-  setTimeout(() => { hideDots(); el('nd-send-btn').disabled = false; netState.animating = false; }, 400);
+  setTimeout(() => {
+    hideDots();
+    clearLinks();
+    el('nd-send-btn').disabled = false;
+    netState.animating = false;
+  }, 400);
 }
 
 function sendPacket() {
@@ -400,54 +583,76 @@ function sendPacket() {
   const sc = coords[s.id], dc = coords[d.id];
   log(`${I.send} ${s.label} \u2192 ${d.label} [${d.mac}]`, 'send');
 
-  if (netState.device === 'hub') {
-    animDot('nd-dot1', sc[0], sc[1], devC[0], devC[1], 400, () => {
+  // Phase 1: Source to Central Device
+  highlightLink(s.id, true);
+  animDot('nd-dot1', sc[0], sc[1], devC[0], devC[1], 450, () => {
+    highlightLink(s.id, false); // clear source link
+
+    if (netState.device === 'hub') {
       log(`${I.hub} HUB broadcasts to ALL ports`, 'hub');
       const others = hosts.filter(h => h.id !== s.id);
-      animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 400);
-      animDot('nd-dot2', devC[0], devC[1], coords[others[0].id][0], coords[others[0].id][1], 400);
-      animDot('nd-dot3', devC[0], devC[1], coords[others[1]?.id || others[0].id][0], coords[others[1]?.id || others[0].id][1], 400, () => {
+      
+      // Highlight broadcast links
+      others.forEach(o => highlightLink(o.id, true));
+      
+      animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 450);
+      animDot('nd-dot2', devC[0], devC[1], coords[others[0].id][0], coords[others[0].id][1], 450);
+      animDot('nd-dot3', devC[0], devC[1], coords[others[1]?.id || others[0].id][0], coords[others[1]?.id || others[0].id][1], 450, () => {
         netState.colCnt++;
         if (netState.colCnt >= 2) { el('nd-crash').style.display = 'block'; log(`${I.warn} COLLISION \u2014 multiple broadcasts collide`, 'col'); }
         log(`${I.check} ${d.label} received (but so did others)`, 'recv');
         endAnim();
       });
-    });
-  } else if (netState.device === 'switch') {
-    const known = !!netState.macTable[d.mac];
-    animDot('nd-dot1', sc[0], sc[1], devC[0], devC[1], 400, () => {
+    } else if (netState.device === 'switch') {
+      const known = !!netState.macTable[d.mac];
       netState.macTable[s.mac] = s.label;
       log(`${I.brain} SWITCH learned: ${s.label} \u2192 ${s.mac}`, 'learn');
+      
       if (known) {
         log(`${I.target} Forwarded to ${d.label} only (known MAC)`, 'sw');
-        animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 400, () => { log(`${I.check} ${d.label} received exclusively`, 'recv'); endAnim(); });
+        highlightLink(d.id, true);
+        animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 450, () => {
+          log(`${I.check} ${d.label} received exclusively`, 'recv');
+          endAnim();
+        });
       } else {
         log(`${I.question} Unknown MAC \u2014 flooding all ports except source`, 'sw');
         const others = hosts.filter(h => h.id !== s.id);
-        animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 400);
-        animDot('nd-dot2', devC[0], devC[1], coords[others.find(h=>h.id!==d.id).id][0], coords[others.find(h=>h.id!==d.id).id][1], 400, () => {
+        
+        // Highlight flooded links
+        others.forEach(o => highlightLink(o.id, true));
+        
+        animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 450);
+        animDot('nd-dot2', devC[0], devC[1], coords[others.find(h=>h.id!==d.id).id][0], coords[others.find(h=>h.id!==d.id).id][1], 450, () => {
           netState.macTable[d.mac] = d.label;
           log(`${I.check} ${d.label} received (switch now knows ${d.mac})`, 'recv');
           endAnim();
         });
         const rest = hosts.filter(h => h.id !== s.id && h.id !== d.id);
-        if (rest.length > 1) animDot('nd-dot3', devC[0], devC[1], coords[rest[1].id][0], coords[rest[1].id][1], 400);
+        if (rest.length > 1) animDot('nd-dot3', devC[0], devC[1], coords[rest[1].id][0], coords[rest[1].id][1], 450);
       }
-    });
-  } else if (netState.device === 'router') {
-    const same = s.sub === d.sub;
-    animDot('nd-dot1', sc[0], sc[1], devC[0], devC[1], 400, () => {
+    } else if (netState.device === 'router') {
+      const same = s.sub === d.sub;
       log(`${I.search} ROUTER: lookup ${d.ip}`, 'router');
       if (same) {
         log(`${I.warn} ${s.label} & ${d.label} are on same subnet \u2014 use a Switch`, 'info');
-        animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 400, () => { log(`${I.check} ${d.label} received`, 'recv'); endAnim(); });
+        highlightLink(d.id, true);
+        animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 450, () => {
+          log(`${I.check} ${d.label} received`, 'recv');
+          endAnim();
+        });
       } else {
         log(`${I.globe} Routing ${s.ip} \u2192 ${d.ip} across subnets`, 'router');
-        animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 400, () => { log(`${I.check} ${d.label} received (routed)`, 'recv'); endAnim(); });
+        highlightLink(d.id, true);
+        animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 450, () => {
+          log(`${I.check} ${d.label} received (routed)`, 'recv');
+          endAnim();
+        });
       }
-    });
-  }
+    }
+  });
 }
+
 
 /* ===================================================================
    TAB 2 — OSI Sim
