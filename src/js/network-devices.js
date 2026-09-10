@@ -50,6 +50,7 @@ function buildNDLayout() {
   <div class="nd-tabs">
     <button class="nd-tab active" data-ndtab="network-tab">${I.network} Network Devices</button>
     <button class="nd-tab" data-ndtab="osi-tab">${I.layers} OSI Sim</button>
+    <button class="nd-tab" data-ndtab="subnet-tab">${I.globe} Subnetting & CIDR</button>
     <button class="nd-tab" data-ndtab="crypto-tab">${I.crypto} Encryption</button>
     <button class="nd-tab" data-ndtab="parity-tab">${I.parity} Parity Check</button>
   </div>
@@ -62,7 +63,7 @@ function buildNDLayout() {
           ${I.network}
           <div>
             <div class="nd-panel-title">Network Devices Lab</div>
-            <div class="nd-panel-sub">Hub \u00b7 Switch \u00b7 Router</div>
+            <div class="nd-panel-sub">Hub &bull; Switch &bull; Router</div>
           </div>
         </div>
         <div class="nd-device-selector">
@@ -79,6 +80,12 @@ function buildNDLayout() {
         </div>
         <div class="nd-card"><div class="nd-card-title">${I.search} Device Info</div><div class="nd-info-content" id="nd-info-content"></div></div>
         <div class="nd-card"><div class="nd-card-title">${I.brain} MAC Table</div><div class="nd-table-content" id="nd-table-content"><em style="color:var(--text-muted)">No activity yet</em></div></div>
+        <div class="nd-card">
+          <div class="nd-card-title">${I.list} Packet Protocol Breakdown</div>
+          <div class="nd-packet-inspector" id="nd-packet-inspector">
+            <em style="color:var(--text-muted);font-size:0.75rem">Transmit a packet to inspect L2 frame &amp; L3/L4 headers</em>
+          </div>
+        </div>
         <!-- Topology Legend -->
         <div class="nd-card" style="margin-top:auto">
           <div class="nd-card-title">${I.key} Topology Legend</div>
@@ -206,6 +213,75 @@ function buildNDLayout() {
     <div id="osi-container"></div>
   </div>
 
+  <!-- SUBNETTING & CIDR LAB -->
+  <div class="nd-tab-content" id="subnet-tab">
+    <div class="subnet-layout">
+      <div class="subnet-left">
+        <div class="nd-panel-header">
+          ${I.globe}
+          <div>
+            <div class="nd-panel-title">IPv4 Subnet &amp; CIDR Lab</div>
+            <div class="nd-panel-sub">Classless Addressing &bull; VLSM &bull; Binary Octets</div>
+          </div>
+        </div>
+
+        <div class="subnet-card">
+          <div class="subnet-input-row">
+            <label class="subnet-input-label">IP Address</label>
+            <input type="text" id="subnet-ip-input" class="subnet-text-input" value="192.168.10.75" placeholder="e.g. 192.168.1.1">
+          </div>
+          <div class="subnet-input-row">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <label class="subnet-input-label">CIDR Prefix</label>
+              <span class="subnet-prefix-val" id="subnet-prefix-val">/26</span>
+            </div>
+            <input type="range" id="subnet-cidr-slider" min="8" max="30" value="26" class="subnet-slider">
+            <div class="subnet-presets">
+              <button class="subnet-preset-btn" data-cidr="8">/8</button>
+              <button class="subnet-preset-btn" data-cidr="16">/16</button>
+              <button class="subnet-preset-btn" data-cidr="24">/24</button>
+              <button class="subnet-preset-btn" data-cidr="26">/26</button>
+              <button class="subnet-preset-btn" data-cidr="28">/28</button>
+              <button class="subnet-preset-btn" data-cidr="30">/30</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="subnet-card">
+          <div class="subnet-card-title">${I.search} Calculated Parameters</div>
+          <div class="subnet-calc-grid" id="subnet-calc-grid"></div>
+        </div>
+      </div>
+
+      <div class="subnet-right">
+        <div class="subnet-card">
+          <div class="subnet-card-title">${I.bits} 32-Bit Binary Breakdown (Network vs Host Bits)</div>
+          <div class="subnet-binary-vis" id="subnet-binary-vis"></div>
+        </div>
+
+        <div class="subnet-card" style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+          <div class="subnet-card-title" style="display:flex;justify-content:space-between;align-items:center">
+            <span>${I.layers} Subnet Partition Slices</span>
+            <span style="font-size:0.7rem;color:var(--text-muted)">Addresses in this block</span>
+          </div>
+          <div class="subnet-table-wrap" style="flex:1;overflow-y:auto;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-primary)">
+            <table class="subnet-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Network Address</th>
+                  <th>Usable Host Range</th>
+                  <th>Broadcast Address</th>
+                </tr>
+              </thead>
+              <tbody id="subnet-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ENCRYPTION -->
   <div class="nd-tab-content" id="crypto-tab">
     <div class="crypto-layout">
@@ -320,14 +396,16 @@ function bindNDTabs() {
     qsa('.nd-tab').forEach(x => x.classList.remove('active'));
     qsa('.nd-tab-content').forEach(x => x.classList.remove('active'));
     t.classList.add('active');
-    el(t.dataset.ndtab).classList.add('active');
+    el(t.dataset.ndtab)?.classList.add('active');
     if (t.dataset.ndtab === 'network-tab') initNetLab();
     else if (t.dataset.ndtab === 'osi-tab') initOSI();
+    else if (t.dataset.ndtab === 'subnet-tab') initSubnetLab();
     else if (t.dataset.ndtab === 'crypto-tab') initCrypto();
     else if (t.dataset.ndtab === 'parity-tab') initParity();
   }));
   initNetLab();
   initOSI();
+  initSubnetLab();
   initCrypto();
   initParity();
 }
@@ -384,7 +462,7 @@ function updateNetUI() {
   const d = netState.device;
   const box = el('nd-devbox');
   if (box) {
-    box.className = `nd-dev-box ${d}`;
+    box.setAttribute('class', `nd-dev-box ${d}`);
     box.style.fill = d === 'hub' ? 'rgba(129,140,248,0.08)' : d === 'switch' ? 'rgba(34,211,165,0.08)' : 'rgba(251,191,36,0.08)';
   }
   const lbl = el('nd-devlabel');

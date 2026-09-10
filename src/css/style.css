@@ -1,16 +1,9 @@
 @import './variables.css';
 @import './navigation.css';
-@import './course.css';
-@import './explorer.css';
 @import './sandbox.css';
-@import './modals.css';
-@import './subnetting.css';
-@import './encoder.css';
 @import './network-devices.css';
 @import './osi-sim.css';
-@import './settings.css';
+@import './modals.css';
 @import './responsive.css';
-@import './professional.css';
 @import './utilities.css';
 @import './kids.css';
-

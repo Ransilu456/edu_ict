@@ -2,8 +2,6 @@ import { generateExplanations, renderExplanationPanel, toggleExplanationPanel } 
 import { showComponentTooltip, hideComponentTooltip, COMPONENT_EDU_DATA } from './component-info.js';
 import { openTruthTableDesigner } from './truth-table-designer.js';
 import { parseBooleanExpression } from './bool-parser.js';
-import { updatePhysicsPanel } from './physics-panel.js';
-import { openLabMode } from './lab-mode.js';
 
 let sandboxNodes = [];
 let sandboxWires = [];
@@ -51,51 +49,38 @@ function performUndo() {
   const snapshot = JSON.parse(undoStack.pop());
   importLayout(snapshot);
   playSound('click');
-  showToast('Undone ↩');
+  showToast('Undone Γå⌐');
   const undoBtn = document.getElementById('sandbox-undo');
   if (undoBtn) undoBtn.disabled = undoStack.length === 0;
 }
 const COMPONENT_DEFS = {
-  'input': { inputs: 0, outputs: 1, label: 'Toggle Switch', category: 'Inputs' },
-  'clock': { inputs: 0, outputs: 1, label: 'Clock Signal', category: 'Inputs' },
-  'sensor': { inputs: 0, outputs: 1, label: 'Analog Sensor', category: 'Inputs', data: { value: 50, threshold: 50 } },
-  'not': { inputs: 1, outputs: 1, label: 'NOT Gate', category: 'Logic Gates' },
-  'and': { inputs: 2, outputs: 1, label: 'AND Gate', category: 'Logic Gates' },
-  'or': { inputs: 2, outputs: 1, label: 'OR Gate', category: 'Logic Gates' },
-  'nand': { inputs: 2, outputs: 1, label: 'NAND Gate', category: 'Logic Gates' },
-  'nor': { inputs: 2, outputs: 1, label: 'NOR Gate', category: 'Logic Gates' },
-  'xor': { inputs: 2, outputs: 1, label: 'XOR Gate', category: 'Logic Gates' },
-  'xnor': { inputs: 2, outputs: 1, label: 'XNOR Gate', category: 'Logic Gates' },
-  'output': { inputs: 1, outputs: 0, label: 'LED Light', category: 'Outputs' },
-  'rgb-led': { inputs: 3, outputs: 0, label: 'RGB LED', category: 'Outputs' },
-  'buzzer': { inputs: 1, outputs: 0, label: 'Buzzer', category: 'Outputs' },
-  'led-bar': { inputs: 4, outputs: 0, label: 'LED Bar (4-bit)', category: 'Outputs' },
-  'd-flop': { inputs: 2, outputs: 1, label: 'D Flip-Flop', category: 'Advanced' },
-  'half-adder': { inputs: 2, outputs: 2, label: 'Half Adder', category: 'Compound' },
-  'full-adder': { inputs: 3, outputs: 2, label: 'Full Adder', category: 'Compound' },
-  'seven-seg': { inputs: 4, outputs: 0, label: '7-Seg Display', category: 'Advanced' },
-  'text-label': { inputs: 0, outputs: 0, label: 'Text Label', category: 'Utility' },
-
-  'battery': { inputs: 1, outputs: 1, label: 'Battery', category: 'Electricity', data: { emf: 9 } },
-  'power-supply': { inputs: 1, outputs: 1, label: 'DC Power Supply', category: 'Electricity', data: { voltage: 12 } },
-  'resistor': { inputs: 1, outputs: 1, label: 'Resistor', category: 'Electricity', data: { R: 10 } },
-  'bulb': { inputs: 1, outputs: 1, label: 'Light Bulb', category: 'Electricity', data: { brightness: 0 } },
-  'switch': { inputs: 1, outputs: 1, label: 'Switch', category: 'Electricity', data: { closed: false } },
-  'ammeter': { inputs: 2, outputs: 1, label: 'Ammeter (A)', category: 'Electricity', data: { current: 0 } },
-  'voltmeter': { inputs: 2, outputs: 0, label: 'Voltmeter (V)', category: 'Electricity', data: { voltage: 0 } },
-  'motor': { inputs: 1, outputs: 1, label: 'Electric Motor', category: 'Electricity', data: { speed: 0 } },
-  'fuse': { inputs: 1, outputs: 1, label: 'Fuse', category: 'Electricity', data: { blown: false } },
-  'led-elec': { inputs: 1, outputs: 1, label: 'LED', category: 'Electricity', data: { on: false } },
-  'junction': { inputs: 2, outputs: 2, label: 'Wire Junction', category: 'Electricity', data: {} },
-  'transistor': { inputs: 1, outputs: 1, label: 'NPN Transistor', category: 'Electricity', data: { on: false } },
-  'diode': { inputs: 1, outputs: 1, label: 'Diode', category: 'Electricity', data: { forward: false, R: 0.1 } },
-  'zener': { inputs: 1, outputs: 1, label: 'Zener Diode', category: 'Electricity', data: { forward: false, zenerVoltage: 5.1 } },
-  'ldr': { inputs: 1, outputs: 1, label: 'LDR', category: 'Electricity', data: { lightLevel: 50, R: 10000 } },
-  'thermistor': { inputs: 1, outputs: 1, label: 'Thermistor', category: 'Electricity', data: { temperature: 25, R: 10000 } },
-  'potentiometer': { inputs: 1, outputs: 1, label: 'Potentiometer', category: 'Electricity', data: { wiperPos: 50, totalR: 1000, R: 500 } },
-  'capacitor': { inputs: 1, outputs: 1, label: 'Capacitor', category: 'Electricity', data: { charge: 0, voltage: 0, capacitance: 100, maxVoltage: 12 } },
-  'relay': { inputs: 1, outputs: 1, label: 'Relay', category: 'Electricity', data: { coilEnergized: false } },
-  'op-amp': { inputs: 2, outputs: 1, label: 'Op-Amp (Comparator)', category: 'Digital', data: { vcc: 12, vee: -12 } },
+  'input':       { inputs: 0, outputs: 1, label: 'Toggle Switch',    category: 'Inputs' },
+  'clock':       { inputs: 0, outputs: 1, label: 'Clock Signal',     category: 'Inputs' },
+  'buffer':      { inputs: 1, outputs: 1, label: 'Buffer Gate',      category: 'Logic Gates' },
+  'not':         { inputs: 1, outputs: 1, label: 'NOT Gate',         category: 'Logic Gates' },
+  'and':         { inputs: 2, outputs: 1, label: 'AND Gate',         category: 'Logic Gates' },
+  'or':          { inputs: 2, outputs: 1, label: 'OR Gate',          category: 'Logic Gates' },
+  'nand':        { inputs: 2, outputs: 1, label: 'NAND Gate',        category: 'Logic Gates' },
+  'nor':         { inputs: 2, outputs: 1, label: 'NOR Gate',         category: 'Logic Gates' },
+  'xor':         { inputs: 2, outputs: 1, label: 'XOR Gate',         category: 'Logic Gates' },
+  'xnor':        { inputs: 2, outputs: 1, label: 'XNOR Gate',        category: 'Logic Gates' },
+  'output':      { inputs: 1, outputs: 0, label: 'LED Light',        category: 'Outputs' },
+  'rgb-led':     { inputs: 3, outputs: 0, label: 'RGB LED',          category: 'Outputs' },
+  'buzzer':      { inputs: 1, outputs: 0, label: 'Buzzer',           category: 'Outputs' },
+  'led-bar':     { inputs: 4, outputs: 0, label: 'LED Bar (4-bit)',  category: 'Outputs' },
+  'd-flop':      { inputs: 2, outputs: 1, label: 'D Flip-Flop',     category: 'Sequential' },
+  'sr-latch':    { inputs: 2, outputs: 2, label: 'SR Latch',        category: 'Sequential' },
+  'jk-flop':     { inputs: 3, outputs: 2, label: 'JK Flip-Flop',   category: 'Sequential' },
+  't-flop':      { inputs: 2, outputs: 1, label: 'T Flip-Flop',    category: 'Sequential' },
+  'half-adder':  { inputs: 2, outputs: 2, label: 'Half Adder',      category: 'Arithmetic' },
+  'full-adder':  { inputs: 3, outputs: 2, label: 'Full Adder',      category: 'Arithmetic' },
+  'mux-2-1':     { inputs: 3, outputs: 1, label: '2:1 Multiplexer', category: 'Combinational' },
+  'demux-1-2':   { inputs: 2, outputs: 2, label: '1:2 DeMultiplexer', category: 'Combinational' },
+  'decoder-2-4': { inputs: 2, outputs: 4, label: '2:4 Decoder',    category: 'Combinational' },
+  'encoder-4-2': { inputs: 4, outputs: 2, label: '4:2 Priority Encoder', category: 'Combinational' },
+  'comparator':  { inputs: 4, outputs: 3, label: '2-bit Comparator', category: 'Combinational' },
+  'seven-seg':   { inputs: 4, outputs: 0, label: '7-Seg Display',   category: 'Outputs' },
+  'text-label':  { inputs: 0, outputs: 0, label: 'Text Label',      category: 'Utility' },
 };
 window.initSandboxCanvas = function () {
   workspace = document.getElementById('sandbox-workspace-canvas');
@@ -216,7 +201,7 @@ function setupToolboxItem(item) {
     if (!workspace) return;
     const r = workspace.getBoundingClientRect();
     placeNode(type, label, r.width / 2 - 60, r.height / 2 - 40);
-    showToast(`${label} placed ✓`);
+    showToast(`${label} placed Γ£ô`);
   });
   let touchDragGhost = null;
   let touchDragActive = false;
@@ -281,7 +266,7 @@ function setupToolboxItem(item) {
       const dropX = touch.clientX - wr.left - panX - 60;
       const dropY = touch.clientY - wr.top - panY - 30;
       placeNode(type, label, dropX, dropY);
-      showToast(`${label} placed ✓`);
+      showToast(`${label} placed Γ£ô`);
     }
   });
 }
@@ -367,7 +352,7 @@ function setupToolbar() {
     saveCircuitToLocal(name);
     saveModal.style.display = 'none';
     playSound('success');
-    showToast(`Saved "${name}" ✓`);
+    showToast(`Saved "${name}" Γ£ô`);
   });
   saveNameInput?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') document.getElementById('confirm-save-btn')?.click();
@@ -383,7 +368,7 @@ function setupToolbar() {
     loadModal.style.display = 'none';
   });
   document.getElementById('sandbox-export')?.addEventListener('click', () => {
-    if (sandboxNodes.length === 0) { showToast('Canvas is empty — nothing to export.'); return; }
+    if (sandboxNodes.length === 0) { showToast('Canvas is empty ΓÇö nothing to export.'); return; }
     exportCircuitJSON();
     playSound('success');
   });
@@ -400,7 +385,7 @@ function setupToolbar() {
         const layout = JSON.parse(ev.target.result);
         importLayout(layout);
         playSound('success');
-        showToast('Circuit imported ✓');
+        showToast('Circuit imported Γ£ô');
       } catch {
         showAlert('Invalid circuit file.', 'Error');
       }
@@ -453,145 +438,54 @@ function setupToolbar() {
     if (e.key === 'Escape') document.getElementById('ic-create-modal').style.display = 'none';
   });
 
-  const toolbar = document.querySelector('.sandbox-toolbar');
-  if (toolbar) {
-    const explainBtn = document.getElementById('sandbox-explain-btn') || document.createElement('button');
-    if (!document.getElementById('sandbox-explain-btn')) {
-      explainBtn.className = 'sandbox-btn';
-      explainBtn.id = 'sandbox-explain-btn';
-      explainBtn.title = 'Toggle explanation panel';
-      explainBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h10M8 12h10M8 18h6"/><circle cx="4" cy="12" r="2"/></svg> <span>Explain</span>';
-      explainBtn.addEventListener('click', () => {
-        playSound('click');
-        const visible = toggleExplanationPanel();
-        explainBtn.classList.toggle('active', visible);
-      });
-      toolbar.appendChild(explainBtn);
-    }
+  document.getElementById('sandbox-truth-btn')?.addEventListener('click', () => {
+    playSound('click');
+    showTruthTable();
+  });
 
-    const truthDesignerBtn = document.getElementById('sandbox-truth-designer-btn') || document.createElement('button');
-    if (!document.getElementById('sandbox-truth-designer-btn')) {
-      truthDesignerBtn.className = 'sandbox-btn';
-      truthDesignerBtn.id = 'sandbox-truth-designer-btn';
-      truthDesignerBtn.title = 'Open truth table designer';
-      truthDesignerBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg> <span>Designer</span>';
-      truthDesignerBtn.addEventListener('click', () => {
-        playSound('click');
-        openTruthTableDesigner();
-      });
-      toolbar.appendChild(truthDesignerBtn);
-    }
-
-    const booleanBtn = document.getElementById('sandbox-bool-btn') || document.createElement('button');
-    if (!document.getElementById('sandbox-bool-btn')) {
-      booleanBtn.className = 'sandbox-btn';
-      booleanBtn.id = 'sandbox-bool-btn';
-      booleanBtn.title = 'Generate circuit from boolean expression';
-      booleanBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 5h8a4 4 0 0 1 0 8H7z"/><path d="M7 13h8a4 4 0 0 1 0 8H7z"/></svg> <span>Boolean</span>';
-      booleanBtn.addEventListener('click', () => {
-        playSound('click');
-        const expr = window.prompt('Enter a boolean expression (e.g. A+B, A·B, A⊕B, (A+B)·C):');
-        if (!expr) return;
-        try {
-          const layout = parseBooleanExpression(expr);
-          layout.nodes.forEach(n => {
-            n.x += 120;
-            n.y += 40;
-          });
-          layout.nodes.forEach(n => {
-            const def = COMPONENT_DEFS[n.type];
-            if (def) {
-              n.inputsCount = n.inputsCount ?? def.inputs;
-              n.outputsCount = n.outputsCount ?? def.outputs;
-              n.outputState = 0;
-              n.outputState2 = 0;
-              n.inputValues = Array(n.inputsCount).fill(0);
-              n.data = n.data || (def.data ? { ...def.data } : {});
-            }
-          });
-          layout.nodes.forEach(n => { sandboxNodes.push(n); renderNodeDOM(n); });
-          layout.wires.forEach(w => sandboxWires.push(w));
-          evaluateSandbox();
-          showToast('Boolean expression circuit generated ✓');
-        } catch (error) {
-          showAlert(error.message || 'Could not parse that expression.', 'Boolean Parser');
-        }
-      });
-      toolbar.appendChild(booleanBtn);
-    }
-
-    const physicsBtn = document.getElementById('sandbox-physics-btn') || document.createElement('button');
-    if (!document.getElementById('sandbox-physics-btn')) {
-      physicsBtn.className = 'sandbox-btn';
-      physicsBtn.id = 'sandbox-physics-btn';
-      physicsBtn.title = 'Show physics panel';
-      physicsBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 18h16"/><path d="M7 14l3-4 3 2 4-6"/></svg> <span>Physics</span>';
-      physicsBtn.addEventListener('click', () => {
-        playSound('click');
-        const panel = document.getElementById('sandbox-physics-panel');
-        if (panel) {
-          panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-          updatePhysicsPanel(panel, sandboxNodes);
-        }
-      });
-      toolbar.appendChild(physicsBtn);
-    }
-
-    const labBtn = document.getElementById('sandbox-lab-btn') || document.createElement('button');
-    if (!document.getElementById('sandbox-lab-btn')) {
-      labBtn.className = 'sandbox-btn';
-      labBtn.id = 'sandbox-lab-btn';
-      labBtn.title = 'Open lab mode';
-      labBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19h16"/><path d="M7 19V7m5 12V3m5 16v-7"/></svg> <span>Lab</span>';
-      labBtn.addEventListener('click', () => {
-        playSound('click');
-        openLabMode();
-      });
-      toolbar.appendChild(labBtn);
-    }
-    const sep = document.createElement('div');
-    sep.style.cssText = 'width:1px;background:var(--border-color);height:20px';
-    toolbar.appendChild(sep);
-
-    const speedWrap = document.createElement('div');
-    speedWrap.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-muted)';
-    speedWrap.innerHTML = '<span style="white-space:nowrap">Speed</span>';
-    const speedSlider = document.createElement('input');
-    speedSlider.type = 'range';
-    speedSlider.min = '1';
-    speedSlider.max = '8';
-    speedSlider.value = String(simSpeed * 2);
-    speedSlider.step = '1';
-    speedSlider.style.cssText = 'width:48px;height:3px;accent-color:var(--color-cyan)';
-    speedSlider.title = 'Simulation Speed';
-    const speedLabel = document.createElement('span');
-    speedLabel.style.cssText = 'font-family:monospace;font-weight:600;min-width:28px;text-align:right';
-    speedLabel.textContent = '1x';
-    speedSlider.addEventListener('input', () => {
-      const val = parseInt(speedSlider.value);
-      simSpeed = val / 2;
-      speedLabel.textContent = simSpeed >= 1 ? simSpeed + 'x' : '0.' + Math.round(simSpeed * 10) + 'x';
+  const speedBtn = document.getElementById('sandbox-speed-btn');
+  if (speedBtn) {
+    const speeds = [1, 2, 4, 0.5];
+    let speedIdx = 0;
+    speedBtn.addEventListener('click', () => {
+      speedIdx = (speedIdx + 1) % speeds.length;
+      simSpeed = speeds[speedIdx];
+      const lbl = speedBtn.querySelector('span');
+      if (lbl) lbl.textContent = simSpeed + 'x';
+      playSound('click');
       if (isSimRunning) startSimulationLoop();
     });
-    speedWrap.appendChild(speedSlider);
-    speedWrap.appendChild(speedLabel);
-    toolbar.appendChild(speedWrap);
-
-    const sep2 = document.createElement('div');
-    sep2.style.cssText = 'width:1px;background:var(--border-color);height:20px';
-    toolbar.appendChild(sep2);
-
-    const truthBtn = document.createElement('button');
-    truthBtn.className = 'sandbox-btn';
-    truthBtn.id = 'sandbox-truth-table';
-    truthBtn.title = 'Generate Truth Table';
-    truthBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg> <span>Truth Table</span>';
-    truthBtn.addEventListener('click', () => {
-      playSound('click');
-      showTruthTable();
-    });
-    toolbar.appendChild(truthBtn);
   }
+
+  document.getElementById('sandbox-bool-btn')?.addEventListener('click', () => {
+    playSound('click');
+    const expr = window.prompt('Enter a boolean expression (e.g. A+B, A·B, A⊕B, (A+B)·C):');
+    if (!expr) return;
+    try {
+      const layout = parseBooleanExpression(expr);
+      layout.nodes.forEach(n => {
+        n.x += 120;
+        n.y += 40;
+      });
+      layout.nodes.forEach(n => {
+        const def = COMPONENT_DEFS[n.type];
+        if (def) {
+          n.inputsCount = n.inputsCount ?? def.inputs;
+          n.outputsCount = n.outputsCount ?? def.outputs;
+          n.outputState = 0;
+          n.outputState2 = 0;
+          n.inputValues = Array(n.inputsCount).fill(0);
+          n.data = n.data || (def.data ? { ...def.data } : {});
+        }
+      });
+      layout.nodes.forEach(n => { sandboxNodes.push(n); renderNodeDOM(n); });
+      layout.wires.forEach(w => sandboxWires.push(w));
+      evaluateSandbox();
+      showToast('Boolean expression circuit generated ✓');
+    } catch (error) {
+      showAlert(error.message || 'Could not parse that expression.', 'Boolean Parser');
+    }
+  });
 
   [saveModal, loadModal].forEach(modal => {
     if (!modal) return;
@@ -674,9 +568,7 @@ function renderNodeDOM(node) {
       el.style.height = `${height}px`;
     }
   }
-  const electricSchematicTypes = ['battery','power-supply','resistor','bulb','switch','ammeter','voltmeter','motor','fuse','led-elec','junction','transistor','diode','zener','ldr','thermistor','potentiometer','capacitor','relay'];
-  if (electricSchematicTypes.includes(node.type)) el.classList.add('elec-schematic-node');
-  const delBtn = document.createElement('button');
+    const delBtn = document.createElement('button');
   delBtn.className = 'node-delete-btn';
   delBtn.innerHTML = '&times;';
   delBtn.title = 'Delete (Del)';
@@ -798,7 +690,7 @@ function renderNodeBody(node, body) {
             
             <path d="M 38 32 A 20 20 0 0 1 54 20" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.8" stroke-linecap="round" class="bulb-shine"/>
           </svg>
-          <span class="bulb-state-label" id="${node.id}-state">○ OFF</span>
+          <span class="bulb-state-label" id="${node.id}-state">Γùï OFF</span>
         </div>`;
       break;
     }
@@ -875,7 +767,7 @@ function renderNodeBody(node, body) {
             <line x1="25" y1="0" x2="25" y2="40" class="osc-cursor" id="${node.id}-cursor"/>
           </svg>
           <div class="clk-meta">
-            <span class="clk-badge" id="${node.id}-phase">▼ LOW</span>
+            <span class="clk-badge" id="${node.id}-phase">Γû╝ LOW</span>
             <span class="clk-hz">1 Hz</span>
           </div>
         </div>`;
@@ -910,6 +802,42 @@ function renderNodeBody(node, body) {
       break;
     }
 
+    case 'buffer': {
+      body.innerHTML = '<svg viewBox="0 0 60 40" width="60" height="40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="4,4 42,20 4,36"/><line x1="42" y1="20" x2="56" y2="20"/></svg>';
+      break;
+    }
+    case 'sr-latch': {
+      body.innerHTML = '<div style="text-align:center;padding:4px 2px"><div style="font-size:0.7rem;font-weight:800;color:var(--color-indigo)">SR LATCH</div><div style="font-size:0.6rem;color:var(--text-muted);margin-top:2px">S,R → Q,Q̄</div></div>';
+      break;
+    }
+    case 'jk-flop': {
+      body.innerHTML = '<div style="text-align:center;padding:4px 2px"><div style="font-size:0.7rem;font-weight:800;color:var(--color-indigo)">JK FF</div><div style="font-size:0.6rem;color:var(--text-muted);margin-top:2px">J,K,CLK → Q,Q̄</div></div>';
+      break;
+    }
+    case 't-flop': {
+      body.innerHTML = '<div style="text-align:center;padding:4px 2px"><div style="font-size:0.7rem;font-weight:800;color:var(--color-indigo)">T FF</div><div style="font-size:0.6rem;color:var(--text-muted);margin-top:2px">T,CLK → Q (Toggle)</div></div>';
+      break;
+    }
+    case 'mux-2-1': {
+      body.innerHTML = '<div style="text-align:center;padding:4px 2px"><div style="font-size:0.7rem;font-weight:800;color:var(--color-cyan)">2:1 MUX</div><div style="font-size:0.6rem;color:var(--text-muted);margin-top:2px">D0,D1,S → Y</div></div>';
+      break;
+    }
+    case 'demux-1-2': {
+      body.innerHTML = '<div style="text-align:center;padding:4px 2px"><div style="font-size:0.7rem;font-weight:800;color:var(--color-cyan)">1:2 DEMUX</div><div style="font-size:0.6rem;color:var(--text-muted);margin-top:2px">In,S → Y0,Y1</div></div>';
+      break;
+    }
+    case 'decoder-2-4': {
+      body.innerHTML = '<div style="text-align:center;padding:4px 2px"><div style="font-size:0.7rem;font-weight:800;color:var(--color-amber)">2:4 DECODER</div><div style="font-size:0.6rem;color:var(--text-muted);margin-top:2px">A,B → Y0-Y3</div></div>';
+      break;
+    }
+    case 'encoder-4-2': {
+      body.innerHTML = '<div style="text-align:center;padding:4px 2px"><div style="font-size:0.7rem;font-weight:800;color:var(--color-amber)">4:2 ENCODER</div><div style="font-size:0.6rem;color:var(--text-muted);margin-top:2px">D0-D3 → A,B</div></div>';
+      break;
+    }
+    case 'comparator': {
+      body.innerHTML = '<div style="text-align:center;padding:4px 2px"><div style="font-size:0.7rem;font-weight:800;color:var(--color-success)">COMPARATOR</div><div style="font-size:0.6rem;color:var(--text-muted);margin-top:2px">A[1:0],B[1:0] → &gt;,=,&lt;</div></div>';
+      break;
+    }
     case 'd-flop': {
       body.innerHTML = `
         <div class="compound-body-grid" class="is-mono-label">
@@ -919,7 +847,7 @@ function renderNodeBody(node, body) {
 
       const expandBtn = document.createElement('button');
       expandBtn.className = 'sandbox-toggle-btn expand-adder-btn';
-      expandBtn.innerText = '👁 View Timing';
+      expandBtn.innerText = '≡ƒæü View Timing';
       expandBtn.style.cssText = 'margin-top:6px; font-size:0.62rem; padding:0.15rem 0.4rem; pointer-events:auto; font-family:var(--font-header);';
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -932,13 +860,13 @@ function renderNodeBody(node, body) {
     case 'half-adder': {
       body.innerHTML = `
         <div class="compound-body-grid" class="is-mono-label">
-          <div class="cb-row"><span class="cb-pin">A</span><span class="cb-name">½ ADD</span><span class="cb-pin out-pin">S</span></div>
+          <div class="cb-row"><span class="cb-pin">A</span><span class="cb-name">┬╜ ADD</span><span class="cb-pin out-pin">S</span></div>
           <div class="cb-row"><span class="cb-pin">B</span><span></span><span class="cb-pin out-pin">C</span></div>
         </div>`;
 
       const expandBtn = document.createElement('button');
       expandBtn.className = 'sandbox-toggle-btn expand-adder-btn';
-      expandBtn.innerText = '👁 View Inside';
+      expandBtn.innerText = '≡ƒæü View Inside';
       expandBtn.style.cssText = 'margin-top:6px; font-size:0.62rem; padding:0.15rem 0.4rem; pointer-events:auto; font-family:var(--font-header);';
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -958,13 +886,91 @@ function renderNodeBody(node, body) {
 
       const expandBtn = document.createElement('button');
       expandBtn.className = 'sandbox-toggle-btn expand-adder-btn';
-      expandBtn.innerText = '👁 View Inside';
+      expandBtn.innerText = '≡ƒæü View Inside';
       expandBtn.style.cssText = 'margin-top:6px; font-size:0.62rem; padding:0.15rem 0.4rem; pointer-events:auto; font-family:var(--font-header);';
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         openLogicViewer('full-adder');
       });
       body.appendChild(expandBtn);
+      break;
+    }
+
+    case 'buffer':
+      node.outputState = a ? 1 : 0;
+      break;
+
+    case 'sr-latch': {
+      const set = a ? 1 : 0, rst = b ? 1 : 0;
+      if (set && !rst)       { node.outputState = 1; node.outputState2 = 0; }
+      else if (!set && rst)  { node.outputState = 0; node.outputState2 = 1; }
+      else if (set && rst)   { node.outputState = 0; node.outputState2 = 0; } // invalid
+      // else hold state
+      break;
+    }
+
+    case 'jk-flop': {
+      const j = a ? 1 : 0, k = b ? 1 : 0, clk = c ? 1 : 0;
+      if (clk && !node.prevClockState) {
+        if (j && !k)      { node.outputState = 1; }
+        else if (!j && k) { node.outputState = 0; }
+        else if (j && k)  { node.outputState = node.outputState ? 0 : 1; }
+        node.outputState2 = node.outputState ? 0 : 1;
+      }
+      node.prevClockState = clk;
+      break;
+    }
+
+    case 't-flop': {
+      const t = a ? 1 : 0, clk = b ? 1 : 0;
+      if (clk && !node.prevClockState) {
+        if (t) node.outputState = node.outputState ? 0 : 1;
+      }
+      node.prevClockState = clk;
+      break;
+    }
+
+    case 'mux-2-1': {
+      const sel = c ? 1 : 0;
+      node.outputState = sel ? (b ? 1 : 0) : (a ? 1 : 0);
+      break;
+    }
+
+    case 'demux-1-2': {
+      const inp = a ? 1 : 0, sel = b ? 1 : 0;
+      node.outputState  = (!sel && inp) ? 1 : 0;
+      node.outputState2 = (sel && inp)  ? 1 : 0;
+      break;
+    }
+
+    case 'decoder-2-4': {
+      const inA = a ? 1 : 0, inB = b ? 1 : 0;
+      const val = (inA << 1) | inB;
+      node.outputState  = val === 0 ? 1 : 0;
+      node.outputState2 = val === 1 ? 1 : 0;
+      node.outputState3 = val === 2 ? 1 : 0;
+      node.outputState4 = val === 3 ? 1 : 0;
+      break;
+    }
+
+    case 'encoder-4-2': {
+      const d0 = (node.inputValues[0]||0) ? 1 : 0;
+      const d1 = (node.inputValues[1]||0) ? 1 : 0;
+      const d2 = (node.inputValues[2]||0) ? 1 : 0;
+      const d3 = (node.inputValues[3]||0) ? 1 : 0;
+      let encOut = 0;
+      if (d1) encOut = 1; if (d2) encOut = 2; if (d3) encOut = 3;
+      node.outputState  = (encOut >> 1) & 1;
+      node.outputState2 = encOut & 1;
+      break;
+    }
+
+    case 'comparator': {
+      const A = ((node.inputValues[0]||0) << 1) | (node.inputValues[1]||0);
+      const B = ((node.inputValues[2]||0) << 1) | (node.inputValues[3]||0);
+      node.outputState  = A > B ? 1 : 0;
+      node.outputState2 = A === B ? 1 : 0;
+      node.outputState3 = A < B ? 1 : 0;
       break;
     }
 
@@ -985,7 +991,7 @@ function renderNodeBody(node, body) {
 
       const expandBtn = document.createElement('button');
       expandBtn.className = 'sandbox-toggle-btn expand-adder-btn';
-      expandBtn.innerText = '👁 Segment Map';
+      expandBtn.innerText = '≡ƒæü Segment Map';
       expandBtn.style.cssText = 'margin-top:6px; font-size:0.62rem; padding:0.15rem 0.4rem; pointer-events:auto; font-family:var(--font-header);';
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1014,49 +1020,7 @@ function renderNodeBody(node, body) {
       }, 0);
       body.appendChild(ta);
       break;
-    }
-    case 'battery':
-    case 'power-supply':
-    case 'resistor':
-    case 'bulb':
-    case 'switch':
-    case 'ammeter':
-    case 'voltmeter':
-    case 'motor':
-    case 'fuse':
-    case 'led-elec':
-    case 'junction':
-    case 'transistor':
-    case 'diode':
-    case 'zener':
-    case 'ldr':
-    case 'thermistor':
-    case 'potentiometer':
-    case 'capacitor':
-    case 'relay': {
-      body.innerHTML = getElectricityNodeInner(node);
-      break;
-    }
-    case 'op-amp': {
-      const pos = node.outputState === 1 ? 'HIGH' : 'LOW';
-      body.innerHTML = `
-        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;padding:1px 0">
-          <div style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%">
-            <div style="font-size:7px;color:#818cf8;font-weight:700;display:flex;align-items:center;gap:1px">
-              <span style="font-size:8px">+</span><span>In</span>
-            </div>
-            <svg viewBox="0 0 40 28" width="40" height="28"><polygon points="4,2 36,14 4,26" fill="var(--bg-tertiary)" stroke="var(--text-primary)" stroke-width="1.5"/><text x="20" y="17" text-anchor="middle" font-size="7" fill="var(--text-primary)" font-weight="700">∞</text></svg>
-            <div style="font-size:7px;color:#f87171;font-weight:700;display:flex;align-items:center;gap:1px">
-              <span style="font-size:6px">−</span><span>In</span>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:4px">
-            <span style="font-size:8px;font-weight:700;color:${node.outputState === 1 ? '#22d3a5' : 'var(--text-muted)'}">Out: ${pos}</span>
-          </div>
-          <div style="font-size:6px;color:var(--text-muted)" class="op-amp-voltages">V+ ${(node.data.vcc || 12).toFixed(0)}V V- ${(node.data.vee || -12).toFixed(0)}V</div>
-        </div>`;
-      break;
-    }
+    }
 
     default: {
       const gateStyle = window.__gateStyle || 'box';
@@ -1087,7 +1051,7 @@ function renderNodeBody(node, body) {
           <button onclick="event.stopPropagation();window.removeGateInput('${node.id}')"
             style="font-size:10px;padding:1px 5px;border-radius:3px;border:1px solid var(--border-color);
             background:var(--bg-tertiary);color:var(--text-primary);cursor:pointer;line-height:1.2"
-            title="Remove input port">−</button>`;
+            title="Remove input port">ΓêÆ</button>`;
         body.appendChild(controls);
       }
     }
@@ -1098,6 +1062,11 @@ function renderGateSVG(type) {
   const color = 'currentColor';
   const strokeW = 1.8;
   switch (type) {
+    case 'buffer':
+      return `<svg viewBox="0 0 60 40" width="60" height="40" fill="none" stroke="${color}" stroke-width="${strokeW}" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="4,4 42,20 4,36"/>
+        <line x1="42" y1="20" x2="56" y2="20"/>
+      </svg>`;
     case 'not':
       return `<svg viewBox="0 0 60 40" width="60" height="40" fill="none" stroke="${color}" stroke-width="${strokeW}" stroke-linecap="round" stroke-linejoin="round">
         <polygon points="4,4 38,20 4,36"/>
@@ -1211,29 +1180,41 @@ function renderOutputPorts(node, el) {
 
 function getInputPortLabels(type, count) {
   switch (type) {
+    case 'not': case 'buffer': return ['In'];
+    case 'and': case 'or': case 'nand': case 'nor': case 'xor': case 'xnor':
+      return Array.from({ length: count }, (_, i) => 'In ' + String.fromCharCode(65 + i));
     case 'd-flop': return ['D', 'CLK'];
+    case 'sr-latch': return ['Set (S)', 'Reset (R)'];
+    case 'jk-flop': return ['J', 'K', 'CLK'];
+    case 't-flop': return ['T', 'CLK'];
     case 'half-adder': return ['A', 'B'];
     case 'full-adder': return ['A', 'B', 'Cin'];
-    case 'seven-seg': return ['D3 (MSB)', 'D2', 'D1', 'D0 (LSB)'];
-    case 'rgb-led': return ['Red (R)', 'Green (G)', 'Blue (B)'];
-    case 'led-bar': return ['D3 (MSB)', 'D2', 'D1', 'D0 (LSB)'];
-    default: {
-      // Generate A, B, C, ... Z for up to 26, then A0, A1... for more
-      const n = count || 4;
-      return Array.from({ length: n }, (_, i) => {
-        if (i < 26) return String.fromCharCode(65 + i);
-        return 'I' + (i - 26);
-      });
-    }
+    case 'mux-2-1': return ['D0', 'D1', 'Select'];
+    case 'demux-1-2': return ['Input', 'Select'];
+    case 'decoder-2-4': return ['A (MSB)', 'B (LSB)'];
+    case 'encoder-4-2': return ['D0 (LSB)', 'D1', 'D2', 'D3 (MSB)'];
+    case 'comparator': return ['A1', 'A0', 'B1', 'B0'];
+    case 'rgb-led': return ['Red', 'Green', 'Blue'];
+    case 'led-bar': return ['D3', 'D2', 'D1', 'D0'];
+    default: return Array.from({ length: count }, (_, i) => 'In ' + i);
   }
 }
 
 function getOutputPortLabels(type) {
   switch (type) {
-    case 'half-adder': return ['Sum', 'Carry'];
-    case 'full-adder': return ['Sum', 'Cout'];
+    case 'not': case 'buffer': case 'and': case 'or': case 'nand': case 'nor':
+    case 'xor': case 'xnor': case 'mux-2-1': return ['Out'];
+    case 'demux-1-2': return ['Y0', 'Y1'];
+    case 'half-adder': return ['Sum (S)', 'Carry (C)'];
+    case 'full-adder': return ['Sum (S)', 'Carry-Out'];
+    case 'decoder-2-4': return ['Y0', 'Y1', 'Y2', 'Y3'];
+    case 'encoder-4-2': return ['A (MSB)', 'B (LSB)'];
+    case 'comparator': return ['A>B', 'A=B', 'A<B'];
     case 'd-flop': return ['Q'];
-    default: return ['Y'];
+    case 'sr-latch': return ['Q', "Q'"];
+    case 'jk-flop': return ['Q', "Q'"];
+    case 't-flop': return ['Q'];
+    default: return ['Out'];
   }
 }
 function setupPanning() {
@@ -1550,6 +1531,7 @@ function drawWiringPreview(e) {
   prev.setAttribute('opacity', '0.75');
   wiresSvg.appendChild(prev);
 }
+
 function updateSandboxWires() {
   if (!wiresSvg || !workspace) return;
   wiresSvg.innerHTML = '';
@@ -1579,8 +1561,7 @@ function updateSandboxWires() {
     const x2 = iR.left + iR.width / 2 - canvasRect.left - panX;
     const y2 = iR.top + iR.height / 2 - canvasRect.top - panY;
     const srcNode = sandboxNodes.find(n => n.id === wire.fromNodeId);
-    const electricityTypes = ['battery','resistor','bulb','switch','ammeter','voltmeter','motor','fuse','led-elec','junction','transistor','diode','zener','ldr','thermistor','potentiometer','capacitor','relay'];
-    const isElectricityCircuit = srcNode && electricityTypes.includes(srcNode.type);
+    const isElectricityCircuit = false;
     const isActive = isElectricityCircuit
       ? !!wire.active
       : srcNode
@@ -1607,7 +1588,6 @@ function updateSandboxWires() {
     });
     const visPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     visPath.setAttribute('d', d);
-    visPath.setAttribute('fill', 'none');
     visPath.setAttribute('stroke', isActive ? 'var(--color-high)' : 'var(--color-low)');
     visPath.setAttribute('stroke-width', '2.5');
     visPath.setAttribute('stroke-linecap', 'round');
@@ -1627,33 +1607,8 @@ function updateSandboxWires() {
       flow.style.animation = 'marchingAnts 1s linear infinite';
       wiresSvg.appendChild(flow);
     }
-    if (isElectricityCircuit && wire.potentialLabel) {
-      const mx = (x1 + x2) / 2;
-      const my = (y1 + y2) / 2 - 12;
-      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      label.setAttribute('x', mx);
-      label.setAttribute('y', my);
-      label.setAttribute('text-anchor', 'middle');
-      label.setAttribute('fill', 'var(--color-high)');
-      label.setAttribute('font-size', '9');
-      label.setAttribute('font-family', 'monospace');
-      label.setAttribute('font-weight', '600');
-      label.textContent = wire.potentialLabel;
-      wiresSvg.appendChild(label);
-      if (wire.currentLabel) {
-        const lbl2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        lbl2.setAttribute('x', mx);
-        lbl2.setAttribute('y', my + 12);
-        lbl2.setAttribute('text-anchor', 'middle');
-        lbl2.setAttribute('fill', '#f87171');
-        lbl2.setAttribute('font-size', '8');
-        lbl2.setAttribute('font-family', 'monospace');
-        lbl2.setAttribute('font-weight', '500');
-        lbl2.textContent = wire.currentLabel;
-        wiresSvg.appendChild(lbl2);
-      }
-    }
   });
+
   sandboxNodes.forEach(node => {
     const el = document.getElementById(node.id);
     if (!el) return;
@@ -1665,599 +1620,9 @@ function updateSandboxWires() {
   });
 }
 
-function renderComponentSVG(type, data, nodeId) {
-  const c = 'currentColor';
-  const sw = '2';    // stroke width — thicker for clarity
-  const sw3 = '3';
+// renderComponentSVG removed
 
-  switch (type) {
-    // ── Battery ─────────────────────────────────────────────────────────────
-    case 'battery': {
-      const emf = (data && data.emf) ? data.emf : 9;
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <!-- lead wires -->
-        <line x1="2" y1="26" x2="16" y2="26"/>
-        <line x1="64" y1="26" x2="78" y2="26"/>
-        <!-- cell 1: long plate (positive) -->
-        <line x1="16" y1="10" x2="16" y2="42" stroke-width="${sw3}"/>
-        <!-- cell 1: short plate (negative) -->
-        <line x1="26" y1="17" x2="26" y2="35" stroke-width="1.5"/>
-        <!-- connector -->
-        <line x1="26" y1="26" x2="38" y2="26"/>
-        <!-- cell 2: long plate (positive) -->
-        <line x1="38" y1="10" x2="38" y2="42" stroke-width="${sw3}"/>
-        <!-- cell 2: short plate (negative) -->
-        <line x1="48" y1="17" x2="48" y2="35" stroke-width="1.5"/>
-        <!-- connector to right lead -->
-        <line x1="48" y1="26" x2="64" y2="26"/>
-        <!-- labels -->
-        <text x="11" y="9" font-size="9" fill="#22d3a5" stroke="none" font-weight="700">+</text>
-        <text x="51" y="9" font-size="9" fill="#f87171" stroke="none" font-weight="700">−</text>
-        <text x="40" y="48" font-size="8" fill="#22d3a5" stroke="none" font-weight="700" font-family="monospace">${emf}V</text>
-      </svg>`;
-    }
-
-    // ── DC Power Supply ──────────────────────────────────────────────────────
-    case 'power-supply': {
-      const pv = (data && data.voltage) ? data.voltage : 12;
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke-linecap="round">
-        <line x1="2" y1="26" x2="14" y2="26" stroke="${c}" stroke-width="${sw}"/>
-        <line x1="66" y1="26" x2="78" y2="26" stroke="${c}" stroke-width="${sw}"/>
-        <rect x="14" y="8" width="52" height="36" rx="5" fill="var(--bg-tertiary)" stroke="var(--border-color)" stroke-width="1.5"/>
-        <rect x="20" y="14" width="40" height="14" rx="2" fill="var(--bg-secondary)" stroke="none"/>
-        <text x="40" y="25" text-anchor="middle" font-size="9" fill="#22d3a5" stroke="none" font-weight="800" font-family="monospace">${pv.toFixed(1)}V DC</text>
-        <!-- terminal dots -->
-        <circle cx="20" cy="36" r="3" fill="#f87171" stroke="none"/>
-        <text x="18" y="47" font-size="7" fill="#f87171" stroke="none" font-weight="700">−</text>
-        <circle cx="60" cy="36" r="3" fill="#22d3a5" stroke="none"/>
-        <text x="57" y="47" font-size="7" fill="#22d3a5" stroke="none" font-weight="700">+</text>
-      </svg>`;
-    }
-
-    // ── Resistor (US zigzag) ─────────────────────────────────────────────────
-    case 'resistor': {
-      const active = data && data.current > 0.001;
-      const glowColor = '#fbbf24';
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
-        ${active ? `<filter id="glow-r"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>` : ''}
-        <line x1="2" y1="26" x2="12" y2="26"/>
-        <polyline points="12,26 16,14 22,38 28,14 34,38 40,14 46,38 52,14 58,26"
-          ${active ? `stroke="${glowColor}" filter="url(#glow-r)"` : ''}/>
-        ${!active ? `<polyline points="12,26 16,14 22,38 28,14 34,38 40,14 46,38 52,14 58,26"/>` : ''}
-        <line x1="58" y1="26" x2="78" y2="26"/>
-        ${active ? `<text x="35" y="49" text-anchor="middle" font-size="8" fill="${glowColor}" stroke="none" font-weight="700" font-family="monospace">${(data.current*1000).toFixed(1)}mA</text>` : ''}
-      </svg>`;
-    }
-
-    // ── Light Bulb (circle + X filament) ─────────────────────────────────────
-    case 'bulb': {
-      const brightness = (data && data.brightness) || 0;
-      const isOn = brightness > 0.1;
-      const glow = isOn ? `rgba(251,191,36,${0.15 + brightness * 0.35})` : 'transparent';
-      const filCol = isOn ? '#fbbf24' : c;
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        ${isOn ? `<circle cx="40" cy="26" r="22" fill="${glow}" stroke="none"/>` : ''}
-        <line x1="2" y1="26" x2="22" y2="26"/>
-        <circle cx="40" cy="26" r="16"/>
-        <!-- X filament -->
-        <line x1="30" y1="17" x2="50" y2="35" stroke="${filCol}" stroke-width="2.2"/>
-        <line x1="50" y1="17" x2="30" y2="35" stroke="${filCol}" stroke-width="2.2"/>
-        <line x1="58" y1="26" x2="78" y2="26"/>
-        ${isOn ? `<text x="40" y="49" text-anchor="middle" font-size="8" fill="#fbbf24" stroke="none" font-weight="700">ON</text>` : ''}
-      </svg>`;
-    }
-
-    // ── Switch (pivoting arm) ────────────────────────────────────────────────
-    case 'switch': {
-      const swClosed = data && data.closed;
-      const sc = swClosed ? '#22d3a5' : '#818cf8';
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${sc}" stroke-width="${sw}" stroke-linecap="round">
-        <line x1="2" y1="26" x2="18" y2="26"/>
-        <!-- left terminal circle -->
-        <circle cx="20" cy="26" r="3" fill="${sc}" stroke="${sc}"/>
-        <!-- pivoting arm -->
-        <line x1="20" y1="26" x2="56" y2="${swClosed ? '26' : '12'}" stroke-width="2.5"/>
-        <!-- right terminal circle -->
-        <circle cx="60" cy="26" r="3" fill="${sc}" stroke="${sc}"/>
-        <line x1="62" y1="26" x2="78" y2="26"/>
-        ${swClosed ? `<!-- closed: small cross indicator -->
-        <text x="40" y="44" text-anchor="middle" font-size="8" fill="#22d3a5" stroke="none" font-weight="700">CLOSED</text>` : `<text x="40" y="44" text-anchor="middle" font-size="8" fill="#818cf8" stroke="none" font-weight="700">OPEN</text>`}
-      </svg>`;
-    }
-
-    // ── Ammeter ──────────────────────────────────────────────────────────────
-    case 'ammeter': {
-      const cur = (data && data.current) || 0;
-      const angle = -60 + Math.min(cur / 2 * 120, 120);
-      const rad = angle * Math.PI / 180;
-      const nx = 40 + 10 * Math.sin(rad), ny = 26 - 10 * Math.cos(rad);
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}">
-        <line x1="2" y1="26" x2="20" y2="26"/>
-        <circle cx="40" cy="26" r="18"/>
-        <!-- meter arc -->
-        <path d="M 26 32 A 14 14 0 0 1 54 32" stroke="var(--text-muted)" stroke-width="1" fill="none"/>
-        <!-- needle -->
-        <line x1="40" y1="26" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#f87171" stroke-width="1.5"/>
-        <circle cx="40" cy="26" r="2" fill="#f87171" stroke="none"/>
-        <text x="40" y="23" text-anchor="middle" font-size="10" fill="${c}" stroke="none" font-weight="800" font-family="sans-serif">A</text>
-        <line x1="60" y1="26" x2="78" y2="26"/>
-        ${cur > 0.001 ? `<text x="40" y="49" text-anchor="middle" font-size="8" fill="#f87171" stroke="none" font-weight="700" font-family="monospace">${cur.toFixed(3)}A</text>` : ''}
-      </svg>`;
-    }
-
-    // ── Voltmeter ────────────────────────────────────────────────────────────
-    case 'voltmeter': {
-      const v = (data && data.voltage) || 0;
-      const angle2 = -60 + Math.min(v / 20 * 120, 120);
-      const rad2 = angle2 * Math.PI / 180;
-      const nx2 = 40 + 10 * Math.sin(rad2), ny2 = 26 - 10 * Math.cos(rad2);
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}">
-        <line x1="2" y1="26" x2="20" y2="26"/>
-        <circle cx="40" cy="26" r="18"/>
-        <path d="M 26 32 A 14 14 0 0 1 54 32" stroke="var(--text-muted)" stroke-width="1" fill="none"/>
-        <line x1="40" y1="26" x2="${nx2.toFixed(1)}" y2="${ny2.toFixed(1)}" stroke="#818cf8" stroke-width="1.5"/>
-        <circle cx="40" cy="26" r="2" fill="#818cf8" stroke="none"/>
-        <text x="40" y="23" text-anchor="middle" font-size="10" fill="${c}" stroke="none" font-weight="800" font-family="sans-serif">V</text>
-        <line x1="60" y1="26" x2="78" y2="26"/>
-        ${v > 0.01 ? `<text x="40" y="49" text-anchor="middle" font-size="8" fill="#818cf8" stroke="none" font-weight="700" font-family="monospace">${v.toFixed(2)}V</text>` : ''}
-      </svg>`;
-    }
-
-    // ── Electric Motor ───────────────────────────────────────────────────────
-    case 'motor': {
-      const spd = (data && data.speed) || 0;
-      const isRunning = spd > 0.01;
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}">
-        <line x1="2" y1="26" x2="20" y2="26"/>
-        <circle cx="40" cy="26" r="18" ${isRunning ? 'stroke="#818cf8"' : ''}/>
-        <text x="40" y="30" text-anchor="middle" font-size="13" fill="${isRunning ? '#818cf8' : c}" stroke="none" font-weight="900" font-family="sans-serif">M</text>
-        ${isRunning ? `<!-- rotating arrows -->
-        <path d="M 50 16 Q 58 20 56 28" stroke="#818cf8" stroke-width="1.5" fill="none"/>
-        <polygon points="56,28 53,22 59,22" fill="#818cf8" stroke="none"/>` : ''}
-        <line x1="60" y1="26" x2="78" y2="26"/>
-        ${isRunning ? `<text x="40" y="49" text-anchor="middle" font-size="8" fill="#818cf8" stroke="none" font-weight="700">RUNNING</text>` : ''}
-      </svg>`;
-    }
-
-    // ── Fuse ─────────────────────────────────────────────────────────────────
-    case 'fuse': {
-      const blown = data && data.blown;
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <line x1="2" y1="26" x2="14" y2="26"/>
-        <rect x="14" y="16" width="52" height="20" rx="4" ${blown ? 'stroke="#f87171"' : ''}/>
-        ${blown
-          ? `<!-- blown: broken wire -->
-            <line x1="16" y1="26" x2="30" y2="26" stroke="#f87171"/>
-            <line x1="30" y1="26" x2="35" y2="18" stroke="#f87171"/>
-            <line x1="52" y1="26" x2="66" y2="26" stroke="#f87171"/>
-            <text x="40" y="42" text-anchor="middle" font-size="8" fill="#f87171" stroke="none" font-weight="700">BLOWN</text>`
-          : `<line x1="16" y1="26" x2="64" y2="26"/>`}
-        <line x1="66" y1="26" x2="78" y2="26"/>
-      </svg>`;
-    }
-
-    // ── LED (triangle + bar + light rays) ────────────────────────────────────
-    case 'led-elec': {
-      const on = data && data.on;
-      const ledColor = on ? '#22d3a5' : c;
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
-        ${on ? `<circle cx="40" cy="26" r="14" fill="rgba(34,211,165,0.12)" stroke="none"/>` : ''}
-        <line x1="2" y1="26" x2="20" y2="26"/>
-        <!-- triangle body -->
-        <polygon points="20,13 20,39 48,26" fill="${on ? 'rgba(34,211,165,0.25)' : 'transparent'}" stroke="${ledColor}"/>
-        <!-- cathode bar -->
-        <line x1="48" y1="12" x2="48" y2="40" stroke="${ledColor}" stroke-width="2.5"/>
-        <line x1="48" y1="26" x2="78" y2="26"/>
-        ${on ? `<!-- light rays -->
-        <line x1="52" y1="16" x2="62" y2="8" stroke="#22d3a5" stroke-width="1.5"/>
-        <line x1="55" y1="21" x2="67" y2="15" stroke="#22d3a5" stroke-width="1.5"/>
-        <line x1="52" y1="36" x2="62" y2="44" stroke="#22d3a5" stroke-width="1.5"/>` : ''}
-      </svg>`;
-    }
-
-    // ── Wire Junction ────────────────────────────────────────────────────────
-    case 'junction':
-      return `<svg viewBox="0 0 40 40" width="40" height="40" fill="none">
-        <line x1="20" y1="4" x2="20" y2="36" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
-        <line x1="4" y1="20" x2="36" y2="20" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
-        <circle cx="20" cy="20" r="5" fill="#fbbf24" stroke="none"/>
-      </svg>`;
-
-    // ── NPN Transistor ───────────────────────────────────────────────────────
-    case 'transistor': {
-      const isOn = data && data.on;
-      const tc = isOn ? '#22d3a5' : '#818cf8';
-      return `<svg viewBox="0 0 80 64" width="80" height="64" fill="none" stroke="${tc}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
-        <!-- base lead -->
-        <line x1="2" y1="32" x2="28" y2="32"/>
-        <!-- vertical body line -->
-        <line x1="28" y1="14" x2="28" y2="50" stroke-width="3"/>
-        <!-- collector (top) -->
-        <line x1="28" y1="18" x2="50" y2="10"/>
-        <line x1="50" y1="10" x2="50" y2="2"/>
-        <!-- emitter (bottom) with arrow -->
-        <line x1="28" y1="46" x2="50" y2="54"/>
-        <line x1="50" y1="54" x2="50" y2="62"/>
-        <!-- emitter arrow -->
-        <polygon points="38,43 44,51 30,50" fill="${tc}" stroke="none"/>
-        <!-- labels -->
-        <text x="4" y="30" font-size="8" fill="var(--text-muted)" stroke="none" font-weight="600">B</text>
-        <text x="54" y="8" font-size="8" fill="${isOn ? '#22d3a5' : 'var(--text-muted)'}" stroke="none" font-weight="600">C</text>
-        <text x="54" y="62" font-size="8" fill="${isOn ? '#22d3a5' : 'var(--text-muted)'}" stroke="none" font-weight="600">E</text>
-        ${isOn ? `<text x="40" y="36" text-anchor="middle" font-size="7" fill="#22d3a5" stroke="none" font-weight="700">ON</text>` : ''}
-      </svg>`;
-    }
-
-    // ── Diode ────────────────────────────────────────────────────────────────
-    case 'diode': {
-      const fwd = data && data.forward;
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="2" y1="26" x2="22" y2="26"/>
-        <polygon points="22,12 22,40 54,26" fill="${fwd ? 'rgba(34,211,165,0.2)' : 'transparent'}" stroke="${c}"/>
-        <line x1="54" y1="11" x2="54" y2="41" stroke-width="2.5"/>
-        <line x1="54" y1="26" x2="78" y2="26"/>
-        ${fwd ? `<text x="40" y="49" text-anchor="middle" font-size="8" fill="#22d3a5" stroke="none" font-weight="700">FORWARD ✓</text>` : ''}
-      </svg>`;
-    }
-
-    // ── Zener Diode ──────────────────────────────────────────────────────────
-    case 'zener': {
-      const zfwd = data && data.forward;
-      const zv = (data && data.zenerVoltage) || 5.1;
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="2" y1="26" x2="22" y2="26"/>
-        <polygon points="22,13 22,39 52,26" fill="${zfwd ? 'rgba(251,191,36,0.2)' : 'transparent'}" stroke="${c}"/>
-        <!-- zener bar with bent ends -->
-        <line x1="52" y1="12" x2="52" y2="40" stroke-width="2.5"/>
-        <line x1="52" y1="12" x2="58" y2="12"/>
-        <line x1="52" y1="40" x2="46" y2="40"/>
-        <line x1="52" y1="26" x2="78" y2="26"/>
-        <text x="40" y="49" text-anchor="middle" font-size="8" fill="#fbbf24" stroke="none" font-weight="700">${zv.toFixed(1)}V</text>
-      </svg>`;
-    }
-
-    // ── LDR ──────────────────────────────────────────────────────────────────
-    case 'ldr': {
-      const lvl = data ? (data.lightLevel || 50) : 50;
-      const ldrR = data ? (data.R || 10000) : 10000;
-      const ldrRStr = ldrR > 1000 ? (ldrR/1000).toFixed(0)+'kΩ' : ldrR.toFixed(0)+'Ω';
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <line x1="2" y1="26" x2="14" y2="26"/>
-        <!-- resistor box -->
-        <rect x="14" y="12" width="30" height="28" rx="4" fill="rgba(251,191,36,${lvl/200})"/>
-        <polyline points="16,18 20,24 24,18 28,24 32,18 36,24 40,18" stroke="#fbbf24" stroke-width="1.8"/>
-        <text x="29" y="35" text-anchor="middle" font-size="7" fill="#fbbf24" stroke="none" font-weight="600">${ldrRStr}</text>
-        <!-- light arrows -->
-        <line x1="18" y1="4" x2="24" y2="10" stroke="#fbbf24" stroke-width="1.5"/>
-        <polygon points="24,10 19,10 22,5" fill="#fbbf24" stroke="none"/>
-        <line x1="28" y1="2" x2="34" y2="8" stroke="#fbbf24" stroke-width="1.5"/>
-        <polygon points="34,8 29,8 32,3" fill="#fbbf24" stroke="none"/>
-        <line x1="44" y1="26" x2="78" y2="26"/>
-      </svg>`;
-    }
-
-    // ── Thermistor ───────────────────────────────────────────────────────────
-    case 'thermistor': {
-      const tmp = data ? (data.temperature || 25) : 25;
-      const tR = data ? (data.R || 10000) : 10000;
-      const tRStr = tR > 1000 ? (tR/1000).toFixed(0)+'kΩ' : tR.toFixed(0)+'Ω';
-      const heat = Math.min(tmp / 100, 1);
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <line x1="2" y1="26" x2="14" y2="26"/>
-        <rect x="14" y="12" width="30" height="28" rx="4" fill="rgba(239,68,68,${heat * 0.4})"/>
-        <text x="29" y="28" text-anchor="middle" font-size="10" fill="#ef4444" stroke="none" font-weight="800">NTC</text>
-        <text x="29" y="38" text-anchor="middle" font-size="7" fill="var(--text-muted)" stroke="none">${tmp.toFixed(0)}°C</text>
-        <!-- T arrow diagonal -->
-        <line x1="40" y1="6" x2="40" y2="14" stroke="#ef4444" stroke-width="1.5"/>
-        <polygon points="40,6 36,12 44,12" fill="#ef4444" stroke="none"/>
-        <line x1="44" y1="26" x2="78" y2="26"/>
-      </svg>`;
-    }
-
-    // ── Potentiometer ────────────────────────────────────────────────────────
-    case 'potentiometer': {
-      const wp = data ? (data.wiperPos || 50) : 50;
-      const pR = data ? (data.R || 500) : 500;
-      const wiperX = 14 + (wp / 100) * 30;
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <line x1="2" y1="26" x2="14" y2="26"/>
-        <rect x="14" y="20" width="52" height="12" rx="2" fill="rgba(251,191,36,0.1)" stroke="${c}" stroke-width="1.5"/>
-        <polyline points="14,26 20,18 26,34 32,18 38,34 44,18 50,34 56,18 62,18 66,26"/>
-        <!-- wiper -->
-        <line x1="${wiperX}" y1="20" x2="${wiperX}" y2="8" stroke="#fbbf24" stroke-width="2" stroke-dasharray="2,2"/>
-        <polygon points="${wiperX},8 ${wiperX-4},14 ${wiperX+4},14" fill="#fbbf24" stroke="none"/>
-        <line x1="66" y1="26" x2="78" y2="26"/>
-        <text x="40" y="48" text-anchor="middle" font-size="8" fill="#fbbf24" stroke="none" font-weight="600">${pR}Ω</text>
-      </svg>`;
-    }
-
-    // ── Capacitor ────────────────────────────────────────────────────────────
-    case 'capacitor': {
-      const cv = data ? (data.voltage || 0) : 0;
-      const pct = Math.min(cv / 20, 1);
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <line x1="2" y1="26" x2="30" y2="26"/>
-        <!-- plate 1 (positive) -->
-        <line x1="30" y1="10" x2="30" y2="42" stroke-width="3.5"/>
-        <!-- plate 2 (negative) -->
-        <line x1="40" y1="10" x2="40" y2="42" stroke-width="3.5"/>
-        <line x1="40" y1="26" x2="78" y2="26"/>
-        <!-- charge indicator -->
-        ${cv > 0.5 ? `<rect x="30" y="16" width="${pct*10}" height="20" fill="rgba(129,140,248,${pct*0.4})" stroke="none"/>` : ''}
-        <text x="35" y="8" text-anchor="middle" font-size="8" fill="#818cf8" stroke="none" font-weight="700">${cv > 0.1 ? cv.toFixed(1)+'V' : ''}</text>
-        <text x="70" y="44" font-size="7" fill="var(--text-muted)" stroke="none">${(data && data.capacitance) ? data.capacitance+'µF' : ''}</text>
-      </svg>`;
-    }
-
-    // ── Relay ─────────────────────────────────────────────────────────────────
-    case 'relay': {
-      const ce = data && data.coilEnergized;
-      return `<svg viewBox="0 0 80 52" width="80" height="52" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round">
-        <!-- coil section -->
-        <line x1="2" y1="40" x2="12" y2="40"/>
-        <rect x="12" y="32" width="24" height="16" rx="3" fill="${ce ? 'rgba(34,211,165,0.15)' : 'transparent'}" stroke="${ce ? '#22d3a5' : 'var(--text-muted)'}"/>
-        <path d="M 14 40 L 16 34 L 20 46 L 24 34 L 28 46 L 32 34" stroke="${ce ? '#22d3a5' : 'var(--text-muted)'}" stroke-width="1.5"/>
-        <line x1="36" y1="40" x2="46" y2="40"/>
-        <!-- switch section -->
-        <circle cx="50" cy="26" r="2.5" fill="${ce ? '#22d3a5' : 'var(--text-muted)'}" stroke="none"/>
-        <line x1="50" y1="26" x2="68" y2="${ce ? '26' : '16'}" stroke="${ce ? '#22d3a5' : 'var(--text-muted)'}" stroke-width="2.5"/>
-        <circle cx="70" cy="26" r="2.5" fill="${ce ? '#22d3a5' : 'var(--text-muted)'}" stroke="none"/>
-        <line x1="72" y1="26" x2="78" y2="26" stroke="${ce ? '#22d3a5' : c}"/>
-        <text x="40" y="16" text-anchor="middle" font-size="8" fill="${ce ? '#22d3a5' : 'var(--text-muted)'}" stroke="none" font-weight="700">${ce ? '⚡ ON' : 'OFF'}</text>
-      </svg>`;
-    }
-
-    default:
-      return '';
-  }
-}
-
-function getElectricityNodeInner(node) {
-  const t = node.type, d = node.data;
-  const svg = renderComponentSVG(t, d, node.id);
-
-  if (t === 'battery') {
-    const emf = d.emf || 9;
-    return `${svg}
-      <div style="display:flex;align-items:center;gap:4px;width:100%;padding:0 2px;color:#22d3a5">
-        <span style="font-size:10px;font-weight:600;white-space:nowrap">${emf}V</span>
-        <input type="range" min="1" max="20" value="${emf}" step="0.5" style="flex:1;height:3px;accent-color:#22d3a5"
-          oninput="window.updateElectricProp && window.updateElectricProp('${node.id}','emf',+this.value);window.evaluateSandbox()">
-      </div>`;
-  }
-
-  if (t === 'power-supply') {
-    const v = d.voltage || 12;
-    return `${svg}
-      <div style="display:flex;flex-direction:column;gap:3px;width:100%;padding:2px">
-        <div style="display:flex;align-items:center;justify-content:space-between;font-size:9px;color:var(--text-muted)">
-          <span style="color:#fbbf24;font-weight:600">PS</span>
-          <span style="color:#22d3a5;font-size:12px;font-weight:700;font-family:monospace">${v.toFixed(1)}V</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px">
-          <span style="font-size:8px;color:var(--text-muted)">─</span>
-          <input type="range" min="0.5" max="30" value="${v}" step="0.5" style="flex:1;height:3px;accent-color:#22d3a5"
-            oninput="window.updateElectricProp && window.updateElectricProp('${node.id}','voltage',+this.value);window.evaluateSandbox()">
-          <span style="font-size:8px;color:var(--text-muted)">+</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:7px;color:var(--text-muted)">
-          <span>0V</span>
-          <span>30V</span>
-        </div>
-      </div>`;
-  }
-
-  if (t === 'resistor') {
-    const R = d.R || 10;
-    const cur = d.current || 0;
-    const vDrop = d.voltageDrop || 0;
-    return `${svg}
-      <div style="display:flex;align-items:center;gap:4px;width:100%;padding:0 2px">
-        <span style="font-size:10px;font-weight:600;white-space:nowrap;color:#fbbf24">${R}Ω</span>
-        <input type="range" min="1" max="1000" value="${R}" style="flex:1;height:3px;accent-color:#fbbf24"
-          oninput="window.updateElectricProp && window.updateElectricProp('${node.id}','R',+this.value);window.evaluateSandbox()">
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);margin-top:2px;width:100%">
-        <span>${cur > 0.001 ? cur.toFixed(3) + 'A' : ''}</span>
-        <span>${vDrop > 0.001 ? vDrop.toFixed(2) + 'V' : ''}</span>
-      </div>`;
-  }
-
-  if (t === 'bulb') {
-    const brightness = d.brightness || 0;
-    const isOn = brightness > 0.1;
-    return `<div class="bulb-wrap-elec" id="${node.id}-bulb-elec">
-      <svg class="bulb-svg" viewBox="0 0 100 120">
-        <circle cx="50" cy="45" r="42" class="bulb-halo" ${isOn ? `style="fill:rgba(251,191,36,${0.2 + brightness * 0.3})"` : ''}/>
-        <path d="M 32 75 C 20 62 20 40 32 26 C 44 12 56 12 68 26 C 80 40 80 62 68 75 C 62 82 58 90 58 95 L 42 95 C 42 90 38 82 32 75 Z" class="bulb-glass" ${isOn ? `style="fill:rgba(251,191,36,${0.2 + brightness * 0.4})"` : ''}/>
-        <line x1="42" y1="95" x2="45" y2="70" class="bulb-wire"/>
-        <line x1="58" y1="95" x2="55" y2="70" class="bulb-wire"/>
-        <path d="M 45 70 C 45 60 48 56 50 56 C 52 56 55 60 55 70" class="bulb-filament" ${isOn ? `style="stroke:rgba(251,191,36,${0.5 + brightness * 0.5});filter:drop-shadow(0 0 ${3 + brightness * 6}px rgba(251,191,36,${0.4 + brightness * 0.4}))"` : ''}/>
-        <rect x="40" y="95" width="20" height="12" rx="2" class="bulb-base"/>
-        <path d="M 44 107 L 56 107 C 54 113 46 113 44 107 Z" class="bulb-base-tip"/>
-        <path d="M 38 32 A 20 20 0 0 1 54 20" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.8" stroke-linecap="round" class="bulb-shine"/>
-      </svg>
-      <span class="bulb-state-label-elec" id="${node.id}-state-elec" style="font-size:10px;text-align:center;color:#fbbf24;margin-top:4px">${brightness > 0.7 ? 'BRIGHT' : brightness > 0.3 ? 'DIM' : 'OFF'}</span>
-    </div>`;
-  }
-
-  if (t === 'switch') {
-    const closed = d.closed || false;
-    return `${svg}
-      <button
-        onclick="event.stopPropagation();window.toggleElectricSwitch('${node.id}')"
-        style="padding:3px 10px;border-radius:3px;border:1px solid ${closed ? '#22d3a5' : '#9ba3c7'};
-        background:${closed ? 'rgba(34,211,165,0.15)' : 'transparent'};color:${closed ? '#22d3a5' : '#9ba3c7'};
-        font-weight:600;cursor:pointer;font-size:10px;transition:all 0.2s">
-        ${closed ? 'CLOSED ■' : 'OPEN ○'}</button>`;
-  }
-
-  if (t === 'ammeter') {
-    const current = d.current || 0;
-    const angle = -60 + Math.min(current / 2 * 120, 120);
-    return `${svg}
-      <div style="display:flex;align-items:center;gap:4px;width:100%">
-        <div style="flex:1;height:16px;border:1px solid var(--border-color);border-radius:3px;position:relative;overflow:hidden;background:linear-gradient(to right,#22d3a5,#fbbf24,#f87171);opacity:0.12">
-          <div style="position:absolute;bottom:0;left:50%;width:1px;height:12px;background:#9ba3c7;transform:translateX(-50%) rotate(${angle}deg);transform-origin:bottom;transition:transform 0.3s"></div>
-        </div>
-        <span style="font-size:10px;font-weight:600;color:#f87171;white-space:nowrap">${current.toFixed(2)}A</span>
-      </div>`;
-  }
-
-  if (t === 'voltmeter') {
-    const voltage = d.voltage || 0;
-    const angle = -60 + Math.min(voltage / 20 * 120, 120);
-    return `${svg}
-      <div style="display:flex;align-items:center;gap:4px;width:100%">
-        <div style="flex:1;height:16px;border:1px solid var(--border-color);border-radius:3px;position:relative;overflow:hidden;background:linear-gradient(to right,#22d3a5,#fbbf24,#f87171);opacity:0.12">
-          <div style="position:absolute;bottom:0;left:50%;width:1px;height:12px;background:#818cf8;transform:translateX(-50%) rotate(${angle}deg);transform-origin:bottom;transition:transform 0.3s"></div>
-        </div>
-        <span style="font-size:10px;font-weight:600;color:#818cf8;white-space:nowrap">${voltage.toFixed(1)}V</span>
-      </div>`;
-  }
-
-  if (t === 'motor') {
-    const speed = d.speed || 0;
-    return `${svg}
-      <div style="font-size:10px;text-align:center;color:#818cf8">${speed > 0 ? 'RUNNING' : 'STOPPED'}</div>`;
-  }
-
-  if (t === 'led-elec') {
-    const on = d.on || false;
-    return `${svg}
-      <div style="display:flex;align-items:center;gap:6px;justify-content:center">
-        <div style="width:10px;height:10px;border-radius:50%;background:${on ? '#22d3a5' : '#475569'};
-          border:1.5px solid ${on ? '#10b981' : '#64748b'};box-shadow:${on ? '0 0 6px #22d3a5' : 'none'};transition:all 0.2s"></div>
-        <span style="font-size:10px;color:#22d3a5;font-weight:600">${on ? 'ON' : 'OFF'}</span>
-      </div>`;
-  }
-
-  if (t === 'fuse') {
-    const blown = d.blown || false;
-    return `${svg}
-      <div style="font-size:10px;font-weight:600;text-align:center;color:${blown ? '#f87171' : '#fbbf24'}">${blown ? 'BLOWN' : 'OK'}</div>`;
-  }
-
-  if (t === 'junction') {
-    return svg;
-  }
-
-  if (t === 'transistor') {
-    const on = d.on || false;
-    return `${svg}
-      <button
-        onclick="event.stopPropagation();window.toggleElectricTransistor('${node.id}')"
-        style="padding:2px 8px;border-radius:3px;border:1px solid ${on ? '#22d3a5' : '#9ba3c7'};
-        background:${on ? 'rgba(34,211,165,0.15)' : 'transparent'};color:${on ? '#22d3a5' : '#9ba3c7'};
-        font-weight:600;cursor:pointer;font-size:9px;transition:all 0.2s">
-        Base: ${on ? 'HIGH ▲' : 'LOW ▼'}</button>`;
-  }
-
-  if (t === 'diode') {
-    const fwd = d.forward || false;
-    return `${svg}
-      <div style="font-size:9px;text-align:center;padding:1px 0;color:${fwd ? '#22d3a5' : '#f87171'};font-weight:600">
-        ${fwd ? 'FORWARD BIASED ✓' : 'REVERSE / OFF'}
-      </div>`;
-  }
-
-  if (t === 'zener') {
-    const zfwd = d.forward || false;
-    const zv = d.zenerVoltage || 5.1;
-    return `${svg}
-      <div style="display:flex;flex-direction:column;align-items:center;gap:1px;width:100%">
-        <div style="display:flex;align-items:center;gap:4px;width:100%">
-          <span style="font-size:9px;font-weight:600;color:#fbbf24">${zv.toFixed(1)}V</span>
-          <input type="range" min="1" max="24" value="${zv}" step="0.1" style="flex:1;height:3px;accent-color:#fbbf24"
-            oninput="window.updateElectricProp && window.updateElectricProp('${node.id}','zenerVoltage',+this.value);window.evaluateSandbox()">
-        </div>
-        <span style="font-size:9px;color:${zfwd ? '#22d3a5' : '#9ba3c7'}">${zfwd ? 'REGULATING ✓' : 'BLOCKED'}</span>
-      </div>`;
-  }
-
-  if (t === 'ldr') {
-    const lvl = d.lightLevel || 50;
-    const ldrR = d.R || 10000;
-    const litDesc = lvl > 70 ? 'BRIGHT' : lvl > 30 ? 'DIM' : 'DARK';
-    return `${svg}
-      <div style="display:flex;flex-direction:column;align-items:center;gap:1px;width:100%">
-        <div style="display:flex;align-items:center;gap:4px;width:100%">
-          <span style="font-size:8px;color:#fbbf24">☀️</span>
-          <input type="range" min="0" max="100" value="${lvl}" style="flex:1;height:3px;accent-color:#fbbf24"
-            oninput="window.updateElectricProp && window.updateElectricProp('${node.id}','lightLevel',+this.value);window.evaluateSandbox()">
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;font-size:8px;color:var(--text-muted)">
-          <span>${litDesc}</span>
-          <span>${ldrR > 1000 ? (ldrR/1000).toFixed(0)+'k' : ldrR.toFixed(0)}Ω</span>
-        </div>
-      </div>`;
-  }
-
-  if (t === 'thermistor') {
-    const temp = d.temperature || 25;
-    const tR = d.R || 10000;
-    return `${svg}
-      <div style="display:flex;flex-direction:column;align-items:center;gap:1px;width:100%">
-        <div style="display:flex;align-items:center;gap:4px;width:100%">
-          <span style="font-size:8px;color:#ef4444">🌡️</span>
-          <input type="range" min="0" max="100" value="${temp}" style="flex:1;height:3px;accent-color:#ef4444"
-            oninput="window.updateElectricProp && window.updateElectricProp('${node.id}','temperature',+this.value);window.evaluateSandbox()">
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;font-size:8px;color:var(--text-muted)">
-          <span>${temp.toFixed(0)}°C</span>
-          <span>${tR > 1000 ? (tR/1000).toFixed(0)+'k' : tR.toFixed(0)}Ω</span>
-        </div>
-      </div>`;
-  }
-
-  if (t === 'potentiometer') {
-    const wp = d.wiperPos || 50;
-    const pR = d.R || 500;
-    return `${svg}
-      <div style="display:flex;flex-direction:column;align-items:center;gap:1px;width:100%">
-        <div style="display:flex;align-items:center;gap:4px;width:100%">
-          <span style="font-size:8px;color:#fbbf24">↕️</span>
-          <input type="range" min="0" max="100" value="${wp}" style="flex:1;height:3px;accent-color:#fbbf24"
-            oninput="window.updateElectricProp && window.updateElectricProp('${node.id}','wiperPos',+this.value);window.evaluateSandbox()">
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;font-size:8px;color:var(--text-muted)">
-          <span>${wp.toFixed(0)}%</span>
-          <span>${pR}Ω</span>
-        </div>
-      </div>`;
-  }
-
-  if (t === 'capacitor') {
-    const cv = d.voltage || 0;
-    const ch = d.charge || 0;
-    const cap = d.capacitance || 100;
-    const pct = cap > 0 ? Math.min(ch / cap * 100, 100) : 0;
-    return `${svg}
-      <div style="display:flex;flex-direction:column;align-items:center;gap:1px;width:100%">
-        <div style="display:flex;align-items:center;gap:4px;width:100%">
-          <span style="font-size:8px;color:#818cf8">⏳</span>
-          <div style="flex:1;height:6px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden;border:1px solid var(--border-color)">
-            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#818cf8,#22d3a5);transition:width 0.3s"></div>
-          </div>
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;font-size:8px;color:var(--text-muted)">
-          <span>${cv.toFixed(2)}V</span>
-          <span>${cap}µF</span>
-        </div>
-      </div>`;
-  }
-
-  if (t === 'relay') {
-    const ce = d.coilEnergized || false;
-    return `${svg}
-      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:0 2px">
-        <span style="font-size:8px;color:${ce ? '#22d3a5' : 'var(--text-muted)'}">Coil: ${ce ? '⚡' : '○'}</span>
-        <span style="font-size:8px;font-weight:600;color:${ce ? '#22d3a5' : '#9ba3c7'}">${ce ? 'CLOSED' : 'OPEN'}</span>
-      </div>`;
-  }
-
-  return '';
-}
+// getElectricityNodeInner removed
 
 function findSeriesCycle(startId, adj) {
   const visited = new Set();
@@ -2279,209 +1644,12 @@ function findSeriesCycle(startId, adj) {
   return false;
 }
 
-function evaluateElectricity() {
-  const electricityTypes = ['battery','resistor','bulb','switch','ammeter','voltmeter','motor','fuse','led-elec','junction','transistor','diode','zener','ldr','thermistor','potentiometer','capacitor','relay','power-supply'];
-  const elecNodes = sandboxNodes.filter(n => electricityTypes.includes(n.type));
-  if (elecNodes.length === 0) return;
+// evaluateElectricity removed
+// window.updateElectricProp = removed
 
-  const undirAdj = {};
-  elecNodes.forEach(n => { undirAdj[n.id] = []; });
-  sandboxWires.forEach(w => {
-    if (undirAdj[w.fromNodeId] && undirAdj[w.toNodeId]) {
-      undirAdj[w.fromNodeId].push(w.toNodeId);
-      undirAdj[w.toNodeId].push(w.fromNodeId);
-    }
-  });
+// window.toggleElectricSwitch = removed
 
-  const visited = new Set();
-  const subcircuits = [];
-  elecNodes.forEach(n => {
-    if (visited.has(n.id)) return;
-    const queue = [n.id];
-    const cluster = [];
-    visited.add(n.id);
-    while (queue.length) {
-      const id = queue.shift();
-      const node = sandboxNodes.find(nd => nd.id === id);
-      if (node) cluster.push(node);
-      (undirAdj[id] || []).forEach(nb => {
-        if (!visited.has(nb)) { visited.add(nb); queue.push(nb); }
-      });
-    }
-    if (cluster.length) subcircuits.push(cluster);
-  });
-
-  sandboxWires.forEach(w => { w.active = false; delete w.potentialLabel; delete w.currentLabel; });
-  elecNodes.forEach(n => { n.outputState = 0; });
-
-  subcircuits.forEach(cluster => {
-    const clusterIds = new Set(cluster.map(nd => nd.id));
-    const voltageSources = cluster.filter(n => n.type === 'battery' || n.type === 'power-supply');
-    const switches = cluster.filter(n => n.type === 'switch');
-    const diodes   = cluster.filter(n => n.type === 'diode');
-    const zeners   = cluster.filter(n => n.type === 'zener');
-    const relays   = cluster.filter(n => n.type === 'relay');
-    const transistors = cluster.filter(n => n.type === 'transistor');
-    const fuses    = cluster.filter(n => n.type === 'fuse');
-
-    const anyOpen = switches.some(s => !s.data.closed);
-    const anyDiodeBlocked = diodes.some(d => !d.data.forward);
-    const anyZenerBlocked = zeners.some(z => !z.data.forward);
-    const anyRelayOpen = relays.some(r => !r.data.coilEnergized);
-    const anyTransistorOff = transistors.some(t => !t.data.on);
-    const anyFuseBlown = fuses.some(f => f.data.blown);
-
-    const hasLoop = voltageSources.some(vs => findSeriesCycle(vs.id, undirAdj));
-
-    const circuitActive = voltageSources.length > 0 && !anyOpen && !anyDiodeBlocked
-      && !anyZenerBlocked && !anyRelayOpen && !anyTransistorOff && !anyFuseBlown && hasLoop;
-
-    if (!circuitActive) {
-      cluster.forEach(n => {
-        n.outputState = 0;
-        if (n.type === 'bulb') n.data.brightness = 0;
-        else if (n.type === 'led-elec') n.data.on = false;
-        else if (n.type === 'motor') n.data.speed = 0;
-        else if (n.type === 'ammeter') n.data.current = 0;
-        else if (n.type === 'voltmeter') n.data.voltage = 0;
-        else if (n.type === 'fuse') { /* keep blown state */ }
-        else if (n.type === 'capacitor') {
-          n.data.charge = Math.max(0, (n.data.charge || 0) - 0.01);
-          n.data.voltage = n.data.charge / ((n.data.capacitance || 100) / 1000000);
-        }
-        else if (n.type === 'relay') n.data.coilEnergized = false;
-      });
-      return;
-    }
-
-    const totalEMF = voltageSources.reduce((sum, vs) => {
-      if (vs.type === 'battery') return sum + (vs.data.emf || 9);
-      return sum + (vs.data.voltage || 12);
-    }, 0);
-
-    const totalR = cluster.reduce((sum, n) => {
-      if (n.type === 'resistor') return sum + (n.data.R !== undefined ? parseFloat(n.data.R) : 10);
-      if (n.type === 'bulb') return sum + 10;
-      if (n.type === 'motor') return sum + 15;
-      if (n.type === 'led-elec') return sum + 5;
-      if (n.type === 'ammeter') return sum + 0.1;
-      if (n.type === 'fuse') return sum + 0.1;
-      if (n.type === 'diode') return sum + 0.5;
-      if (n.type === 'zener') return sum + 0.5;
-      if (n.type === 'ldr') return sum + (n.data.R !== undefined ? parseFloat(n.data.R) : 10000);
-      if (n.type === 'thermistor') return sum + (n.data.R !== undefined ? parseFloat(n.data.R) : 10000);
-      if (n.type === 'potentiometer') return sum + (n.data.R !== undefined ? parseFloat(n.data.R) : 500);
-      if (n.type === 'capacitor') return sum + 1;
-      if (n.type === 'relay') return sum + 10;
-      if (n.type === 'battery') return sum + 0.5;
-      if (n.type === 'power-supply') return sum + 0.5;
-      if (n.type === 'junction') return sum + 0.01;
-      return sum;
-    }, 0);
-
-    const current = totalEMF / Math.max(totalR, 0.1);
-
-    cluster.forEach(n => { n.outputState = 1; });
-
-    sandboxWires.forEach(w => {
-      if (clusterIds.has(w.fromNodeId) && clusterIds.has(w.toNodeId)) {
-        w.active = true;
-        w.potentialLabel = totalEMF.toFixed(1) + 'V';
-        w.currentLabel = current.toFixed(3) + 'A';
-      }
-    });
-
-    // CRITICAL FIX: declare cluster-local filter arrays used below
-    const resistors      = cluster.filter(n => n.type === 'resistor');
-    const bulbs          = cluster.filter(n => n.type === 'bulb');
-    const leds           = cluster.filter(n => n.type === 'led-elec');
-    const motors         = cluster.filter(n => n.type === 'motor');
-    const ammeters       = cluster.filter(n => n.type === 'ammeter');
-    const voltmeters     = cluster.filter(n => n.type === 'voltmeter');
-    const ldrs           = cluster.filter(n => n.type === 'ldr');
-    const thermistors    = cluster.filter(n => n.type === 'thermistor');
-    const potentiometers = cluster.filter(n => n.type === 'potentiometer');
-    const capacitors     = cluster.filter(n => n.type === 'capacitor');
-
-    resistors.forEach(n => {
-      const R = n.data.R !== undefined ? parseFloat(n.data.R) : 10;
-      n.data.current = current;
-      n.data.voltageDrop = current * R;
-    });
-    bulbs.forEach(n => {
-      const bulbV = current * 10;
-      n.data.brightness = Math.min(bulbV / 6, 1);
-    });
-    leds.forEach(n => { n.data.on = current > 0.01; });
-    motors.forEach(n => { n.data.speed = current; });
-    fuses.forEach(n => { n.data.blown = current > 0.5; });
-    ammeters.forEach(n => { n.data.current = current; });
-    voltmeters.forEach(n => {
-      const wiresToV = sandboxWires.filter(w => w.toNodeId === n.id);
-      let p0 = 0, p1 = 0;
-      wiresToV.forEach(w => {
-        const srcPot = w.fromNodeId === voltageSources[0].id ? totalEMF : 0;
-        if (w.toPortIdx === 0) p0 = srcPot;
-        else if (w.toPortIdx === 1) p1 = srcPot;
-      });
-      n.data.voltage = Math.abs(p0 - p1);
-    });
-    diodes.forEach(n => { n.data.forward = true; });
-    zeners.forEach(n => { n.data.forward = true; n.data.voltage = Math.min(totalEMF, n.data.zenerVoltage || 5.1); });
-    ldrs.forEach(n => {
-      const lvl = n.data.lightLevel || 50;
-      n.data.R = 1000000 * (1 - lvl / 100) + 100 * (lvl / 100);
-      n.data.current = current;
-    });
-    thermistors.forEach(n => {
-      const temp = n.data.temperature || 25;
-      n.data.R = 50000 * Math.exp(-0.05 * temp);
-      n.data.current = current;
-    });
-    potentiometers.forEach(n => {
-      const wp = n.data.wiperPos || 50;
-      n.data.R = (wp / 100) * (n.data.totalR || 1000);
-      n.data.current = current;
-    });
-    capacitors.forEach(n => {
-      const dt = 0.08;
-      const cap = n.data.capacitance || 100;
-      const tau = (n.data.R || 1) * cap / 1000000;
-      const targetCharge = cap * totalEMF / 1000000;
-      const prevCharge = n.data.charge || 0;
-      n.data.charge = prevCharge + (targetCharge - prevCharge) * dt / (tau + dt);
-      n.data.voltage = n.data.charge / (cap / 1000000);
-    });
-    relays.forEach(n => { n.data.coilEnergized = current > 0.02; });
-  });
-}
-window.updateElectricProp = function (nodeId, prop, value) {
-  const node = sandboxNodes.find(n => n.id === nodeId);
-  if (node) {
-    node.data[prop] = value;
-    updateNodeVisuals(node);
-  }
-};
-
-window.toggleElectricSwitch = function (nodeId) {
-  const node = sandboxNodes.find(n => n.id === nodeId);
-  if (node && node.type === 'switch') {
-    node.data.closed = !node.data.closed;
-    playSound('toggle');
-    updateNodeVisuals(node);
-    evaluateSandbox();
-  }
-};
-
-window.toggleElectricTransistor = function (nodeId) {
-  const node = sandboxNodes.find(n => n.id === nodeId);
-  if (node && node.type === 'transistor') {
-    node.data.on = !node.data.on;
-    playSound('toggle');
-    updateNodeVisuals(node);
-    evaluateSandbox();
-  }
-};
+// window.toggleElectricTransistor = removed
 
 window.updateSensorValue = function (nodeId, value) {
   const node = sandboxNodes.find(n => n.id === nodeId);
@@ -2506,13 +1674,7 @@ window.updateSensorThreshold = function (nodeId, value) {
 };
 function evaluateSandbox() {
   if (sandboxNodes.length === 0) return;
-  const electricityTypesList = ['battery', 'resistor', 'bulb', 'switch', 'ammeter', 'voltmeter', 'motor', 'fuse', 'led-elec', 'junction', 'transistor', 'diode', 'zener', 'ldr', 'thermistor', 'potentiometer', 'capacitor', 'relay'];
-  const hasElectricity = sandboxNodes.some(n => electricityTypesList.includes(n.type));
-
-  if (hasElectricity) {
-    evaluateElectricity();
-    updateSandboxWires();
-  }
+  // electricity branch removed
 
   const MAX_ITER = Math.max(sandboxNodes.length * 3, 20);
 
@@ -2528,7 +1690,11 @@ function evaluateSandbox() {
         if (wire.toNodeId !== node.id) return;
         const src = sandboxNodes.find(n => n.id === wire.fromNodeId);
         if (!src) return;
-        const val = wire.fromPortIdx === 0 ? src.outputState : src.outputState2;
+        let val = 0;
+        if (wire.fromPortIdx === 0) val = src.outputState || 0;
+        else if (wire.fromPortIdx === 1) val = src.outputState2 || 0;
+        else if (wire.fromPortIdx === 2) val = src.outputState3 || 0;
+        else if (wire.fromPortIdx === 3) val = src.outputState4 || 0;
         if (wire.toPortIdx < node.inputsCount) node.inputValues[wire.toPortIdx] = val;
       });
 
@@ -2546,9 +1712,9 @@ function evaluateSandbox() {
     if (!changed) break;
   }
 
-  // ── Logic-Electricity Bridge ──────────────────────────────────────────────
+  // ΓöÇΓöÇ Logic-Electricity Bridge ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   // Digital gate outputs drive electricity switches and transistors.
-  // This allows circuits like: Toggle Switch → Electricity Switch → Battery → Bulb
+  // This allows circuits like: Toggle Switch ΓåÆ Electricity Switch ΓåÆ Battery ΓåÆ Bulb
   {
     const digitalTypes = new Set(['input','clock','not','and','or','nand','nor','xor','xnor',
       'd-flop','half-adder','full-adder','output','rgb-led','buzzer','led-bar',
@@ -2597,6 +1763,8 @@ function computeNodeOutput(node) {
       const tmpNodes = icDef.nodes.map(n => ({
         ...n, outputState: n.type === 'input' ? 0 : (n.outputState || 0),
         outputState2: n.outputState2 || 0,
+        outputState3: n.outputState3 || 0,
+        outputState4: n.outputState4 || 0,
         inputValues: Array(n.inputsCount).fill(0), prevClockState: 0
       }));
       const tmpNodeMap = {};
@@ -2690,7 +1858,7 @@ function computeNodeOutput(node) {
     case 'not':
       node.outputState = a ? 0 : 1;
       break;
-    // ── Multi-input gates use reduce logic ───────────────────────────────
+    // ΓöÇΓöÇ Multi-input gates use reduce logic ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     case 'and':
       node.outputState = allHigh() ? 1 : 0;
       break;
@@ -2747,7 +1915,7 @@ function computeNodeOutput(node) {
   }
 }
 
-// ── Multi-input gate management ────────────────────────────────────────────────
+// ΓöÇΓöÇ Multi-input gate management ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 const MULTI_INPUT_GATE_TYPES = new Set(['and','or','nand','nor','xor','xnor']);
 const MAX_GATE_INPUTS = 32;
 const MIN_GATE_INPUTS = 2;
@@ -2759,7 +1927,7 @@ function addGateInput(nodeId) {
   pushUndo();
   node.inputsCount++;
   node.inputValues = Array(node.inputsCount).fill(0);
-  // Remove any wires that targeted ports that no longer make sense (none needed — just grow)
+  // Remove any wires that targeted ports that no longer make sense (none needed ΓÇö just grow)
   const el = document.getElementById(nodeId);
   if (el) {
     // Remove old input ports, re-render
@@ -2770,7 +1938,7 @@ function addGateInput(nodeId) {
   }
   evaluateSandbox();
   playSound('click');
-  showToast(`Input added → ${node.inputsCount} inputs`);
+  showToast(`Input added ΓåÆ ${node.inputsCount} inputs`);
 }
 
 function removeGateInput(nodeId) {
@@ -2791,7 +1959,7 @@ function removeGateInput(nodeId) {
   }
   evaluateSandbox();
   playSound('click');
-  showToast(`Input removed → ${node.inputsCount} inputs`);
+  showToast(`Input removed ΓåÆ ${node.inputsCount} inputs`);
 }
 window.addGateInput = addGateInput;
 window.removeGateInput = removeGateInput;
@@ -2802,7 +1970,7 @@ function updateGateNodeHeight(el, inputsCount) {
   el.style.minHeight = minH + 'px';
 }
 
-// ── Right-click context menu ──────────────────────────────────────────────────
+// ΓöÇΓöÇ Right-click context menu ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 let _sbCtxMenu = null;
 function showSandboxContextMenu(e, node) {
   e.preventDefault();
@@ -2817,22 +1985,22 @@ function showSandboxContextMenu(e, node) {
 
   const items = [
     {
-      icon: '➕', label: `Add Input (now ${node.inputsCount})`,
+      icon: 'Γ₧ò', label: `Add Input (now ${node.inputsCount})`,
       action: () => addGateInput(node.id),
       disabled: node.inputsCount >= MAX_GATE_INPUTS
     },
     {
-      icon: '➖', label: `Remove Input (now ${node.inputsCount})`,
+      icon: 'Γ₧û', label: `Remove Input (now ${node.inputsCount})`,
       action: () => removeGateInput(node.id),
       disabled: node.inputsCount <= MIN_GATE_INPUTS
     },
     { separator: true },
     {
-      icon: '📋', label: 'Show Inspector',
+      icon: '≡ƒôï', label: 'Show Inspector',
       action: () => { selectNode(node.id); }
     },
     {
-      icon: '🗑️', label: 'Delete Gate',
+      icon: '≡ƒùæ∩╕Å', label: 'Delete Gate',
       action: () => deleteNode(node.id)
     }
   ];
@@ -2884,7 +2052,7 @@ function updateNodeVisuals(node) {
       if (wrap) wrap.classList.toggle('high', isHigh);
       if (state) {
         state.classList.toggle('high', isHigh);
-        state.innerText = isHigh ? '● ON' : '○ OFF';
+        state.innerText = isHigh ? 'ΓùÅ ON' : 'Γùï OFF';
       }
       break;
     }
@@ -2920,7 +2088,7 @@ function updateNodeVisuals(node) {
       const waveColor = isOn ? '#f59e0b' : 'var(--border-color)';
       if (wave1) wave1.style.stroke = waveColor;
       if (wave2) wave2.style.stroke = waveColor;
-      if (lbl) { lbl.innerText = isOn ? '♪ BUZZ' : 'SILENT'; lbl.style.color = isOn ? '#f59e0b' : 'var(--text-muted)'; }
+      if (lbl) { lbl.innerText = isOn ? 'ΓÖ¬ BUZZ' : 'SILENT'; lbl.style.color = isOn ? '#f59e0b' : 'var(--text-muted)'; }
       if (wrap) wrap.classList.toggle('buzzer-on', isOn);
       break;
     }
@@ -2931,7 +2099,7 @@ function updateNodeVisuals(node) {
     case 'clock': {
       const phase = document.getElementById(`${node.id}-phase`);
       if (phase) {
-        phase.innerText = node.outputState === 1 ? '▲ HIGH' : '▼ LOW';
+        phase.innerText = node.outputState === 1 ? 'Γû▓ HIGH' : 'Γû╝ LOW';
         phase.style.color = node.outputState === 1 ? 'var(--color-cyan)' : 'var(--text-muted)';
       }
       const cursor = document.getElementById(`${node.id}-cursor`);
@@ -2949,38 +2117,7 @@ function updateNodeVisuals(node) {
         btn.className = node.outputState === 1 ? 'sandbox-toggle-btn high' : 'sandbox-toggle-btn';
       }
       break;
-    }
-    case 'battery':
-    case 'resistor':
-    case 'bulb':
-    case 'switch':
-    case 'ammeter':
-    case 'voltmeter':
-    case 'motor':
-    case 'fuse':
-    case 'led-elec':
-    case 'junction':
-    case 'transistor':
-    case 'diode':
-    case 'zener':
-    case 'ldr':
-    case 'thermistor':
-    case 'potentiometer':
-    case 'capacitor':
-    case 'relay': {
-      const body = el.querySelector('.sandbox-node-body');
-      if (body) {
-        body.innerHTML = getElectricityNodeInner(node);
-      }
-      el.classList.toggle('elec-active', node.outputState === 1);
-      break;
-    }
-    case 'op-amp': {
-      const body = el.querySelector('.sandbox-node-body');
-      if (body) { body.innerHTML = ''; renderNodeBody(node, body); }
-      el.classList.toggle('elec-active', node.outputState === 1);
-      break;
-    }
+    }
     default: {
       if (node.type && node.type.startsWith('custom-ic-')) {
         const body = el.querySelector('.sandbox-node-body');
@@ -3062,8 +2199,7 @@ function getDigitalGates() {
 }
 
 function isDigitalCircuit() {
-  const electricityTypes = ['battery','resistor','bulb','switch','ammeter','voltmeter','motor','fuse','led-elec','junction','transistor','diode','zener','ldr','thermistor','potentiometer','capacitor','relay','power-supply'];
-  return sandboxNodes.length > 0 && !sandboxNodes.some(n => electricityTypes.includes(n.type));
+  return sandboxNodes.length > 0;
 }
 
 window.showTruthTable = function () {
@@ -3150,7 +2286,7 @@ window.showTruthTable = function () {
       const binStr = bits.join('');
       const dec = bits.length > 0 ? parseInt(binStr, 2) : 0;
       binaryDisplay = `<div style="margin-top:0.5rem;padding:0.5rem;background:var(--bg-tertiary);border-radius:4px;font-family:monospace;font-size:0.8rem;border:1px solid var(--border-color)">
-        <strong>Binary:</strong> ${binStr || '—'} &nbsp;|&nbsp; <strong>Decimal:</strong> ${bits.length > 0 ? dec : '—'} &nbsp;|&nbsp; <strong>Hex:</strong> ${bits.length > 0 ? '0x' + dec.toString(16).toUpperCase() : '—'}
+        <strong>Binary:</strong> ${binStr || 'ΓÇö'} &nbsp;|&nbsp; <strong>Decimal:</strong> ${bits.length > 0 ? dec : 'ΓÇö'} &nbsp;|&nbsp; <strong>Hex:</strong> ${bits.length > 0 ? '0x' + dec.toString(16).toUpperCase() : 'ΓÇö'}
       </div>`;
     }
     rowsHtml += `<tr>${tds.join('')}</tr>`;
@@ -3250,7 +2386,7 @@ function showInspectorForNode(node) {
       const R = d.R || 10;
       const cur = d.current || 0;
       const vDrop = d.voltageDrop || 0;
-      detail = `<div class="insp-row"><span>Resistance</span><span style="color:#fbbf24;font-weight:600">${R}Ω</span></div>
+      detail = `<div class="insp-row"><span>Resistance</span><span style="color:#fbbf24;font-weight:600">${R}╬⌐</span></div>
         <div class="insp-row"><span>Current</span><span style="color:#f87171">${cur.toFixed(3)}A</span></div>
         <div class="insp-row"><span>Voltage Drop</span><span style="color:#22d3a5">${vDrop.toFixed(2)}V</span></div>
         <div class="insp-row"><span>Power</span><span style="color:#818cf8">${(cur * vDrop).toFixed(3)}W</span></div>`; break;
@@ -3275,14 +2411,14 @@ function showInspectorForNode(node) {
         <div class="insp-row"><span>Zener Voltage</span><span style="color:#fbbf24;font-weight:600">${zv}V</span></div>`; break;
     }
     case 'ldr': detail = `<div class="insp-row"><span>Light Level</span><span style="color:#fbbf24">${d.lightLevel || 50}%</span></div>
-      <div class="insp-row"><span>Resistance</span><span style="color:#818cf8">${(d.R || 10000) > 1000 ? ((d.R || 10000) / 1000).toFixed(0) + 'k' : (d.R || 10000).toFixed(0)}Ω</span></div>`; break;
-    case 'thermistor': detail = `<div class="insp-row"><span>Temperature</span><span style="color:#ef4444">${d.temperature || 25}°C</span></div>
-      <div class="insp-row"><span>Resistance</span><span style="color:#818cf8">${(d.R || 10000) > 1000 ? ((d.R || 10000) / 1000).toFixed(0) + 'k' : (d.R || 10000).toFixed(0)}Ω</span></div>`; break;
+      <div class="insp-row"><span>Resistance</span><span style="color:#818cf8">${(d.R || 10000) > 1000 ? ((d.R || 10000) / 1000).toFixed(0) + 'k' : (d.R || 10000).toFixed(0)}╬⌐</span></div>`; break;
+    case 'thermistor': detail = `<div class="insp-row"><span>Temperature</span><span style="color:#ef4444">${d.temperature || 25}┬░C</span></div>
+      <div class="insp-row"><span>Resistance</span><span style="color:#818cf8">${(d.R || 10000) > 1000 ? ((d.R || 10000) / 1000).toFixed(0) + 'k' : (d.R || 10000).toFixed(0)}╬⌐</span></div>`; break;
     case 'potentiometer': {
       const pos = d.wiperPos || 50;
       const pR = d.R || 500;
       detail = `<div class="insp-row"><span>Wiper</span><span style="color:#fbbf24">${pos}%</span></div>
-        <div class="insp-row"><span>Resistance</span><span style="color:#818cf8">${pR}Ω</span></div>`; break;
+        <div class="insp-row"><span>Resistance</span><span style="color:#818cf8">${pR}╬⌐</span></div>`; break;
     }
     case 'capacitor': detail = `<div class="insp-row"><span>Voltage</span><span style="color:#22d3a5">${(d.voltage || 0).toFixed(2)}V</span></div>
       <div class="insp-row"><span>Charge</span><span style="color:#818cf8">${((d.charge || 0) * 100).toFixed(0)}%</span></div>`; break;
@@ -3462,7 +2598,7 @@ function createICFromSelection(name) {
   const inputs = inputPortNodeIds.length;
   const outputs = outputPortNodeIds.length;
   if (inputs === 0 && outputs === 0) {
-    showAlert('Selected circuit has no external connections. All nodes and wires are fully internal — nothing to expose as ports.', 'No Ports Found');
+    showAlert('Selected circuit has no external connections. All nodes and wires are fully internal ΓÇö nothing to expose as ports.', 'No Ports Found');
     return;
   }
   const allICs = JSON.parse(localStorage.getItem('logicQuest_ics') || '{}');
@@ -3514,7 +2650,7 @@ function doSaveIC(name, internalNodes, internalWires, inputPortNodeIds, outputPo
   replaceSelectedWithIC(name, inputs, outputs, inputPortNodeIds, outputPortNodeIds);
   deselectAllNodes();
   playSound('success');
-  showToast(`IC "${name}" created ✓`);
+  showToast(`IC "${name}" created Γ£ô`);
 }
 
 function replaceSelectedWithIC(icName, inputs, outputs, inputPortNodeIds, outputPortNodeIds) {
@@ -3614,7 +2750,7 @@ function renderSavedCircuitsList() {
       loadCircuitFromLocal(name);
       document.getElementById('load-modal').style.display = 'none';
       playSound('success');
-      showToast(`Loaded "${name}" ✓`);
+      showToast(`Loaded "${name}" Γ£ô`);
     });
 
     const delBtn = document.createElement('button');
@@ -4261,8 +3397,8 @@ const CIRCUIT_TEMPLATES = {
     nodes: [
       { id: 'sb-node-1', type: 'battery', label: 'Battery', x: 70, y: 120, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 12 } },
       { id: 'sb-node-2', type: 'switch', label: 'Switch', x: 70, y: 280, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { closed: false } },
-      { id: 'sb-node-3', type: 'resistor', label: 'R1 (100Ω)', x: 250, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 100, current: 0, voltageDrop: 0 } },
-      { id: 'sb-node-4', type: 'resistor', label: 'R2 (50Ω)', x: 250, y: 260, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 50, current: 0, voltageDrop: 0 } },
+      { id: 'sb-node-3', type: 'resistor', label: 'R1 (100╬⌐)', x: 250, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 100, current: 0, voltageDrop: 0 } },
+      { id: 'sb-node-4', type: 'resistor', label: 'R2 (50╬⌐)', x: 250, y: 260, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 50, current: 0, voltageDrop: 0 } },
       { id: 'sb-node-5', type: 'voltmeter', label: 'V out (R2)', x: 430, y: 180, inputsCount: 2, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { voltage: 0 } },
     ],
     wires: [
@@ -4295,7 +3431,7 @@ const CIRCUIT_TEMPLATES = {
     nodes: [
       { id: 'sb-node-1', type: 'battery', label: 'Battery (9V)', x: 70, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 9 } },
       { id: 'sb-node-2', type: 'switch', label: 'Base Switch', x: 230, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { closed: false } },
-      { id: 'sb-node-3', type: 'resistor', label: 'Base R (1kΩ)', x: 390, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 1000, current: 0, voltageDrop: 0 } },
+      { id: 'sb-node-3', type: 'resistor', label: 'Base R (1k╬⌐)', x: 390, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 1000, current: 0, voltageDrop: 0 } },
       { id: 'sb-node-4', type: 'transistor', label: 'NPN Transistor', x: 100, y: 310, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { on: false } },
       { id: 'sb-node-5', type: 'led-elec', label: 'LED (Load)', x: 280, y: 310, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { on: false } },
     ],
@@ -4313,9 +3449,9 @@ const CIRCUIT_TEMPLATES = {
     version: 2, nextNodeId: 6,
     nodes: [
       { id: 'sb-node-1', type: 'battery', label: 'Battery (12V)', x: 70, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 12 } },
-      { id: 'sb-node-2', type: 'resistor', label: 'Base R (500Ω)', x: 230, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 500, current: 0, voltageDrop: 0 } },
+      { id: 'sb-node-2', type: 'resistor', label: 'Base R (500╬⌐)', x: 230, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 500, current: 0, voltageDrop: 0 } },
       { id: 'sb-node-3', type: 'transistor', label: 'NPN Transistor', x: 100, y: 290, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { on: false } },
-      { id: 'sb-node-4', type: 'resistor', label: 'Load R (100Ω)', x: 270, y: 290, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 100, current: 0, voltageDrop: 0 } },
+      { id: 'sb-node-4', type: 'resistor', label: 'Load R (100╬⌐)', x: 270, y: 290, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 100, current: 0, voltageDrop: 0 } },
       { id: 'sb-node-5', type: 'bulb', label: 'Bulb (Load)', x: 430, y: 290, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { brightness: 0 } },
     ],
     wires: [
@@ -4333,7 +3469,7 @@ const CIRCUIT_TEMPLATES = {
     nodes: [
       { id: 'sb-node-1', type: 'battery', label: 'Battery (9V)', x: 60, y: 120, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 9 } },
       { id: 'sb-node-2', type: 'diode', label: 'Diode', x: 220, y: 120, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { forward: false, R: 0.1 } },
-      { id: 'sb-node-3', type: 'resistor', label: 'Resistor (200Ω)', x: 370, y: 120, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 200, current: 0, voltageDrop: 0 } },
+      { id: 'sb-node-3', type: 'resistor', label: 'Resistor (200╬⌐)', x: 370, y: 120, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 200, current: 0, voltageDrop: 0 } },
       { id: 'sb-node-4', type: 'led-elec', label: 'LED', x: 520, y: 120, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { on: false } },
       { id: 'sb-node-5', type: 'switch', label: 'Switch', x: 60, y: 280, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { closed: false } },
     ],
@@ -4351,7 +3487,7 @@ const CIRCUIT_TEMPLATES = {
     nodes: [
       { id: 'sb-node-1', type: 'battery', label: 'Battery (9V)', x: 60, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 9 } },
       { id: 'sb-node-2', type: 'ldr', label: 'LDR (Sensor)', x: 220, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { lightLevel: 50, R: 10000 } },
-      { id: 'sb-node-3', type: 'resistor', label: 'Fixed R (1kΩ)', x: 370, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 1000, current: 0, voltageDrop: 0 } },
+      { id: 'sb-node-3', type: 'resistor', label: 'Fixed R (1k╬⌐)', x: 370, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 1000, current: 0, voltageDrop: 0 } },
       { id: 'sb-node-4', type: 'bulb', label: 'Bulb', x: 520, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { brightness: 0 } },
       { id: 'sb-node-5', type: 'switch', label: 'Switch', x: 60, y: 260, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { closed: false } },
     ],
@@ -4368,8 +3504,8 @@ const CIRCUIT_TEMPLATES = {
     version: 2, nextNodeId: 6,
     nodes: [
       { id: 'sb-node-1', type: 'battery', label: 'Battery (9V)', x: 60, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 9 } },
-      { id: 'sb-node-2', type: 'capacitor', label: 'Capacitor (100µF)', x: 220, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { charge: 0, voltage: 0, capacitance: 100, maxVoltage: 12 } },
-      { id: 'sb-node-3', type: 'resistor', label: 'Resistor (1kΩ)', x: 370, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 1000, current: 0, voltageDrop: 0 } },
+      { id: 'sb-node-2', type: 'capacitor', label: 'Capacitor (100┬╡F)', x: 220, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { charge: 0, voltage: 0, capacitance: 100, maxVoltage: 12 } },
+      { id: 'sb-node-3', type: 'resistor', label: 'Resistor (1k╬⌐)', x: 370, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 1000, current: 0, voltageDrop: 0 } },
       { id: 'sb-node-4', type: 'bulb', label: 'Bulb', x: 520, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { brightness: 0 } },
       { id: 'sb-node-5', type: 'switch', label: 'Switch', x: 60, y: 260, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { closed: false } },
     ],
@@ -4411,7 +3547,7 @@ const TEMPLATE_THEORY = {
   'not-demo': {
     title: 'NOT Inverter Demo',
     theory: 'The NOT gate (also called an inverter) takes a single input and outputs its opposite state. It performs logic negation.',
-    expression: 'Y = A\'  (or  Y = ¬A)',
+    expression: 'Y = A\'  (or  Y = ┬¼A)',
     headers: ['Input A', 'Output Y'],
     truthTable: [
       [0, 1],
@@ -4426,7 +3562,7 @@ const TEMPLATE_THEORY = {
   'and-demo': {
     title: 'AND Gate Verification',
     theory: 'The AND gate outputs 1 only when BOTH inputs are high (1). If any input is 0, the output remains low (0).',
-    expression: 'Y = A • B',
+    expression: 'Y = A ΓÇó B',
     headers: ['A', 'B', 'Output Y'],
     truthTable: [
       [0, 0, 0],
@@ -4443,7 +3579,7 @@ const TEMPLATE_THEORY = {
   'xor-parity': {
     title: 'XOR 3-Bit Parity Checker',
     theory: 'An XOR gate acts as an odd detector. A cascaded XOR array counts the parity of inputs. If the count of high inputs is odd, the parity bit is 1.',
-    expression: 'Y = A ⊕ B ⊕ C',
+    expression: 'Y = A Γèò B Γèò C',
     headers: ['A', 'B', 'C', 'Parity Y'],
     truthTable: [
       [0, 0, 0, 0],
@@ -4465,7 +3601,7 @@ const TEMPLATE_THEORY = {
   'sr-latch': {
     title: 'SR feedback Memory Latch',
     theory: 'A Set-Reset Latch stores 1 bit of memory using cross-coupled NAND gates. Set (S) and Reset (R) are active-low control inputs.',
-    expression: 'Q = (S • Q\')\'  |  Q\' = (R • Q)\'',
+    expression: 'Q = (S ΓÇó Q\')\'  |  Q\' = (R ΓÇó Q)\'',
     headers: ['S', 'R', 'Q (State)', 'Q\''],
     truthTable: [
       [1, 1, 'Hold State', 'No change'],
@@ -4484,7 +3620,7 @@ const TEMPLATE_THEORY = {
   'half-adder-demo': {
     title: 'Half Adder Arithmetic',
     theory: 'A half adder performs single-digit binary addition. It outputs a Sum (S) using XOR and a Carry (C) using AND.',
-    expression: 'S = A ⊕ B  |  C = A • B',
+    expression: 'S = A Γèò B  |  C = A ΓÇó B',
     headers: ['A', 'B', 'Sum (S)', 'Carry (C)'],
     truthTable: [
       [0, 0, 0, 0],
@@ -4503,7 +3639,7 @@ const TEMPLATE_THEORY = {
   'full-adder-gate': {
     title: 'Gate-Level Full Adder',
     theory: 'A Full Adder adds three bits: A, B, and a Carry-In (Cin) from a previous stage. It handles multi-bit addition.',
-    expression: 'S = A ⊕ B ⊕ Cin  |  Cout = (A•B) + Cin•(A⊕B)',
+    expression: 'S = A Γèò B Γèò Cin  |  Cout = (AΓÇóB) + CinΓÇó(AΓèòB)',
     headers: ['A', 'B', 'Cin', 'Sum (S)', 'Cout'],
     truthTable: [
       [0, 0, 0, 0, 0],
@@ -4522,7 +3658,7 @@ const TEMPLATE_THEORY = {
   'nand-universality-and': {
     title: 'NAND Universality (AND gate)',
     theory: 'The NAND gate is a universal gate. Here, a NAND gate is wired to a second NAND gate configured as an inverter, forming a standard AND gate.',
-    expression: 'Y = ⎹ (A • B) = A • B',
+    expression: 'Y = ΓÄ╣ (A ΓÇó B) = A ΓÇó B',
     headers: ['A', 'B', 'NAND 1', 'AND Out'],
     truthTable: [
       [0, 0, 1, 0],
@@ -4540,11 +3676,11 @@ const TEMPLATE_THEORY = {
   'd-flipflop-reg': {
     title: '1-Bit D Flip-Flop Register',
     theory: 'A D Flip-Flop captures the level of the Data (D) input at the rising edge of the Clock (CLK) transition, and holds it.',
-    expression: 'Q(next) = D  (at CLK ↑)',
+    expression: 'Q(next) = D  (at CLK Γåæ)',
     headers: ['D', 'CLK', 'State Q', 'Action'],
     truthTable: [
-      [0, '↑', 0, 'Capture 0'],
-      [1, '↑', 1, 'Capture 1'],
+      [0, 'Γåæ', 0, 'Capture 0'],
+      [1, 'Γåæ', 1, 'Capture 1'],
       ['X', '0 or 1', 'Hold', 'No change']
     ],
     challengeText: 'Toggle <strong>Data (D) to 1 (ON)</strong>, then wait for or click the Clock Signal to rise to 1 to capture and hold it (Q LED ON)!',
@@ -4572,7 +3708,7 @@ const TEMPLATE_THEORY = {
     }
   },
   'or-gate-demo': {
-    title: 'OR Gate — Inclusive OR',
+    title: 'OR Gate ΓÇö Inclusive OR',
     theory: 'The OR gate outputs 1 if AT LEAST ONE input is high (1). It is only 0 when ALL inputs are 0.',
     expression: 'Y = A + B',
     headers: ['A', 'B', 'Output Y'],
@@ -4582,7 +3718,7 @@ const TEMPLATE_THEORY = {
       [1, 0, 1],
       [1, 1, 1]
     ],
-    challengeText: 'Toggle <strong>only Switch A to 1 (ON)</strong> while B is OFF. The LED should still light up — this shows OR only needs one HIGH input!',
+    challengeText: 'Toggle <strong>only Switch A to 1 (ON)</strong> while B is OFF. The LED should still light up ΓÇö this shows OR only needs one HIGH input!',
     checkPassed: () => {
       const inputs = sandboxNodes.filter(n => n.type === 'input');
       const led = sandboxNodes.find(n => n.type === 'output');
@@ -4592,7 +3728,7 @@ const TEMPLATE_THEORY = {
   },
 
   'nor-gate-demo': {
-    title: 'NOR Gate — Not-OR (Universal Gate)',
+    title: 'NOR Gate ΓÇö Not-OR (Universal Gate)',
     theory: 'The NOR gate outputs 1 ONLY when ALL inputs are 0 (LOW). It is the complement of OR and is also a universal gate.',
     expression: 'Y = (A + B)\'',
     headers: ['A', 'B', 'Output Y'],
@@ -4602,7 +3738,7 @@ const TEMPLATE_THEORY = {
       [1, 0, 0],
       [1, 1, 0]
     ],
-    challengeText: 'Keep <strong>both switches at 0 (OFF)</strong>. NOR outputs 1 only when all inputs are LOW — confirm the LED is ON!',
+    challengeText: 'Keep <strong>both switches at 0 (OFF)</strong>. NOR outputs 1 only when all inputs are LOW ΓÇö confirm the LED is ON!',
     checkPassed: () => {
       const inputs = sandboxNodes.filter(n => n.type === 'input');
       const led = sandboxNodes.find(n => n.type === 'output');
@@ -4613,7 +3749,7 @@ const TEMPLATE_THEORY = {
   'xnor-equality': {
     title: 'XNOR Bit Equality Checker',
     theory: 'The XNOR gate outputs 1 when both inputs are EQUAL (both 0 or both 1). It is used as a 1-bit equality comparator.',
-    expression: 'Y = A ⊙ B  (Y = 1 when A = B)',
+    expression: 'Y = A ΓèÖ B  (Y = 1 when A = B)',
     headers: ['A', 'B', 'Equal?'],
     truthTable: [
       [0, 0, 1],
@@ -4621,7 +3757,7 @@ const TEMPLATE_THEORY = {
       [1, 0, 0],
       [1, 1, 1]
     ],
-    challengeText: 'Toggle <strong>both Value A and Value B to 1 (ON)</strong>. Since A equals B, the XNOR outputs 1 — Equal LED lights up!',
+    challengeText: 'Toggle <strong>both Value A and Value B to 1 (ON)</strong>. Since A equals B, the XNOR outputs 1 ΓÇö Equal LED lights up!',
     checkPassed: () => {
       const inputs = sandboxNodes.filter(n => n.type === 'input');
       const led = sandboxNodes.find(n => n.type === 'output');
@@ -4641,7 +3777,7 @@ const TEMPLATE_THEORY = {
       [1, 1, 0, 1],
       [1, 1, 1, 1]
     ],
-    challengeText: 'Toggle <strong>any 2 out of 3 Voters to 1 (ON)</strong>. The Majority LED should light — you have a winning majority!',
+    challengeText: 'Toggle <strong>any 2 out of 3 Voters to 1 (ON)</strong>. The Majority LED should light ΓÇö you have a winning majority!',
     checkPassed: () => {
       const inputs = sandboxNodes.filter(n => n.type === 'input' && n.label.includes('Voter'));
       const led = sandboxNodes.find(n => n.type === 'output');
@@ -4712,7 +3848,7 @@ const TEMPLATE_THEORY = {
   'led-binary-display': {
     title: '4-Bit LED Bar Binary Counter',
     theory: 'The LED Bar Display shows 4 binary bits as 4 individual LEDs. D3 is the Most Significant Bit (MSB) and D0 is the Least Significant Bit (LSB).',
-    expression: 'Decimal = D3×8 + D2×4 + D1×2 + D0×1',
+    expression: 'Decimal = D3├ù8 + D2├ù4 + D1├ù2 + D0├ù1',
     headers: ['D3', 'D2', 'D1', 'D0', 'Decimal'],
     truthTable: [
       [0, 0, 0, 0, 0],
@@ -4730,7 +3866,7 @@ const TEMPLATE_THEORY = {
   'and-alarm': {
     title: 'AND-Gate Dual-Security Alarm',
     theory: 'An AND alarm requires ALL sensors active before triggering. Unlike OR alarms, this prevents false triggers from a single sensor failure.',
-    expression: 'ALARM = Security_A • Security_B',
+    expression: 'ALARM = Security_A ΓÇó Security_B',
     headers: ['Security A', 'Security B', 'Alarm'],
     truthTable: [
       [0, 0, 0],
@@ -4746,9 +3882,9 @@ const TEMPLATE_THEORY = {
   },
 
   'multi-led-and': {
-    title: 'Gate Comparator — AND vs OR vs XOR',
+    title: 'Gate Comparator ΓÇö AND vs OR vs XOR',
     theory: 'This circuit connects the same two inputs to AND, OR, and XOR gates simultaneously, showing the different outputs. Compare them side by side!',
-    expression: 'AND=A·B  |  OR=A+B  |  XOR=A⊕B',
+    expression: 'AND=A┬╖B  |  OR=A+B  |  XOR=AΓèòB',
     headers: ['A', 'B', 'AND', 'OR', 'XOR'],
     truthTable: [
       [0, 0, 0, 0, 0],
@@ -4767,13 +3903,13 @@ const TEMPLATE_THEORY = {
   'clock-rgb-chase': {
     title: 'Clock-Driven RGB Color Chase',
     theory: 'The Clock signal alternates between HIGH and LOW. By inverting it through NOT gates, you can create complementary signals that drive an RGB LED through color sequences.',
-    expression: 'CLK=direct→G  |  NOT(CLK)→R  |  NOT(NOT(CLK))→B',
-    headers: ['CLK', 'R (NOT CLK)', 'G (CLK)', 'B (NOT²CLK)', 'Color'],
+    expression: 'CLK=directΓåÆG  |  NOT(CLK)ΓåÆR  |  NOT(NOT(CLK))ΓåÆB',
+    headers: ['CLK', 'R (NOT CLK)', 'G (CLK)', 'B (NOT┬▓CLK)', 'Color'],
     truthTable: [
       [0, 1, 0, 0, 'RED'],
       [1, 0, 1, 1, 'CYAN']
     ],
-    challengeText: 'Watch the RGB LED! As the Clock ticks, it <strong>automatically alternates between RED and CYAN</strong> — a living light pattern!',
+    challengeText: 'Watch the RGB LED! As the Clock ticks, it <strong>automatically alternates between RED and CYAN</strong> ΓÇö a living light pattern!',
     checkPassed: () => {
       const rgbNode = sandboxNodes.find(n => n.type === 'rgb-led');
       const clkNode = sandboxNodes.find(n => n.type === 'clock');
@@ -4783,14 +3919,14 @@ const TEMPLATE_THEORY = {
 
   'nand-not-gate': {
     title: 'NAND as NOT (Universality Demo)',
-    theory: 'A NAND gate with BOTH inputs tied together acts as a NOT gate (inverter). NAND is universal — you can make any logic gate with only NAND gates.',
-    expression: 'Y = (A • A)\' = A\'  (when both inputs tied)',
+    theory: 'A NAND gate with BOTH inputs tied together acts as a NOT gate (inverter). NAND is universal ΓÇö you can make any logic gate with only NAND gates.',
+    expression: 'Y = (A ΓÇó A)\' = A\'  (when both inputs tied)',
     headers: ['A', 'A (tied)', 'NOT Output'],
     truthTable: [
       [0, 0, 1],
       [1, 1, 0]
     ],
-    challengeText: 'Toggle the switch to <strong>1 (ON)</strong>. The NAND with tied inputs inverts it — NOT LED should go OFF!',
+    challengeText: 'Toggle the switch to <strong>1 (ON)</strong>. The NAND with tied inputs inverts it ΓÇö NOT LED should go OFF!',
     checkPassed: () => {
       const sw = sandboxNodes.find(n => n.type === 'input');
       const led = sandboxNodes.find(n => n.type === 'output');
@@ -4807,8 +3943,8 @@ const TEMPLATE_THEORY = {
   'voltage-divider': {
     title: 'Voltage Divider Rule',
     theory: 'When resistors are connected in series, the voltage divides across each proportional to its resistance. The voltmeter measures Vout across R2.',
-    expression: 'Vout = Vin × R2 / (R1 + R2)',
-    challengeText: 'Close the switch. With R1=100Ω and R2=50Ω, Vout should be 12 × 50/(100+50) = 4V. Try changing R2!',
+    expression: 'Vout = Vin ├ù R2 / (R1 + R2)',
+    challengeText: 'Close the switch. With R1=100╬⌐ and R2=50╬⌐, Vout should be 12 ├ù 50/(100+50) = 4V. Try changing R2!',
     checkPassed: () => true
   },
   'simple-bulb-circuit': {
@@ -4821,21 +3957,21 @@ const TEMPLATE_THEORY = {
   'transistor-switch': {
     title: 'NPN Transistor as a Switch',
     theory: 'An NPN transistor acts as an electronic switch. When the base receives current (via the base switch), it allows a larger current to flow from collector to emitter, powering the LED.',
-    expression: 'Base ON  →  Transistor ON  →  LED ON',
+    expression: 'Base ON  ΓåÆ  Transistor ON  ΓåÆ  LED ON',
     challengeText: 'First close the Base Switch. Then click the NPN Transistor to turn it ON. The LED should light up!',
     checkPassed: () => true
   },
   'transistor-controlled-bulb': {
     title: 'Transistor-Controlled Load',
     theory: 'The transistor controls a separate load circuit. The base current (through R_base) controls whether the transistor conducts, switching the bulb in the collector circuit.',
-    expression: 'Transistor ON  →  Bulb circuit complete',
+    expression: 'Transistor ON  ΓåÆ  Bulb circuit complete',
     challengeText: 'Click the NPN Transistor to turn it ON. Current flows through both the base path and the load (bulb) path!',
     checkPassed: () => true
   },
   'diode-circuit': {
     title: 'Diode Forward Bias',
     theory: 'A semiconductor diode conducts current only when forward-biased (anode positive relative to cathode). The arrow in the symbol shows the direction of conventional current flow.',
-    expression: 'I = I_s(e^(V_D/ηV_T) - 1)',
+    expression: 'I = I_s(e^(V_D/╬╖V_T) - 1)',
     headers: ['Condition', 'Current', 'LED'],
     truthTable: [
       ['Switch ON', 'Flows', 'GLOWS'],
@@ -4850,12 +3986,12 @@ const TEMPLATE_THEORY = {
   'ldr-divider': {
     title: 'LDR Voltage Divider',
     theory: 'A Light Dependent Resistor (LDR) changes its resistance with light intensity. In a voltage divider, the output voltage varies with LDR resistance, controlling the load.',
-    expression: 'R_light ∝ 1/lux',
+    expression: 'R_light Γê¥ 1/lux',
     headers: ['Light Level', 'LDR R', 'Bulb Brightness'],
     truthTable: [
-      ['Bright', 'Low (100Ω)', 'Dim'],
+      ['Bright', 'Low (100╬⌐)', 'Dim'],
       ['Dim', 'Medium', 'Medium'],
-      ['Dark', 'High (1MΩ)', 'Bright']
+      ['Dark', 'High (1M╬⌐)', 'Bright']
     ],
     challengeText: 'Adjust the LDR light level slider. In bright light (low LDR resistance), more voltage drops across the fixed resistor, dimming the bulb.',
     checkPassed: () => {
@@ -4865,13 +4001,13 @@ const TEMPLATE_THEORY = {
   },
   'capacitor-timing': {
     title: 'Capacitor Charging',
-    theory: 'A capacitor stores electrical charge. When a voltage is applied, it charges exponentially through a resistor with time constant τ = RC.',
+    theory: 'A capacitor stores electrical charge. When a voltage is applied, it charges exponentially through a resistor with time constant ╧ä = RC.',
     expression: 'V(t) = V_0(1 - e^(-t/RC))',
     headers: ['Time', 'Capacitor V', 'Bulb'],
     truthTable: [
       ['t=0', '0V', 'Bright'],
       ['t=RC', '63% of Vin', 'Dim'],
-      ['t=5RC', '≈Vin', 'OFF']
+      ['t=5RC', 'ΓëêVin', 'OFF']
     ],
     challengeText: 'Close the switch to start charging the capacitor. Watch the voltage build up as the bulb gradually dims.',
     checkPassed: () => {
@@ -4992,7 +4128,7 @@ window.checkTheoryChallenge = function () {
       fb.classList.add('success');
     }
     playSound('success');
-    showToast(`Micro-Challenge Completed! ✓ (+10 XP)`);
+    showToast(`Micro-Challenge Completed! Γ£ô (+10 XP)`);
     const xp = (parseInt(localStorage.getItem('logicQuest_extraXp')) || 0) + 10;
     localStorage.setItem('logicQuest_extraXp', xp);
     if (window.updateXPDisplay) window.updateXPDisplay();

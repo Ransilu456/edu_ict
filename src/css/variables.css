@@ -1,102 +1,109 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Sinhala:wght@300;400;500;600;700&family=Nunito:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Sinhala:wght@300;400;500;600;700&display=swap');
 
+/* Kids mode is the ONLY theme — baked in permanently */
 :root {
-  --bg-primary: #faf6eb;
+  /* Backgrounds */
+  --bg-primary: #f0f7ff;
   --bg-secondary: #ffffff;
-  --bg-tertiary: #f2ede0;
-  --border-color: #e2dbcd;
-  --bg-mobile: #e2dbcd;
+  --bg-tertiary: #e0f2fe;
+  --border-color: #cbd5e1;
+  --bg-mobile: #e0f2fe;
 
-  --text-primary: #3c3c3c;
-  --text-secondary: #777777;
-  --text-muted: #afafaf;
+  /* Text */
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
 
-  --color-indigo: #7c5ef2;
-  --color-indigo-glow: rgba(124, 94, 242, 0.15);
+  /* Brand / accent colors */
+  --color-indigo: #1cb0f6;
+  --color-indigo-glow: rgba(28, 176, 246, 0.15);
   --color-cyan: #1cb0f6;
   --color-cyan-glow: rgba(28, 176, 246, 0.15);
 
-  --color-high: #7c5ef2;
-  --color-high-glow: rgba(124, 94, 242, 0.2);
-  --color-low: #e2dbcd;
+  /* Logic signal colors */
+  --color-high: #58cc02;
+  --color-high-glow: rgba(88, 204, 2, 0.2);
+  --color-low: #cbd5e1;
   --color-low-glow: transparent;
+  --color-label: #334155;
 
+  /* Semantic colors */
   --color-success: #58cc02;
-  --color-error: #ea2b2b;
+  --color-error: #ff4b4b;
   --color-amber: #ff9600;
-  --color-label: #100036b9;
 
-  --font-sans: 'Poppins', 'Inter', sans-serif;
-  --font-header: 'Poppins', 'Outfit', sans-serif;
-  --font-sinhala: 'Noto Sans Sinhala', 'Poppins', sans-serif;
+  /* Typography */
+  --font-sans: 'Nunito', system-ui, sans-serif;
+  --font-header: 'Nunito', system-ui, sans-serif;
+  --font-sinhala: 'Noto Sans Sinhala', 'Nunito', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
+  /* Kids palette tokens */
+  --kids-bg: #f0f7ff;
+  --kids-card-bg: #ffffff;
+  --kids-border: #38bdf8;
+  --kids-shadow: 0 8px 0 rgba(56, 189, 248, 0.3);
+  --kids-btn-primary: #58cc02;
+  --kids-btn-primary-shadow: 0 6px 0 #3fa000;
+  --kids-btn-secondary: #ff9600;
+  --kids-btn-secondary-shadow: 0 6px 0 #cc7800;
+  --kids-btn-danger: #ff4b4b;
+  --kids-btn-danger-shadow: 0 6px 0 #cc3c3c;
+  --kids-accent: #1cb0f6;
+  --kids-accent-shadow: 0 6px 0 #0d8bcc;
+  --kids-dot: rgba(28, 176, 246, 0.12);
+  --kids-text: #1e293b;
+  --kids-text-light: #475569;
+
+  /* Transitions */
   --transition-fast: 0.1s ease;
   --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-:root.dark-theme {
-  --bg-primary: #15131c;
-  --bg-secondary: #201d29;
-  --bg-tertiary: #2a2736;
-  --border-color: #353144;
-  --bg-mobile: transparent;
+/* Kids Dark Theme */
+:root.dark,
+[data-theme="dark"] {
+  --bg-primary: #0b132b;
+  --bg-secondary: #1c2541;
+  --bg-tertiary: #273549;
+  --border-color: #334155;
+  --bg-mobile: #1c2541;
 
-  --color-label: #817e8d;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
 
-  --text-primary: #f5f4f7;
-  --text-secondary: #bbb8c4;
-  --text-muted: #817e8d;
+  --color-indigo: #38bdf8;
+  --color-indigo-glow: rgba(56, 189, 248, 0.25);
+  --color-cyan: #38bdf8;
+  --color-cyan-glow: rgba(56, 189, 248, 0.25);
 
-  --color-indigo: #9075ff;
-  --color-cyan: #3fc0ff;
+  --color-high: #4ade80;
+  --color-high-glow: rgba(74, 222, 128, 0.35);
+  --color-low: #475569;
+  --color-low-glow: transparent;
+  --color-label: #e2e8f0;
 
-  --color-high: #9075ff;
-  --color-low: #353144;
+  --color-success: #4ade80;
+  --color-error: #f87171;
+  --color-amber: #fbbf24;
 
-  --color-success: #63e203;
-  --color-error: #ff4d4d;
-  --color-amber: #ffb13b;
-}
-
-:root.kids-mode {
-  --font-sans: 'Nunito', 'Poppins', sans-serif;
-  --font-header: 'Nunito', 'Outfit', sans-serif;
-
-  --kids-bg: #fff8e1;
-  --kids-card-bg: #ffffff;
-  --kids-border: #ffd54f;
-  --kids-shadow: 0 8px 0 rgba(255, 213, 79, 0.4);
+  --kids-bg: #0b132b;
+  --kids-card-bg: #1c2541;
+  --kids-border: #334155;
+  --kids-shadow: 0 8px 0 #050a18;
   --kids-btn-primary: #58cc02;
-  --kids-btn-primary-shadow: 0 6px 0 #3fa000;
+  --kids-btn-primary-shadow: 0 6px 0 #367d02;
   --kids-btn-secondary: #ff9600;
-  --kids-btn-secondary-shadow: 0 6px 0 #cc7800;
+  --kids-btn-secondary-shadow: 0 6px 0 #a35600;
   --kids-btn-danger: #ff4b4b;
-  --kids-btn-danger-shadow: 0 6px 0 #cc3c3c;
-  --kids-accent: #1cb0f6;
-  --kids-accent-shadow: 0 6px 0 #0d8bcc;
-  --kids-dot: rgba(255, 213, 79, 0.15);
-  --kids-text: #3c3c3c;
-  --kids-text-light: #777777;
-}
-
-:root.dark-theme.kids-mode {
-  --kids-bg: #1a1a2e;
-  --kids-card-bg: #252540;
-  --kids-border: #ffb300;
-  --kids-shadow: 0 8px 0 rgba(255, 179, 0, 0.3);
-  --kids-btn-primary: #58cc02;
-  --kids-btn-primary-shadow: 0 6px 0 #3fa000;
-  --kids-btn-secondary: #ff9600;
-  --kids-btn-secondary-shadow: 0 6px 0 #cc7800;
-  --kids-btn-danger: #ff4b4b;
-  --kids-btn-danger-shadow: 0 6px 0 #cc3c3c;
-  --kids-accent: #1cb0f6;
-  --kids-accent-shadow: 0 6px 0 #0d8bcc;
-  --kids-dot: rgba(255, 179, 0, 0.1);
-  --kids-text: #f5f4f7;
-  --kids-text-light: #bbb8c4;
+  --kids-btn-danger-shadow: 0 6px 0 #991b1b;
+  --kids-accent: #38bdf8;
+  --kids-accent-shadow: 0 6px 0 #0284c7;
+  --kids-dot: rgba(56, 189, 248, 0.18);
+  --kids-text: #f8fafc;
+  --kids-text-light: #cbd5e1;
 }
 
 * {
@@ -119,32 +126,13 @@ body {
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-header);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
-}
-
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }

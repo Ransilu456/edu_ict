@@ -1,5 +1,5 @@
 /* ===================================================================
-   KIDS MODE (PLAYFUL DUOLINGO-STYLE DESIGN SYSTEM)
+   LOGICQUEST — KIDS MODE (PLAYFUL DUOLINGO-STYLE DESIGN SYSTEM)
    =================================================================== */
 
 .kids-mode {
@@ -10,7 +10,7 @@
   --text-primary: #1e293b;
   --text-secondary: #475569;
   --text-muted: #64748b;
-  
+
   --color-indigo: #1cb0f6;
   --color-indigo-glow: rgba(28, 176, 246, 0.15);
   --color-success: #58cc02;
@@ -19,58 +19,77 @@
   --color-error-glow: rgba(255, 75, 75, 0.15);
   --color-high: #58cc02;
   --color-low: #cbd5e1;
-  
-  font-family: 'Noto Sans Sinhala', 'Inter', system-ui, -apple-system, sans-serif !important;
+
+  font-family: 'Nunito', 'Noto Sans Sinhala', system-ui, -apple-system, sans-serif !important;
 }
 
-/* Global Animations & Transitions */
-.kids-mode * {
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), 
-              box-shadow 0.2s ease, 
-              background-color 0.2s ease,
-              border-color 0.2s ease;
-}
-
-/* Playful Dotted Background for Canvas/Workspace */
-.kids-mode .sandbox-workspace, 
-.kids-mode .nd-svg-wrap, 
-.kids-mode .explorer-canvas,
-.kids-mode .sub-map-container {
-  background-color: #f0f9ff !important;
-  background-image: radial-gradient(#bae6fd 2.5px, transparent 2.5px) !important;
+/* ── Workspace / Canvas ────────────────────────────────────────── */
+.kids-mode .sandbox-workspace,
+.kids-mode .nd-svg-wrap,
+.kids-mode .nd-canvas-wrap {
+  background-color: #f8fbff !important;
+  background-image: radial-gradient(#93c5fd 2px, transparent 2px) !important;
   background-size: 24px 24px !important;
 }
 
-/* Sleek Bubble Headers */
+/* ── Header ────────────────────────────────────────────────────── */
 .kids-mode header {
   background: #ffffff !important;
-  border-bottom: 4px solid #e2e8f0 !important;
-  box-shadow: 0 4px 0 rgba(226, 232, 240, 0.3) !important;
-  height: 64px !important;
+  border-bottom: 3px solid #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(28, 176, 246, 0.07) !important;
+  height: 66px !important;
+  padding: 0 1.25rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.kids-mode .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .kids-mode .logo span {
+  font-family: 'Nunito', sans-serif !important;
   color: #1cb0f6 !important;
-  font-size: 1.1rem;
-  letter-spacing: 0.05em;
-  text-shadow: 2px 2px 0px rgba(28, 176, 246, 0.1);
+  font-size: 1.25rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em !important;
+  text-shadow: 2px 2px 0px rgba(28, 176, 246, 0.12);
 }
 
-/* Duolingo 3D Navigation Tabs */
+/* ── Navigation Tabs ───────────────────────────────────────────── */
+.kids-mode .desktop-nav {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .kids-mode .nav-tab {
-  border-radius: 12px !important;
-  margin: 0 0.25rem !important;
-  border: 2px solid transparent !important;
-  padding: 0.5rem 0.85rem !important;
+  border-radius: 14px !important;
+  border: 2px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  box-shadow: 0 4px 0 #cbd5e1 !important;
+  padding: 0.55rem 1.15rem !important;
+  font-family: 'Nunito', sans-serif !important;
   font-weight: 800 !important;
+  font-size: 0.95rem !important;
   color: #64748b !important;
-  transform: translateY(-2px);
+  cursor: pointer !important;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  text-decoration: none !important;
 }
 
 .kids-mode .nav-tab:hover {
-  background-color: #f1f5f9 !important;
-  color: #334155 !important;
-  transform: translateY(-4px);
+  background-color: #f0f9ff !important;
+  color: #0369a1 !important;
+  border-color: #bae6fd !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 0 #cbd5e1 !important;
 }
 
 .kids-mode .nav-tab.active {
@@ -78,190 +97,682 @@
   border: 2px solid #38bdf8 !important;
   box-shadow: 0 4px 0 #0284c7 !important;
   color: #0369a1 !important;
-  transform: translateY(-2px);
+  transform: translateY(-2px) !important;
 }
 
-.kids-mode .nav-tab:active {
-  transform: translateY(2px);
-  box-shadow: none !important;
+.kids-mode .nav-tab.active:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #0284c7 !important;
 }
 
-/* 3D Pressable Bubble Buttons */
-.kids-mode button,
-.kids-mode .sandbox-btn,
-.kids-mode .nd-send-btn,
-.kids-mode .nd-host-btn,
-.kids-mode .crypto-btn,
-.kids-mode .parity-action-btn,
-.kids-mode .mode-toggle-btn {
-  border-radius: 16px !important;
-  border: 2px solid #222222 !important;
-  font-weight: 800 !important;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 0.6rem 1.2rem;
-  box-shadow: 0 4px 0 #222222 !important;
-  transform: translateY(-3px);
-  cursor: pointer;
-  background: #ffffff;
-}
-
-.kids-mode button:hover,
-.kids-mode .sandbox-btn:hover,
-.kids-mode .nd-send-btn:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 0 #222222 !important;
-}
-
-.kids-mode button:active,
-.kids-mode .sandbox-btn:active,
-.kids-mode .nd-send-btn:active {
-  transform: translateY(1px);
-  box-shadow: 0 0px 0 #222222 !important;
-}
-
-/* Color Coding for 3D buttons */
-.kids-mode .nd-send-btn, 
-.kids-mode .btn-play.running,
-.kids-mode .settings-btn-solid {
-  background: #58cc02 !important;
-  color: #ffffff !important;
-  border-color: #3fa000 !important;
-  box-shadow: 0 4px 0 #3fa000 !important;
-}
-
-.kids-mode .nd-send-btn:hover,
-.kids-mode .settings-btn-solid:hover {
-  box-shadow: 0 6px 0 #3fa000 !important;
-}
-
-.kids-mode .nd-send-btn:active,
-.kids-mode .settings-btn-solid:active {
-  box-shadow: 0 0px 0 #3fa000 !important;
-}
-
-/* Playful Rounded Cards & Sidebars */
-.kids-mode .sandbox-toolbox,
-.kids-mode .nd-left,
-.kids-mode .settings-card,
-.kids-mode .nd-card,
-.kids-mode .explorer-toolbox {
-  border: 3px solid #cbd5e1 !important;
-  border-radius: 20px !important;
-  box-shadow: 0 8px 0 rgba(203, 213, 225, 0.4) !important;
+/* Audio and Theme toggle buttons in header */
+.kids-mode #audio-toggle,
+.kids-mode #theme-toggle {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  max-width: 42px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  border: 2px solid #e2e8f0 !important;
   background: #ffffff !important;
-  padding: 1.25rem !important;
-  margin: 0.5rem;
+  box-shadow: 0 3px 0 #cbd5e1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  color: #1cb0f6 !important;
+  transition: all 0.15s ease !important;
 }
 
+.kids-mode #audio-toggle:hover,
+.kids-mode #theme-toggle:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 0 #cbd5e1 !important;
+  border-color: #38bdf8 !important;
+}
+
+.kids-mode #audio-toggle:active,
+.kids-mode #theme-toggle:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #cbd5e1 !important;
+}
+
+/* ── Toolbox Sidebar ───────────────────────────────────────────── */
 .kids-mode .sandbox-toolbox {
-  margin: 0 !important;
-  border-radius: 0 20px 20px 0 !important;
+  background: #ffffff !important;
+  border: 3px solid #e2e8f0 !important;
   border-left: none !important;
+  border-radius: 0 20px 20px 0 !important;
+  box-shadow: 4px 0 16px rgba(226, 232, 240, 0.6) !important;
+  padding: 1.15rem !important;
 }
 
-/* Bubble Nodes in Sandbox */
-.kids-mode .sandbox-node {
-  border: 3.5px solid #475569 !important;
-  border-radius: 18px !important;
-  box-shadow: 0 6px 0 #475569 !important;
+.kids-mode .sandbox-toolbox h3 {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1e293b !important;
+  font-size: 1.15rem !important;
+  border-bottom: 2.5px solid #f1f5f9 !important;
+}
+
+.kids-mode .toolbox-section-title {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  font-size: 0.82rem !important;
+  color: #475569 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  margin-top: 0.75rem !important;
+  margin-bottom: 0.45rem !important;
+}
+
+.kids-mode .toolbox-section-title::before { content: "✨ "; }
+.kids-mode .toolbox-section-title[data-category="Inputs"]::before { content: "🎮 "; }
+.kids-mode .toolbox-section-title[data-category="Gates"]::before { content: "🧩 "; }
+.kids-mode .toolbox-section-title[data-category="Outputs"]::before { content: "💡 "; }
+.kids-mode .toolbox-section-title[data-category="Templates"]::before { content: "📚 "; }
+
+.kids-mode .toolbox-item {
+  border-radius: 12px !important;
+  border: 2px solid #e2e8f0 !important;
+  box-shadow: 0 3px 0 #e2e8f0 !important;
+  background: #f8fafc !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  color: #334155 !important;
+  padding: 0.4rem 0.65rem !important;
+  margin-bottom: 0.4rem !important;
+  cursor: grab !important;
+  transition: all 0.15s ease !important;
+}
+
+.kids-mode .toolbox-item:hover {
+  border-color: #38bdf8 !important;
+  background: #f0f9ff !important;
+  box-shadow: 0 4px 0 #38bdf8 !important;
+  transform: translateX(4px) !important;
+  color: #0284c7 !important;
+}
+
+/* ── Top Toolbar in Sandbox ────────────────────────────────────── */
+.kids-mode .sandbox-toolbar {
   background: #ffffff !important;
-  padding: 0.65rem !important;
-  transform: scale(1.02);
+  border: 2.5px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06) !important;
+  padding: 0.45rem 0.75rem !important;
+  gap: 0.45rem !important;
+}
+
+.kids-mode .sandbox-btn {
+  border-radius: 12px !important;
+  border: 2px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  box-shadow: 0 3px 0 #cbd5e1 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 0.85rem !important;
+  padding: 0.4rem 0.8rem !important;
+  color: #475569 !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+}
+
+.kids-mode .sandbox-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 0 #cbd5e1 !important;
+  color: #1e293b !important;
+  border-color: #cbd5e1 !important;
+}
+
+.kids-mode .sandbox-btn:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #cbd5e1 !important;
+}
+
+.kids-mode .sandbox-btn.btn-play {
+  background: #58cc02 !important;
+  border-color: #46a302 !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 0 #3b8b00 !important;
+}
+
+.kids-mode .sandbox-btn.btn-play:hover {
+  box-shadow: 0 5px 0 #3b8b00 !important;
+}
+
+.kids-mode .sandbox-btn.btn-play.running {
+  background: #ff9600 !important;
+  border-color: #ea580c !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 0 #c2410c !important;
+}
+
+/* ── Canvas Nodes ──────────────────────────────────────────────── */
+.kids-mode .sandbox-node {
+  background: #ffffff !important;
+  border: 2.5px solid #cbd5e1 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 0 #cbd5e1 !important;
+  padding: 0.65rem 0.85rem !important;
+  user-select: none !important;
+  min-width: 95px !important;
 }
 
 .kids-mode .sandbox-node:hover {
-  transform: scale(1.05) translateY(-2px);
-  box-shadow: 0 8px 0 #475569 !important;
+  border-color: #94a3b8 !important;
+  box-shadow: 0 6px 0 #94a3b8 !important;
 }
 
 .kids-mode .sandbox-node.selected {
   border-color: #1cb0f6 !important;
-  box-shadow: 0 6px 0 #0284c7 !important;
+  box-shadow: 0 5px 0 #0284c7, 0 0 12px rgba(28, 176, 246, 0.25) !important;
 }
 
-/* Rainbow Highlight for Active Electrical components in Kids Mode */
-.kids-mode .sandbox-node.elec-active {
-  border-color: #58cc02 !important;
-  box-shadow: 0 8px 0 #3fa000 !important;
-  animation: kidsElecBounce 1.4s ease-in-out infinite alternate;
+.kids-mode .sandbox-node-header {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 0.82rem !important;
+  color: #334155 !important;
 }
 
-@keyframes kidsElecBounce {
-  0% { transform: translateY(0) scale(1.02); }
-  100% { transform: translateY(-4px) scale(1.04); }
+/* Ports on nodes */
+.kids-mode .sandbox-port {
+  width: 11px !important;
+  height: 11px !important;
+  border-radius: 50% !important;
+  background: #f8fafc !important;
+  border: 2.5px solid #94a3b8 !important;
+  z-index: 10 !important;
 }
 
-/* Fun Stickers for Categories in Toolbox */
-.kids-mode .toolbox-section-title::before {
-  content: "✨ ";
-}
-.kids-mode .toolbox-section-title[data-category="Inputs"]::before { content: "🎮 "; }
-.kids-mode .toolbox-section-title[data-category="Gates"]::before { content: "🧩 "; }
-.kids-mode .toolbox-section-title[data-category="Outputs"]::before { content: "💡 "; }
-.kids-mode .toolbox-section-title[data-category="Electricity"]::before { content: "⚡ "; }
-.kids-mode .toolbox-section-title[data-category="Templates"]::before { content: "📚 "; }
-
-/* Toolbox Item Styling */
-.kids-mode .toolbox-item {
-  border-radius: 12px !important;
-  border: 2px solid #cbd5e1 !important;
-  background: #ffffff !important;
-  font-weight: 700 !important;
-  margin-bottom: 0.25rem;
+.kids-mode .sandbox-port:hover {
+  transform: scale(1.4) !important;
+  border-color: #1cb0f6 !important;
+  background: #1cb0f6 !important;
 }
 
-.kids-mode .toolbox-item:hover {
-  border-color: #818cf8 !important;
-  background: #f5f3ff !important;
-  transform: translateX(4px);
+.kids-mode .sandbox-port.eligible {
+  background: #38bdf8 !important;
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.35) !important;
 }
 
-/* Duolingo XP Energy Bar */
-.kids-mode .xp-bar-wrap {
-  border-radius: 12px !important;
-  height: 18px !important;
-  border: 2.5px solid #222222 !important;
-  box-shadow: 0 3px 0 #222222 !important;
-  overflow: hidden;
-  background: #ffffff;
+.kids-mode .sandbox-port.wiring-source {
+  background: #58cc02 !important;
+  border-color: #3fa000 !important;
+  box-shadow: 0 0 0 4px rgba(88, 204, 2, 0.35) !important;
 }
 
-.kids-mode .xp-bar-fill {
-  background: linear-gradient(90deg, #ffc700, #ff9600) !important;
-  border-radius: 8px !important;
+/* Node Delete Button — small crisp circle */
+.kids-mode .node-delete-btn {
+  position: absolute !important;
+  top: -8px !important;
+  right: -8px !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+  border-radius: 50% !important;
+  background: #ff4b4b !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) !important;
+  font-size: 0.85rem !important;
+  font-weight: 900 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: none !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  z-index: 25 !important;
+  transform: none !important;
 }
 
-/* Switch & Transistor toggle custom buttons in Kids Mode */
-.kids-mode button[onclick*="toggleElectricSwitch"],
-.kids-mode button[onclick*="toggleElectricTransistor"] {
-  border-radius: 10px !important;
-  border: 2px solid #222222 !important;
-  padding: 2px 6px !important;
-  box-shadow: 0 3px 0 #222222 !important;
-  font-size: 0.65rem !important;
+.kids-mode .sandbox-node:hover .node-delete-btn,
+.kids-mode .sandbox-node.selected .node-delete-btn {
+  display: flex !important;
 }
 
-.kids-mode button[onclick*="toggleElectricSwitch"]:active,
-.kids-mode button[onclick*="toggleElectricTransistor"]:active {
+.kids-mode .node-delete-btn:hover {
+  background: #dc2626 !important;
+  transform: scale(1.15) !important;
+}
+
+/* ── Primary & Secondary Action Buttons ────────────────────────── */
+.kids-mode .btn-primary,
+.kids-mode .nd-send-btn {
+  border-radius: 14px !important;
+  border: 2px solid #46a302 !important;
+  background: #58cc02 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 0 #3b8b00 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 0.95rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  padding: 0.6rem 1.4rem !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+}
+
+.kids-mode .btn-primary:hover,
+.kids-mode .nd-send-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 0 #3b8b00 !important;
+}
+
+.kids-mode .btn-primary:active,
+.kids-mode .nd-send-btn:active {
   transform: translateY(2px) !important;
-  box-shadow: none !important;
+  box-shadow: 0 1px 0 #3b8b00 !important;
 }
 
-/* Settings elements */
-.kids-mode .settings-view {
+.kids-mode .btn-secondary {
+  border-radius: 14px !important;
+  border: 2px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  color: #64748b !important;
+  box-shadow: 0 3px 0 #cbd5e1 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  padding: 0.55rem 1.2rem !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+}
+
+.kids-mode .btn-secondary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 0 #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+/* ── Template Cards ────────────────────────────────────────────── */
+.kids-mode .template-card {
+  border-radius: 14px !important;
+  border: 2px solid #e2e8f0 !important;
+  box-shadow: 0 3px 0 #e2e8f0 !important;
+  background: #ffffff !important;
+  transition: all 0.15s ease !important;
+  margin-bottom: 0.45rem !important;
+}
+
+.kids-mode .template-card:hover {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 4px 0 #38bdf8 !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ── Networking Lab ────────────────────────────────────────────── */
+.kids-mode .nd-main {
   background: #f0f7ff !important;
 }
 
-.kids-mode .settings-card {
-  border: 3px solid #cbd5e1 !important;
-  border-radius: 20px !important;
-  box-shadow: 0 8px 0 rgba(203, 213, 225, 0.3) !important;
+.kids-mode .nd-tabs {
+  gap: 0.5rem !important;
+  padding: 0.75rem 1.25rem !important;
   background: #ffffff !important;
-  padding: 1.35rem 1.5rem !important;
+  border-bottom: 2.5px solid #e2e8f0 !important;
 }
 
-.kids-mode .settings-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 0 rgba(28, 176, 246, 0.2) !important;
+.kids-mode .nd-tab {
+  border-radius: 14px !important;
+  border: 2px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  box-shadow: 0 3px 0 #cbd5e1 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  color: #64748b !important;
+  padding: 0.5rem 1rem !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.kids-mode .nd-tab:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 0 #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+.kids-mode .nd-tab.active {
+  background: #e0f2fe !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 4px 0 #0284c7 !important;
+  color: #0369a1 !important;
+  transform: translateY(-2px) !important;
+}
+
+.kids-mode .nd-left,
+.kids-mode .nd-card {
+  border: 3px solid #e2e8f0 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 6px 0 rgba(226, 232, 240, 0.5) !important;
+  background: #ffffff !important;
+  padding: 1.15rem !important;
+}
+
+.kids-mode .nd-dev-btn {
+  border-radius: 12px !important;
+  border: 2px solid #e2e8f0 !important;
+  box-shadow: 0 3px 0 #cbd5e1 !important;
+  font-weight: 800 !important;
+  font-family: 'Nunito', sans-serif !important;
+  padding: 0.45rem 0.9rem !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+}
+
+.kids-mode .nd-dev-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 0 #cbd5e1 !important;
+}
+
+.kids-mode .nd-dev-btn.active {
+  background: #e0f2fe !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 3px 0 #0284c7 !important;
+  color: #0369a1 !important;
+}
+
+/* ── Modals ────────────────────────────────────────────────────── */
+.kids-mode .success-modal,
+.kids-mode .sandbox-modal {
+  border-radius: 24px !important;
+  border: 3px solid #e2e8f0 !important;
+  box-shadow: 0 16px 40px rgba(28, 176, 246, 0.12) !important;
+  background: #ffffff !important;
+}
+
+/* ── Mobile Navbar ─────────────────────────────────────────────── */
+.kids-mode .mobile-navbar {
+  background: #ffffff !important;
+  border-top: 3px solid #e2e8f0 !important;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+.kids-mode .mobile-nav-btn {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  color: #64748b !important;
+}
+
+.kids-mode .mobile-nav-btn.active {
+  color: #0369a1 !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   KIDS DARK MODE OVERRIDES
+   ══════════════════════════════════════════════════════════════════ */
+.kids-mode.dark header,
+[data-theme="dark"].kids-mode header,
+[data-theme="dark"] .kids-mode header {
+  background: #1c2541 !important;
+  border-bottom: 3px solid #334155 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+.kids-mode.dark .sandbox-workspace,
+.kids-mode.dark .nd-svg-wrap,
+.kids-mode.dark .nd-canvas-wrap,
+[data-theme="dark"].kids-mode .sandbox-workspace,
+[data-theme="dark"].kids-mode .nd-svg-wrap,
+[data-theme="dark"].kids-mode .nd-canvas-wrap {
+  background-color: #0b132b !important;
+  background-image: radial-gradient(#1e3a8a 2.5px, transparent 2.5px) !important;
+}
+
+.kids-mode.dark .nav-tab,
+[data-theme="dark"].kids-mode .nav-tab {
+  background: #1c2541 !important;
+  border-color: #334155 !important;
+  box-shadow: 0 4px 0 #0b132b !important;
+  color: #94a3b8 !important;
+}
+
+.kids-mode.dark .nav-tab:hover,
+[data-theme="dark"].kids-mode .nav-tab:hover {
+  background: #273549 !important;
+  color: #f8fafc !important;
+  border-color: #475569 !important;
+}
+
+.kids-mode.dark .nav-tab.active,
+[data-theme="dark"].kids-mode .nav-tab.active {
+  background: #0c4a6e !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 4px 0 #0369a1 !important;
+  color: #38bdf8 !important;
+}
+
+.kids-mode.dark #audio-toggle,
+.kids-mode.dark #theme-toggle,
+[data-theme="dark"].kids-mode #audio-toggle,
+[data-theme="dark"].kids-mode #theme-toggle {
+  background: #1c2541 !important;
+  border-color: #334155 !important;
+  box-shadow: 0 3px 0 #0b132b !important;
+  color: #38bdf8 !important;
+}
+
+.kids-mode.dark .sandbox-toolbox,
+[data-theme="dark"].kids-mode .sandbox-toolbox {
+  background: #111827 !important;
+  border-color: #334155 !important;
+  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+.kids-mode.dark .sandbox-toolbox h3,
+[data-theme="dark"].kids-mode .sandbox-toolbox h3 {
+  color: #f8fafc !important;
+  border-bottom-color: #1f2937 !important;
+}
+
+.kids-mode.dark .toolbox-section-title,
+[data-theme="dark"].kids-mode .toolbox-section-title {
+  color: #94a3b8 !important;
+}
+
+.kids-mode.dark .toolbox-item,
+[data-theme="dark"].kids-mode .toolbox-item {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+  box-shadow: 0 3px 0 #111827 !important;
+  color: #f3f4f6 !important;
+}
+
+.kids-mode.dark .toolbox-item:hover,
+[data-theme="dark"].kids-mode .toolbox-item:hover {
+  background: #1e293b !important;
+  border-color: #38bdf8 !important;
+  color: #38bdf8 !important;
+  box-shadow: 0 4px 0 #0284c7 !important;
+}
+
+.kids-mode.dark .sandbox-toolbar,
+[data-theme="dark"].kids-mode .sandbox-toolbar {
+  background: #1c2541 !important;
+  border-color: #334155 !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3) !important;
+}
+
+.kids-mode.dark .sandbox-btn,
+[data-theme="dark"].kids-mode .sandbox-btn {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+  box-shadow: 0 3px 0 #0b132b !important;
+  color: #cbd5e1 !important;
+}
+
+.kids-mode.dark .sandbox-btn:hover,
+[data-theme="dark"].kids-mode .sandbox-btn:hover {
+  background: #374151 !important;
+  color: #ffffff !important;
+}
+
+.kids-mode.dark .sandbox-node,
+[data-theme="dark"].kids-mode .sandbox-node {
+  background: #1c2541 !important;
+  border-color: #475569 !important;
+  box-shadow: 0 4px 0 #0b132b !important;
+  color: #f8fafc !important;
+}
+
+.kids-mode.dark .sandbox-node:hover,
+[data-theme="dark"].kids-mode .sandbox-node:hover {
+  border-color: #64748b !important;
+  box-shadow: 0 6px 0 #0b132b !important;
+}
+
+.kids-mode.dark .sandbox-node.selected,
+[data-theme="dark"].kids-mode .sandbox-node.selected {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 5px 0 #0284c7, 0 0 16px rgba(56, 189, 248, 0.4) !important;
+}
+
+.kids-mode.dark .sandbox-node-header,
+[data-theme="dark"].kids-mode .sandbox-node-header {
+  color: #cbd5e1 !important;
+}
+
+.kids-mode.dark .template-card,
+[data-theme="dark"].kids-mode .template-card {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+  box-shadow: 0 3px 0 #111827 !important;
+}
+
+.kids-mode.dark .template-card:hover,
+[data-theme="dark"].kids-mode .template-card:hover {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 4px 0 #0284c7 !important;
+}
+
+.kids-mode.dark .nd-main,
+[data-theme="dark"].kids-mode .nd-main {
+  background: #0b132b !important;
+}
+
+.kids-mode.dark .nd-tabs,
+[data-theme="dark"].kids-mode .nd-tabs {
+  background: #1c2541 !important;
+  border-bottom-color: #334155 !important;
+}
+
+.kids-mode.dark .nd-tab,
+[data-theme="dark"].kids-mode .nd-tab {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+  box-shadow: 0 3px 0 #0b132b !important;
+  color: #94a3b8 !important;
+}
+
+.kids-mode.dark .nd-tab.active,
+[data-theme="dark"].kids-mode .nd-tab.active {
+  background: #0c4a6e !important;
+  border-color: #38bdf8 !important;
+  color: #38bdf8 !important;
+  box-shadow: 0 4px 0 #0284c7 !important;
+}
+
+.kids-mode.dark .nd-left,
+.kids-mode.dark .nd-card,
+[data-theme="dark"].kids-mode .nd-left,
+[data-theme="dark"].kids-mode .nd-card {
+  background: #1c2541 !important;
+  border-color: #334155 !important;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.4) !important;
+}
+
+.kids-mode.dark .success-modal,
+.kids-mode.dark .sandbox-modal,
+[data-theme="dark"].kids-mode .success-modal,
+[data-theme="dark"].kids-mode .sandbox-modal {
+  background: #1c2541 !important;
+  border-color: #334155 !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5) !important;
+  color: #f8fafc !important;
+}
+
+.kids-mode.dark .mobile-navbar,
+[data-theme="dark"].kids-mode .mobile-navbar {
+  background: #1c2541 !important;
+  border-top-color: #334155 !important;
+}
+
+/* ── Live Waveform Oscilloscope Panel ──────────────────────────── */
+.kids-mode .sandbox-waveform-panel {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(680px, calc(100% - 2.5rem));
+  background: #ffffff;
+  border: 3px solid #e2e8f0;
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(28, 176, 246, 0.15);
+  padding: 0.85rem 1.15rem;
+  z-index: 50;
+}
+
+.kids-mode.dark .sandbox-waveform-panel,
+[data-theme="dark"].kids-mode .sandbox-waveform-panel {
+  background: #1c2541 !important;
+  border-color: #334155 !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+.kids-mode .waveform-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.kids-mode.dark .waveform-header,
+[data-theme="dark"].kids-mode .waveform-header {
+  color: #f8fafc !important;
+}
+
+.kids-mode .waveform-clear-btn {
+  background: #f1f5f9;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+  color: #475569;
+}
+
+.kids-mode .waveform-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #64748b;
+  line-height: 1;
+  padding: 0 0.25rem;
+}
+
+.kids-mode #waveform-canvas {
+  width: 100%;
+  height: 140px;
+  border-radius: 12px;
+  background: #f8fafc;
+  display: block;
+}
+
+.kids-mode.dark #waveform-canvas,
+[data-theme="dark"].kids-mode #waveform-canvas {
+  background: #0f172a !important;
 }
