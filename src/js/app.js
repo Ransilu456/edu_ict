@@ -1,6 +1,5 @@
 import './common.js';
 import './sandbox.js';
-import './ic-creator.js';
 import { initNetworkDevices } from './network-devices.js';
 
 if (document.readyState === 'loading') {
@@ -47,6 +46,9 @@ function setupViewNavigation() {
         if (!networkReady) {
           initNetworkDevices();
           networkReady = true;
+        }
+        if (btn.dataset.subtab && window.switchNDTab) {
+          window.switchNDTab(btn.dataset.subtab);
         }
       }
     });

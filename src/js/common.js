@@ -1,5 +1,3 @@
-// LogicQuest — common.js (simplified, no UserService / XP / theme)
-
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let soundEnabled = localStorage.getItem("soundEnabled") !== "false";
 

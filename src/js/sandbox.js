@@ -1,7 +1,5 @@
-import { generateExplanations, renderExplanationPanel, toggleExplanationPanel } from './sandbox-explain.js';
-import { showComponentTooltip, hideComponentTooltip, COMPONENT_EDU_DATA } from './component-info.js';
-import { openTruthTableDesigner } from './truth-table-designer.js';
 import { parseBooleanExpression } from './bool-parser.js';
+import { REAL_ICS } from './real-ic-defs.js';
 
 let sandboxNodes = [];
 let sandboxWires = [];
@@ -9,7 +7,6 @@ let activeWiringSource = null;
 let pendingWirePortIdx = 0;      
 let selectedNodeId = null;
 let selectedNodeIds = [];
-let customICs = {};
 let simInterval = null;
 let clockInterval = null;
 let isSimRunning = true;
@@ -81,6 +78,12 @@ const COMPONENT_DEFS = {
   'comparator':  { inputs: 4, outputs: 3, label: '2-bit Comparator', category: 'Combinational' },
   'seven-seg':   { inputs: 4, outputs: 0, label: '7-Seg Display',   category: 'Outputs' },
   'text-label':  { inputs: 0, outputs: 0, label: 'Text Label',      category: 'Utility' },
+  'ic-7408':     { inputs: 15, outputs: 15, label: '7408 Quad AND', category: 'ICs' },
+  'ic-7432':     { inputs: 15, outputs: 15, label: '7432 Quad OR',  category: 'ICs' },
+  'ic-7404':     { inputs: 15, outputs: 15, label: '7404 Hex NOT',  category: 'ICs' },
+  'ic-7400':     { inputs: 15, outputs: 15, label: '7400 Quad NAND', category: 'ICs' },
+  'ic-7402':     { inputs: 15, outputs: 15, label: '7402 Quad NOR', category: 'ICs' },
+  'ic-7486':     { inputs: 15, outputs: 15, label: '7486 Quad XOR', category: 'ICs' },
 };
 window.initSandboxCanvas = function () {
   workspace = document.getElementById('sandbox-workspace-canvas');
@@ -185,7 +188,6 @@ window.initSandboxCanvas = function () {
       toggleCollapse();
     });
   }
-  loadCustomICs();
   if (window.initICCreator) window.initICCreator();
 };
 function setupToolboxItem(item) {
@@ -517,6 +519,7 @@ function placeNode(type, label, x, y) {
   if (!def) { console.warn('Unknown component type:', type); return; }
 
   const id = `sb-node-${nextNodeId++}`;
+  const isIC = !!REAL_ICS[type];
 
   const node = {
     id,
@@ -527,8 +530,11 @@ function placeNode(type, label, x, y) {
     inputsCount: def.inputs,
     outputsCount: def.outputs,
     outputState: 0,           
-    outputState2: 0,           
+    outputState2: 0,
+    outputStates: {},
     inputValues: Array(def.inputs).fill(0),
+    // IC nodes: pin-number-keyed value map (matches real-ic-defs evaluate() signature)
+    pinValues: isIC ? {} : null,
     prevClockState: 0,
     labelText: type === 'text-label' ? 'Label' : '',
     data: def.data ? { ...def.data } : {},
@@ -541,6 +547,116 @@ function placeNode(type, label, x, y) {
   playSound('click');
   return node;
 }
+
+function renderRealICNodeDOM(node, el) {
+  const ic = REAL_ICS[node.type];
+  if (!ic) return;
+
+  el.classList.add('real-ic-node');
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'node-delete-btn';
+  delBtn.innerHTML = '&times;';
+  delBtn.title = 'Delete (Del)';
+  delBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteNode(node.id); });
+  el.appendChild(delBtn);
+
+  const notch = document.createElement('div');
+  notch.className = 'real-ic-notch';
+  el.appendChild(notch);
+
+  const dot = document.createElement('div');
+  dot.className = 'real-ic-dot';
+  el.appendChild(dot);
+
+  const header = document.createElement('div');
+  header.className = 'real-ic-header-text';
+  header.innerHTML = `
+    <div class="real-ic-mfg">LQ LOGIC</div>
+    <div class="real-ic-part">${ic.partNumber}</div>
+    <div class="real-ic-subtitle">${ic.label}</div>
+  `;
+  el.appendChild(header);
+
+  const body = document.createElement('div');
+  body.className = 'real-ic-body';
+
+  const leftCol = document.createElement('div');
+  leftCol.className = 'real-ic-col left';
+
+  const rightCol = document.createElement('div');
+  rightCol.className = 'real-ic-col right';
+
+  const leftPins = ic.pins.slice(0, 7); // 1..7
+  const rightPins = ic.pins.slice(7).reverse(); // 14 down to 8
+
+  function createPinRow(pin, side) {
+    const row = document.createElement('div');
+    row.className = `real-ic-pin-row ${side} ${pin.type}`;
+    row.dataset.pin = pin.pin;
+
+    const isOutput = pin.type === 'output';
+    const port = document.createElement('div');
+    port.className = `sandbox-port ${isOutput ? 'port-output' : 'port-input'}`;
+    port.dataset.portIdx = pin.pin;
+    port.dataset.pinNum = pin.pin;
+    port.title = `Pin ${pin.pin}: ${pin.name} (${pin.desc || pin.type})`;
+
+    port.addEventListener('click', (e) => {
+      if (_ignorePortClick) return;
+      e.stopPropagation();
+      handlePortClick(node.id, isOutput ? 'output' : 'input', pin.pin);
+    });
+    port.addEventListener('touchend', (e) => {
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
+      _ignorePortClick = true;
+      setTimeout(() => { _ignorePortClick = false; }, 200);
+      handlePortClick(node.id, isOutput ? 'output' : 'input', pin.pin);
+    });
+
+    const ind = document.createElement('span');
+    ind.className = 'real-ic-pin-indicator';
+    ind.id = `${node.id}-pin-${pin.pin}-ind`;
+
+    const numSpan = document.createElement('span');
+    numSpan.className = 'real-ic-pin-num';
+    numSpan.textContent = pin.pin;
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'real-ic-pin-name';
+    nameSpan.textContent = pin.name;
+
+    row.appendChild(port);
+    row.appendChild(numSpan);
+    row.appendChild(nameSpan);
+    row.appendChild(ind);
+
+    return row;
+  }
+
+  leftPins.forEach(p => leftCol.appendChild(createPinRow(p, 'left')));
+  rightPins.forEach(p => rightCol.appendChild(createPinRow(p, 'right')));
+
+  body.appendChild(leftCol);
+  body.appendChild(rightCol);
+  el.appendChild(body);
+
+  const onStartDrag = (e) => {
+    if (e.target.closest('.sandbox-port') || e.target.closest('button')) return;
+    startDrag(e, node);
+  };
+  el.addEventListener('mousedown', onStartDrag);
+  el.addEventListener('touchstart', onStartDrag, { passive: false });
+  el.addEventListener('click', (e) => {
+    if (isDragging) return;
+    e.stopPropagation();
+    selectNode(node.id, e.shiftKey || e.ctrlKey || e.metaKey);
+  });
+
+  (panContainer || workspace).appendChild(el);
+}
+
 function renderNodeDOM(node) {
   const existing = document.getElementById(node.id);
   if (existing) existing.remove();
@@ -550,6 +666,12 @@ function renderNodeDOM(node) {
   el.className = 'sandbox-node';
   el.style.left = `${node.x}px`;
   el.style.top = `${node.y}px`;
+
+  if (node.type && REAL_ICS[node.type]) {
+    renderRealICNodeDOM(node, el);
+    return;
+  }
+
   if (['half-adder', 'full-adder', 'd-flop', 'op-amp'].includes(node.type)) {
     el.classList.add('compound-node');
   }
@@ -557,32 +679,18 @@ function renderNodeDOM(node) {
   if (node.type === 'rgb-led') el.classList.add('rgb-led-node');
   if (node.type === 'led-bar') el.classList.add('led-bar-node');
   if (node.type === 'text-label') el.classList.add('node-text-label');
-  if (node.type && node.type.startsWith('custom-ic-')) {
-    el.classList.add('custom-ic-node');
-    const icName = node.data.icName || node.type.slice(9);
-    const def = window.customICs ? window.customICs[icName] : null;
-    if (def) {
-      const P = def.pinCount || 8;
-      const height = (P / 2) * 22 + 30;
-      el.style.width = '140px';
-      el.style.height = `${height}px`;
-    }
-  }
-    const delBtn = document.createElement('button');
+
+  const delBtn = document.createElement('button');
   delBtn.className = 'node-delete-btn';
   delBtn.innerHTML = '&times;';
   delBtn.title = 'Delete (Del)';
   delBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteNode(node.id); });
   el.appendChild(delBtn);
+
   const header = document.createElement('div');
   header.className = 'sandbox-node-header';
   header.innerText = node.label;
-  header.addEventListener('mouseenter', (e) => {
-    if (node.type && COMPONENT_EDU_DATA) {
-      showComponentTooltip(node, header);
-    }
-  });
-  header.addEventListener('mouseleave', () => hideComponentTooltip());
+
   // In realistic (ANSI) gate mode, hide header text for pure logic gate types
   const pureGateTypes = ['not','and','or','nand','nor','xor','xnor'];
   const gateStyle = window.__gateStyle || localStorage.getItem('sandboxGateStyle') || 'box';
@@ -590,18 +698,15 @@ function renderNodeDOM(node) {
     header.style.display = 'none';
   }
   el.appendChild(header);
+
   const body = document.createElement('div');
   body.className = 'sandbox-node-body';
   renderNodeBody(node, body);
   el.appendChild(body);
-  if (node.type && node.type.startsWith('custom-ic-')) {
-    if (window.renderCustomICPorts) {
-      window.renderCustomICPorts(node, el);
-    }
-  } else {
-    renderInputPorts(node, el);
-    renderOutputPorts(node, el);
-  }
+
+  renderInputPorts(node, el);
+  renderOutputPorts(node, el);
+
   const onStartDrag = (e) => {
     if (e.target.closest('.sandbox-port') || e.target.closest('button') || e.target.closest('textarea') || e.target.closest('input')) {
       return;
@@ -612,18 +717,6 @@ function renderNodeDOM(node) {
   el.addEventListener('touchstart', onStartDrag, { passive: false });
   el.addEventListener('click', (e) => {
     if (isDragging) return;
-    const toggleBtn = e.target.closest('[data-toggle]');
-    if (toggleBtn) {
-      e.stopPropagation();
-      const toggleType = toggleBtn.dataset.toggle;
-      const nid = toggleBtn.dataset.nodeId;
-      if (toggleType === 'switch' && window.toggleElectricSwitch) {
-        window.toggleElectricSwitch(nid);
-      } else if (toggleType === 'transistor' && window.toggleElectricTransistor) {
-        window.toggleElectricTransistor(nid);
-      }
-      return;
-    }
     e.stopPropagation();
     selectNode(node.id, e.shiftKey || e.ctrlKey || e.metaKey);
   });
@@ -644,15 +737,6 @@ function renderNodeDOM(node) {
 }
 
 function renderNodeBody(node, body) {
-  if (node.type && node.type.startsWith('custom-ic-')) {
-    if (window.getCustomICNodeInner) {
-      body.innerHTML = window.getCustomICNodeInner(node);
-    } else {
-      const icName = node.data.icName || node.type.slice(9);
-      body.innerHTML = `<div class="gate-type-label">${icName}</div>`;
-    }
-    return;
-  }
   switch (node.type) {
     case 'input': {
       const btn = document.createElement('button');
@@ -1020,7 +1104,8 @@ function renderNodeBody(node, body) {
       }, 0);
       body.appendChild(ta);
       break;
-    }
+    }
+
 
     default: {
       const gateStyle = window.__gateStyle || 'box';
@@ -1051,7 +1136,7 @@ function renderNodeBody(node, body) {
           <button onclick="event.stopPropagation();window.removeGateInput('${node.id}')"
             style="font-size:10px;padding:1px 5px;border-radius:3px;border:1px solid var(--border-color);
             background:var(--bg-tertiary);color:var(--text-primary);cursor:pointer;line-height:1.2"
-            title="Remove input port">ΓêÆ</button>`;
+            title="Remove input port">&minus;</button>`;
         body.appendChild(controls);
       }
     }
@@ -1060,52 +1145,69 @@ function renderNodeBody(node, body) {
 
 function renderGateSVG(type) {
   const color = 'currentColor';
-  const strokeW = 1.8;
+  const sw = 1.8;
   switch (type) {
     case 'buffer':
-      return `<svg viewBox="0 0 60 40" width="60" height="40" fill="none" stroke="${color}" stroke-width="${strokeW}" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="4,4 42,20 4,36"/>
-        <line x1="42" y1="20" x2="56" y2="20"/>
+      return `<svg viewBox="0 0 72 44" width="72" height="44" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="0" y1="22" x2="10" y2="22"/>
+        <polygon points="10,5 50,22 10,39" fill="var(--bg-secondary)"/>
+        <line x1="50" y1="22" x2="72" y2="22"/>
       </svg>`;
     case 'not':
-      return `<svg viewBox="0 0 60 40" width="60" height="40" fill="none" stroke="${color}" stroke-width="${strokeW}" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="4,4 38,20 4,36"/>
-        <line x1="38" y1="20" x2="52" y2="20"/>
-        <circle cx="44" cy="20" r="3"/>
+      return `<svg viewBox="0 0 72 44" width="72" height="44" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="0" y1="22" x2="10" y2="22"/>
+        <polygon points="10,5 46,22 10,39" fill="var(--bg-secondary)"/>
+        <circle cx="50" cy="22" r="4" fill="var(--bg-secondary)"/>
+        <line x1="54" y1="22" x2="72" y2="22"/>
       </svg>`;
     case 'and':
-      return `<svg viewBox="0 0 60 40" width="60" height="40" fill="none" stroke="${color}" stroke-width="${strokeW}" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 6h12q12 0 12 14 0 14-12 14H4V6z"/>
-        <line x1="4" y1="6" x2="4" y2="34"/>
+      // Standard ANSI AND: flat left side, curved right dome, 2 inputs, 1 output
+      return `<svg viewBox="0 0 80 50" width="80" height="50" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="0" y1="14" x2="20" y2="14"/>
+        <line x1="0" y1="36" x2="20" y2="36"/>
+        <path d="M20 7 L44 7 Q62 7 62 25 Q62 43 44 43 L20 43 Z" fill="var(--bg-secondary)"/>
+        <line x1="62" y1="25" x2="80" y2="25"/>
       </svg>`;
     case 'or':
-      return `<svg viewBox="0 0 60 40" width="60" height="40" fill="none" stroke="${color}" stroke-width="${strokeW}" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M 4 6 Q 16 6 28 20 Q 16 34 4 34 Q 2 27 4 20 Q 2 13 4 6"/>
+      // Standard ANSI OR: curved left and right sides
+      return `<svg viewBox="0 0 80 50" width="80" height="50" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="0" y1="14" x2="18" y2="14"/>
+        <line x1="0" y1="36" x2="18" y2="36"/>
+        <path d="M10 7 Q24 7 50 25 Q24 43 10 43 Q18 34 18 25 Q18 16 10 7 Z" fill="var(--bg-secondary)"/>
+        <line x1="50" y1="25" x2="80" y2="25"/>
       </svg>`;
     case 'nand':
-      return `<svg viewBox="0 0 68 40" width="68" height="40" fill="none" stroke="${color}" stroke-width="${strokeW}" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 6h12q12 0 12 14 0 14-12 14H4V6z"/>
-        <line x1="4" y1="6" x2="4" y2="34"/>
-        <circle cx="32" cy="20" r="3"/>
-        <line x1="35" y1="20" x2="58" y2="20"/>
+      return `<svg viewBox="0 0 86 50" width="86" height="50" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="0" y1="14" x2="20" y2="14"/>
+        <line x1="0" y1="36" x2="20" y2="36"/>
+        <path d="M20 7 L44 7 Q62 7 62 25 Q62 43 44 43 L20 43 Z" fill="var(--bg-secondary)"/>
+        <circle cx="66" cy="25" r="4" fill="var(--bg-secondary)"/>
+        <line x1="70" y1="25" x2="86" y2="25"/>
       </svg>`;
     case 'nor':
-      return `<svg viewBox="0 0 68 40" width="68" height="40" fill="none" stroke="${color}" stroke-width="${strokeW}" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M 4 6 Q 16 6 28 20 Q 16 34 4 34 Q 2 27 4 20 Q 2 13 4 6"/>
-        <circle cx="31" cy="20" r="3"/>
-        <line x1="34" y1="20" x2="58" y2="20"/>
+      return `<svg viewBox="0 0 86 50" width="86" height="50" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="0" y1="14" x2="18" y2="14"/>
+        <line x1="0" y1="36" x2="18" y2="36"/>
+        <path d="M10 7 Q24 7 50 25 Q24 43 10 43 Q18 34 18 25 Q18 16 10 7 Z" fill="var(--bg-secondary)"/>
+        <circle cx="54" cy="25" r="4" fill="var(--bg-secondary)"/>
+        <line x1="58" y1="25" x2="86" y2="25"/>
       </svg>`;
     case 'xor':
-      return `<svg viewBox="0 0 68 40" width="68" height="40" fill="none" stroke="${color}" stroke-width="${strokeW}" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M 4 6 Q 16 6 28 20 Q 16 34 4 34 Q 2 27 4 20 Q 2 13 4 6"/>
-        <path d="M -2 4 Q -4 12 -2 20 Q -4 28 -2 36"/>
+      return `<svg viewBox="0 0 86 50" width="86" height="50" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="0" y1="14" x2="22" y2="14"/>
+        <line x1="0" y1="36" x2="22" y2="36"/>
+        <path d="M14 7 Q28 7 54 25 Q28 43 14 43 Q22 34 22 25 Q22 16 14 7 Z" fill="var(--bg-secondary)"/>
+        <path d="M6 7 Q14 25 6 43" fill="none"/>
+        <line x1="54" y1="25" x2="86" y2="25"/>
       </svg>`;
     case 'xnor':
-      return `<svg viewBox="0 0 72 40" width="72" height="40" fill="none" stroke="${color}" stroke-width="${strokeW}" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M 4 6 Q 16 6 28 20 Q 16 34 4 34 Q 2 27 4 20 Q 2 13 4 6"/>
-        <path d="M -2 4 Q -4 12 -2 20 Q -4 28 -2 36"/>
-        <circle cx="31" cy="20" r="3"/>
-        <line x1="34" y1="20" x2="62" y2="20"/>
+      return `<svg viewBox="0 0 92 50" width="92" height="50" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="0" y1="14" x2="22" y2="14"/>
+        <line x1="0" y1="36" x2="22" y2="36"/>
+        <path d="M14 7 Q28 7 54 25 Q28 43 14 43 Q22 34 22 25 Q22 16 14 7 Z" fill="var(--bg-secondary)"/>
+        <path d="M6 7 Q14 25 6 43" fill="none"/>
+        <circle cx="58" cy="25" r="4" fill="var(--bg-secondary)"/>
+        <line x1="62" y1="25" x2="92" y2="25"/>
       </svg>`;
     default:
       return `<span class="gate-type-label">${type.toUpperCase()}</span>`;
@@ -1561,12 +1663,21 @@ function updateSandboxWires() {
     const x2 = iR.left + iR.width / 2 - canvasRect.left - panX;
     const y2 = iR.top + iR.height / 2 - canvasRect.top - panY;
     const srcNode = sandboxNodes.find(n => n.id === wire.fromNodeId);
-    const isElectricityCircuit = false;
-    const isActive = isElectricityCircuit
-      ? !!wire.active
-      : srcNode
-        ? (window.getSourceOutputVal ? window.getSourceOutputVal(srcNode, wire.fromPortIdx) : (wire.fromPortIdx === 0 ? srcNode.outputState : srcNode.outputState2)) === 1
-        : false;
+    let srcVal = 0;
+    if (srcNode) {
+      if (srcNode.outputStates && srcNode.outputStates[wire.fromPortIdx] !== undefined) {
+        srcVal = srcNode.outputStates[wire.fromPortIdx];
+      } else if (wire.fromPortIdx === 0) {
+        srcVal = srcNode.outputState || 0;
+      } else if (wire.fromPortIdx === 1) {
+        srcVal = srcNode.outputState2 || 0;
+      } else if (wire.fromPortIdx === 2) {
+        srcVal = srcNode.outputState3 || 0;
+      } else if (wire.fromPortIdx === 3) {
+        srcVal = srcNode.outputState4 || 0;
+      }
+    }
+    const isActive = srcVal === 1;
 
     const dir = x2 >= x1 ? 1 : -1;
     const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
@@ -1612,44 +1723,23 @@ function updateSandboxWires() {
   sandboxNodes.forEach(node => {
     const el = document.getElementById(node.id);
     if (!el) return;
+    const isIC = !!(REAL_ICS[node.type]);
     el.querySelectorAll('.port-output').forEach(p => {
       const portIdx = parseInt(p.dataset.portIdx);
-      const val = portIdx === 0 ? node.outputState : node.outputState2;
+      let val = 0;
+      if (isIC) {
+        // IC: portIdx IS the pin number, outputStates keyed by pin number
+        val = (node.outputStates && node.outputStates[portIdx] !== undefined) ? node.outputStates[portIdx] : 0;
+      } else {
+        val = portIdx === 0 ? (node.outputState || 0) :
+              portIdx === 1 ? (node.outputState2 || 0) :
+              portIdx === 2 ? (node.outputState3 || 0) :
+              portIdx === 3 ? (node.outputState4 || 0) : 0;
+      }
       p.classList.toggle('active-port', val === 1);
     });
   });
 }
-
-// renderComponentSVG removed
-
-// getElectricityNodeInner removed
-
-function findSeriesCycle(startId, adj) {
-  const visited = new Set();
-  visited.add(startId);
-  function dfs(current, parent) {
-    for (const nb of (adj[current] || [])) {
-      if (nb === startId && nb !== parent) return true;
-      if (!visited.has(nb)) {
-        visited.add(nb);
-        if (dfs(nb, current)) return true;
-      }
-    }
-    return false;
-  }
-  for (const nb of (adj[startId] || [])) {
-    visited.add(nb);
-    if (dfs(nb, startId)) return true;
-  }
-  return false;
-}
-
-// evaluateElectricity removed
-// window.updateElectricProp = removed
-
-// window.toggleElectricSwitch = removed
-
-// window.toggleElectricTransistor = removed
 
 window.updateSensorValue = function (nodeId, value) {
   const node = sandboxNodes.find(n => n.id === nodeId);
@@ -1674,7 +1764,6 @@ window.updateSensorThreshold = function (nodeId, value) {
 };
 function evaluateSandbox() {
   if (sandboxNodes.length === 0) return;
-  // electricity branch removed
 
   const MAX_ITER = Math.max(sandboxNodes.length * 3, 20);
 
@@ -1683,19 +1772,32 @@ function evaluateSandbox() {
 
     sandboxNodes.forEach(node => {
       if (node.type === 'text-label' || node.type === 'input' || node.type === 'clock') return;
+      const isIC = !!(node.pinValues !== null && node.pinValues !== undefined && REAL_ICS[node.type]);
+
       const prev = [...node.inputValues];
       node.inputValues = Array(node.inputsCount).fill(0);
+      if (isIC) node.pinValues = {};
 
       sandboxWires.forEach(wire => {
         if (wire.toNodeId !== node.id) return;
         const src = sandboxNodes.find(n => n.id === wire.fromNodeId);
         if (!src) return;
         let val = 0;
-        if (wire.fromPortIdx === 0) val = src.outputState || 0;
+        // Get output value from source node
+        if (src.outputStates && src.outputStates[wire.fromPortIdx] !== undefined) {
+          val = src.outputStates[wire.fromPortIdx] || 0;
+        } else if (wire.fromPortIdx === 0) val = src.outputState || 0;
         else if (wire.fromPortIdx === 1) val = src.outputState2 || 0;
         else if (wire.fromPortIdx === 2) val = src.outputState3 || 0;
         else if (wire.fromPortIdx === 3) val = src.outputState4 || 0;
-        if (wire.toPortIdx < node.inputsCount) node.inputValues[wire.toPortIdx] = val;
+
+        // Route into destination node
+        if (isIC) {
+          // For ICs: toPortIdx IS the pin number (1..14)
+          node.pinValues[wire.toPortIdx] = val;
+        } else {
+          if (wire.toPortIdx < node.inputsCount) node.inputValues[wire.toPortIdx] = val;
+        }
       });
 
       const inputsChanged = node.inputValues.some((v, i) => v !== prev[i]);
@@ -1712,39 +1814,6 @@ function evaluateSandbox() {
     if (!changed) break;
   }
 
-  // ΓöÇΓöÇ Logic-Electricity Bridge ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-  // Digital gate outputs drive electricity switches and transistors.
-  // This allows circuits like: Toggle Switch ΓåÆ Electricity Switch ΓåÆ Battery ΓåÆ Bulb
-  {
-    const digitalTypes = new Set(['input','clock','not','and','or','nand','nor','xor','xnor',
-      'd-flop','half-adder','full-adder','output','rgb-led','buzzer','led-bar',
-      'seven-seg','sensor','op-amp']);
-    const bridgeTargets = new Set(['switch', 'transistor']);
-    let bridgeChanged = false;
-    sandboxWires.forEach(wire => {
-      const from = sandboxNodes.find(n => n.id === wire.fromNodeId);
-      const to   = sandboxNodes.find(n => n.id === wire.toNodeId);
-      if (!from || !to) return;
-      if (digitalTypes.has(from.type) && bridgeTargets.has(to.type)) {
-        const signal = wire.fromPortIdx === 0 ? from.outputState : (from.outputState2 || 0);
-        if (to.type === 'switch') {
-          const prev = to.data.closed;
-          to.data.closed = signal === 1;
-          if (prev !== to.data.closed) bridgeChanged = true;
-        }
-        if (to.type === 'transistor') {
-          const prev = to.data.on;
-          to.data.on = signal === 1;
-          if (prev !== to.data.on) bridgeChanged = true;
-        }
-      }
-    });
-    // If bridge changed any state, re-run electricity evaluation
-    if (bridgeChanged) {
-      evaluateElectricity();
-    }
-  }
-
   sandboxNodes.forEach(node => updateNodeVisuals(node));
   updateSandboxWires();
   updateNodeInspector();
@@ -1753,88 +1822,22 @@ function evaluateSandbox() {
 window.evaluateSandbox = evaluateSandbox;
 
 function computeNodeOutput(node) {
-  if (node.type && node.type.startsWith('custom-ic-')) {
-    if (window.evaluateCustomIC) {
-      window.evaluateCustomIC(node);
-    } else {
-      const icName = node.data.icName || node.type.slice(9);
-      const icDef = customICs[icName];
-      if (!icDef || icDef.nodes.length === 0) { node.outputState = 0; node.outputState2 = 0; return; }
-      const tmpNodes = icDef.nodes.map(n => ({
-        ...n, outputState: n.type === 'input' ? 0 : (n.outputState || 0),
-        outputState2: n.outputState2 || 0,
-        outputState3: n.outputState3 || 0,
-        outputState4: n.outputState4 || 0,
-        inputValues: Array(n.inputsCount).fill(0), prevClockState: 0
-      }));
-      const tmpNodeMap = {};
-      tmpNodes.forEach(n => tmpNodeMap[n.id] = n);
-      icDef.inputPorts.forEach((portId, idx) => {
-        const tn = tmpNodeMap[portId];
-        if (tn) tn.outputState = node.inputValues[idx] || 0;
-      });
-      const tmpWires = icDef.wires.map(w => ({ ...w }));
-      for (let iter = 0; iter < 30; iter++) {
-        let changed = false;
-        tmpNodes.forEach(n => {
-          if (n.type === 'input' || n.type === 'clock' || n.type === 'text-label' || n.type.startsWith('custom-ic-')) return;
-          const prev = [...n.inputValues];
-          n.inputValues = Array(n.inputsCount).fill(0);
-          tmpWires.forEach(w => {
-            if (w.toNodeId !== n.id) return;
-            const src = tmpNodeMap[w.fromNodeId];
-            if (!src) return;
-            const val = w.fromPortIdx === 0 ? src.outputState : src.outputState2;
-            if (w.toPortIdx < n.inputsCount) n.inputValues[w.toPortIdx] = val;
-          });
-          if (n.type === 'sensor') { return; }
-          const pA = n.inputValues[0] || 0, pB = n.inputValues[1] || 0, pC = n.inputValues[2] || 0;
-          switch (n.type) {
-            case 'output': n.outputState = pA ? 1 : 0; break;
-            case 'buzzer': n.outputState = pA ? 1 : 0; break;
-            case 'not': n.outputState = pA ? 0 : 1; break;
-            case 'and': n.outputState = (pA && pB) ? 1 : 0; break;
-            case 'or': n.outputState = (pA || pB) ? 1 : 0; break;
-            case 'nand': n.outputState = !(pA && pB) ? 1 : 0; break;
-            case 'nor': n.outputState = !(pA || pB) ? 1 : 0; break;
-            case 'xor': n.outputState = (!!pA !== !!pB) ? 1 : 0; break;
-            case 'xnor': n.outputState = (!!pA === !!pB) ? 1 : 0; break;
-            case 'd-flop': {
-              const clk = pB ? 1 : 0;
-              if (clk === 1 && n.prevClockState === 0) n.outputState = pA ? 1 : 0;
-              n.prevClockState = clk;
-              break;
-            }
-            case 'half-adder': n.outputState = (!!pA !== !!pB) ? 1 : 0; n.outputState2 = (pA && pB) ? 1 : 0; break;
-            case 'full-adder': {
-              const s1 = (!!pA !== !!pB); const c1 = (pA && pB);
-              n.outputState = (s1 !== !!pC) ? 1 : 0; n.outputState2 = (c1 || (s1 && pC)) ? 1 : 0;
-              break;
-            }
-            case 'rgb-led': n.outputState = pA ? 1 : 0; n.outputState2 = pB ? 1 : 0; n._blueState = pC ? 1 : 0; break;
-            case 'led-bar': n.outputState = pA ? 1 : 0; break;
-            case 'seven-seg': break;
-            case 'op-amp': n.outputState = (pA > pB) ? 1 : 0; break;
-          }
-          if (n.outputState !== prev[0] || n.outputState2 !== (prev[1] || 0)) changed = true;
-        });
-        if (!changed) break;
-      }
-      node.outputState = 0; node.outputState2 = 0;
-      icDef.outputPorts.forEach((portId, idx) => {
-        const tn = tmpNodeMap[portId];
-        if (tn) {
-          if (idx === 0) node.outputState = tn.outputState;
-          else if (idx === 1) node.outputState2 = tn.outputState;
-        }
-      });
-    }
+  if (node.type && REAL_ICS[node.type]) {
+    const icDef = REAL_ICS[node.type];
+    // pinValues is the pin-number-keyed map; fall back to inputValues for compatibility
+    const pinsMap = (node.pinValues && Object.keys(node.pinValues).length > 0)
+      ? node.pinValues
+      : node.inputValues || {};
+    const outMap = icDef.evaluate(pinsMap);
+    if (!node.outputStates) node.outputStates = {};
+    Object.assign(node.outputStates, outMap);
+    const firstOutPin = Object.keys(outMap)[0];
+    if (firstOutPin !== undefined) node.outputState = outMap[firstOutPin] || 0;
     return;
   }
   const iv = node.inputValues;
   const a = iv[0], b = iv[1], c = iv[2];
 
-  // Multi-input gate evaluation helpers
   const allHigh  = () => iv.every(v => !!v);
   const anyHigh  = () => iv.some(v => !!v);
   const xorParity = () => (iv.filter(v => !!v).length % 2 === 1) ? 1 : 0;
@@ -1858,7 +1861,6 @@ function computeNodeOutput(node) {
     case 'not':
       node.outputState = a ? 0 : 1;
       break;
-    // ΓöÇΓöÇ Multi-input gates use reduce logic ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
     case 'and':
       node.outputState = allHigh() ? 1 : 0;
       break;
@@ -1915,7 +1917,6 @@ function computeNodeOutput(node) {
   }
 }
 
-// ΓöÇΓöÇ Multi-input gate management ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 const MULTI_INPUT_GATE_TYPES = new Set(['and','or','nand','nor','xor','xnor']);
 const MAX_GATE_INPUTS = 32;
 const MIN_GATE_INPUTS = 2;
@@ -1970,7 +1971,6 @@ function updateGateNodeHeight(el, inputsCount) {
   el.style.minHeight = minH + 'px';
 }
 
-// ΓöÇΓöÇ Right-click context menu ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 let _sbCtxMenu = null;
 function showSandboxContextMenu(e, node) {
   e.preventDefault();
@@ -2117,32 +2117,26 @@ function updateNodeVisuals(node) {
         btn.className = node.outputState === 1 ? 'sandbox-toggle-btn high' : 'sandbox-toggle-btn';
       }
       break;
-    }
+    }
+
     default: {
-      if (node.type && node.type.startsWith('custom-ic-')) {
-        const body = el.querySelector('.sandbox-node-body');
-        if (body && window.getCustomICNodeInner) {
-          body.innerHTML = window.getCustomICNodeInner(node);
-        }
-        el.querySelectorAll('.sandbox-port').forEach(p => {
-          const pinType = p.dataset.pinType;
-          const portIdx = parseInt(p.dataset.portIdx);
+      if (node.type && REAL_ICS[node.type]) {
+        const icDef = REAL_ICS[node.type];
+        icDef.pins.forEach(p => {
           let val = 0;
-          const icName = node.data.icName || node.type.slice(9);
-          const def = window.customICs[icName];
-          if (def) {
-            if (pinType === 'input') {
-              val = node.inputValues[portIdx] || 0;
-            } else if (pinType === 'output') {
-              val = node.outputStates ? (node.outputStates[portIdx] || 0) : (portIdx === 0 ? node.outputState : node.outputState2);
-            } else if (pinType === 'power') {
-              val = node.inputValues[def.inputs] || 0;
-            } else if (pinType === 'ground') {
-              val = node.inputValues[def.inputs + 1] || 0;
-            }
+          if (p.type === 'output') {
+            val = (node.outputStates && node.outputStates[p.pin] !== undefined) ? node.outputStates[p.pin] : 0;
+          } else if (p.type === 'input') {
+            // pinValues is keyed by pin number
+            val = (node.pinValues && node.pinValues[p.pin] !== undefined) ? node.pinValues[p.pin] : 0;
+          } else if (p.type === 'power') {
+            val = 1; // VCC always high
           }
-          p.classList.toggle('active-port', val === 1);
-          p.style.backgroundColor = val === 1 ? '#22d3a5' : val === 0 ? '#475569' : '#f97316';
+          const ind = document.getElementById(`${node.id}-pin-${p.pin}-ind`);
+          if (ind) ind.classList.toggle('high', val === 1);
+          // dataset.portIdx stores the pin number (e.g. 1, 2, ... 14)
+          const port = el.querySelector(`.sandbox-port[data-port-idx="${p.pin}"]`);
+          if (port) port.classList.toggle('active-port', val === 1);
         });
       }
       break;
@@ -2193,6 +2187,8 @@ function getOutputNodes() {
 function getInputNodes() {
   return sandboxNodes.filter(n => n.type === 'input');
 }
+window.getSandboxInputNodes = getInputNodes;
+window.getSandboxOutputNodes = getOutputNodes;
 
 function getDigitalGates() {
   return sandboxNodes.filter(n => ['not','and','or','nand','nor','xor','xnor','d-flop','half-adder','full-adder','seven-seg'].includes(n.type));
@@ -2354,7 +2350,6 @@ function showInspectorForNode(node) {
       detail += `<div class="insp-row"><span>Color</span><span style="color:${r||g||b ? '#22d3a5' : 'var(--text-muted)'}">${colorName}</span></div>`;
       break;
     }
-    case 'buzzer': detail = `<div class="insp-row"><span>State</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal ? 'BUZZ' : 'SILENT'}</span></div>`; break;
     case 'not': case 'and': case 'or': case 'nand': case 'nor': case 'xor': case 'xnor':
       detail = `<div class="insp-row"><span>Inputs</span><span>${inpVals.join(', ')}</span></div>
         <div class="insp-row"><span>Output</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`; break;
@@ -2380,58 +2375,22 @@ function showInspectorForNode(node) {
         <div class="insp-row"><span>Decimal</span><span style="font-weight:700">${dec}</span></div>
         <div class="insp-row"><span>Hex</span><span style="font-weight:700">0x${dec.toString(16).toUpperCase()}</span></div>`; break;
     }
-    case 'battery': detail = `<div class="insp-row"><span>EMF</span><span style="color:#22d3a5;font-weight:600">${d.emf || 9}V</span></div>
-      <div class="insp-row"><span>Output</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal ? 'ACTIVE' : 'OFF'}</span></div>`; break;
-    case 'resistor': {
-      const R = d.R || 10;
-      const cur = d.current || 0;
-      const vDrop = d.voltageDrop || 0;
-      detail = `<div class="insp-row"><span>Resistance</span><span style="color:#fbbf24;font-weight:600">${R}╬⌐</span></div>
-        <div class="insp-row"><span>Current</span><span style="color:#f87171">${cur.toFixed(3)}A</span></div>
-        <div class="insp-row"><span>Voltage Drop</span><span style="color:#22d3a5">${vDrop.toFixed(2)}V</span></div>
-        <div class="insp-row"><span>Power</span><span style="color:#818cf8">${(cur * vDrop).toFixed(3)}W</span></div>`; break;
-    }
-    case 'bulb': {
-      const bri = d.brightness || 0;
-      detail = `<div class="insp-row"><span>Brightness</span><span style="color:#fbbf24">${(bri * 100).toFixed(0)}%</span></div>
-        <div class="insp-row"><span>State</span><span class="insp-badge ${bri > 0.1 ? 'on' : 'off'}">${bri > 0.7 ? 'BRIGHT' : bri > 0.3 ? 'DIM' : 'OFF'}</span></div>`; break;
-    }
-    case 'switch': detail = `<div class="insp-row"><span>Contact</span><span class="insp-badge ${d.closed ? 'on' : 'off'}">${d.closed ? 'CLOSED' : 'OPEN'}</span></div>`; break;
-    case 'ammeter': detail = `<div class="insp-row"><span>Current</span><span style="color:#f87171;font-weight:600">${(d.current || 0).toFixed(3)}A</span></div>`; break;
-    case 'voltmeter': detail = `<div class="insp-row"><span>Voltage</span><span style="color:#22d3a5;font-weight:600">${(d.voltage || 0).toFixed(2)}V</span></div>`; break;
-    case 'motor': detail = `<div class="insp-row"><span>Speed</span><span style="color:#fbbf24;font-weight:600">${(d.speed || 0).toFixed(0)} RPM</span></div>
-      <div class="insp-row"><span>State</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal ? 'RUNNING' : 'STOPPED'}</span></div>`; break;
-    case 'fuse': detail = `<div class="insp-row"><span>Status</span><span class="insp-badge ${d.blown ? 'off' : 'on'}">${d.blown ? 'BLOWN' : 'OK'}</span></div>`; break;
-    case 'led-elec': detail = `<div class="insp-row"><span>LED</span><span class="insp-badge ${d.on ? 'on' : 'off'}">${d.on ? 'ON' : 'OFF'}</span></div>`; break;
-    case 'transistor': detail = `<div class="insp-row"><span>Base</span><span class="insp-badge ${d.on ? 'on' : 'off'}">${d.on ? 'HIGH' : 'LOW'}</span></div>`; break;
-    case 'diode': detail = `<div class="insp-row"><span>Bias</span><span class="insp-badge ${d.forward ? 'on' : 'off'}">${d.forward ? 'FORWARD' : 'REVERSE'}</span></div>`; break;
-    case 'zener': {
-      const zv = d.zenerVoltage || 5.1;
-      detail = `<div class="insp-row"><span>Bias</span><span class="insp-badge ${d.forward ? 'on' : 'off'}">${d.forward ? 'FORWARD' : 'REVERSE'}</span></div>
-        <div class="insp-row"><span>Zener Voltage</span><span style="color:#fbbf24;font-weight:600">${zv}V</span></div>`; break;
-    }
-    case 'ldr': detail = `<div class="insp-row"><span>Light Level</span><span style="color:#fbbf24">${d.lightLevel || 50}%</span></div>
-      <div class="insp-row"><span>Resistance</span><span style="color:#818cf8">${(d.R || 10000) > 1000 ? ((d.R || 10000) / 1000).toFixed(0) + 'k' : (d.R || 10000).toFixed(0)}╬⌐</span></div>`; break;
-    case 'thermistor': detail = `<div class="insp-row"><span>Temperature</span><span style="color:#ef4444">${d.temperature || 25}┬░C</span></div>
-      <div class="insp-row"><span>Resistance</span><span style="color:#818cf8">${(d.R || 10000) > 1000 ? ((d.R || 10000) / 1000).toFixed(0) + 'k' : (d.R || 10000).toFixed(0)}╬⌐</span></div>`; break;
-    case 'potentiometer': {
-      const pos = d.wiperPos || 50;
-      const pR = d.R || 500;
-      detail = `<div class="insp-row"><span>Wiper</span><span style="color:#fbbf24">${pos}%</span></div>
-        <div class="insp-row"><span>Resistance</span><span style="color:#818cf8">${pR}╬⌐</span></div>`; break;
-    }
-    case 'capacitor': detail = `<div class="insp-row"><span>Voltage</span><span style="color:#22d3a5">${(d.voltage || 0).toFixed(2)}V</span></div>
-      <div class="insp-row"><span>Charge</span><span style="color:#818cf8">${((d.charge || 0) * 100).toFixed(0)}%</span></div>`; break;
-    case 'relay': detail = `<div class="insp-row"><span>Coil</span><span class="insp-badge ${d.coilEnergized ? 'on' : 'off'}">${d.coilEnergized ? 'ENERGIZED' : 'OFF'}</span></div>`; break;
-    case 'op-amp': detail = `<div class="insp-row"><span>V+</span><span>${inpVals[0] || 0}</span></div>
-      <div class="insp-row"><span>V-</span><span>${inpVals[1] || 0}</span></div>
-      <div class="insp-row"><span>Output</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`; break;
     case 'text-label': detail = `<div class="insp-row"><span>Text</span><span style="font-style:italic">${node.labelText || '(empty)'}</span></div>`; break;
     default:
-      if (t && t.startsWith('custom-ic-')) {
-        detail = `<div class="insp-row"><span>IC</span><span style="color:#818cf8;font-weight:600">${d.icName || t.slice(9)}</span></div>
-          <div class="insp-row"><span>Inputs/Outputs</span><span>${node.inputsCount} / ${node.outputsCount}</span></div>
-          <div class="insp-row"><span>Output</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`;
+      if (t && REAL_ICS[t]) {
+        const ic = REAL_ICS[t];
+        const pinRows = ic.pins.map(p => {
+          let val = 0;
+          if (p.type === 'output') {
+            val = (node.outputStates && node.outputStates[p.pin] !== undefined) ? node.outputStates[p.pin] : 0;
+          } else if (p.type === 'input') {
+            val = (node.pinValues && node.pinValues[p.pin] !== undefined) ? node.pinValues[p.pin] : 0;
+          } else if (p.type === 'power') {
+            val = 1;
+          }
+          return `<div class="insp-row"><span>Pin ${p.pin}: ${p.name} (${p.type})</span><span class="insp-badge ${val ? 'on' : 'off'}">${val ? 'HIGH' : 'LOW'}</span></div>`;
+        }).join('');
+        detail = `<div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:6px">${ic.desc}</div>${pinRows}`;
       } else {
         detail = `<div class="insp-row"><span>Output</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`;
       }
@@ -2528,175 +2487,6 @@ function deleteNode(id) {
   evaluateSandbox();
 }
 
-function loadCustomICs() {
-  try {
-    const stored = JSON.parse(localStorage.getItem('logicQuest_ics') || '{}');
-    const toolbox = document.querySelector('.sandbox-toolbox-items');
-    let section = toolbox ? toolbox.querySelector('.toolbox-section[data-category="Custom ICs"]') : null;
-    if (!section && Object.keys(stored).length > 0) {
-      section = document.createElement('div');
-      section.className = 'toolbox-section';
-      section.dataset.category = 'Custom ICs';
-      section.innerHTML = '<div class="toolbox-section-title">Custom ICs</div><div class="toolbox-items"></div>';
-      const utilitySection = toolbox ? toolbox.querySelector('.toolbox-section:last-child') : null;
-      if (utilitySection && utilitySection.parentNode) {
-        utilitySection.parentNode.insertBefore(section, utilitySection.nextSibling);
-      } else if (toolbox) {
-        toolbox.appendChild(section);
-      }
-    }
-    Object.keys(stored).forEach(name => {
-      let def = stored[name];
-      if (window.upgradeICDefinition) {
-        def = window.upgradeICDefinition(def, name);
-        stored[name] = def;
-      }
-      customICs[name] = def;
-      const actualInputs = def.inputs + (def.strictTTL ? 2 : 0);
-      COMPONENT_DEFS[`custom-ic-${name}`] = { 
-        inputs: actualInputs, 
-        outputs: def.outputs, 
-        label: name, 
-        category: 'Custom ICs', 
-        data: { icName: name } 
-      };
-    });
-    localStorage.setItem('logicQuest_ics', JSON.stringify(stored));
-    if (section) {
-      const container = section.querySelector('.toolbox-items');
-      if (container) {
-        container.innerHTML = '';
-        Object.keys(stored).forEach(name => {
-          const item = document.createElement('div');
-          item.className = 'toolbox-item';
-          item.dataset.type = `custom-ic-${name}`;
-          item.innerHTML = `<span>${name}</span>`;
-          container.appendChild(item);
-          if (typeof setupToolboxItem === 'function') setupToolboxItem(item);
-        });
-      }
-    }
-  } catch (e) { /* ignore corrupt data */ }
-}
-
-function createICFromSelection(name) {
-  const nodeIds = selectedNodeIds;
-  const idSet = new Set(nodeIds);
-  const internalNodes = sandboxNodes.filter(n => idSet.has(n.id));
-  const internalWires = sandboxWires.filter(w => idSet.has(w.fromNodeId) && idSet.has(w.toNodeId));
-  const externalWires = sandboxWires.filter(w => idSet.has(w.fromNodeId) !== idSet.has(w.toNodeId));
-  const inputPortNodeIds = [];
-  const outputPortNodeIds = [];
-  externalWires.forEach(w => {
-    if (idSet.has(w.toNodeId) && !idSet.has(w.fromNodeId)) {
-      if (!inputPortNodeIds.includes(w.toNodeId)) inputPortNodeIds.push(w.toNodeId);
-    }
-    if (idSet.has(w.fromNodeId) && !idSet.has(w.toNodeId)) {
-      if (!outputPortNodeIds.includes(w.fromNodeId)) outputPortNodeIds.push(w.fromNodeId);
-    }
-  });
-  const inputs = inputPortNodeIds.length;
-  const outputs = outputPortNodeIds.length;
-  if (inputs === 0 && outputs === 0) {
-    showAlert('Selected circuit has no external connections. All nodes and wires are fully internal ΓÇö nothing to expose as ports.', 'No Ports Found');
-    return;
-  }
-  const allICs = JSON.parse(localStorage.getItem('logicQuest_ics') || '{}');
-  if (allICs[name]) {
-    showConfirm(`Overwrite existing IC "${name}"?`, (r) => {
-      if (r) doSaveIC(name, internalNodes, internalWires, inputPortNodeIds, outputPortNodeIds, inputs, outputs, allICs);
-    });
-    return;
-  }
-  doSaveIC(name, internalNodes, internalWires, inputPortNodeIds, outputPortNodeIds, inputs, outputs, allICs);
-}
-
-function doSaveIC(name, internalNodes, internalWires, inputPortNodeIds, outputPortNodeIds, inputs, outputs, allICs) {
-  const cleanNodes = internalNodes.map(n => ({
-    id: n.id, type: n.type, label: n.label, x: n.x, y: n.y,
-    inputsCount: n.inputsCount, outputsCount: n.outputsCount,
-    outputState: 0, outputState2: 0, inputValues: Array(n.inputsCount).fill(0),
-    prevClockState: 0, labelText: n.labelText || '', data: n.data ? { ...n.data } : {}
-  }));
-  const inputSet = new Set(inputPortNodeIds);
-  const outputSet = new Set(outputPortNodeIds);
-  const gap = 45;
-  const inX = 30, outX = 200, midX = 115;
-  let inIdx = 0, outIdx = 0, midIdx = 0;
-  cleanNodes.forEach(n => {
-    if (inputSet.has(n.id)) {
-      n.x = inX; n.y = 30 + inIdx++ * gap;
-    } else if (outputSet.has(n.id)) {
-      n.x = outX; n.y = 30 + outIdx++ * gap;
-    } else {
-      n.x = midX; n.y = 30 + midIdx++ * gap;
-    }
-  });
-  const cleanWires = internalWires.map(w => ({ fromNodeId: w.fromNodeId, fromPortIdx: w.fromPortIdx, toNodeId: w.toNodeId, toPortIdx: w.toPortIdx }));
-  const icDef = { nodes: cleanNodes, wires: cleanWires, inputPorts: inputPortNodeIds, outputPorts: outputPortNodeIds, inputs, outputs };
-  allICs[name] = icDef;
-  localStorage.setItem('logicQuest_ics', JSON.stringify(allICs));
-  customICs[name] = icDef;
-  COMPONENT_DEFS[`custom-ic-${name}`] = { inputs, outputs, label: name, category: 'Custom ICs', data: { icName: name } };
-  const container = document.querySelector('.toolbox-section[data-category="Custom ICs"] .toolbox-items');
-  if (container) {
-    const item = document.createElement('div');
-    item.className = 'toolbox-item';
-    item.dataset.type = `custom-ic-${name}`;
-    item.innerHTML = `<span>${name}</span>`;
-    container.appendChild(item);
-    if (typeof setupToolboxItem === 'function') setupToolboxItem(item);
-  }
-  replaceSelectedWithIC(name, inputs, outputs, inputPortNodeIds, outputPortNodeIds);
-  deselectAllNodes();
-  playSound('success');
-  showToast(`IC "${name}" created Γ£ô`);
-}
-
-function replaceSelectedWithIC(icName, inputs, outputs, inputPortNodeIds, outputPortNodeIds) {
-  const nodeIds = selectedNodeIds;
-  const idSet = new Set(nodeIds);
-  const externalWires = sandboxWires.filter(w => idSet.has(w.fromNodeId) !== idSet.has(w.toNodeId));
-  const avgX = Math.round(sandboxNodes.filter(n => idSet.has(n.id)).reduce((s, n) => s + n.x, 0) / nodeIds.length);
-  const avgY = Math.round(sandboxNodes.filter(n => idSet.has(n.id)).reduce((s, n) => s + n.y, 0) / nodeIds.length);
-  nodeIds.forEach(id => {
-    document.getElementById(id)?.remove();
-    sandboxNodes = sandboxNodes.filter(n => n.id !== id);
-  });
-  sandboxWires = sandboxWires.filter(w => !idSet.has(w.fromNodeId) && !idSet.has(w.toNodeId));
-  const icNode = {
-    id: `sb-node-${nextNodeId++}`, type: `custom-ic-${icName}`,
-    label: icName, x: avgX, y: avgY,
-    inputsCount: inputs, outputsCount: outputs,
-    outputState: 0, outputState2: 0,
-    inputValues: Array(inputs).fill(0), prevClockState: 0, labelText: '',
-    data: { icName }
-  };
-  sandboxNodes.push(icNode);
-  renderNodeDOM(icNode);
-  externalWires.forEach(w => {
-    const newWire = { fromNodeId: '', fromPortIdx: w.fromPortIdx, toNodeId: '', toPortIdx: w.toPortIdx };
-    if (idSet.has(w.fromNodeId)) {
-      newWire.fromNodeId = icNode.id;
-      newWire.fromPortIdx = outputPortNodeIds ? outputPortNodeIds.indexOf(w.fromNodeId) : 0;
-      if (newWire.fromPortIdx < 0) newWire.fromPortIdx = 0;
-    } else {
-      newWire.fromNodeId = w.fromNodeId;
-      newWire.fromPortIdx = w.fromPortIdx;
-    }
-    if (idSet.has(w.toNodeId)) {
-      newWire.toNodeId = icNode.id;
-      newWire.toPortIdx = inputPortNodeIds ? inputPortNodeIds.indexOf(w.toNodeId) : 0;
-      if (newWire.toPortIdx < 0) newWire.toPortIdx = 0;
-    } else {
-      newWire.toNodeId = w.toNodeId;
-      newWire.toPortIdx = w.toPortIdx;
-    }
-    if (newWire.fromNodeId && newWire.toNodeId) sandboxWires.push(newWire);
-  });
-  cancelWiring();
-  evaluateSandbox();
-}
 
 function clearSandbox() {
   sandboxNodes.forEach(n => document.getElementById(n.id)?.remove());
@@ -2790,8 +2580,15 @@ function importLayout(layout) {
     if (!def) return;
     n.outputsCount = n.outputsCount ?? def.outputs;
     n.outputState2 = n.outputState2 ?? 0;
+    n.outputStates = n.outputStates ?? {};
     n.inputValues = n.inputValues ?? Array(n.inputsCount).fill(0);
     n.data = n.data ?? (def.data ? { ...def.data } : {});
+    // Ensure IC nodes always have pinValues initialized
+    if (REAL_ICS[n.type]) {
+      n.pinValues = n.pinValues ?? {};
+    } else {
+      n.pinValues = null;
+    }
     sandboxNodes.push(n);
     renderNodeDOM(n);
   });
@@ -3376,162 +3173,6 @@ const CIRCUIT_TEMPLATES = {
       { fromNodeId: 'sb-node-2', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
     ]
   },
-  'ohms-law': {
-    version: 2, nextNodeId: 5,
-    nodes: [
-      { id: 'sb-node-1', type: 'battery', label: 'Battery (9V)', x: 70, y: 150, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 9 } },
-      { id: 'sb-node-2', type: 'switch', label: 'Switch', x: 230, y: 150, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { closed: false } },
-      { id: 'sb-node-3', type: 'resistor', label: 'Resistor', x: 390, y: 150, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 10, current: 0, voltageDrop: 0 } },
-      { id: 'sb-node-4', type: 'ammeter', label: 'Ammeter (A)', x: 550, y: 150, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { current: 0 } },
-    ],
-    wires: [
-      { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-2', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-2', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-3', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-4', fromPortIdx: 0, toNodeId: 'sb-node-1', toPortIdx: 0 },
-    ]
-  },
-
-  'voltage-divider': {
-    version: 2, nextNodeId: 6,
-    nodes: [
-      { id: 'sb-node-1', type: 'battery', label: 'Battery', x: 70, y: 120, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 12 } },
-      { id: 'sb-node-2', type: 'switch', label: 'Switch', x: 70, y: 280, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { closed: false } },
-      { id: 'sb-node-3', type: 'resistor', label: 'R1 (100╬⌐)', x: 250, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 100, current: 0, voltageDrop: 0 } },
-      { id: 'sb-node-4', type: 'resistor', label: 'R2 (50╬⌐)', x: 250, y: 260, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 50, current: 0, voltageDrop: 0 } },
-      { id: 'sb-node-5', type: 'voltmeter', label: 'V out (R2)', x: 430, y: 180, inputsCount: 2, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { voltage: 0 } },
-    ],
-    wires: [
-      { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-3', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-4', fromPortIdx: 0, toNodeId: 'sb-node-2', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-2', fromPortIdx: 0, toNodeId: 'sb-node-1', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-3', fromPortIdx: 0, toNodeId: 'sb-node-5', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-4', fromPortIdx: 0, toNodeId: 'sb-node-5', toPortIdx: 1 },
-    ]
-  },
-
-  'simple-bulb-circuit': {
-    version: 2, nextNodeId: 5,
-    nodes: [
-      { id: 'sb-node-1', type: 'battery', label: 'Battery', x: 70, y: 150, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 9 } },
-      { id: 'sb-node-2', type: 'switch', label: 'Switch', x: 230, y: 150, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { closed: false } },
-      { id: 'sb-node-3', type: 'resistor', label: 'Resistor', x: 390, y: 150, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 20, current: 0, voltageDrop: 0 } },
-      { id: 'sb-node-4', type: 'bulb', label: 'Bulb', x: 550, y: 150, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { brightness: 0 } },
-    ],
-    wires: [
-      { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-2', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-2', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-3', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-4', fromPortIdx: 0, toNodeId: 'sb-node-1', toPortIdx: 0 },
-    ]
-  },
-  'transistor-switch': {
-    version: 2, nextNodeId: 6,
-    nodes: [
-      { id: 'sb-node-1', type: 'battery', label: 'Battery (9V)', x: 70, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 9 } },
-      { id: 'sb-node-2', type: 'switch', label: 'Base Switch', x: 230, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { closed: false } },
-      { id: 'sb-node-3', type: 'resistor', label: 'Base R (1k╬⌐)', x: 390, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 1000, current: 0, voltageDrop: 0 } },
-      { id: 'sb-node-4', type: 'transistor', label: 'NPN Transistor', x: 100, y: 310, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { on: false } },
-      { id: 'sb-node-5', type: 'led-elec', label: 'LED (Load)', x: 280, y: 310, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { on: false } },
-    ],
-    wires: [
-      { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-2', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-2', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-3', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-4', fromPortIdx: 0, toNodeId: 'sb-node-1', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-5', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-5', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
-    ]
-  },
-
-  'transistor-controlled-bulb': {
-    version: 2, nextNodeId: 6,
-    nodes: [
-      { id: 'sb-node-1', type: 'battery', label: 'Battery (12V)', x: 70, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 12 } },
-      { id: 'sb-node-2', type: 'resistor', label: 'Base R (500╬⌐)', x: 230, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 500, current: 0, voltageDrop: 0 } },
-      { id: 'sb-node-3', type: 'transistor', label: 'NPN Transistor', x: 100, y: 290, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { on: false } },
-      { id: 'sb-node-4', type: 'resistor', label: 'Load R (100╬⌐)', x: 270, y: 290, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 100, current: 0, voltageDrop: 0 } },
-      { id: 'sb-node-5', type: 'bulb', label: 'Bulb (Load)', x: 430, y: 290, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { brightness: 0 } },
-    ],
-    wires: [
-      { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-2', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-2', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-3', fromPortIdx: 0, toNodeId: 'sb-node-1', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-4', fromPortIdx: 0, toNodeId: 'sb-node-5', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-5', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
-    ]
-  },
-
-  'diode-circuit': {
-    version: 2, nextNodeId: 6,
-    nodes: [
-      { id: 'sb-node-1', type: 'battery', label: 'Battery (9V)', x: 60, y: 120, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 9 } },
-      { id: 'sb-node-2', type: 'diode', label: 'Diode', x: 220, y: 120, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { forward: false, R: 0.1 } },
-      { id: 'sb-node-3', type: 'resistor', label: 'Resistor (200╬⌐)', x: 370, y: 120, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 200, current: 0, voltageDrop: 0 } },
-      { id: 'sb-node-4', type: 'led-elec', label: 'LED', x: 520, y: 120, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { on: false } },
-      { id: 'sb-node-5', type: 'switch', label: 'Switch', x: 60, y: 280, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { closed: false } },
-    ],
-    wires: [
-      { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-2', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-2', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-3', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-4', fromPortIdx: 0, toNodeId: 'sb-node-5', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-5', fromPortIdx: 0, toNodeId: 'sb-node-1', toPortIdx: 0 },
-    ]
-  },
-
-  'ldr-divider': {
-    version: 2, nextNodeId: 6,
-    nodes: [
-      { id: 'sb-node-1', type: 'battery', label: 'Battery (9V)', x: 60, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 9 } },
-      { id: 'sb-node-2', type: 'ldr', label: 'LDR (Sensor)', x: 220, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { lightLevel: 50, R: 10000 } },
-      { id: 'sb-node-3', type: 'resistor', label: 'Fixed R (1k╬⌐)', x: 370, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 1000, current: 0, voltageDrop: 0 } },
-      { id: 'sb-node-4', type: 'bulb', label: 'Bulb', x: 520, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { brightness: 0 } },
-      { id: 'sb-node-5', type: 'switch', label: 'Switch', x: 60, y: 260, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { closed: false } },
-    ],
-    wires: [
-      { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-2', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-2', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-3', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-4', fromPortIdx: 0, toNodeId: 'sb-node-5', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-5', fromPortIdx: 0, toNodeId: 'sb-node-1', toPortIdx: 0 },
-    ]
-  },
-
-  'capacitor-timing': {
-    version: 2, nextNodeId: 6,
-    nodes: [
-      { id: 'sb-node-1', type: 'battery', label: 'Battery (9V)', x: 60, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { emf: 9 } },
-      { id: 'sb-node-2', type: 'capacitor', label: 'Capacitor (100┬╡F)', x: 220, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { charge: 0, voltage: 0, capacitance: 100, maxVoltage: 12 } },
-      { id: 'sb-node-3', type: 'resistor', label: 'Resistor (1k╬⌐)', x: 370, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { R: 1000, current: 0, voltageDrop: 0 } },
-      { id: 'sb-node-4', type: 'bulb', label: 'Bulb', x: 520, y: 100, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { brightness: 0 } },
-      { id: 'sb-node-5', type: 'switch', label: 'Switch', x: 60, y: 260, inputsCount: 1, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '', data: { closed: false } },
-    ],
-    wires: [
-      { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-2', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-2', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-3', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-4', fromPortIdx: 0, toNodeId: 'sb-node-5', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-5', fromPortIdx: 0, toNodeId: 'sb-node-1', toPortIdx: 0 },
-    ]
-  },
-
-  'op-amp-comparator': {
-    version: 2, nextNodeId: 6,
-    nodes: [
-      { id: 'sb-node-1', type: 'input', label: 'V+ (Ref)', x: 60, y: 80, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-2', type: 'input', label: 'V- (Sense)', x: 60, y: 220, inputsCount: 0, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [], prevClockState: 0, labelText: '' },
-      { id: 'sb-node-3', type: 'op-amp', label: 'Op-Amp Comp', x: 260, y: 130, inputsCount: 2, outputsCount: 1, outputState: 0, outputState2: 0, inputValues: [0, 0], prevClockState: 0, labelText: '', data: { vcc: 12, vee: -12 } },
-      { id: 'sb-node-4', type: 'output', label: 'Output LED', x: 460, y: 120, inputsCount: 1, outputsCount: 0, outputState: 0, outputState2: 0, inputValues: [0], prevClockState: 0, labelText: '' },
-    ],
-    wires: [
-      { fromNodeId: 'sb-node-1', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 0 },
-      { fromNodeId: 'sb-node-2', fromPortIdx: 0, toNodeId: 'sb-node-3', toPortIdx: 1 },
-      { fromNodeId: 'sb-node-3', fromPortIdx: 0, toNodeId: 'sb-node-4', toPortIdx: 0 },
-    ]
-  },
   'sensor-demo': {
     version: 2, nextNodeId: 4,
     nodes: [
@@ -3933,105 +3574,6 @@ const TEMPLATE_THEORY = {
       return sw && sw.outputState === 1 && led && led.outputState === 0;
     }
   },
-  'ohms-law': {
-    title: "Ohm's Law (V = IR)",
-    theory: "Ohm's Law states that the current through a conductor is directly proportional to the voltage across it and inversely proportional to its resistance. Close the switch to see the ammeter reading.",
-    expression: 'I = V / R  |  V = IR  |  R = V/I',
-    challengeText: 'Close the switch and observe the ammeter. Try adjusting the resistor slider to see how current changes!',
-    checkPassed: () => true
-  },
-  'voltage-divider': {
-    title: 'Voltage Divider Rule',
-    theory: 'When resistors are connected in series, the voltage divides across each proportional to its resistance. The voltmeter measures Vout across R2.',
-    expression: 'Vout = Vin ├ù R2 / (R1 + R2)',
-    challengeText: 'Close the switch. With R1=100╬⌐ and R2=50╬⌐, Vout should be 12 ├ù 50/(100+50) = 4V. Try changing R2!',
-    checkPassed: () => true
-  },
-  'simple-bulb-circuit': {
-    title: 'Simple Series Circuit',
-    theory: 'A basic series circuit with a battery, switch, resistor, and bulb. The current flows through all components in a single loop.',
-    expression: 'I = V / (R_load + R_bulb)',
-    challengeText: 'Close the switch to light the bulb. Adjust the resistor value to see brightness change!',
-    checkPassed: () => true
-  },
-  'transistor-switch': {
-    title: 'NPN Transistor as a Switch',
-    theory: 'An NPN transistor acts as an electronic switch. When the base receives current (via the base switch), it allows a larger current to flow from collector to emitter, powering the LED.',
-    expression: 'Base ON  ΓåÆ  Transistor ON  ΓåÆ  LED ON',
-    challengeText: 'First close the Base Switch. Then click the NPN Transistor to turn it ON. The LED should light up!',
-    checkPassed: () => true
-  },
-  'transistor-controlled-bulb': {
-    title: 'Transistor-Controlled Load',
-    theory: 'The transistor controls a separate load circuit. The base current (through R_base) controls whether the transistor conducts, switching the bulb in the collector circuit.',
-    expression: 'Transistor ON  ΓåÆ  Bulb circuit complete',
-    challengeText: 'Click the NPN Transistor to turn it ON. Current flows through both the base path and the load (bulb) path!',
-    checkPassed: () => true
-  },
-  'diode-circuit': {
-    title: 'Diode Forward Bias',
-    theory: 'A semiconductor diode conducts current only when forward-biased (anode positive relative to cathode). The arrow in the symbol shows the direction of conventional current flow.',
-    expression: 'I = I_s(e^(V_D/╬╖V_T) - 1)',
-    headers: ['Condition', 'Current', 'LED'],
-    truthTable: [
-      ['Switch ON', 'Flows', 'GLOWS'],
-      ['Switch OFF', 'Blocked', 'OFF']
-    ],
-    challengeText: 'Close the switch to forward-bias the diode. Current flows through the diode, resistor, and lights the LED.',
-    checkPassed: () => {
-      const leds = sandboxNodes.filter(n => n.type === 'led-elec');
-      return leds.length > 0 && leds.some(n => n.data.on);
-    }
-  },
-  'ldr-divider': {
-    title: 'LDR Voltage Divider',
-    theory: 'A Light Dependent Resistor (LDR) changes its resistance with light intensity. In a voltage divider, the output voltage varies with LDR resistance, controlling the load.',
-    expression: 'R_light Γê¥ 1/lux',
-    headers: ['Light Level', 'LDR R', 'Bulb Brightness'],
-    truthTable: [
-      ['Bright', 'Low (100╬⌐)', 'Dim'],
-      ['Dim', 'Medium', 'Medium'],
-      ['Dark', 'High (1M╬⌐)', 'Bright']
-    ],
-    challengeText: 'Adjust the LDR light level slider. In bright light (low LDR resistance), more voltage drops across the fixed resistor, dimming the bulb.',
-    checkPassed: () => {
-      const bulbs = sandboxNodes.filter(n => n.type === 'bulb');
-      return bulbs.length > 0 && bulbs.some(n => n.data.brightness > 0.3);
-    }
-  },
-  'capacitor-timing': {
-    title: 'Capacitor Charging',
-    theory: 'A capacitor stores electrical charge. When a voltage is applied, it charges exponentially through a resistor with time constant ╧ä = RC.',
-    expression: 'V(t) = V_0(1 - e^(-t/RC))',
-    headers: ['Time', 'Capacitor V', 'Bulb'],
-    truthTable: [
-      ['t=0', '0V', 'Bright'],
-      ['t=RC', '63% of Vin', 'Dim'],
-      ['t=5RC', 'ΓëêVin', 'OFF']
-    ],
-    challengeText: 'Close the switch to start charging the capacitor. Watch the voltage build up as the bulb gradually dims.',
-    checkPassed: () => {
-      const caps = sandboxNodes.filter(n => n.type === 'capacitor');
-      return caps.length > 0 && caps.some(n => n.data.voltage > 3);
-    }
-  },
-  'op-amp-comparator': {
-    title: 'Operational Amplifier (Comparator)',
-    theory: 'An op-amp used as a comparator compares two voltages at its inputs. When V+ > V-, the output goes HIGH (positive saturation). When V- > V+, output goes LOW (negative saturation).',
-    expression: 'V_out = A(V_+ - V_-)',
-    headers: ['V+ Input', 'V- Input', 'Output'],
-    truthTable: [
-      ['1 (HIGH)', '0 (LOW)', '1 (HIGH)'],
-      ['0 (LOW)', '1 (HIGH)', '0 (LOW)'],
-      ['1 (HIGH)', '1 (HIGH)', '0 (LOW)'],
-      ['0 (LOW)', '0 (LOW)', '0 (LOW)']
-    ],
-    challengeText: 'Toggle switches to change V+ and V- inputs. The LED lights when V+ > V-. This is how analog sensors trigger digital logic.',
-    checkPassed: () => {
-      const outputs = sandboxNodes.filter(n => n.type === 'output');
-      return outputs.length > 0 && outputs.some(n => n.outputState === 1);
-    }
-  },
   'sensor-demo': {
     title: 'Analog Sensor + Threshold',
     theory: 'An Analog Sensor outputs a continuous value (0-100). When its value exceeds a configurable <strong>threshold</strong>, the sensor sends a HIGH signal. This lets digital circuits react to analog conditions.',
@@ -4107,7 +3649,7 @@ window.updateTheoryGuide = function (name) {
       </div>
       <div class="learning-challenge-feedback" id="challenge-feedback">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--color-success)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        Goal Achieved! +10 XP
+        Goal Achieved! ✓
       </div>
     </div>
   `;
@@ -4128,10 +3670,7 @@ window.checkTheoryChallenge = function () {
       fb.classList.add('success');
     }
     playSound('success');
-    showToast(`Micro-Challenge Completed! Γ£ô (+10 XP)`);
-    const xp = (parseInt(localStorage.getItem('logicQuest_extraXp')) || 0) + 10;
-    localStorage.setItem('logicQuest_extraXp', xp);
-    if (window.updateXPDisplay) window.updateXPDisplay();
+    showToast(`Micro-Challenge Completed! ✓`);
   }
 };
 
@@ -4151,10 +3690,6 @@ window.loadSandboxTemplate = function (name) {
       'nand-universality-and': 'NAND Universality',
       'd-flipflop-reg': '1-Bit Register',
       'seven-seg-decoder-demo': '7-Seg Decoder',
-      'diode-circuit': 'Diode Forward Bias',
-      'ldr-divider': 'LDR Voltage Divider',
-      'capacitor-timing': 'Capacitor Charging',
-      'op-amp-comparator': 'Op-Amp Comparator',
       'sensor-demo': 'Analog Sensor Demo'
     };
     showToast(`Loaded: ${labels[name] || name}`);
@@ -4200,8 +3735,15 @@ window.appendSandboxTemplate = function (name, dropX, dropY) {
     if (def) {
       n.outputsCount = n.outputsCount ?? def.outputs;
       n.outputState2 = n.outputState2 ?? 0;
+      n.outputStates = n.outputStates ?? {};
       n.inputValues = n.inputValues ?? Array(n.inputsCount).fill(0);
       n.data = n.data ?? (def.data ? { ...def.data } : {});
+      // Initialize pinValues for IC nodes
+      if (REAL_ICS[n.type]) {
+        n.pinValues = n.pinValues ?? {};
+      } else {
+        n.pinValues = null;
+      }
     }
 
     sandboxNodes.push(n);

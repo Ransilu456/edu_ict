@@ -411,6 +411,7 @@ function bindNDTabs() {
 }
 
 function switchNDTab(id) { qs(`.nd-tab[data-ndtab="${id}"]`)?.click(); }
+window.switchNDTab = switchNDTab;
 
 /* ===================================================================
    TAB 1 — NETWORK DEVICES
@@ -792,6 +793,201 @@ function modPow(base, exp, mod) {
   let r = 1;
   for (let i = 0; i < exp; i++) r = (r * base) % mod;
   return r;
+}
+
+/* ===================================================================
+   TAB — SUBNETTING & CIDR LAB
+   =================================================================== */
+let subnetReady = false;
+function initSubnetLab() {
+  if (subnetReady) { calculateSubnet(); return; }
+  subnetReady = true;
+
+  const ipInput = el('subnet-ip-input');
+  const slider = el('subnet-cidr-slider');
+  const prefixVal = el('subnet-prefix-val');
+
+  if (ipInput) {
+    ipInput.addEventListener('input', calculateSubnet);
+  }
+  if (slider) {
+    slider.addEventListener('input', () => {
+      if (prefixVal) prefixVal.textContent = `/${slider.value}`;
+      calculateSubnet();
+    });
+  }
+
+  qsa('.subnet-preset-btn', el('subnet-tab')).forEach(btn => {
+    btn.addEventListener('click', () => {
+      play('click');
+      const cidr = btn.dataset.cidr;
+      if (slider) slider.value = cidr;
+      if (prefixVal) prefixVal.textContent = `/${cidr}`;
+      calculateSubnet();
+    });
+  });
+
+  calculateSubnet();
+}
+
+function ipToNum(ipStr) {
+  const parts = ipStr.trim().split('.').map(Number);
+  if (parts.length !== 4 || parts.some(p => isNaN(p) || p < 0 || p > 255)) return null;
+  return ((parts[0] << 24) >>> 0) + ((parts[1] << 16) >>> 0) + ((parts[2] << 8) >>> 0) + (parts[3] >>> 0);
+}
+
+function numToIp(num) {
+  return [
+    (num >>> 24) & 255,
+    (num >>> 16) & 255,
+    (num >>> 8) & 255,
+    num & 255
+  ].join('.');
+}
+
+function numToBin8(n) {
+  return n.toString(2).padStart(8, '0');
+}
+
+function calculateSubnet() {
+  const ipInput = el('subnet-ip-input');
+  const slider = el('subnet-cidr-slider');
+  if (!ipInput || !slider) return;
+
+  const rawIp = ipInput.value.trim();
+  const ipNum = ipToNum(rawIp);
+  const cidr = parseInt(slider.value, 10) || 24;
+
+  const grid = el('subnet-calc-grid');
+  const binVis = el('subnet-binary-vis');
+  const tableBody = el('subnet-table-body');
+
+  if (ipNum === null) {
+    if (grid) grid.innerHTML = `<div class="subnet-calc-row" style="color:var(--color-error)"><span>Invalid IPv4 format (e.g. 192.168.1.10)</span></div>`;
+    return;
+  }
+
+  const maskNum = cidr === 0 ? 0 : ((0xFFFFFFFF << (32 - cidr)) >>> 0);
+  const wildcardNum = (~maskNum) >>> 0;
+  const netNum = (ipNum & maskNum) >>> 0;
+  const bcastNum = (netNum | wildcardNum) >>> 0;
+
+  const totalAddresses = Math.pow(2, 32 - cidr);
+  const usableHosts = cidr >= 31 ? (cidr === 31 ? 2 : 1) : Math.max(0, totalAddresses - 2);
+
+  const firstHostNum = cidr >= 31 ? netNum : netNum + 1;
+  const lastHostNum = cidr >= 31 ? bcastNum : bcastNum - 1;
+
+  const firstOctet = (ipNum >>> 24) & 255;
+  let ipClass = 'Class A';
+  let defaultPrefix = 8;
+  if (firstOctet >= 128 && firstOctet <= 191) { ipClass = 'Class B'; defaultPrefix = 16; }
+  else if (firstOctet >= 192 && firstOctet <= 223) { ipClass = 'Class C'; defaultPrefix = 24; }
+  else if (firstOctet >= 224 && firstOctet <= 239) { ipClass = 'Class D (Multicast)'; defaultPrefix = 0; }
+  else if (firstOctet >= 240) { ipClass = 'Class E (Experimental)'; defaultPrefix = 0; }
+
+  let scope = 'Public Internet';
+  if ((firstOctet === 10) ||
+      (firstOctet === 172 && ((ipNum >>> 16) & 255) >= 16 && ((ipNum >>> 16) & 255) <= 31) ||
+      (firstOctet === 192 && ((ipNum >>> 16) & 255) === 168)) {
+    scope = 'Private (RFC 1918)';
+  } else if (firstOctet === 127) {
+    scope = 'Loopback (RFC 1122)';
+  } else if (firstOctet === 169 && ((ipNum >>> 16) & 255) === 254) {
+    scope = 'Link-Local / APIPA';
+  }
+
+  if (grid) {
+    const rows = [
+      ['IP Address', `${numToIp(ipNum)} /${cidr}`],
+      ['Network Address', numToIp(netNum)],
+      ['Subnet Mask', numToIp(maskNum)],
+      ['Wildcard Mask', numToIp(wildcardNum)],
+      ['Broadcast Address', numToIp(bcastNum)],
+      ['Usable Host Range', usableHosts > 0 ? `${numToIp(firstHostNum)} — ${numToIp(lastHostNum)}` : 'None'],
+      ['Total Addresses', totalAddresses.toLocaleString()],
+      ['Usable Hosts', usableHosts.toLocaleString()],
+      ['IP Class', `${ipClass} (Default /${defaultPrefix})`],
+      ['Address Scope', scope]
+    ];
+
+    grid.innerHTML = rows.map(([k, v]) => `
+      <div class="subnet-calc-row">
+        <span class="subnet-calc-k">${k}</span>
+        <span class="subnet-calc-v">${v}</span>
+      </div>
+    `).join('');
+  }
+
+  if (binVis) {
+    const ipParts = [(ipNum >>> 24) & 255, (ipNum >>> 16) & 255, (ipNum >>> 8) & 255, ipNum & 255];
+    const maskParts = [(maskNum >>> 24) & 255, (maskNum >>> 16) & 255, (maskNum >>> 8) & 255, maskNum & 255];
+    const netParts = [(netNum >>> 24) & 255, (netNum >>> 16) & 255, (netNum >>> 8) & 255, netNum & 255];
+
+    function renderOctetBits(octetNum, octetIdx) {
+      const binStr = numToBin8(octetNum);
+      return binStr.split('').map((bit, bitIdx) => {
+        const globalBitIdx = octetIdx * 8 + bitIdx;
+        const isNet = globalBitIdx < cidr;
+        const isSubnetBit = isNet && globalBitIdx >= defaultPrefix;
+        let bitStyle = isNet ? (isSubnetBit ? 'background:#06b6d4;color:#fff' : 'background:#3b82f6;color:#fff') : 'background:#10b981;color:#fff';
+        return `<span style="display:inline-block;width:15px;height:17px;line-height:17px;text-align:center;font-size:0.65rem;font-weight:700;border-radius:2px;margin:0 1px;${bitStyle}" title="Bit ${globalBitIdx + 1}: ${isNet ? 'Network Bit' : 'Host Bit'}">${bit}</span>`;
+      }).join('');
+    }
+
+    binVis.innerHTML = `
+      <div style="display:flex;align-items:center;gap:0.5rem;font-family:var(--font-mono);font-size:0.75rem;margin-bottom:0.25rem">
+        <span style="min-width:45px;color:var(--text-muted)">IP:</span>
+        <div style="display:flex;align-items:center;gap:3px">
+          ${ipParts.map((p, i) => `<span>${renderOctetBits(p, i)}</span>`).join('<span style="font-weight:700;color:var(--text-muted)">.</span>')}
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.5rem;font-family:var(--font-mono);font-size:0.75rem;margin-bottom:0.25rem">
+        <span style="min-width:45px;color:var(--text-muted)">Mask:</span>
+        <div style="display:flex;align-items:center;gap:3px">
+          ${maskParts.map((p, i) => `<span>${renderOctetBits(p, i)}</span>`).join('<span style="font-weight:700;color:var(--text-muted)">.</span>')}
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.5rem;font-family:var(--font-mono);font-size:0.75rem;margin-bottom:0.4rem">
+        <span style="min-width:45px;color:var(--text-muted)">Net:</span>
+        <div style="display:flex;align-items:center;gap:3px">
+          ${netParts.map((p, i) => `<span>${renderOctetBits(p, i)}</span>`).join('<span style="font-weight:700;color:var(--text-muted)">.</span>')}
+        </div>
+      </div>
+      <div style="display:flex;gap:0.75rem;font-size:0.68rem;color:var(--text-secondary)">
+        <span style="display:flex;align-items:center;gap:0.25rem"><span style="width:10px;height:10px;border-radius:2px;background:#3b82f6;display:inline-block"></span> Network Bits (${cidr})</span>
+        <span style="display:flex;align-items:center;gap:0.25rem"><span style="width:10px;height:10px;border-radius:2px;background:#10b981;display:inline-block"></span> Host Bits (${32 - cidr})</span>
+      </div>
+    `;
+  }
+
+  if (tableBody) {
+    const parentPrefix = Math.max(0, Math.min(cidr - 1, cidr <= 16 ? 8 : (cidr <= 24 ? 16 : 24)));
+    const parentBlockSize = Math.pow(2, 32 - parentPrefix);
+    const parentNetNum = (ipNum & (parentPrefix === 0 ? 0 : (0xFFFFFFFF << (32 - parentPrefix)) >>> 0)) >>> 0;
+    
+    const sliceCount = Math.min(32, parentBlockSize / totalAddresses);
+    const rowsHtml = [];
+
+    for (let i = 0; i < sliceCount; i++) {
+      const sNet = (parentNetNum + i * totalAddresses) >>> 0;
+      const sBcast = (sNet + totalAddresses - 1) >>> 0;
+      const isCurrent = sNet === netNum;
+      const sFirst = cidr >= 31 ? sNet : sNet + 1;
+      const sLast = cidr >= 31 ? sBcast : sBcast - 1;
+
+      rowsHtml.push(`
+        <tr style="${isCurrent ? 'background:rgba(56,189,248,0.18);font-weight:700;' : ''}">
+          <td style="padding:0.4rem 0.6rem;border-bottom:1px solid var(--border-color)">${i + 1}${isCurrent ? ' ★' : ''}</td>
+          <td style="padding:0.4rem 0.6rem;border-bottom:1px solid var(--border-color)"><code style="color:var(--color-indigo)">${numToIp(sNet)}/${cidr}</code></td>
+          <td style="padding:0.4rem 0.6rem;border-bottom:1px solid var(--border-color)"><code>${numToIp(sFirst)} – ${numToIp(sLast)}</code></td>
+          <td style="padding:0.4rem 0.6rem;border-bottom:1px solid var(--border-color)"><code>${numToIp(sBcast)}</code></td>
+        </tr>
+      `);
+    }
+
+    tableBody.innerHTML = rowsHtml.join('');
+  }
 }
 
 /* ===================================================================

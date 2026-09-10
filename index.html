@@ -53,7 +53,7 @@
         </svg>
         <span>🧩 Logic Gates</span>
       </button>
-      <button class="nav-tab" data-target="network-devices-view" title="Networking Lab">
+      <button class="nav-tab" data-target="network-devices-view" data-subtab="network-tab" title="Network Devices (Hub, Switch, Router)">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="2" y="2" width="20" height="20" rx="3" />
           <circle cx="12" cy="12" r="3" />
@@ -62,7 +62,24 @@
           <line x1="9" y1="12" x2="5" y2="12" />
           <line x1="15" y1="12" x2="19" y2="12" />
         </svg>
-        <span>🌐 Networking</span>
+        <span>🌐 Network Devices</span>
+      </button>
+      <button class="nav-tab" data-target="network-devices-view" data-subtab="osi-tab" title="OSI 7-Layer Interactive Simulator">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M2 5l8 4 8-4-8-4L2 5z"/>
+          <path d="M2 10l8 4 8-4"/>
+          <path d="M2 15l8 4 8-4"/>
+        </svg>
+        <span>📦 OSI Simulator</span>
+      </button>
+      <button class="nav-tab" data-target="network-devices-view" data-subtab="subnet-tab" title="IPv4 Subnetting & CIDR Calculator">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9"/>
+          <line x1="3.6" y1="9" x2="20.4" y2="9"/>
+          <line x1="3.6" y1="15" x2="20.4" y2="15"/>
+          <path d="M12 3a14.5 14.5 0 0 0 0 18M12 3a14.5 14.5 0 0 1 0 18"/>
+        </svg>
+        <span>🔢 Subnetting &amp; CIDR</span>
       </button>
     </nav>
 
@@ -92,7 +109,7 @@
       </svg>
       <span>🧩 Gates</span>
     </button>
-    <button class="mobile-nav-btn" data-target="network-devices-view" title="Networking">
+    <button class="mobile-nav-btn" data-target="network-devices-view" data-subtab="network-tab" title="Network Devices">
       <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="2" y="2" width="20" height="20" rx="3" />
         <circle cx="12" cy="12" r="3" />
@@ -101,7 +118,23 @@
         <line x1="9" y1="12" x2="5" y2="12" />
         <line x1="15" y1="12" x2="19" y2="12" />
       </svg>
-      <span>🌐 Network</span>
+      <span>🌐 Devices</span>
+    </button>
+    <button class="mobile-nav-btn" data-target="network-devices-view" data-subtab="osi-tab" title="OSI Sim">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M2 5l8 4 8-4-8-4L2 5z"/>
+        <path d="M2 10l8 4 8-4"/>
+        <path d="M2 15l8 4 8-4"/>
+      </svg>
+      <span>📦 OSI</span>
+    </button>
+    <button class="mobile-nav-btn" data-target="network-devices-view" data-subtab="subnet-tab" title="Subnetting">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9"/>
+        <line x1="3.6" y1="9" x2="20.4" y2="9"/>
+        <line x1="3.6" y1="15" x2="20.4" y2="15"/>
+      </svg>
+      <span>🔢 Subnet</span>
     </button>
   </nav>
 
@@ -205,6 +238,58 @@
               <path d="M4 7V5h16v2M9 20h6M12 5v15" />
             </svg>
             <span>Text Label</span>
+          </div>
+        </div>
+
+        <div class="toolbox-section">
+          <div class="toolbox-section-title" data-category="ICs">Real ICs (DIP-14)</div>
+          <div class="toolbox-item" data-type="ic-7408" draggable="true" title="7408 Quad 2-Input AND Gate (DIP-14)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="2" width="14" height="20" rx="2" />
+              <line x1="2" y1="5" x2="5" y2="5" /><line x1="2" y1="9" x2="5" y2="9" /><line x1="2" y1="13" x2="5" y2="13" /><line x1="2" y1="17" x2="5" y2="17" />
+              <line x1="19" y1="5" x2="22" y2="5" /><line x1="19" y1="9" x2="22" y2="9" /><line x1="19" y1="13" x2="22" y2="13" /><line x1="19" y1="17" x2="22" y2="17" />
+            </svg>
+            <span>7408 Quad AND</span>
+          </div>
+          <div class="toolbox-item" data-type="ic-7432" draggable="true" title="7432 Quad 2-Input OR Gate (DIP-14)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="2" width="14" height="20" rx="2" />
+              <line x1="2" y1="5" x2="5" y2="5" /><line x1="2" y1="9" x2="5" y2="9" /><line x1="2" y1="13" x2="5" y2="13" /><line x1="2" y1="17" x2="5" y2="17" />
+              <line x1="19" y1="5" x2="22" y2="5" /><line x1="19" y1="9" x2="22" y2="9" /><line x1="19" y1="13" x2="22" y2="13" /><line x1="19" y1="17" x2="22" y2="17" />
+            </svg>
+            <span>7432 Quad OR</span>
+          </div>
+          <div class="toolbox-item" data-type="ic-7404" draggable="true" title="7404 Hex Inverter / NOT Gate (DIP-14)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="2" width="14" height="20" rx="2" />
+              <line x1="2" y1="5" x2="5" y2="5" /><line x1="2" y1="9" x2="5" y2="9" /><line x1="2" y1="13" x2="5" y2="13" /><line x1="2" y1="17" x2="5" y2="17" />
+              <line x1="19" y1="5" x2="22" y2="5" /><line x1="19" y1="9" x2="22" y2="9" /><line x1="19" y1="13" x2="22" y2="13" /><line x1="19" y1="17" x2="22" y2="17" />
+            </svg>
+            <span>7404 Hex NOT</span>
+          </div>
+          <div class="toolbox-item" data-type="ic-7400" draggable="true" title="7400 Quad 2-Input NAND Gate (DIP-14)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="2" width="14" height="20" rx="2" />
+              <line x1="2" y1="5" x2="5" y2="5" /><line x1="2" y1="9" x2="5" y2="9" /><line x1="2" y1="13" x2="5" y2="13" /><line x1="2" y1="17" x2="5" y2="17" />
+              <line x1="19" y1="5" x2="22" y2="5" /><line x1="19" y1="9" x2="22" y2="9" /><line x1="19" y1="13" x2="22" y2="13" /><line x1="19" y1="17" x2="22" y2="17" />
+            </svg>
+            <span>7400 Quad NAND</span>
+          </div>
+          <div class="toolbox-item" data-type="ic-7402" draggable="true" title="7402 Quad 2-Input NOR Gate (DIP-14)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="2" width="14" height="20" rx="2" />
+              <line x1="2" y1="5" x2="5" y2="5" /><line x1="2" y1="9" x2="5" y2="9" /><line x1="2" y1="13" x2="5" y2="13" /><line x1="2" y1="17" x2="5" y2="17" />
+              <line x1="19" y1="5" x2="22" y2="5" /><line x1="19" y1="9" x2="22" y2="9" /><line x1="19" y1="13" x2="22" y2="13" /><line x1="19" y1="17" x2="22" y2="17" />
+            </svg>
+            <span>7402 Quad NOR</span>
+          </div>
+          <div class="toolbox-item" data-type="ic-7486" draggable="true" title="7486 Quad 2-Input XOR Gate (DIP-14)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="2" width="14" height="20" rx="2" />
+              <line x1="2" y1="5" x2="5" y2="5" /><line x1="2" y1="9" x2="5" y2="9" /><line x1="2" y1="13" x2="5" y2="13" /><line x1="2" y1="17" x2="5" y2="17" />
+              <line x1="19" y1="5" x2="22" y2="5" /><line x1="19" y1="9" x2="22" y2="9" /><line x1="19" y1="13" x2="22" y2="13" /><line x1="19" y1="17" x2="22" y2="17" />
+            </svg>
+            <span>7486 Quad XOR</span>
           </div>
         </div>
 
@@ -417,15 +502,6 @@
               <path d="M7 13h8a4 4 0 0 1 0 8H7z" />
             </svg> <span>Boolean</span>
           </button>
-          <div style="width:1px;background:var(--border-color);height:20px"></div>
-          <button class="sandbox-btn" id="sandbox-create-ic" title="Select 2+ components (Shift+click) to create an IC">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="8" height="8" rx="1" />
-              <rect x="13" y="3" width="8" height="8" rx="1" />
-              <rect x="3" y="13" width="8" height="8" rx="1" />
-              <rect x="13" y="13" width="8" height="8" rx="1" />
-            </svg> <span>Create IC</span>
-          </button>
           <button class="sandbox-btn" id="sandbox-screenshot-btn" title="Export Circuit as Image">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
@@ -585,20 +661,6 @@
         </div>
       </div>
 
-      <!-- Create IC Modal -->
-      <div class="success-modal-overlay" id="ic-create-modal" style="display:none">
-        <div class="success-modal" style="max-width:400px;padding:2rem;text-align:left">
-          <h2 class="success-modal-title" style="font-size:1.2rem;margin-bottom:1rem">Create Custom IC</h2>
-          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.75rem">Name your new Integrated
-            Circuit. It will replace selected components with a single IC node.</p>
-          <input type="text" id="ic-name-input" placeholder="e.g. My Adder, Full Adder, …"
-            style="width:100%;padding:.6rem .75rem;border-radius:5px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-sans);font-size:.95rem;margin-bottom:1rem;outline:none">
-          <div style="display:flex;gap:.5rem; justify-content:flex-end; height: 50px;">
-            <button class="btn-secondary" id="cancel-ic-btn" style="flex:0;padding:.6rem 1.25rem">Cancel</button>
-            <button class="btn-primary" id="confirm-ic-btn" style="flex:0;padding:.6rem 1.5rem">Create IC</button>
-          </div>
-        </div>
-      </div>
     </section>
 
     <!-- ══════════════════════════════════════════════════════════════════

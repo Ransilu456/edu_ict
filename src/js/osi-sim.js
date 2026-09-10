@@ -38,13 +38,13 @@ const I = {
 };
 
 const LAYERS = [
-  { id: 7, name: 'Application', short: 'App', icon: I.doc, color: '#ef4444', desc: 'User-facing protocols — HTTP, FTP, SMTP, DNS. Provides network services to applications.', analogy: 'Like writing a letter — you decide what to say and who to send it to.' },
-  { id: 6, name: 'Presentation', short: 'Pres', icon: I.wrench, color: '#f97316', desc: 'Data formatting, encryption, compression. Translates between app and network formats.', analogy: 'Like translating your letter into a language the postal system understands, and sealing it in an envelope.' },
-  { id: 5, name: 'Session', short: 'Sess', icon: I.link, color: '#eab308', desc: 'Manages sessions — connect, transfer, disconnect. Controls dialog between devices.', analogy: 'Like picking up the phone, establishing a call, and hanging up when done.' },
-  { id: 4, name: 'Transport', short: 'Trans', icon: I.box, color: '#22c55e', desc: 'End-to-end reliable delivery. Segmentation, flow control, error recovery. TCP (reliable) / UDP (fast).', analogy: 'Like a courier company numbering each box so the recipient can reassemble them in order.' },
-  { id: 3, name: 'Network', short: 'Net', icon: I.globe, color: '#3b82f6', desc: 'Logical addressing & routing. IP packets forwarded across networks. Routers operate here.', analogy: 'Like writing the destination address on the package so it reaches the right city.' },
-  { id: 2, name: 'Data Link', short: 'Link', icon: I.plug, color: '#818cf8', desc: 'MAC addressing, framing, error detection. Switches operate here. Ethernet, PPP, ARP.', analogy: 'Like handing the package to the local delivery driver who knows the exact street address.' },
-  { id: 1, name: 'Physical', short: 'Phys', icon: I.bolt, color: '#c084fc', desc: 'Raw bit transmission over wire/fibre/air. Voltage levels, cable specs. Hubs/Repeaters operate here.', analogy: 'Like the electrical signals traveling through the wire — the raw physical medium.' },
+  { id: 7, name: 'Application', short: 'App', pdu: 'Data', tcpIp: 'Application', icon: I.doc, color: '#ef4444', desc: 'User-facing protocols — HTTP, FTP, SMTP, DNS. Provides network services directly to software applications.', analogy: 'Like writing a letter — you decide what to say and who to send it to.' },
+  { id: 6, name: 'Presentation', short: 'Pres', pdu: 'Data', tcpIp: 'Application', icon: I.wrench, color: '#f97316', desc: 'Data formatting, syntax translation, encryption (TLS/SSL), and compression. Prepares data for transmission.', analogy: 'Like translating your letter into a standard postal format, and sealing it in an envelope.' },
+  { id: 5, name: 'Session', short: 'Sess', pdu: 'Data', tcpIp: 'Application', icon: I.link, color: '#eab308', desc: 'Establishes, maintains, and synchronizes dialog sessions between applications (checkpoints, full/half duplex).', analogy: 'Like picking up the telephone, ensuring the connection is open, and saying hello.' },
+  { id: 4, name: 'Transport', short: 'Trans', pdu: 'Segment / Datagram', tcpIp: 'Transport', icon: I.box, color: '#22c55e', desc: 'End-to-end delivery, port multiplexing, segmentation, flow control, and error recovery. TCP (reliable) / UDP (fast).', analogy: 'Like numbering individual boxes so the receiver can reassemble them in order and verify none are lost.' },
+  { id: 3, name: 'Network', short: 'Net', pdu: 'Packet', tcpIp: 'Internet', icon: I.globe, color: '#3b82f6', desc: 'Logical addressing (IP) and routing across disparate networks. Routers and Layer-3 switches operate here.', analogy: 'Like writing the complete street, city, and postal code address so postal trucks route it correctly.' },
+  { id: 2, name: 'Data Link', short: 'Link', pdu: 'Frame', tcpIp: 'Network Access', icon: I.plug, color: '#818cf8', desc: 'Physical MAC addressing, framing, and error checking (CRC/FCS). Switches, Bridges, and NICs operate here.', analogy: 'Like handing the package to the local neighborhood delivery driver who knows the exact doorstep.' },
+  { id: 1, name: 'Physical', short: 'Phys', pdu: 'Bits', tcpIp: 'Network Access', icon: I.bolt, color: '#c084fc', desc: 'Transmits raw unstructured bitstreams (0s & 1s) over copper cables, optical fibers, or wireless radio frequencies.', analogy: 'Like the electric voltage or light pulses propagating across the physical wires.' },
 ];
 
 const STEP_NAMES = [
@@ -116,12 +116,14 @@ function buildOSILayout() {
   <div class="osi-ctrl-group">
     <button class="osi-btn primary" id="osi-step-btn">Next Step</button>
     <button class="osi-btn" id="osi-auto-btn">Auto</button>
+    <button class="osi-btn" id="osi-speed-btn" title="Cycle simulation speed (0.5x, 1x, 2x, 4x)">1x</button>
     <button class="osi-btn" id="osi-reset-btn">Reset</button>
   </div>
   <div class="osi-ctrl-group">
     <button class="osi-btn" id="osi-binary-btn">Bin</button>
     <button class="osi-btn" id="osi-hex-btn">Hex</button>
     <button class="osi-btn" id="osi-insp-btn">${I.list} Inspect</button>
+    <button class="osi-btn" id="osi-compare-btn">${I.layers} OSI vs TCP/IP</button>
     <button class="osi-btn" id="osi-crypto-btn">${I.shield} RSA</button>
   </div>
 </div>
@@ -148,7 +150,7 @@ function buildOSILayout() {
           <div class="osi-switch-icon switch" id="osi-switch-icon">${I.switch_}</div>
           <div class="osi-switch-label" id="osi-switch-label">Switch</div>
         </div>
-        <div class="osi-switch-status" id="osi-switch-status">Waiting\u2026</div>
+        <div class="osi-switch-status" id="osi-switch-status">Waiting…</div>
       </div>
       <div class="osi-cable" id="osi-cable-right"><div class="osi-cable-track" id="osi-cable-track2"></div></div>
       <div class="osi-binary-row" id="osi-bits-display"></div>
@@ -167,6 +169,65 @@ function buildOSILayout() {
     <button class="osi-insp-close" id="osi-insp-close">&times;</button>
   </div>
   <div class="osi-insp-body" id="osi-insp-body"></div>
+</div>
+<div class="osi-crypto-modal" id="osi-compare-modal">
+  <div class="osi-crypto-box" style="max-width:700px;width:94%">
+    <div class="osi-crypto-title">${I.layers} OSI 7-Layer vs TCP/IP 4-Layer Architecture</div>
+    <div style="max-height:360px;overflow-y:auto;margin:0.8rem 0;border:1px solid var(--border-color);border-radius:8px">
+      <table style="width:100%;border-collapse:collapse;font-size:0.75rem;text-align:left">
+        <thead>
+          <tr style="background:var(--bg-tertiary);border-bottom:1px solid var(--border-color)">
+            <th style="padding:0.5rem 0.6rem">OSI Layer</th>
+            <th style="padding:0.5rem 0.6rem">PDU</th>
+            <th style="padding:0.5rem 0.6rem">TCP/IP Layer</th>
+            <th style="padding:0.5rem 0.6rem">Key Protocols & Hardware</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border-color)">
+            <td style="padding:0.45rem 0.6rem"><strong style="color:#ef4444">7. Application</strong></td>
+            <td style="padding:0.45rem 0.6rem">Data</td>
+            <td style="padding:0.45rem 0.6rem" rowspan="3"><strong style="color:#f97316">Application Layer</strong><br><small style="color:var(--text-muted)">User processes & representation</small></td>
+            <td style="padding:0.45rem 0.6rem">HTTP, HTTPS, DNS, FTP, SMTP, DHCP</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-color)">
+            <td style="padding:0.45rem 0.6rem"><strong style="color:#f97316">6. Presentation</strong></td>
+            <td style="padding:0.45rem 0.6rem">Data</td>
+            <td style="padding:0.45rem 0.6rem">TLS/SSL, JPEG, ASCII, MPEG</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-color)">
+            <td style="padding:0.45rem 0.6rem"><strong style="color:#eab308">5. Session</strong></td>
+            <td style="padding:0.45rem 0.6rem">Data</td>
+            <td style="padding:0.45rem 0.6rem">NetBIOS, RPC, Sockets, PPTP</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-color)">
+            <td style="padding:0.45rem 0.6rem"><strong style="color:#22c55e">4. Transport</strong></td>
+            <td style="padding:0.45rem 0.6rem">Segment (TCP) / Datagram (UDP)</td>
+            <td style="padding:0.45rem 0.6rem"><strong style="color:#22c55e">Transport Layer</strong><br><small style="color:var(--text-muted)">Host-to-Host reliability</small></td>
+            <td style="padding:0.45rem 0.6rem">TCP, UDP, Port Numbers (e.g. 80, 443)</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-color)">
+            <td style="padding:0.45rem 0.6rem"><strong style="color:#3b82f6">3. Network</strong></td>
+            <td style="padding:0.45rem 0.6rem">Packet</td>
+            <td style="padding:0.45rem 0.6rem"><strong style="color:#3b82f6">Internet Layer</strong><br><small style="color:var(--text-muted)">Logical addressing & routing</small></td>
+            <td style="padding:0.45rem 0.6rem">IPv4, IPv6, ICMP, ARP, <strong>Router</strong></td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-color)">
+            <td style="padding:0.45rem 0.6rem"><strong style="color:#818cf8">2. Data Link</strong></td>
+            <td style="padding:0.45rem 0.6rem">Frame</td>
+            <td style="padding:0.45rem 0.6rem" rowspan="2"><strong style="color:#818cf8">Network Access / Link</strong><br><small style="color:var(--text-muted)">Physical hardware delivery</small></td>
+            <td style="padding:0.45rem 0.6rem">Ethernet (802.3), Wi-Fi (802.11), <strong>Switch</strong>, MAC</td>
+          </tr>
+          <tr>
+            <td style="padding:0.45rem 0.6rem"><strong style="color:#c084fc">1. Physical</strong></td>
+            <td style="padding:0.45rem 0.6rem">Bits</td>
+            <td style="padding:0.45rem 0.6rem">Copper Cables, Fiber, <strong>Hub</strong>, Repeaters</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button class="osi-btn primary" id="osi-compare-close" style="align-self:flex-end">Close</button>
+  </div>
 </div>
 <div class="osi-crypto-modal" id="osi-crypto-modal">
   <div class="osi-crypto-box" id="osi-crypto-box">
@@ -193,10 +254,10 @@ function createLayerBlock(l, side) {
       <span class="osi-layer-badge" style="background:${l.color}">${l.id}</span>
       <span class="osi-layer-icon">${l.icon}</span>
       <span class="osi-layer-name">${l.name}</span>
-      <span class="osi-layer-short" style="color:${l.color}">${l.short}</span>
+      <span class="osi-layer-pdu" style="margin-left:auto;font-size:0.62rem;font-weight:700;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.08);color:${l.color}" title="Protocol Data Unit: ${l.pdu}">${l.pdu}</span>
     </div>
     <div class="osi-layer-data" id="osi-${side}-l${l.id}-data"></div>`;
-  div.title = `${l.name}\n${l.desc}\n\n${l.analogy}`;
+  div.title = `${l.name} Layer\nPDU: ${l.pdu}\n${l.desc}\n\n${l.analogy}`;
   div.addEventListener('click', () => showLayerInfo(l));
   return div;
 }
@@ -204,8 +265,17 @@ function createLayerBlock(l, side) {
 function showLayerInfo(l) {
   play('click');
   if (window.showAlert) window.showAlert(
-    `<strong>Layer ${l.id}: ${l.name}</strong><br><br>${l.desc}<br><br><em>${l.analogy}</em>`,
-    `Layer ${l.id} \u2014 ${l.name}`
+    `<div style="text-align:left;line-height:1.5;">
+      <p style="margin-bottom:0.5rem"><strong style="color:${l.color};font-size:1.1rem">Layer ${l.id}: ${l.name} Layer</strong></p>
+      <p style="margin-bottom:0.3rem"><strong>PDU (Protocol Data Unit):</strong> <span style="color:#22d3a5;font-weight:700">${l.pdu}</span></p>
+      <p style="margin-bottom:0.3rem"><strong>TCP/IP Model Equivalent:</strong> <span style="color:#38bdf8;font-weight:700">${l.tcpIp} Layer</span></p>
+      <p style="margin-bottom:0.6rem;color:var(--text-secondary);font-size:0.85rem">${l.desc}</p>
+      <div style="background:rgba(255,255,255,0.05);padding:8px 12px;border-radius:6px;border-left:3px solid ${l.color}">
+        <small style="color:var(--text-muted)">Real-World Analogy:</small><br>
+        <em>${l.analogy}</em>
+      </div>
+    </div>`,
+    `Layer ${l.id} — ${l.name}`
   );
 }
 
@@ -217,6 +287,18 @@ function bindOSIControls() {
     el('osi-auto-btn').classList.toggle('active', state.autoMode);
     if (state.autoMode && state.step < STEP_NAMES.length - 1) autoStep();
   });
+  
+  const speedBtn = el('osi-speed-btn');
+  if (speedBtn) {
+    const speeds = [1, 2, 4, 0.5];
+    speedBtn.addEventListener('click', () => {
+      play('click');
+      const idx = speeds.indexOf(state.speed);
+      state.speed = speeds[(idx + 1) % speeds.length];
+      speedBtn.textContent = `${state.speed}x`;
+    });
+  }
+
   el('osi-reset-btn').addEventListener('click', () => { play('click'); resetOSI(); });
   el('osi-binary-btn').addEventListener('click', () => {
     play('click');
@@ -249,6 +331,26 @@ function bindOSIControls() {
     if (!rsaGenerated) generateRSA();
     el('osi-crypto-modal').classList.add('open');
   });
+
+  const compModal = el('osi-compare-modal');
+  const compBtn = el('osi-compare-btn');
+  const compClose = el('osi-compare-close');
+  if (compBtn && compModal) {
+    compBtn.addEventListener('click', () => {
+      play('click');
+      compModal.classList.add('open');
+    });
+  }
+  if (compClose && compModal) {
+    compClose.addEventListener('click', () => {
+      compModal.classList.remove('open');
+    });
+  }
+  if (compModal) {
+    compModal.addEventListener('click', (e) => {
+      if (e.target === compModal) compModal.classList.remove('open');
+    });
+  }
 
   ['msg','srcip','dstip','protocol','transport','device','subnet'].forEach(id => {
     const inp = el('osi-' + id);
