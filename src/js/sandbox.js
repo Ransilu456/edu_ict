@@ -298,7 +298,7 @@ function setupToolboxItem(item) {
       if (Math.abs(dy) >= Math.abs(dx)) return;
       makeGhost(touch);
     }
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     touchDragActive = true;
     touchDragGhost.style.left = `${touch.clientX - 40}px`;
     touchDragGhost.style.top = `${touch.clientY - 20}px`;
