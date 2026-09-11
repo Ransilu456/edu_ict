@@ -1,9 +1,4 @@
-/**
- * Real-World Integrated Circuit (IC) Definitions
- * Standard 74xx Series TTL Dual In-Line Package (DIP-14)
- * Accurate physical pinouts, gate mapping, and logic evaluation.
- */
-
+// real 74xx DIP-14 IC definitions
 export const REAL_ICS = {
   'ic-7408': {
     type: 'ic-7408',
@@ -29,7 +24,7 @@ export const REAL_ICS = {
       { pin: 14, name: 'VCC', type: 'power',  desc: 'Supply Voltage (+5V)' }
     ],
     evaluate: (pins) => {
-      const p14 = pins[14] !== undefined ? pins[14] : 1; // Default powered
+      const p14 = pins[14] !== undefined ? pins[14] : 1;
       const p7 = pins[7] !== undefined ? pins[7] : 0;
       if (p14 === 0 || p7 === 1) return { 3: 0, 6: 0, 8: 0, 11: 0 };
       return {

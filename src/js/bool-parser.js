@@ -1,3 +1,4 @@
+// boolean expression parser
 function tokenize(expr) {
   const tokens = [];
   for (let i = 0; i < expr.length; i++) {

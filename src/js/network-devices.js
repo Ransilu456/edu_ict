@@ -1,3 +1,4 @@
+// networking labs - devices, subnet, crypto, parity
 import './common.js';
 import { initOSISim, cleanupOSISim } from './osi-sim.js';
 
@@ -14,7 +15,6 @@ export function cleanupNetworkDevices() {
 window.initNetworkDevices = initNetworkDevices;
 window.cleanupNetworkDevices = cleanupNetworkDevices;
 
-// SVG icons
 const I = {
   hub: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="2"/><path d="M4.1 4.1a8 8 0 0 0 0 11.8M15.9 4.1a8 8 0 0 1 0 11.8"/></svg>',
   switch_: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="6" width="12" height="8" rx="1"/><path d="M6 10h8M10 6v8"/></svg>',
@@ -414,9 +414,7 @@ function bindNDTabs() {
 function switchNDTab(id) { qs(`.nd-tab[data-ndtab="${id}"]`)?.click(); }
 window.switchNDTab = switchNDTab;
 
-/* ===================================================================
-   TAB 1 — NETWORK DEVICES
-   =================================================================== */
+// devices lab
 let netState = { device: 'hub', animating: false, src: 'pc-b', dst: 'pc-c', macTable: {}, colCnt: 0, abort: false };
 const hosts = [
   { id: 'pc-a', label: 'A', mac: 'AA:AA:AA:AA:AA:01', ip: '192.168.1.10', sub: '192.168.1.0' },
@@ -424,7 +422,7 @@ const hosts = [
   { id: 'pc-c', label: 'C', mac: 'AA:AA:AA:AA:AA:03', ip: '192.168.2.10', sub: '192.168.2.0' },
   { id: 'pc-d', label: 'D', mac: 'AA:AA:AA:AA:AA:04', ip: '192.168.2.20', sub: '192.168.2.0' },
 ];
-// SVG coords for 400x280 viewBox
+
 const coords = {
   'pc-a': [55, 50], 'pc-b': [55, 230],
   'pc-c': [350, 50], 'pc-d': [350, 230]
@@ -471,8 +469,7 @@ function updateNetUI() {
   }
   const lbl = el('nd-devlabel');
   if (lbl) lbl.textContent = d.toUpperCase();
-  
-  // High fidelity switch/hub/router SVG overlays
+
   const overlay = el('nd-dev-icon-overlay');
   if (overlay) {
     if (d === 'hub') {
@@ -497,7 +494,7 @@ function updateNetUI() {
         <circle cx="217" cy="130" r="1.5" fill="#22d3a5"/>
         <circle cx="222" cy="130" r="1.5" fill="#10b981"/>
       `;
-    } else { // router
+    } else {
       overlay.innerHTML = `
         <!-- Router disc/arrows -->
         <circle cx="205" cy="130" r="13" fill="#1e1b4b" stroke="#fbbf24" stroke-width="1.5"/>
@@ -544,12 +541,11 @@ function clearLinks() {
 
 window.selectNDDevice = function(id) {
   if (window.playSound) window.playSound('click');
-  
-  // Highlight clicked card visual border
+
   document.querySelectorAll('.nd-host-group, #nd-center-g').forEach(g => {
     g.querySelector('rect')?.setAttribute('stroke-width', '1.2');
   });
-  
+
   if (id === 'central') {
     const centralG = el('nd-center-g');
     centralG?.querySelector('rect')?.setAttribute('stroke-width', '2.5');
@@ -640,7 +636,7 @@ function log(msg, cls) {
   d.innerHTML = msg;
   list.appendChild(d);
   list.scrollTop = list.scrollHeight;
-  // Update MAC table
+
   if (netState.macTable && Object.keys(netState.macTable).length > 0) {
     const tc = el('nd-table-content');
     if (tc) {
@@ -659,6 +655,7 @@ function animDot(dotId, x1, y1, x2, y2, ms, cb) {
   function f(t) {
     if (netState.abort) { hideDots(); if (cb) cb(); return; }
     let p = Math.min((t - t0) / ms, 1);
+
     const currX = x1 + (x2 - x1) * p;
     const currY = y1 + (y2 - y1) * p;
     if (dot.tagName.toLowerCase() === 'circle') {
@@ -671,7 +668,6 @@ function animDot(dotId, x1, y1, x2, y2, ms, cb) {
   }
   requestAnimationFrame(f);
 }
-
 
 function endAnim() {
   setTimeout(() => {
@@ -695,18 +691,16 @@ function sendPacket() {
   renderPacketInspector();
   log(`${I.send} ${s.label} \u2192 ${d.label} [${d.mac}]`, 'send');
 
-  // Phase 1: Source to Central Device
   highlightLink(s.id, true);
   animDot('nd-dot1', sc[0], sc[1], devC[0], devC[1], 450, () => {
-    highlightLink(s.id, false); // clear source link
+    highlightLink(s.id, false);
 
     if (netState.device === 'hub') {
       log(`${I.hub} HUB broadcasts to ALL ports`, 'hub');
       const others = hosts.filter(h => h.id !== s.id);
-      
-      // Highlight broadcast links
+
       others.forEach(o => highlightLink(o.id, true));
-      
+
       animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 450);
       animDot('nd-dot2', devC[0], devC[1], coords[others[0].id][0], coords[others[0].id][1], 450);
       animDot('nd-dot3', devC[0], devC[1], coords[others[1]?.id || others[0].id][0], coords[others[1]?.id || others[0].id][1], 450, () => {
@@ -719,7 +713,7 @@ function sendPacket() {
       const known = !!netState.macTable[d.mac];
       netState.macTable[s.mac] = s.label;
       log(`${I.brain} SWITCH learned: ${s.label} \u2192 ${s.mac}`, 'learn');
-      
+
       if (known) {
         log(`${I.target} Forwarded to ${d.label} only (known MAC)`, 'sw');
         highlightLink(d.id, true);
@@ -730,10 +724,9 @@ function sendPacket() {
       } else {
         log(`${I.question} Unknown MAC \u2014 flooding all ports except source`, 'sw');
         const others = hosts.filter(h => h.id !== s.id);
-        
-        // Highlight flooded links
+
         others.forEach(o => highlightLink(o.id, true));
-        
+
         animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 450);
         animDot('nd-dot2', devC[0], devC[1], coords[others.find(h=>h.id!==d.id).id][0], coords[others.find(h=>h.id!==d.id).id][1], 450, () => {
           netState.macTable[d.mac] = d.label;
@@ -765,10 +758,7 @@ function sendPacket() {
   });
 }
 
-
-/* ===================================================================
-   TAB 2 — OSI Sim
-   =================================================================== */
+// osi tab
 let osiReady = false;
 function initOSI() {
   if (osiReady) return;
@@ -776,9 +766,7 @@ function initOSI() {
   initOSISim();
 }
 
-/* ===================================================================
-   TAB 3 — ENCRYPTION
-   =================================================================== */
+// crypto tab
 let cryptoReady = false;
 function initCrypto() {
   if (cryptoReady) return;
@@ -828,9 +816,7 @@ function modPow(base, exp, mod) {
   return r;
 }
 
-/* ===================================================================
-   TAB — SUBNETTING & CIDR LAB
-   =================================================================== */
+// subnet tab
 let subnetReady = false;
 function initSubnetLab() {
   if (subnetReady) { calculateSubnet(); return; }
@@ -1001,8 +987,9 @@ function calculateSubnet() {
     const parentPrefix = Math.max(0, Math.min(cidr - 1, cidr <= 16 ? 8 : (cidr <= 24 ? 16 : 24)));
     const parentBlockSize = Math.pow(2, 32 - parentPrefix);
     const parentNetNum = (ipNum & (parentPrefix === 0 ? 0 : (0xFFFFFFFF << (32 - parentPrefix)) >>> 0)) >>> 0;
-    
+
     const sliceCount = Math.min(32, parentBlockSize / totalAddresses);
+
     const rowsHtml = [];
 
     for (let i = 0; i < sliceCount; i++) {
@@ -1026,9 +1013,7 @@ function calculateSubnet() {
   }
 }
 
-/* ===================================================================
-   TAB 4 — PARITY CHECK
-   =================================================================== */
+// parity tab
 let parityReady = false;
 let parityBits = [];
 function initParity() {
@@ -1037,7 +1022,6 @@ function initParity() {
   const c = el('parity-input-bits');
   parityBits = [];
 
-  // Live ones-count readout under the sender bits
   const senderBox = c.closest('.parity-box');
   const countEl = document.createElement('div');
   countEl.className = 'parity-count';

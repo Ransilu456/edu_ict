@@ -27,7 +27,6 @@
   background-size: 24px 24px !important;
 }
 
-/* NavBar */
 .kids-mode header {
   background: #ffffff !important;
   border-bottom: 3px solid #e2e8f0 !important;
@@ -131,7 +130,6 @@
   box-shadow: 0 1px 0 #cbd5e1 !important;
 }
 
-/* Logic Area */
 .kids-mode .sandbox-toolbox {
   background: #ffffff !important;
   border: 3px solid #e2e8f0 !important;
@@ -757,7 +755,6 @@
   background: #0f172a !important;
 }
 
-/* Network Area*/
 .kids-mode .network-devices-view {
   background: #edf2f7 !important;
 }

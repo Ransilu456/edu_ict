@@ -1,0 +1,37 @@
+<div class="success-modal-overlay" id="logic-modal">
+        <div class="success-modal" style="max-width:640px;width:92%;padding:2rem">
+          <h2 class="success-modal-title" id="logic-modal-title"
+            style="font-size:1.4rem;text-align:left;margin-bottom:0">Gate-Level Logic Inside</h2>
+          <div id="logic-modal-content"
+            style="margin:1.25rem 0;width:100%;display:flex;justify-content:center;align-items:flex-start;flex-direction:column">
+          </div>
+          <div style="display:flex;justify-content:flex-end">
+            <button class="btn-primary" style="width:auto;padding:.6rem 1.5rem;border-radius:6px;flex:0"
+              id="close-logic-modal">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="success-modal-overlay" id="save-modal" style="display:none">
+        <div class="success-modal" style="max-width:400px;padding:2rem;text-align:left">
+          <h2 class="success-modal-title" style="font-size:1.2rem;margin-bottom:1rem">Save Circuit</h2>
+          <input type="text" id="save-circuit-name" placeholder="Enter circuit name…"
+            style="width:100%;padding:.6rem .75rem;border-radius:5px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-sans);font-size:.95rem;margin-bottom:1rem;outline:none">
+          <div style="display:flex;gap:.5rem;justify-content:flex-end">
+            <button class="btn-secondary" id="cancel-save-btn" style="flex:0;padding:.6rem 1.25rem">Cancel</button>
+            <button class="btn-primary" id="confirm-save-btn" style="flex:0;padding:.6rem 1.5rem">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="success-modal-overlay" id="load-modal" style="display:none">
+        <div class="success-modal" style="max-width:420px;padding:2rem;text-align:left">
+          <h2 class="success-modal-title" style="font-size:1.2rem;margin-bottom:1rem">Load Circuit</h2>
+          <div id="saved-circuits-list"
+            style="max-height:280px;overflow-y:auto;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-primary)">
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:1rem">
+            <button class="btn-secondary" id="cancel-load-btn" style="flex:0;padding:.6rem 1.25rem">Close</button>
+          </div>
+        </div>
+      </div>

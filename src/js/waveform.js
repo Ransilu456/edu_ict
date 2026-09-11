@@ -1,6 +1,4 @@
-// LogicQuest — waveform.js
-// Real-time Digital Logic Waveform Scope & Timing Diagram + Circuit Screenshot Export
-
+// waveform scope and circuit image export
 let waveformHistory = [];
 const MAX_WAVEFORM_POINTS = 45;
 let waveformCanvas = null;
@@ -11,7 +9,7 @@ export function initWaveform() {
   waveformCanvas = document.getElementById('waveform-canvas');
   if (!waveformCanvas) return;
   waveformCtx = waveformCanvas.getContext('2d');
-  
+
   const panel = document.getElementById('sandbox-waveform-panel');
   const toggleBtn = document.getElementById('sandbox-waveform-btn');
   const closeBtn = document.getElementById('waveform-close-btn');
@@ -55,7 +53,6 @@ export function initWaveform() {
     }
   });
 
-  // Setup screenshot export button
   const screenshotBtn = document.getElementById('sandbox-screenshot-btn');
   if (screenshotBtn) {
     screenshotBtn.addEventListener('click', () => {
@@ -80,12 +77,11 @@ export function sampleWaveform(nodes = []) {
 
   if (!nodes || nodes.length === 0) return;
 
-  // Filter interesting channels: inputs, clocks, outputs, or gates (max 5)
   const channels = [];
-  
+
   nodes.forEach(n => {
     if (channels.length >= 5) return;
-    if (n.type === 'clock' || n.type === 'input' || n.type === 'output' || 
+    if (n.type === 'clock' || n.type === 'input' || n.type === 'output' ||
         ['and','or','not','xor','nand','nor'].includes(n.type)) {
       channels.push({
         id: n.id,
@@ -122,10 +118,9 @@ export function drawWaveform() {
   const w = waveformCanvas.width;
   const h = waveformCanvas.height;
 
-  const isDark = document.documentElement.classList.contains('dark') || 
+  const isDark = document.documentElement.classList.contains('dark') ||
                  document.documentElement.getAttribute('data-theme') === 'dark';
 
-  // Background
   ctx.fillStyle = isDark ? '#0f172a' : '#f8fafc';
   ctx.fillRect(0, 0, w, h);
 
@@ -143,10 +138,10 @@ export function drawWaveform() {
   if (numChannels === 0) return;
 
   const rowHeight = Math.floor((h - 20) / numChannels);
+
   const labelWidth = 85;
   const plotWidth = w - labelWidth - 15;
 
-  // Grid lines
   ctx.strokeStyle = isDark ? '#1e293b' : '#e2e8f0';
   ctx.lineWidth = 1;
   for (let c = 0; c <= numChannels; c++) {
@@ -157,13 +152,12 @@ export function drawWaveform() {
     ctx.stroke();
   }
 
-  // Channel traces
   const colors = [
-    '#1cb0f6', // Sky blue
-    '#58cc02', // Emerald green
-    '#ff9600', // Amber
-    '#a855f7', // Purple
-    '#ec4899', // Pink
+    '#1cb0f6',
+    '#58cc02',
+    '#ff9600',
+    '#a855f7',
+    '#ec4899',
   ];
 
   channels.forEach((ch, chIdx) => {
@@ -173,19 +167,17 @@ export function drawWaveform() {
     const highY = topY + 4;
     const lowY = bottomY - 2;
 
-    // Label
     ctx.fillStyle = isDark ? '#f8fafc' : '#1e293b';
     ctx.font = '800 11px Nunito, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(ch.name, 10, topY + rowHeight / 2);
 
-    // Live value badge
     ctx.fillStyle = ch.val ? '#58cc02' : (isDark ? '#475569' : '#94a3b8');
     ctx.beginPath();
     ctx.arc(labelWidth - 12, topY + rowHeight / 2 - 3, 4, 0, Math.PI * 2);
+
     ctx.fill();
 
-    // Pulse trace
     ctx.strokeStyle = color;
     ctx.lineWidth = 2.5;
     ctx.beginPath();
@@ -205,8 +197,7 @@ export function drawWaveform() {
         const prevSample = waveformHistory[i - 1];
         const prevPtChannel = prevSample.channels.find(c => c.id === ch.id) || ch;
         const prevY = prevPtChannel.val ? highY : lowY;
-        
-        // Square wave transition
+
         if (prevY !== targetY) {
           ctx.lineTo(x, prevY);
         }
@@ -215,7 +206,6 @@ export function drawWaveform() {
     }
     ctx.stroke();
 
-    // Subtle glow on high rail
     if (ch.val) {
       ctx.strokeStyle = color;
       ctx.shadowColor = color;
@@ -227,7 +217,6 @@ export function drawWaveform() {
 }
 window.drawWaveform = drawWaveform;
 
-// ── Circuit Image Exporter ─────────────────────────────────────────
 export function exportCircuitImage() {
   const workspace = document.getElementById('sandbox-workspace-canvas');
   if (!workspace) return;
@@ -238,7 +227,6 @@ export function exportCircuitImage() {
     return;
   }
 
-  // Calculate bounding box of components
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   nodes.forEach(n => {
     const rect = n.getBoundingClientRect();
@@ -266,7 +254,6 @@ export function exportCircuitImage() {
   ctx.fillStyle = isDark ? '#0b132b' : '#f8fbff';
   ctx.fillRect(0, 0, width, height);
 
-  // Draw dot grid
   ctx.fillStyle = isDark ? '#1e3a8a' : '#bae6fd';
   for (let gx = 0; gx < width; gx += 24) {
     for (let gy = 0; gy < height; gy += 24) {
@@ -276,7 +263,6 @@ export function exportCircuitImage() {
     }
   }
 
-  // Watermark / title header
   ctx.fillStyle = '#1cb0f6';
   ctx.font = '900 16px Nunito, sans-serif';
   ctx.fillText('LOGICQUEST', 20, 28);
@@ -284,8 +270,6 @@ export function exportCircuitImage() {
   ctx.font = '600 11px Nunito, sans-serif';
   ctx.fillText('Digital Logic Circuit Simulation', 125, 28);
 
-  // Draw wire paths from SVG (only the colored cores — casing / hit /
-  // flow layers share the same geometry and are purely interactive)
   const wiresSvg = document.getElementById('sandbox-wires-svg');
   if (wiresSvg) {
     const paths = Array.from(wiresSvg.querySelectorAll('path.sb-wire-core, path.sb-wire-preview'));
@@ -296,7 +280,7 @@ export function exportCircuitImage() {
       const stroke = cls.includes('high') ? '#58cc02'
         : cls.includes('hover') ? '#ff4b4b'
         : cls.includes('preview') ? '#1cb0f6' : '#94a3b8';
-      
+
       const p2d = new Path2D(d);
       ctx.save();
       ctx.translate(-minX, -minY);
@@ -307,7 +291,6 @@ export function exportCircuitImage() {
     });
   }
 
-  // Draw nodes
   nodes.forEach(n => {
     const wsRect = workspace.getBoundingClientRect();
     const rect = n.getBoundingClientRect();
@@ -316,29 +299,26 @@ export function exportCircuitImage() {
     const nw = rect.width;
     const nh = rect.height;
 
-    // Node card
     ctx.save();
     ctx.fillStyle = isDark ? '#1e293b' : '#ffffff';
     ctx.strokeStyle = isDark ? '#475569' : '#cbd5e1';
     ctx.lineWidth = 2.5;
-    
-    // Rounded rect
+
     const r = 12;
     ctx.beginPath();
     ctx.roundRect(x, y, nw, nh, r);
     ctx.fill();
     ctx.stroke();
 
-    // Node header label
     const headerEl = n.querySelector('.sandbox-node-header');
     if (headerEl) {
       ctx.fillStyle = isDark ? '#cbd5e1' : '#334155';
       ctx.font = '800 11px Nunito, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(headerEl.textContent.trim(), x + nw / 2, y + 16);
+
     }
 
-    // Node state or icon
     const bodyEl = n.querySelector('.sandbox-node-body');
     if (bodyEl) {
       ctx.fillStyle = isDark ? '#f8fafc' : '#1e293b';
@@ -351,7 +331,6 @@ export function exportCircuitImage() {
     ctx.restore();
   });
 
-  // Download image
   try {
     const dataUrl = canvas.toDataURL('image/png');
     const a = document.createElement('a');

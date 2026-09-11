@@ -1,6 +1,11 @@
+// app shell - mounts components, handles view navigation
 import './common.js';
 import './sandbox.js';
 import { initNetworkDevices } from './network-devices.js';
+import { mountComponents } from './components.js';
+
+mountComponents();
+if (window.initControls) window.initControls();
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', boot);
@@ -54,7 +59,6 @@ function setupViewNavigation() {
     });
   });
 
-  // Default: activate sandbox
   const defaultTab = document.querySelector('.nav-tab[data-target="sandbox-view"]');
   if (defaultTab) {
     defaultTab.classList.add('active');

@@ -1,3 +1,4 @@
+// shared UI - theme, sound, toast, alert, confirm
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let soundEnabled = localStorage.getItem("soundEnabled") !== "false";
 
@@ -48,7 +49,8 @@ window.playSound = playSound;
 
 function initSoundToggle() {
   const audioBtn = document.getElementById("audio-toggle");
-  if (!audioBtn) return;
+  if (!audioBtn || audioBtn.dataset.bound) return;
+  audioBtn.dataset.bound = "1";
   updateAudioIcon(audioBtn);
   audioBtn.addEventListener("click", () => {
     soundEnabled = !soundEnabled;
@@ -90,7 +92,8 @@ function updateThemeIcon(btn) {
 function initThemeToggle() {
   applyTheme(currentTheme);
   const themeBtn = document.getElementById("theme-toggle");
-  if (!themeBtn) return;
+  if (!themeBtn || themeBtn.dataset.bound) return;
+  themeBtn.dataset.bound = "1";
   updateThemeIcon(themeBtn);
   themeBtn.addEventListener("click", () => {
     const nextTheme = currentTheme === "dark" ? "light" : "dark";
@@ -102,21 +105,19 @@ function initThemeToggle() {
 window.applyTheme = applyTheme;
 window.initThemeToggle = initThemeToggle;
 
-// Stub: no-op so existing sandbox.js calls to updateXPDisplay don't crash
 window.updateXPDisplay = function() {};
 
 function initControls() {
   initSoundToggle();
   initThemeToggle();
 }
+window.initControls = initControls;
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initControls);
 } else {
   initControls();
 }
-
-// ── Modal helpers (used by sandbox, network-devices) ──────────────────────
 
 function showAlert(message, title, callback) {
   const modal = document.getElementById('custom-alert-modal');
@@ -143,8 +144,8 @@ function showAlert(message, title, callback) {
     if (callback) callback(result);
   };
   okBtn.onclick = () => close(true);
-  box.addEventListener('click', (e) => e.stopPropagation());
-  modal.addEventListener('click', () => close(true));
+  box.onclick = (e) => e.stopPropagation();
+  modal.onclick = () => close(true);
 }
 window.showAlert = showAlert;
 
@@ -175,8 +176,8 @@ function showConfirm(message, callback, title) {
   };
   okBtn.onclick = () => close(true);
   cancelBtn.onclick = () => close(false);
-  box.addEventListener('click', (e) => e.stopPropagation());
-  modal.addEventListener('click', () => close(false));
+  box.onclick = (e) => e.stopPropagation();
+  modal.onclick = () => close(false);
 }
 window.showConfirm = showConfirm;
 
@@ -187,11 +188,12 @@ function showToast(msg) {
     toast.id = 'sb-toast';
     toast.style.cssText = `
       position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%);
-      background:var(--text-primary); color:var(--bg-primary);
-      padding:0.5rem 1.25rem; border-radius:6px; font-size:0.85rem;
-      font-family:var(--font-header); font-weight:600;
+      background:#1e293b; color:#fff;
+      padding:0.55rem 1.3rem; border-radius:999px; font-size:0.85rem;
+      font-family:var(--font-header); font-weight:700;
+      box-shadow:0 10px 28px rgba(2,6,23,0.35);
       z-index:999; pointer-events:none; opacity:0;
-      transition:opacity 0.2s ease;`;
+      transition:opacity 0.2s ease; max-width:90vw; text-align:center;`;
     document.body.appendChild(toast);
   }
   toast.innerText = msg;

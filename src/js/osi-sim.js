@@ -1,3 +1,4 @@
+// OSI 7-layer packet simulator
 import './common.js';
 
 let osiReady = false;
@@ -6,7 +7,6 @@ let osiAnimTimer = null;
 let rsaGenerated = false;
 let rsaKeys = {};
 
-// SVG icon set — no emojis
 const I = {
   doc: '<svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2h6l4 4v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M11 2v4h4"/></svg>',
   wrench: '<svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 1.3a1 1 0 0 0-1.4 0l-2.8 2.8a4 4 0 0 0-5 5.7L2 13.3A2 2 0 0 0 4.7 16l3.5-3.5a4 4 0 0 0 5.7-5l2.8-2.8a1 1 0 0 0 0-1.4z"/></svg>',
@@ -67,6 +67,7 @@ const STEP_NAMES = [
   'Application Layer \u2014 Message Delivered!',
 ];
 
+// sim state
 let state = {
   step: -1, msg: 'HELLO',
   srcIP: '192.168.1.10', dstIP: '192.168.1.20',
@@ -98,6 +99,7 @@ export function cleanupOSISim() {
 window.initOSISim = initOSISim;
 window.cleanupOSISim = cleanupOSISim;
 
+// layout
 function buildOSILayout() {
   el('osi-container').innerHTML = `
 <div class="osi-topbar" id="osi-topbar">
@@ -251,9 +253,10 @@ function createLayerBlock(l, side) {
   div.className = 'osi-layer-block inactive';
   div.id = `osi-${side}-l${l.id}`;
   div.style.borderLeftColor = l.color;
+  div.style.setProperty('--osi-active-shadow', l.color);
   div.innerHTML = `<div class="osi-layer-top">
       <span class="osi-layer-badge" style="background:${l.color}">${l.id}</span>
-      <span class="osi-layer-icon">${l.icon}</span>
+      <span class="osi-layer-icon" style="color:${l.color}">${l.icon}</span>
       <span class="osi-layer-name">${l.name}</span>
       <span class="osi-layer-pdu" style="margin-left:auto;font-size:0.62rem;font-weight:700;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.08);color:${l.color}" title="Protocol Data Unit: ${l.pdu}">${l.pdu}</span>
     </div>
@@ -288,7 +291,7 @@ function bindOSIControls() {
     el('osi-auto-btn').classList.toggle('active', state.autoMode);
     if (state.autoMode && state.step < STEP_NAMES.length - 1) autoStep();
   });
-  
+
   const speedBtn = el('osi-speed-btn');
   if (speedBtn) {
     const speeds = [1, 2, 4, 0.5];
@@ -424,6 +427,7 @@ function setSendPort() {
   state.dstPort = ports[state.protocol] || 80;
 }
 
+// steps
 function stepOSI() {
   if (state.step >= STEP_NAMES.length - 1) return;
   play('click');
@@ -466,7 +470,6 @@ function autoStep() {
   osiAnimTimer = setTimeout(autoStep, delay);
 }
 
-/* ===== ENCAPSULATION ===== */
 function encapsulateStep(step) {
   const layerId = 7 - step;
   const side = 'alice';
@@ -534,7 +537,6 @@ function encapsulateStep(step) {
   }
 }
 
-/* ===== DECAPSULATION ===== */
 function decapsulateStep(step) {
   const layerId = 1 + step;
   const side = 'bob';
@@ -597,13 +599,13 @@ function completeDelivery() {
   updatePktVis();
 }
 
-/* ===== CABLE ANIMATION ===== */
 function animateCable(side, cb) {
   const trackId = side === 'left' ? 'osi-cable-track1' : 'osi-cable-track2';
   const track = el(trackId);
   if (!track) { if (cb) cb(); return; }
   track.innerHTML = '';
   const numPulses = Math.min(5, Math.max(1, Math.ceil(state.msg.length / 3)));
+
   for (let i = 0; i < numPulses; i++) {
     const p = document.createElement('div');
     p.className = 'osi-cable-pulse';
@@ -633,7 +635,6 @@ function hideCablePulses() {
   });
 }
 
-/* ===== SWITCH / ROUTER ===== */
 function animateSwitch() {
   const dev = state.device;
   const status = el('osi-switch-status');
@@ -671,7 +672,6 @@ function animateSwitch() {
   }
 }
 
-/* ===== INSPECTOR ===== */
 function updateInspector() {
   const body = el('osi-insp-body');
   if (!body) return;
@@ -726,7 +726,7 @@ function updateInspector() {
     </div>`).join('');
 }
 
-/* ===== PACKET HEADER VISUALIZATION ===== */
+// packet view
 function updatePktVis() {
   const wrap = el('osi-packet-wrap');
   if (!wrap) return;
@@ -750,7 +750,7 @@ function updatePktVis() {
   }
 
   if (step >= 0 && step <= 6) {
-    // Encapsulation — show only layers completed so far
+
     const encLayers = [];
     if (step >= 0) encLayers.push({ label: 'Data', color: '#ef4444', det: `&quot;${esc(state.msg)}&quot;` });
     if (step >= 1) encLayers.push({ label: state.protocol === 'HTTPS' ? 'TLS' : 'Pres', color: '#f97316', det: state.protocol === 'HTTPS' ? 'AES-256' : 'UTF-8' });
@@ -761,17 +761,17 @@ function updatePktVis() {
     if (step >= 6) encLayers.push({ label: 'Bits', color: '#c084fc', det: '' });
     wrap.innerHTML = encLayers.map(x => l(x.label, x.color, x.det)).join('');
   } else if (step >= 7 && step <= 9) {
-    // On the wire — full packet
+
     wrap.innerHTML = buildLayers();
   } else if (step >= 10) {
-    // Decapsulation — strip layers
+
     wrap.innerHTML = buildLayers(step - 10);
   } else {
     wrap.innerHTML = l('Data', '#ef4444', `&quot;${esc(state.msg)}&quot;`);
   }
 }
 
-/* ===== RSA ENCRYPTION VISUALIZER ===== */
+// rsa visualizer
 function generateRSA() {
   rsaGenerated = true;
   const p = 61, q = 53;
@@ -835,7 +835,6 @@ function modPow(base, exp, mod) {
   return r;
 }
 
-/* ===== UTILITY ===== */
 function strToBin(s) { return s.split('').map(ch => ch.charCodeAt(0).toString(2).padStart(8, '0')).join(' '); }
 function strToHex(s) { return s.split('').map(ch => ch.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')).join(' '); }
 function calcChecksum(s) {

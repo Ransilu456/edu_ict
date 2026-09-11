@@ -1,22 +1,25 @@
+// logic sandbox - canvas nodes, wires, simulation
 import { parseBooleanExpression } from './bool-parser.js';
 import { REAL_ICS } from './real-ic-defs.js';
+import { initWaveform, sampleWaveform } from './waveform.js';
 
+// canvas state
 let sandboxNodes = [];
 let sandboxWires = [];
-let activeWiringSource = null;   
-let pendingWirePortIdx = 0;      
+let activeWiringSource = null;
+let pendingWirePortIdx = 0;
 let selectedNodeId = null;
 let selectedNodeIds = [];
 let simInterval = null;
 let clockInterval = null;
 let isSimRunning = true;
 let nextNodeId = 1;
-let clockTick = 0;          
+let clockTick = 0;
 
 let workspace = null;
 let wiresSvg = null;
 let panContainer = null;
-let isDragging = false;          
+let isDragging = false;
 let panX = 0, panY = 0;
 let isPanning = false;
 let didPan = false;
@@ -26,8 +29,8 @@ let isSelecting = false;
 let selectionRectStart = { x: 0, y: 0 };
 let selectionRectEl = null;
 const MAX_UNDO = 30;
-let undoStack = [];  
-let _ignorePortClick = false; 
+let undoStack = [];
+let _ignorePortClick = false;
 let simSpeed = 1;
 
 function pushUndo() {
@@ -50,6 +53,7 @@ function performUndo() {
   const undoBtn = document.getElementById('sandbox-undo');
   if (undoBtn) undoBtn.disabled = undoStack.length === 0;
 }
+// component catalog
 const COMPONENT_DEFS = {
   'input':       { inputs: 0, outputs: 1, label: 'Toggle Switch',    category: 'Inputs' },
   'clock':       { inputs: 0, outputs: 1, label: 'Clock Signal',     category: 'Inputs' },
@@ -110,6 +114,7 @@ window.initSandboxCanvas = function () {
   setupDragAndDrop();
   setupToolbar();
   startSimulationLoop();
+  initWaveform();
   workspace.addEventListener('click', (e) => {
     if (didPan) { didPan = false; return; }
     if (e.ctrlKey || e.metaKey) return;
@@ -134,15 +139,17 @@ window.initSandboxCanvas = function () {
       performUndo();
       return;
     }
+    if (e.key === 'Escape') {
+      if (closeTopModal()) return;
+      cancelWiring();
+      deselectAllNodes();
+      return;
+    }
     if (!selectedNodeId) return;
     if (document.activeElement && document.activeElement.tagName === 'TEXTAREA') return;
     if (e.key === 'Delete' || e.key === 'Backspace') {
       e.preventDefault();
       deleteNode(selectedNodeId);
-    }
-    if (e.key === 'Escape') {
-      cancelWiring();
-      deselectAllNodes();
     }
   });
   const theoryBtn = document.getElementById('sandbox-theory-btn');
@@ -207,11 +214,18 @@ function setupToolboxItem(item) {
   });
   let touchDragGhost = null;
   let touchDragActive = false;
+  let touchStartX = 0;
+  let touchStartY = 0;
 
   item.addEventListener('touchstart', (e) => {
     if (e.touches.length !== 1) return;
     touchDragActive = false;
-    const touch = e.touches[0];
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    if (touchDragGhost) { touchDragGhost.remove(); touchDragGhost = null; }
+  }, { passive: true });
+
+  const makeGhost = (touch) => {
     touchDragGhost = document.createElement('div');
     touchDragGhost.className = 'touch-drag-ghost';
     touchDragGhost.textContent = label;
@@ -235,13 +249,20 @@ function setupToolboxItem(item) {
       transition: transform 0.1s;
     `;
     document.body.appendChild(touchDragGhost);
-  }, { passive: true });
+  };
 
   item.addEventListener('touchmove', (e) => {
-    if (!touchDragGhost) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+    if (!touchDragGhost) {
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      if (Math.abs(dy) >= Math.abs(dx)) return;
+      makeGhost(touch);
+    }
     e.preventDefault();
     touchDragActive = true;
-    const touch = e.touches[0];
     touchDragGhost.style.left = `${touch.clientX - 40}px`;
     touchDragGhost.style.top = `${touch.clientY - 20}px`;
 
@@ -257,7 +278,7 @@ function setupToolboxItem(item) {
       touchDragGhost = null;
     }
     workspace.classList.remove('drag-over');
-    if (!touchDragActive) return; 
+    if (!touchDragActive) return;
     touchDragActive = false;
 
     const touch = e.changedTouches[0];
@@ -274,6 +295,13 @@ function setupToolboxItem(item) {
 }
 
 function setupDragAndDrop() {
+  document.querySelectorAll('.toolbox-section-title').forEach(title => {
+    title.style.cursor = 'pointer';
+    title.title = 'Collapse / expand section';
+    title.addEventListener('click', () => {
+      title.parentElement?.classList.toggle('collapsed');
+    });
+  });
   document.querySelectorAll('.toolbox-item').forEach(item => setupToolboxItem(item));
   document.querySelectorAll('.template-card').forEach(card => {
     card.setAttribute('draggable', 'true');
@@ -368,6 +396,21 @@ function setupToolbar() {
   });
   document.getElementById('cancel-load-btn')?.addEventListener('click', () => {
     loadModal.style.display = 'none';
+  });
+  saveModal?.addEventListener('click', (e) => {
+    if (e.target === saveModal) saveModal.style.display = 'none';
+  });
+  loadModal?.addEventListener('click', (e) => {
+    if (e.target === loadModal) loadModal.style.display = 'none';
+  });
+  const logicCloseBtn = document.getElementById('close-logic-modal');
+  const logicModal = document.getElementById('logic-modal');
+  logicCloseBtn?.addEventListener('click', () => {
+    playSound('click');
+    if (logicModal) logicModal.style.display = 'none';
+  });
+  logicModal?.addEventListener('click', (e) => {
+    if (e.target === logicModal) logicModal.style.display = 'none';
   });
   document.getElementById('sandbox-export')?.addEventListener('click', () => {
     if (sandboxNodes.length === 0) { showToast('Canvas is empty — nothing to export.'); return; }
@@ -514,6 +557,7 @@ function reRenderAllNodes() {
   sandboxNodes.forEach(n => renderNodeDOM(n));
   evaluateSandbox();
 }
+// nodes
 function placeNode(type, label, x, y) {
   const def = COMPONENT_DEFS[type];
   if (!def) { console.warn('Unknown component type:', type); return; }
@@ -526,14 +570,16 @@ function placeNode(type, label, x, y) {
     type,
     label: label || def.label,
     x: Math.round(x / 10) * 10,
+
     y: Math.round(y / 10) * 10,
+
     inputsCount: def.inputs,
     outputsCount: def.outputs,
-    outputState: 0,           
+    outputState: 0,
     outputState2: 0,
     outputStates: {},
     inputValues: Array(def.inputs).fill(0),
-    // IC nodes: pin-number-keyed value map (matches real-ic-defs evaluate() signature)
+
     pinValues: isIC ? {} : null,
     prevClockState: 0,
     labelText: type === 'text-label' ? 'Label' : '',
@@ -588,8 +634,8 @@ function renderRealICNodeDOM(node, el) {
   const rightCol = document.createElement('div');
   rightCol.className = 'real-ic-col right';
 
-  const leftPins = ic.pins.slice(0, 7); // 1..7
-  const rightPins = ic.pins.slice(7).reverse(); // 14 down to 8
+  const leftPins = ic.pins.slice(0, 7);
+  const rightPins = ic.pins.slice(7).reverse();
 
   function createPinRow(pin, side) {
     const row = document.createElement('div');
@@ -616,8 +662,6 @@ function renderRealICNodeDOM(node, el) {
       handlePortClick(node.id, isOutput ? 'output' : 'input', pin.pin);
     });
 
-    // Metallic package lead sticking out of the epoxy body (purely visual —
-    // clicks pass through to the port sitting on top of it).
     const lead = document.createElement('span');
     lead.className = 'real-ic-lead';
     lead.setAttribute('aria-hidden', 'true');
@@ -635,14 +679,14 @@ function renderRealICNodeDOM(node, el) {
     nameSpan.textContent = pin.name;
 
     if (side === 'left') {
-      // lead → port → number → name → status pip (mirrors a real DIP)
+
       row.appendChild(lead);
       row.appendChild(port);
       row.appendChild(numSpan);
       row.appendChild(nameSpan);
       row.appendChild(ind);
     } else {
-      // mirrored: status pip → name → number → port → lead
+
       row.appendChild(ind);
       row.appendChild(nameSpan);
       row.appendChild(numSpan);
@@ -675,6 +719,7 @@ function renderRealICNodeDOM(node, el) {
   (panContainer || workspace).appendChild(el);
 }
 
+// node dom
 function renderNodeDOM(node) {
   const existing = document.getElementById(node.id);
   if (existing) existing.remove();
@@ -693,8 +738,7 @@ function renderNodeDOM(node) {
   if (['half-adder', 'full-adder', 'd-flop', 'op-amp'].includes(node.type)) {
     el.classList.add('compound-node');
   }
-  // Pure logic gates get a dedicated compact layout (symbol + io controls)
-  // so ports stay aligned with the symbol's input/output stubs.
+
   if (['not', 'buffer', 'and', 'or', 'nand', 'nor', 'xor', 'xnor'].includes(node.type)) {
     el.classList.add('gate-node');
   }
@@ -714,7 +758,6 @@ function renderNodeDOM(node) {
   header.className = 'sandbox-node-header';
   header.innerText = node.label;
 
-  // In realistic (ANSI) gate mode, hide header text for pure logic gate types
   const pureGateTypes = ['not','and','or','nand','nor','xor','xnor'];
   const gateStyle = window.__gateStyle || localStorage.getItem('sandboxGateStyle') || 'box';
   if (gateStyle === 'realistic' && pureGateTypes.includes(node.type)) {
@@ -750,7 +793,6 @@ function renderNodeDOM(node) {
     }
   });
 
-  // Right-click context menu for multi-input gate types
   el.addEventListener('contextmenu', (e) => {
     e.stopPropagation();
     showSandboxContextMenu(e, node);
@@ -781,20 +823,20 @@ function renderNodeBody(node, body) {
       body.innerHTML = `
         <div class="bulb-wrap" id="${node.id}-bulb">
           <svg class="bulb-svg" viewBox="0 0 100 120">
-            
+
             <circle cx="50" cy="45" r="42" class="bulb-halo"/>
-            
+
             <path d="M 32 75 C 20 62 20 40 32 26 C 44 12 56 12 68 26 C 80 40 80 62 68 75 C 62 82 58 90 58 95 L 42 95 C 42 90 38 82 32 75 Z" class="bulb-glass"/>
-            
+
             <line x1="42" y1="95" x2="45" y2="70" class="bulb-wire"/>
             <line x1="58" y1="95" x2="55" y2="70" class="bulb-wire"/>
-            
+
             <path d="M 45 70 C 45 60 48 56 50 56 C 52 56 55 60 55 70" class="bulb-filament"/>
-            
+
             <rect x="40" y="95" width="20" height="12" rx="2" class="bulb-base"/>
-            
+
             <path d="M 44 107 L 56 107 C 54 113 46 113 44 107 Z" class="bulb-base-tip"/>
-            
+
             <path d="M 38 32 A 20 20 0 0 1 54 20" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.8" stroke-linecap="round" class="bulb-shine"/>
           </svg>
           <span class="bulb-state-label" id="${node.id}-state">○ OFF</span>
@@ -859,18 +901,18 @@ function renderNodeBody(node, body) {
       body.innerHTML = `
         <div class="clk-wrap" id="${node.id}-clk-wrap">
           <svg class="clk-osc-svg" viewBox="0 0 100 40">
-            
+
             <rect x="0" y="0" width="100" height="40" class="osc-bg"/>
-            
+
             <line x1="0" y1="10" x2="100" y2="10" class="osc-grid"/>
             <line x1="0" y1="20" x2="100" y2="20" class="osc-grid"/>
             <line x1="0" y1="30" x2="100" y2="30" class="osc-grid"/>
             <line x1="25" y1="0" x2="25" y2="40" class="osc-grid"/>
             <line x1="50" y1="0" x2="50" y2="40" class="osc-grid"/>
             <line x1="75" y1="0" x2="75" y2="40" class="osc-grid"/>
-            
+
             <path d="M 0 30 L 25 30 L 25 10 L 50 10 L 50 30 L 75 30 L 75 10 L 100 10" class="osc-wave"/>
-            
+
             <line x1="25" y1="0" x2="25" y2="40" class="osc-cursor" id="${node.id}-cursor"/>
           </svg>
           <div class="clk-meta">
@@ -1011,8 +1053,8 @@ function renderNodeBody(node, body) {
       const set = a ? 1 : 0, rst = b ? 1 : 0;
       if (set && !rst)       { node.outputState = 1; node.outputState2 = 0; }
       else if (!set && rst)  { node.outputState = 0; node.outputState2 = 1; }
-      else if (set && rst)   { node.outputState = 0; node.outputState2 = 0; } // invalid
-      // else hold state
+      else if (set && rst)   { node.outputState = 0; node.outputState2 = 0; }
+
       break;
     }
 
@@ -1129,7 +1171,6 @@ function renderNodeBody(node, body) {
       break;
     }
 
-
     default: {
       const gateStyle = window.__gateStyle || 'box';
       const isMultiInputGate = MULTI_INPUT_GATE_TYPES ? MULTI_INPUT_GATE_TYPES.has(node.type) : false;
@@ -1144,7 +1185,7 @@ function renderNodeBody(node, body) {
         symWrap.appendChild(span);
       }
       body.appendChild(symWrap);
-      // Show input count badge and +/- controls for multi-input gates
+
       if (isMultiInputGate && node.inputsCount > 2) {
         const badge = document.createElement('div');
         badge.className = 'gate-input-badge';
@@ -1183,7 +1224,7 @@ function renderGateSVG(type) {
         <line x1="54" y1="22" x2="72" y2="22"/>
       </svg>`;
     case 'and':
-      // Standard ANSI AND: flat left side, curved right dome, 2 inputs, 1 output
+
       return `<svg viewBox="0 0 80 50" width="80" height="50" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
         <line x1="0" y1="14" x2="20" y2="14"/>
         <line x1="0" y1="36" x2="20" y2="36"/>
@@ -1191,7 +1232,7 @@ function renderGateSVG(type) {
         <line x1="62" y1="25" x2="80" y2="25"/>
       </svg>`;
     case 'or':
-      // Standard ANSI OR: curved left and right sides
+
       return `<svg viewBox="0 0 80 50" width="80" height="50" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
         <line x1="0" y1="14" x2="18" y2="14"/>
         <line x1="0" y1="36" x2="18" y2="36"/>
@@ -1240,9 +1281,6 @@ function renderInputPorts(node, el) {
   const count = node.inputsCount;
   if (count === 0) return;
 
-  // Pure gates keep ports inside the symbol band so they line up with the
-  // SVG input stubs (image bug: ports spread 20–80% of the whole card,
-  // which drifts away from the symbol once headers/controls are added).
   const isGate = ['not', 'buffer', 'and', 'or', 'nand', 'nor', 'xor', 'xnor'].includes(node.type);
   for (let i = 0; i < count; i++) {
     const port = document.createElement('div');
@@ -1254,7 +1292,9 @@ function renderInputPorts(node, el) {
       ? 50
       : isGate
         ? 30 + (i * 40) / (count - 1)
+
         : 20 + (i * 60) / (count - 1);
+
     port.style.top = `calc(${pct}% - 4px)`;
     port.style.left = '-7px';
 
@@ -1289,6 +1329,7 @@ function renderOutputPorts(node, el) {
     const pct = count === 1
       ? 50
       : 20 + (i * 60) / (count - 1);
+
     port.style.top = `calc(${pct}% - 4px)`;
     port.style.right = '-7px';
 
@@ -1481,7 +1522,9 @@ function startDrag(e, node) {
     const cur = getClientPos(mv);
     const wr = workspace.getBoundingClientRect();
     node.x = Math.round((cur.x - wr.left - panX - offsetX) / 10) * 10;
+
     node.y = Math.round((cur.y - wr.top - panY - offsetY) / 10) * 10;
+
     const domEl = document.getElementById(node.id);
     if (domEl) {
       domEl.style.left = `${node.x}px`;
@@ -1640,11 +1683,13 @@ function drawWiringPreview(e) {
   const portRect = port.getBoundingClientRect();
 
   const x1 = portRect.left + portRect.width / 2 - canvasRect.left - panX;
+
   const y1 = portRect.top + portRect.height / 2 - canvasRect.top - panY;
+
   const x2 = pos.x - canvasRect.left - panX;
   const y2 = pos.y - canvasRect.top - panY;
 
-  updateSandboxWires();   
+  updateSandboxWires();
 
   const dir = x2 >= x1 ? 1 : -1;
   const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
@@ -1663,9 +1708,12 @@ function drawWiringPreview(e) {
   wiresSvg.appendChild(prev);
 }
 
+// wire render
 function updateSandboxWires() {
   if (!wiresSvg || !workspace) return;
   wiresSvg.innerHTML = '';
+  const hint = document.getElementById('sandbox-empty-hint');
+  if (hint) hint.style.display = sandboxNodes.length ? 'none' : 'flex';
 
   const canvasRect = workspace.getBoundingClientRect();
 
@@ -1688,9 +1736,13 @@ function updateSandboxWires() {
     const iR = inPort.getBoundingClientRect();
 
     const x1 = oR.left + oR.width / 2 - canvasRect.left - panX;
+
     const y1 = oR.top + oR.height / 2 - canvasRect.top - panY;
+
     const x2 = iR.left + iR.width / 2 - canvasRect.left - panX;
+
     const y2 = iR.top + iR.height / 2 - canvasRect.top - panY;
+
     const srcNode = sandboxNodes.find(n => n.id === wire.fromNodeId);
     let srcVal = 0;
     if (srcNode) {
@@ -1711,11 +1763,7 @@ function updateSandboxWires() {
     const dir = x2 >= x1 ? 1 : -1;
     const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
     const d = `M ${x1} ${y1} C ${x1 + dir * dx} ${y1}, ${x2 - dir * dx} ${y2}, ${x2} ${y2}`;
-    // NOTE: theme colors come from CSS classes (.sb-wire-core.high/.low)
-    // because SVG *presentation attributes* do NOT resolve CSS var() — that
-    // was the "thick black wire" bug. Literal fallback attributes below
-    // guarantee thin stroked wires (never black filled blobs) even if the
-    // stylesheet is stale or cached.
+
     const casing = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     casing.setAttribute('d', d);
     casing.setAttribute('fill', 'none');
@@ -1783,7 +1831,7 @@ function updateSandboxWires() {
       const portIdx = parseInt(p.dataset.portIdx);
       let val = 0;
       if (isIC) {
-        // IC: portIdx IS the pin number, outputStates keyed by pin number
+
         val = (node.outputStates && node.outputStates[portIdx] !== undefined) ? node.outputStates[portIdx] : 0;
       } else {
         val = portIdx === 0 ? (node.outputState || 0) :
@@ -1817,6 +1865,7 @@ window.updateSensorThreshold = function (nodeId, value) {
     evaluateSandbox();
   }
 };
+// simulation
 function evaluateSandbox() {
   if (sandboxNodes.length === 0) return;
 
@@ -1838,7 +1887,7 @@ function evaluateSandbox() {
         const src = sandboxNodes.find(n => n.id === wire.fromNodeId);
         if (!src) return;
         let val = 0;
-        // Get output value from source node
+
         if (src.outputStates && src.outputStates[wire.fromPortIdx] !== undefined) {
           val = src.outputStates[wire.fromPortIdx] || 0;
         } else if (wire.fromPortIdx === 0) val = src.outputState || 0;
@@ -1846,9 +1895,8 @@ function evaluateSandbox() {
         else if (wire.fromPortIdx === 2) val = src.outputState3 || 0;
         else if (wire.fromPortIdx === 3) val = src.outputState4 || 0;
 
-        // Route into destination node
         if (isIC) {
-          // For ICs: toPortIdx IS the pin number (1..14)
+
           node.pinValues[wire.toPortIdx] = val;
         } else {
           if (wire.toPortIdx < node.inputsCount) node.inputValues[wire.toPortIdx] = val;
@@ -1878,7 +1926,7 @@ window.evaluateSandbox = evaluateSandbox;
 function computeNodeOutput(node) {
   if (node.type && REAL_ICS[node.type]) {
     const icDef = REAL_ICS[node.type];
-    // pinValues is the pin-number-keyed map; fall back to inputValues for compatibility
+
     const pinsMap = (node.pinValues && Object.keys(node.pinValues).length > 0)
       ? node.pinValues
       : node.inputValues || {};
@@ -1901,9 +1949,9 @@ function computeNodeOutput(node) {
       node.outputState = a ? 1 : 0;
       break;
     case 'rgb-led':
-      node.outputState = a ? 1 : 0;   
-      node.outputState2 = b ? 1 : 0;  
-      node._blueState = c ? 1 : 0;    
+      node.outputState = a ? 1 : 0;
+      node.outputState2 = b ? 1 : 0;
+      node._blueState = c ? 1 : 0;
       break;
     case 'buzzer':
       node.outputState = a ? 1 : 0;
@@ -1928,11 +1976,11 @@ function computeNodeOutput(node) {
       node.outputState = anyHigh() ? 0 : 1;
       break;
     case 'xor':
-      // XOR parity rule: output HIGH if ODD number of inputs are HIGH
+
       node.outputState = xorParity();
       break;
     case 'xnor':
-      // XNOR: output HIGH if EVEN number of inputs are HIGH
+
       node.outputState = xorParity() ? 0 : 1;
       break;
 
@@ -1943,15 +1991,15 @@ function computeNodeOutput(node) {
     case 'd-flop': {
       const clk = b ? 1 : 0;
       if (clk === 1 && node.prevClockState === 0) {
-        node.outputState = a ? 1 : 0;  
+        node.outputState = a ? 1 : 0;
       }
       node.prevClockState = clk;
       break;
     }
 
     case 'half-adder': {
-      node.outputState = (!!a !== !!b) ? 1 : 0;  
-      node.outputState2 = (a && b) ? 1 : 0;        
+      node.outputState = (!!a !== !!b) ? 1 : 0;
+      node.outputState2 = (a && b) ? 1 : 0;
       break;
     }
 
@@ -1960,8 +2008,8 @@ function computeNodeOutput(node) {
       const carry1 = (a && b);
       const sum2 = (sum1 !== !!c);
       const carry2 = (sum1 && c);
-      node.outputState = sum2 ? 1 : 0;              
-      node.outputState2 = (carry1 || carry2) ? 1 : 0;  
+      node.outputState = sum2 ? 1 : 0;
+      node.outputState2 = (carry1 || carry2) ? 1 : 0;
       break;
     }
 
@@ -1982,13 +2030,13 @@ function addGateInput(nodeId) {
   pushUndo();
   node.inputsCount++;
   node.inputValues = Array(node.inputsCount).fill(0);
-  // Remove any wires that targeted ports that no longer make sense (none needed — just grow)
+
   const el = document.getElementById(nodeId);
   if (el) {
-    // Remove old input ports, re-render
+
     el.querySelectorAll('.port-input').forEach(p => p.remove());
     renderInputPorts(node, el);
-    // Auto-resize height
+
     updateGateNodeHeight(el, node.inputsCount);
   }
   evaluateSandbox();
@@ -2004,7 +2052,7 @@ function removeGateInput(nodeId) {
   const removedIdx = node.inputsCount - 1;
   node.inputsCount--;
   node.inputValues = Array(node.inputsCount).fill(0);
-  // Remove wires connected to the removed port
+
   sandboxWires = sandboxWires.filter(w => !(w.toNodeId === nodeId && w.toPortIdx === removedIdx));
   const el = document.getElementById(nodeId);
   if (el) {
@@ -2020,66 +2068,57 @@ window.addGateInput = addGateInput;
 window.removeGateInput = removeGateInput;
 
 function updateGateNodeHeight(el, inputsCount) {
-  // Each input port needs at least 22px, minimum 80px
+
   const minH = Math.max(80, inputsCount * 22 + 20);
   el.style.minHeight = minH + 'px';
 }
 
+// context menu
 let _sbCtxMenu = null;
 function showSandboxContextMenu(e, node) {
   e.preventDefault();
   hideSandboxContextMenu();
-  if (!MULTI_INPUT_GATE_TYPES.has(node.type)) return;
+  const isGate = MULTI_INPUT_GATE_TYPES.has(node.type);
 
   const menu = document.createElement('div');
   menu.className = 'sb-context-menu';
-  menu.style.cssText = `position:fixed;left:${e.clientX}px;top:${e.clientY}px;z-index:9999;
-    background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:8px;
-    box-shadow:0 8px 32px rgba(0,0,0,0.4);min-width:180px;overflow:hidden;`;
+  menu.style.left = `${e.clientX}px`;
+  menu.style.top = `${e.clientY}px`;
 
-  const items = [
-    {
-      icon: '➕', label: `Add Input (now ${node.inputsCount})`,
-      action: () => addGateInput(node.id),
-      disabled: node.inputsCount >= MAX_GATE_INPUTS
-    },
-    {
-      icon: '➖', label: `Remove Input (now ${node.inputsCount})`,
-      action: () => removeGateInput(node.id),
-      disabled: node.inputsCount <= MIN_GATE_INPUTS
-    },
-    { separator: true },
-    {
-      icon: '🗑️', label: 'Delete Gate',
-      action: () => deleteNode(node.id)
-    }
-  ];
+  const items = [];
+  if (isGate) {
+    items.push(
+      { icon: '➕', tone: 'add', label: 'Add Input', count: node.inputsCount, action: () => addGateInput(node.id), disabled: node.inputsCount >= MAX_GATE_INPUTS },
+      { icon: '➖', tone: 'remove', label: 'Remove Input', count: node.inputsCount, action: () => removeGateInput(node.id), disabled: node.inputsCount <= MIN_GATE_INPUTS },
+      { separator: true },
+    );
+  }
+  items.push(
+    { icon: '⧉', tone: 'dup', label: 'Duplicate', action: () => duplicateNode(node.id) },
+    { icon: '🗑️', tone: 'danger', label: 'Delete', danger: true, action: () => deleteNode(node.id) },
+  );
 
   items.forEach(item => {
     if (item.separator) {
       const sep = document.createElement('div');
-      sep.style.cssText = 'height:1px;background:var(--border-color);margin:4px 0';
+      sep.className = 'sb-ctx-sep';
       menu.appendChild(sep);
       return;
     }
     const btn = document.createElement('button');
-    btn.style.cssText = `display:flex;align-items:center;gap:8px;width:100%;padding:8px 14px;
-      background:transparent;border:none;color:var(--text-primary);font-size:0.8rem;
-      cursor:${item.disabled ? 'not-allowed' : 'pointer'};opacity:${item.disabled ? '0.4' : '1'};
-      font-family:var(--font-body);text-align:left;`;
-    btn.innerHTML = `<span>${item.icon}</span><span>${item.label}</span>`;
-    if (!item.disabled) {
-      btn.addEventListener('mouseenter', () => btn.style.background = 'var(--bg-tertiary)');
-      btn.addEventListener('mouseleave', () => btn.style.background = 'transparent');
-      btn.addEventListener('click', () => { hideSandboxContextMenu(); item.action(); });
-    }
+    btn.className = 'sb-ctx-item' + (item.danger ? ' danger' : '');
+    btn.disabled = !!item.disabled;
+    btn.innerHTML = `<span class="sb-ctx-icon ${item.tone || ''}">${item.icon}</span><span class="sb-ctx-label">${item.label}</span>${item.count !== undefined ? `<span class="sb-ctx-count">${item.count}</span>` : ''}`;
+    btn.addEventListener('click', () => { hideSandboxContextMenu(); item.action(); });
     menu.appendChild(btn);
   });
 
   document.body.appendChild(menu);
+  const r = menu.getBoundingClientRect();
+  if (r.right > window.innerWidth - 8) menu.style.left = `${Math.max(8, window.innerWidth - r.width - 8)}px`;
+  if (r.bottom > window.innerHeight - 8) menu.style.top = `${Math.max(8, window.innerHeight - r.height - 8)}px`;
   _sbCtxMenu = menu;
 
-  // Auto-close on outside click
   setTimeout(() => {
     document.addEventListener('click', hideSandboxContextMenu, { once: true });
     document.addEventListener('contextmenu', hideSandboxContextMenu, { once: true });
@@ -2154,7 +2193,7 @@ function updateNodeVisuals(node) {
       }
       const cursor = document.getElementById(`${node.id}-cursor`);
       if (cursor) {
-        const x = node.outputState === 1 ? 62.5 : 12.5; 
+        const x = node.outputState === 1 ? 62.5 : 12.5;
         cursor.setAttribute('x1', x);
         cursor.setAttribute('x2', x);
       }
@@ -2177,14 +2216,14 @@ function updateNodeVisuals(node) {
           if (p.type === 'output') {
             val = (node.outputStates && node.outputStates[p.pin] !== undefined) ? node.outputStates[p.pin] : 0;
           } else if (p.type === 'input') {
-            // pinValues is keyed by pin number
+
             val = (node.pinValues && node.pinValues[p.pin] !== undefined) ? node.pinValues[p.pin] : 0;
           } else if (p.type === 'power') {
-            val = 1; // VCC always high
+            val = 1;
           }
           const ind = document.getElementById(`${node.id}-pin-${p.pin}-ind`);
           if (ind) ind.classList.toggle('high', val === 1);
-          // dataset.portIdx stores the pin number (e.g. 1, 2, ... 14)
+
           const port = el.querySelector(`.sandbox-port[data-port-idx="${p.pin}"]`);
           if (port) port.classList.toggle('active-port', val === 1);
         });
@@ -2195,13 +2234,13 @@ function updateNodeVisuals(node) {
 }
 
 function getRgbColor(r, g, b) {
-  if (r && g && b) return '#ffffff';  
-  if (r && g) return '#fde047';       
-  if (r && b) return '#d946ef';       
-  if (g && b) return '#06b6d4';       
-  if (r) return '#ef4444';            
-  if (g) return '#22c55e';            
-  if (b) return '#3b82f6';            
+  if (r && g && b) return '#ffffff';
+  if (r && g) return '#fde047';
+  if (r && b) return '#d946ef';
+  if (g && b) return '#06b6d4';
+  if (r) return '#ef4444';
+  if (g) return '#22c55e';
+  if (b) return '#3b82f6';
   return 'var(--bg-primary)';
 }
 
@@ -2376,22 +2415,22 @@ function updateSevenSeg(node) {
   const val = (node.inputValues[3] << 3) | (node.inputValues[2] << 2)
     | (node.inputValues[1] << 1) | node.inputValues[0];
   const SEG = [
-    [1, 1, 1, 1, 1, 1, 0], 
-    [0, 1, 1, 0, 0, 0, 0], 
-    [1, 1, 0, 1, 1, 0, 1], 
-    [1, 1, 1, 1, 0, 0, 1], 
-    [0, 1, 1, 0, 0, 1, 1], 
-    [1, 0, 1, 1, 0, 1, 1], 
-    [1, 0, 1, 1, 1, 1, 1], 
-    [1, 1, 1, 0, 0, 0, 0], 
-    [1, 1, 1, 1, 1, 1, 1], 
-    [1, 1, 1, 1, 0, 1, 1], 
-    [1, 1, 1, 0, 1, 1, 1], 
-    [0, 0, 1, 1, 1, 1, 1], 
-    [1, 0, 0, 1, 1, 1, 0], 
-    [0, 1, 1, 1, 1, 0, 1], 
-    [1, 0, 0, 1, 1, 1, 1], 
-    [1, 0, 0, 0, 1, 1, 1], 
+    [1, 1, 1, 1, 1, 1, 0],
+    [0, 1, 1, 0, 0, 0, 0],
+    [1, 1, 0, 1, 1, 0, 1],
+    [1, 1, 1, 1, 0, 0, 1],
+    [0, 1, 1, 0, 0, 1, 1],
+    [1, 0, 1, 1, 0, 1, 1],
+    [1, 0, 1, 1, 1, 1, 1],
+    [1, 1, 1, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 0, 1, 1],
+    [1, 1, 1, 0, 1, 1, 1],
+    [0, 0, 1, 1, 1, 1, 1],
+    [1, 0, 0, 1, 1, 1, 0],
+    [0, 1, 1, 1, 1, 0, 1],
+    [1, 0, 0, 1, 1, 1, 1],
+    [1, 0, 0, 0, 1, 1, 1],
   ];
 
   const segs = SEG[val & 0xF];
@@ -2399,15 +2438,20 @@ function updateSevenSeg(node) {
     document.getElementById(`${node.id}-seg-${s}`)?.classList.toggle('active', segs[i] === 1);
   });
 }
+// clock loop
 function startSimulationLoop() {
   if (simInterval) clearInterval(simInterval);
   if (clockInterval) clearInterval(clockInterval);
 
   const baseInterval = Math.round(80 / simSpeed);
+
   const clockIntervalMs = Math.round(1000 / simSpeed);
 
   simInterval = setInterval(() => {
-    if (isSimRunning) evaluateSandbox();
+    if (isSimRunning) {
+      evaluateSandbox();
+      try { sampleWaveform(sandboxNodes); } catch (err) {}
+    }
   }, Math.max(16, baseInterval));
 
   clockInterval = setInterval(() => {
@@ -2437,7 +2481,34 @@ function deleteNode(id) {
   updateICButtonState();
   evaluateSandbox();
 }
+window.deleteNode = deleteNode;
 
+function duplicateNode(id) {
+  const src = sandboxNodes.find(n => n.id === id);
+  if (!src) return;
+  pushUndo();
+  const node = {
+    ...src,
+    id: `sb-node-${nextNodeId++}`,
+    x: src.x + 30,
+    y: src.y + 30,
+    inputValues: [...(src.inputValues || [])],
+    outputStates: { ...(src.outputStates || {}) },
+    pinValues: src.pinValues ? { ...src.pinValues } : null,
+    data: src.data ? { ...src.data } : {},
+    outputState: 0,
+    outputState2: 0,
+    prevClockState: 0,
+  };
+  sandboxNodes.push(node);
+  renderNodeDOM(node);
+  updateSandboxWires();
+  evaluateSandbox();
+  selectNode(node.id);
+  playSound('success');
+  showToast('Duplicated');
+}
+window.duplicateNode = duplicateNode;
 
 function clearSandbox() {
   sandboxNodes.forEach(n => document.getElementById(n.id)?.remove());
@@ -2450,6 +2521,7 @@ function clearSandbox() {
   cancelWiring();
   if (wiresSvg) wiresSvg.innerHTML = '';
 }
+// save + load
 function saveCircuitToLocal(name) {
   const stored = JSON.parse(localStorage.getItem('logicQuest_circuits') || '{}');
   stored[name] = serializeLayout();
@@ -2534,7 +2606,7 @@ function importLayout(layout) {
     n.outputStates = n.outputStates ?? {};
     n.inputValues = n.inputValues ?? Array(n.inputsCount).fill(0);
     n.data = n.data ?? (def.data ? { ...def.data } : {});
-    // Ensure IC nodes always have pinValues initialized
+
     if (REAL_ICS[n.type]) {
       n.pinValues = n.pinValues ?? {};
     } else {
@@ -2563,13 +2635,11 @@ const halfAdderSvg = `
   <text x="30" y="55" fill="var(--text-primary)" font-family="var(--font-mono)" font-weight="700">A</text>
   <text x="30" y="165" fill="var(--text-primary)" font-family="var(--font-mono)" font-weight="700">B</text>
 
-  
   <g transform="translate(180, 20)">
     <rect x="0" y="10" width="80" height="50" rx="6" fill="var(--bg-secondary)" stroke="var(--text-primary)" stroke-width="2"/>
     <text x="40" y="40" dominant-baseline="middle" text-anchor="middle" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="700">XOR</text>
   </g>
 
-  
   <g transform="translate(180, 130)">
     <rect x="0" y="10" width="80" height="50" rx="6" fill="var(--bg-secondary)" stroke="var(--text-primary)" stroke-width="2"/>
     <text x="40" y="40" dominant-baseline="middle" text-anchor="middle" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="700">AND</text>
@@ -2651,24 +2721,21 @@ const fullAdderSvg = `
 const dFlopTimingSvg = `
 <div style="display:flex; flex-direction:column; gap:0.5rem; width:100%; align-items:center;">
   <svg viewBox="0 0 400 160" width="100%" height="160" class="is-box">
-    
+
     <text x="15" y="35" fill="var(--text-secondary)" font-family="var(--font-mono)" font-size="0.75rem" font-weight="700">CLK</text>
     <path d="M 50 35 L 100 35 L 100 15 L 150 15 L 150 35 L 200 35 L 200 15 L 250 15 L 250 35 L 300 35 L 300 15 L 350 15" fill="none" stroke="var(--text-primary)" stroke-width="2"/>
-    
+
     <path d="M 100 30 L 100 18 L 97 22 M 100 18 L 103 22" fill="none" stroke="var(--color-cyan)" stroke-width="1.5"/>
     <path d="M 200 30 L 200 18 L 197 22 M 200 18 L 203 22" fill="none" stroke="var(--color-cyan)" stroke-width="1.5"/>
     <path d="M 300 30 L 300 18 L 297 22 M 300 18 L 303 22" fill="none" stroke="var(--color-cyan)" stroke-width="1.5"/>
 
-    
     <text x="15" y="85" fill="var(--text-secondary)" font-family="var(--font-mono)" font-size="0.75rem" font-weight="700">D</text>
     <path d="M 50 90 L 130 90 L 130 65 L 230 65 L 230 90 L 350 90" fill="none" stroke="var(--text-secondary)" stroke-width="2"/>
 
-    
     <text x="15" y="135" fill="var(--text-secondary)" font-family="var(--font-mono)" font-size="0.75rem" font-weight="700">Q</text>
-    
+
     <path d="M 50 140 L 200 140 L 200 115 L 300 115 L 300 140 L 350 140" fill="none" stroke="var(--color-success)" stroke-width="2"/>
 
-    
     <line x1="100" y1="15" x2="100" y2="145" stroke="var(--border-color)" stroke-dasharray="3,3"/>
     <line x1="200" y1="15" x2="200" y2="145" stroke="var(--border-color)" stroke-dasharray="3,3"/>
     <line x1="300" y1="15" x2="300" y2="145" stroke="var(--border-color)" stroke-dasharray="3,3"/>
@@ -2737,15 +2804,18 @@ function openLogicViewer(type) {
   modal.style.display = 'flex';
 }
 
-document.getElementById('close-logic-modal')?.addEventListener('click', () => {
-  playSound('click');
-  document.getElementById('logic-modal').style.display = 'none';
-});
-document.getElementById('logic-modal')?.addEventListener('click', (e) => {
-  if (e.target === document.getElementById('logic-modal')) {
-    document.getElementById('logic-modal').style.display = 'none';
+// modals
+function closeTopModal() {
+  const ids = ['logic-modal', 'save-modal', 'load-modal', 'custom-alert-modal'];
+  for (const id of ids) {
+    const m = document.getElementById(id);
+    if (m && m.style.display === 'flex') {
+      m.style.display = 'none';
+      return true;
+    }
   }
-});
+  return false;
+}
 const CIRCUIT_TEMPLATES = {
   'not-demo': {
     version: 2, nextNodeId: 4,
@@ -3547,6 +3617,7 @@ const TEMPLATE_THEORY = {
 let activeChallengeTemplate = null;
 let challengePassed = false;
 
+// theory guide
 window.updateTheoryGuide = function (name) {
   const guide = TEMPLATE_THEORY[name];
   const card = document.getElementById('sandbox-learning-card');
@@ -3554,7 +3625,7 @@ window.updateTheoryGuide = function (name) {
   if (!card || !body) return;
 
   activeChallengeTemplate = name;
-  challengePassed = false; 
+  challengePassed = false;
 
   if (!guide) {
     body.innerHTML = `
@@ -3625,6 +3696,7 @@ window.checkTheoryChallenge = function () {
   }
 };
 
+// templates
 window.loadSandboxTemplate = function (name) {
   const layout = CIRCUIT_TEMPLATES[name];
   if (!layout) { showToast('Template not found.'); return; }
@@ -3671,7 +3743,9 @@ window.appendSandboxTemplate = function (name, dropX, dropY) {
   const width = maxX - minX;
   const height = maxY - minY;
   const offsetX = dropX - (minX + width / 2);
+
   const offsetY = dropY - (minY + height / 2);
+
   const idMap = {};
   nodes.forEach(n => {
     const oldId = n.id;
@@ -3680,6 +3754,7 @@ window.appendSandboxTemplate = function (name, dropX, dropY) {
 
     n.id = newId;
     n.x = Math.round((n.x + offsetX) / 10) * 10;
+
     n.y = Math.round((n.y + offsetY) / 10) * 10;
 
     const def = COMPONENT_DEFS[n.type];
@@ -3689,7 +3764,7 @@ window.appendSandboxTemplate = function (name, dropX, dropY) {
       n.outputStates = n.outputStates ?? {};
       n.inputValues = n.inputValues ?? Array(n.inputsCount).fill(0);
       n.data = n.data ?? (def.data ? { ...def.data } : {});
-      // Initialize pinValues for IC nodes
+
       if (REAL_ICS[n.type]) {
         n.pinValues = n.pinValues ?? {};
       } else {

@@ -239,4 +239,3 @@ home-view .home-view.active {
 home-view:has(.home-view.active) {
   display: flex;
 }
-

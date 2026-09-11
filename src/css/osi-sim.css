@@ -1038,7 +1038,7 @@
 }
 
  .osi-layer-block.active::after {
-  display: none !important; 
+  display: none !important;
 }
 
  .osi-layer-block.done {
@@ -1782,4 +1782,84 @@
 [data-theme="dark"] .osi-switch-area {
   background: #141d33 !important;
   border-color: #26314d !important;
+}
+
+/* OSI REFINEMENT — icon chips, per-layer active glow, numbered packet stack */
+.osi-layer-top {
+  align-items: center !important;
+}
+
+.osi-layer-icon {
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 7px !important;
+  background: color-mix(in srgb, currentColor 12%, transparent) !important;
+  justify-content: center !important;
+}
+
+.osi-layer-block.active {
+  box-shadow: 0 4px 0 var(--osi-active-shadow, #38bdf8), 0 8px 18px color-mix(in srgb, var(--osi-active-shadow, #38bdf8) 30%, transparent) !important;
+}
+
+.osi-layer-pdu {
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-color) !important;
+  padding: 1px 7px !important;
+  border-radius: 999px !important;
+}
+
+.osi-packet-wrap {
+  counter-reset: pkt !important;
+}
+
+.osi-pkt-layer {
+  position: relative !important;
+  padding-left: 1.7rem !important;
+}
+
+.osi-pkt-layer::before {
+  counter-increment: pkt;
+  content: counter(pkt);
+  position: absolute;
+  left: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: currentColor;
+  color: #fff;
+  font-size: 0.44rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+}
+
+.osi-switch-status {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+}
+
+.osi-switch-status::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-success);
+  box-shadow: 0 0 8px var(--color-success);
+  flex-shrink: 0;
+  animation: osiLed 1.6s ease-in-out infinite;
+}
+
+@keyframes osiLed {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.osi-bin-byte {
+  font-weight: 700 !important;
+  padding: 0.08rem 0.14rem !important;
 }

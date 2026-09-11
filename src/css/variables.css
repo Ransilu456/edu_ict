@@ -1,37 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Sinhala:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Backgrounds */
+
   --bg-primary: #f0f7ff;
   --bg-secondary: #ffffff;
   --bg-tertiary: #e0f2fe;
   --border-color: #cbd5e1;
   --bg-mobile: #e0f2fe;
 
-  /* Text */
   --text-primary: #1e293b;
   --text-secondary: #475569;
   --text-muted: #64748b;
 
-  /* Accent */
   --color-indigo: #1cb0f6;
   --color-indigo-glow: rgba(28, 176, 246, 0.15);
   --color-cyan: #1cb0f6;
   --color-cyan-glow: rgba(28, 176, 246, 0.15);
 
-  /* Logic colors */
   --color-high: #58cc02;
   --color-high-glow: rgba(88, 204, 2, 0.2);
   --color-low: #cbd5e1;
   --color-low-glow: transparent;
   --color-label: #334155;
 
-  /* state colors */
   --color-success: #58cc02;
   --color-error: #ff4b4b;
   --color-amber: #ff9600;
 
-  /* Familly */
   --font-sans: 'Nunito', system-ui, sans-serif;
   --font-header: 'Nunito', system-ui, sans-serif;
   --font-sinhala: 'Noto Sans Sinhala', 'Nunito', sans-serif;
@@ -132,3 +127,24 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+::selection {
+  background: rgba(28, 176, 246, 0.28);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-indigo);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

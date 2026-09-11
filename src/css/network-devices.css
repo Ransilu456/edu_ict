@@ -225,7 +225,6 @@
   box-shadow: 0 0 0 3px rgba(251, 191, 36, .08);
 }
 
-/* Host pickers */
 .nd-row {
   display: flex;
   gap: 0.5rem;
@@ -317,7 +316,6 @@
   box-shadow: none;
 }
 
-/* Info / table cards */
 .nd-card {
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
@@ -354,7 +352,6 @@
   font-weight: 600;
 }
 
-/* MAC Table */
 .nd-table-content {
   display: flex;
   flex-direction: column;
@@ -398,7 +395,6 @@
   color: var(--color-success);
 }
 
-/* Legend */
 .nd-legend-content {
   font-size: 0.65rem;
   color: var(--text-secondary);
@@ -414,7 +410,6 @@
   gap: 0.45rem;
 }
 
-/* Right panel */
 .nd-right {
   flex: 1;
   display: flex;
@@ -441,7 +436,6 @@
   overflow: visible;
 }
 
-/* SVG elements */
 .nd-host-bg {
   fill: rgba(99, 102, 241, .07);
   stroke: var(--color-indigo);
@@ -539,7 +533,6 @@
   }
 }
 
-/* Event log */
 .nd-log {
   border-top: 1px solid var(--border-color);
   max-height: 150px;
@@ -641,7 +634,6 @@
   background: rgba(239, 68, 68, .05);
 }
 
-/* ── Tab 3: Encryption ── */
 .crypto-layout {
   flex: 1;
   overflow-y: auto;
@@ -1003,7 +995,6 @@
   color: var(--color-indigo);
 }
 
-/* ── Tab 4: Parity Check ── */
 .parity-layout {
   flex: 1;
   overflow-y: auto;
@@ -1265,7 +1256,6 @@
   font-weight: 600;
 }
 
-/* ── Responsive ── */
 @media (max-width: 900px) {
   .nd-left {
     width: 240px;
@@ -1324,7 +1314,6 @@
   }
 }
 
-/* ── Packet Protocol Inspector ── */
 .nd-packet-inspector {
   display: flex;
   flex-direction: column;
@@ -1375,7 +1364,6 @@
   color: var(--text-primary);
 }
 
-/* ── Subnetting & CIDR Lab ── */
 .subnet-layout {
   display: flex;
   flex: 1;
@@ -1521,7 +1509,6 @@
   color: var(--text-primary);
 }
 
-/* Binary 32-bit map */
 .subnet-binary-vis {
   display: flex;
   flex-direction: column;
@@ -1570,7 +1557,6 @@
   border: 1px solid rgba(88, 204, 2, 0.4);
 }
 
-/* Subnet Table */
 .subnet-table {
   width: 100%;
   border-collapse: collapse;
@@ -1610,13 +1596,6 @@
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   LOGICQUEST DASHBOARD THEME — Network Devices / Subnet / Crypto /
-   Parity labs restyled like a modern analytics dashboard: soft page
-   background, floating white stat cards, black pill headers, segmented
-   tab control, rounded activity feed.
-   ═══════════════════════════════════════════════════════════════════ */
-
 .network-devices-view {
   background: #edf2f7;
 }
@@ -1626,7 +1605,6 @@
   background: transparent;
 }
 
-/* ── Segmented tab bar (Day / Week / Month style) ── */
 .nd-tabs {
   background: transparent !important;
   border-bottom: none !important;
@@ -1656,13 +1634,11 @@
   box-shadow: 0 6px 14px rgba(30, 41, 59, 0.28) !important;
 }
 
-/* ── Board layout on soft canvas ── */
 .nd-layout {
   gap: 0.9rem;
   padding: 0.4rem 1rem 1rem 1rem;
 }
 
-/* ── Left control column: stack of floating stat cards ── */
 .nd-left {
   background: transparent !important;
   border-right: none !important;
@@ -1699,7 +1675,6 @@
   color: rgba(255, 255, 255, 0.65) !important;
 }
 
-/* Device picker tiles */
 .nd-device-btn {
   border-radius: 14px !important;
   border: 1.5px solid #e6ebf1 !important;
@@ -1720,7 +1695,6 @@
   padding: 1px 8px !important;
 }
 
-/* Send button: chunky dashboard CTA */
 .nd-send-btn {
   border-radius: 14px !important;
   padding: 0.7rem 0.8rem !important;
@@ -1729,7 +1703,6 @@
   letter-spacing: 0.05em;
 }
 
-/* ── Info / table cards: mini stat tiles ── */
 .nd-card {
   background: #f7f9fc !important;
   border: 1px solid #e6ebf1 !important;
@@ -1759,7 +1732,6 @@
   box-shadow: 0 2px 6px rgba(15, 42, 67, 0.05) !important;
 }
 
-/* ── Right side: main analytics card ── */
 .nd-right {
   background: #ffffff !important;
   border: 1px solid #e6ebf1 !important;
@@ -1775,7 +1747,6 @@
   border-bottom: 1px solid #eef2f7;
 }
 
-/* ── Event log: activity feed ── */
 .nd-log {
   border-top: none !important;
   background: #ffffff !important;
@@ -1804,7 +1775,6 @@
   font-size: 0.68rem !important;
 }
 
-/* ── Subnet / Crypto / Parity: uniform dashboard cards ── */
 .subnet-layout,
 .crypto-layout,
 .parity-layout {
@@ -1884,7 +1854,6 @@
   background: #f1f5f9 !important;
 }
 
-/* Packet inspector rows */
 .pkt-layer-row {
   border-radius: 12px !important;
 }
@@ -1894,7 +1863,6 @@
   color: #fff !important;
 }
 
-/* ── Dashboard dark mode ── */
 .dark .network-devices-view,
 [data-theme="dark"] .network-devices-view {
   background: #0b132b !important;
@@ -1992,13 +1960,6 @@
   background: #0b132b !important;
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   NETWORK LABS POLISH — live parity readout, flipped-bit flash,
-   class-based subnet bits (flex, wraps on mobile), crypto hint,
-   tidy host picker spacing.
-   ═══════════════════════════════════════════════════════════════════ */
-
-/* ── Parity live count ── */
 .parity-count {
   display: flex;
   justify-content: space-between;
@@ -2038,7 +1999,6 @@
   60% { transform: scale(1.1); }
 }
 
-/* ── Subnet binary bits (flexible, theme-aware) ── */
 .binary-bits-wrap {
   display: flex;
   gap: 2px;
@@ -2069,7 +2029,6 @@
   padding-bottom: 0.25rem;
 }
 
-/* ── Crypto hint ── */
 .crypto-hint {
   font-size: 0.62rem;
   color: var(--text-muted);
@@ -2091,7 +2050,6 @@
   overflow-wrap: anywhere;
 }
 
-/* ── Host picker tidy spacing ── */
 .nd-host-btn {
   margin: 0;
 }
@@ -2108,4 +2066,110 @@
 
 .nd-send-btn {
   margin: 0;
+}
+
+/* NETWORK REFINEMENT — per-device badges, livelier pickers, log rows */
+.nd-device-btn[data-device="hub"] .nd-dev-layer {
+  background: rgba(129, 140, 248, 0.14) !important;
+  color: #818cf8 !important;
+}
+
+.nd-device-btn[data-device="switch"] .nd-dev-layer {
+  background: rgba(34, 211, 165, 0.14) !important;
+  color: #10b981 !important;
+}
+
+.nd-device-btn[data-device="router"] .nd-dev-layer {
+  background: rgba(251, 191, 36, 0.16) !important;
+  color: #d97706 !important;
+}
+
+.nd-device-btn svg {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+.nd-host-btn {
+  transition: transform 0.1s ease, border-color 0.1s ease, background 0.1s ease !important;
+}
+
+.nd-host-btn:hover {
+  transform: translateY(-1px);
+}
+
+.nd-host-btn.active {
+  box-shadow: 0 0 0 2px var(--color-indigo-glow), 0 3px 8px rgba(28, 176, 246, 0.25) !important;
+}
+
+.nd-log-item:hover {
+  filter: brightness(0.985);
+}
+
+.nd-log-item svg {
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  padding: 2px;
+  width: 15px !important;
+  height: 15px !important;
+}
+
+.mac-entry {
+  transition: transform 0.1s ease;
+}
+
+.mac-entry:hover {
+  transform: translateX(2px);
+}
+
+.subnet-presets {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px !important;
+}
+
+.subnet-preset-btn {
+  border: none !important;
+  background: transparent !important;
+  border-radius: 999px !important;
+  padding: 0.25rem 0.6rem !important;
+  flex: 1;
+}
+
+.subnet-preset-btn:hover {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: transparent !important;
+}
+
+.crypto-flow-arrow-wrap {
+  position: relative;
+}
+
+.crypto-flow-arrow {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 1.5px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crypto-input:focus {
+  border-color: var(--color-indigo);
+}
+
+.parity-bit {
+  transition: transform 0.1s ease, background 0.1s ease, border-color 0.1s ease;
+}
+
+.parity-bit:not(.recv):hover {
+  transform: translateY(-2px);
+}
+
+.parity-result {
+  font-weight: 700 !important;
 }
