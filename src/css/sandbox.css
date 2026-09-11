@@ -968,6 +968,21 @@
   box-shadow: 0 0 6px #22d3a5, 0 0 10px rgba(34, 211, 165, 0.4);
 }
 
+.real-ic-pin-row.connected {
+  background: rgba(56, 189, 248, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.35);
+}
+
+.real-ic-pin-row.connected .real-ic-pin-name,
+.real-ic-pin-row.connected .real-ic-pin-num {
+  color: #bae6fd;
+}
+
+.real-ic-pin-indicator.connected {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2), 0 0 7px rgba(56, 189, 248, 0.7);
+}
+
 .real-ic-node .sandbox-port {
   position: relative !important;
   left: auto !important;
@@ -1010,6 +1025,16 @@
   background: #22d3a5 !important;
   border-color: #ffffff !important;
   box-shadow: 0 0 10px #22d3a5 !important;
+}
+
+.real-ic-node .sandbox-port.connected {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18), 0 0 9px rgba(56, 189, 248, 0.75) !important;
+}
+
+.real-ic-node .sandbox-port.connected.active-port {
+  border-color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(34, 211, 165, 0.22), 0 0 10px #22d3a5 !important;
 }
 
 .real-ic-node .node-delete-btn {

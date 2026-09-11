@@ -1756,6 +1756,10 @@ function updateSandboxWires() {
 
   const canvasRect = workspace.getBoundingClientRect();
 
+  document.querySelectorAll('.sandbox-port.connected, .real-ic-pin-row.connected, .real-ic-pin-indicator.connected').forEach(el => {
+    el.classList.remove('connected');
+  });
+
   sandboxWires.forEach((wire) => {
     const fromEl = document.getElementById(wire.fromNodeId);
     const toEl = document.getElementById(wire.toNodeId);
@@ -1770,6 +1774,13 @@ function updateSandboxWires() {
     });
 
     if (!outPort || !inPort) return;
+
+    outPort.classList.add('connected');
+    inPort.classList.add('connected');
+    outPort.closest('.real-ic-pin-row')?.classList.add('connected');
+    inPort.closest('.real-ic-pin-row')?.classList.add('connected');
+    outPort.closest('.real-ic-pin-row')?.querySelector('.real-ic-pin-indicator')?.classList.add('connected');
+    inPort.closest('.real-ic-pin-row')?.querySelector('.real-ic-pin-indicator')?.classList.add('connected');
 
     const oR = outPort.getBoundingClientRect();
     const iR = inPort.getBoundingClientRect();
