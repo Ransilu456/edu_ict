@@ -337,7 +337,7 @@ export function exportCircuitImage() {
     a.download = `logicquest-circuit-${Date.now().toString().slice(-4)}.png`;
     a.href = dataUrl;
     a.click();
-    if (window.showToast) window.showToast('📸 Screenshot saved to Downloads!');
+      if (window.showToast) window.showToast('Screenshot saved to Downloads');
   } catch (err) {
     console.error('Screenshot error:', err);
   }

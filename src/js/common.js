@@ -99,7 +99,7 @@ function initThemeToggle() {
     const nextTheme = currentTheme === "dark" ? "light" : "dark";
     applyTheme(nextTheme);
     playSound('toggle');
-    showToast(nextTheme === "dark" ? "🌙 Dark Mode Activated" : "☀️ Light Mode Activated");
+    showToast(nextTheme === "dark" ? "Dark mode on" : "Light mode on");
   });
 }
 window.applyTheme = applyTheme;

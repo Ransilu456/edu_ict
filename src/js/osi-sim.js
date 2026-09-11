@@ -35,6 +35,9 @@ const I = {
   switch_: '<svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="6" width="12" height="8" rx="1"/><path d="M6 10h8M10 6v8"/></svg>',
   layers: '<svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5l8 4 8-4-8-4L2 5z"/><path d="M2 10l8 4 8-4"/><path d="M2 15l8 4 8-4"/></svg>',
   bytes: '<svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 10h6M7 14h6"/></svg>',
+  gear: '<svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="3"/><path d="M10 2v2.2M10 15.8V18M4.2 4.2l1.55 1.55M14.25 14.25l1.55 1.55M2 10h2.2M15.8 10H18M4.2 15.8l1.55-1.55M14.25 5.75l1.55-1.55"/></svg>',
+  play: '<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M6 4l10 6-10 6V4z"/></svg>',
+  pause: '<svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><rect x="5" y="4" width="4" height="12" rx="1"/><rect x="11" y="4" width="4" height="12" rx="1"/></svg>',
 };
 
 const LAYERS = [
@@ -66,6 +69,14 @@ const STEP_NAMES = [
   'Presentation Layer \u2014 Decoding & Decryption',
   'Application Layer \u2014 Message Delivered!',
 ];
+
+const ERROR_SEQUENCE = [null, 'checksum', 'mac', 'ttl'];
+const ERROR_LABELS = {
+  'null': 'Error: Off',
+  checksum: 'Error: Checksum',
+  mac: 'Error: Unknown MAC',
+  ttl: 'Error: TTL Expired',
+};
 
 // sim state
 let state = {
@@ -103,37 +114,52 @@ window.cleanupOSISim = cleanupOSISim;
 function buildOSILayout() {
   el('osi-container').innerHTML = `
 <div class="osi-topbar" id="osi-topbar">
-  <div class="osi-ctrl-group">
-    <label>Msg <input type="text" id="osi-msg" value="HELLO" size="6"></label>
-    <label>Src IP <input type="text" id="osi-srcip" value="192.168.1.10" size="12"></label>
-    <label>Dst IP <input type="text" id="osi-dstip" value="192.168.1.20" size="12"></label>
+  <div class="osi-brand">
+    <span class="osi-brand-icon">${I.layers}</span>
+    <span class="osi-brand-text"><b>OSI Journey</b><small>7 layers · live encapsulation</small></span>
   </div>
-  <div class="osi-ctrl-group">
+  <div class="osi-ctrl-group" data-group="Message">
+    <span class="osi-group-tag">Message</span>
+    <label>Msg <input type="text" id="osi-msg" value="HELLO" size="6"></label>
     <label>App <select id="osi-protocol"><option>HTTP</option><option>HTTPS</option><option>FTP</option><option>SMTP</option><option>DNS</option></select></label>
     <label>Xport <select id="osi-transport"><option>TCP</option><option>UDP</option></select></label>
   </div>
-  <div class="osi-ctrl-group">
-    <label>Device <select id="osi-device"><option value="switch">Switch</option><option value="router">Router</option></select></label>
-    <label>Subnets <select id="osi-subnet"><option value="same">Same</option><option value="diff">Different</option></select></label>
-  </div>
-  <div class="osi-ctrl-group">
-    <button class="osi-btn primary" id="osi-step-btn">Next Step</button>
-    <button class="osi-btn" id="osi-auto-btn">Auto</button>
+  <div class="osi-ctrl-group" data-group="Run">
+    <span class="osi-group-tag">Run</span>
+    <button class="osi-btn primary" id="osi-step-btn">${I.arrowR} Next Step</button>
+    <button class="osi-btn" id="osi-auto-btn">${I.play} Auto</button>
     <button class="osi-btn" id="osi-speed-btn" title="Cycle simulation speed (0.5x, 1x, 2x, 4x)">1x</button>
-    <button class="osi-btn" id="osi-reset-btn">Reset</button>
+    <button class="osi-btn" id="osi-reset-btn">${I.refresh} Reset</button>
   </div>
-  <div class="osi-ctrl-group">
+  <div class="osi-ctrl-group" data-group="View">
+    <span class="osi-group-tag">View</span>
     <button class="osi-btn" id="osi-binary-btn">Bin</button>
     <button class="osi-btn" id="osi-hex-btn">Hex</button>
+    <button class="osi-btn" id="osi-error-btn" title="Cycle through simulated transmission errors">${I.warn} Error: Off</button>
     <button class="osi-btn" id="osi-insp-btn">${I.list} Inspect</button>
     <button class="osi-btn" id="osi-compare-btn">${I.layers} OSI vs TCP/IP</button>
     <button class="osi-btn" id="osi-crypto-btn">${I.shield} RSA</button>
   </div>
+  <div class="osi-settings-btn-wrap">
+    <button class="osi-btn" id="osi-settings-btn" title="Show network addressing options">${I.gear} Network Settings</button>
+    <span class="osi-settings-summary" id="osi-settings-summary">Switch · Same subnet</span>
+  </div>
 </div>
+<div class="osi-ctrl-group osi-settings-panel" id="osi-settings-panel" data-group="Network">
+  <span class="osi-group-tag">Network</span>
+  <label>Src IP <input type="text" id="osi-srcip" value="192.168.1.10" size="12"></label>
+  <label>Dst IP <input type="text" id="osi-dstip" value="192.168.1.20" size="12"></label>
+  <label>Device <select id="osi-device"><option value="switch">Switch</option><option value="router">Router</option></select></label>
+  <label>Subnets <select id="osi-subnet"><option value="same">Same</option><option value="diff">Different</option></select></label>
+</div>
+<div class="osi-step-rail" id="osi-step-rail"></div>
 <div class="osi-step-indicator">
-  <span class="osi-step-text" id="osi-step-text">Ready</span>
+  <span class="osi-step-text" id="osi-step-text" aria-live="polite">Ready</span>
   <div class="osi-step-bar"><div class="osi-step-fill" id="osi-step-fill" style="width:0%"></div></div>
   <span class="osi-step-text" id="osi-step-num">0 / ${STEP_NAMES.length}</span>
+</div>
+<div class="osi-legend" id="osi-legend">
+  ${LAYERS.map(l => `<span class="osi-legend-chip" style="--c:${l.color}"><i></i>${l.id}. ${l.short}</span>`).join('')}
 </div>
 <div class="osi-main">
   <div class="osi-alice" id="osi-alice">
@@ -141,13 +167,12 @@ function buildOSILayout() {
     <div class="osi-stack" id="osi-alice-stack"></div>
   </div>
   <div class="osi-center">
+    <div class="osi-stage-head"><span class="osi-stage-dot"></span>Live packet<span class="osi-stage-hint">headers stack as layers wrap the data</span></div>
     <div class="osi-packet-vis" id="osi-packet-vis">
-      <div class="osi-packet-wrap" id="osi-packet-wrap">
-        <div class="osi-pkt-layer osi-pkt-data" id="osi-pkt-data" style="background:rgba(239,68,68,0.08);border-color:#ef4444;padding:0.2rem 0.6rem">Data: &quot;HELLO&quot;</div>
-      </div>
+      <div class="osi-packet-wrap" id="osi-packet-wrap"></div>
     </div>
     <div class="osi-cable-area">
-      <div class="osi-cable" id="osi-cable-left"><div class="osi-cable-track" id="osi-cable-track1"></div></div>
+      <div class="osi-cable-row"><span class="osi-cable-tag">Alice link</span><div class="osi-cable" id="osi-cable-left"><div class="osi-cable-track" id="osi-cable-track1"></div></div></div>
       <div class="osi-switch-area" id="osi-switch-area">
         <div class="osi-switch-device">
           <div class="osi-switch-icon switch" id="osi-switch-icon">${I.switch_}</div>
@@ -155,7 +180,7 @@ function buildOSILayout() {
         </div>
         <div class="osi-switch-status" id="osi-switch-status">Waiting…</div>
       </div>
-      <div class="osi-cable" id="osi-cable-right"><div class="osi-cable-track" id="osi-cable-track2"></div></div>
+      <div class="osi-cable-row"><span class="osi-cable-tag">Bob link</span><div class="osi-cable" id="osi-cable-right"><div class="osi-cable-track" id="osi-cable-track2"></div></div></div>
       <div class="osi-binary-row" id="osi-bits-display"></div>
       <div class="osi-hex-row" id="osi-hex-display"></div>
     </div>
@@ -240,12 +265,37 @@ function buildOSILayout() {
   </div>
 </div>`;
 
-  const aliceStack = el('osi-alice-stack');
-  const bobStack = el('osi-bob-stack');
+  const aliceStack = el('osi-alice-stack');  const bobStack = el('osi-bob-stack');
   LAYERS.forEach(l => {
     aliceStack.appendChild(createLayerBlock(l, 'alice'));
     bobStack.appendChild(createLayerBlock(l, 'bob'));
   });
+  buildStepRail();
+}
+
+function buildStepRail() {
+  const rail = el('osi-step-rail');
+  if (!rail || rail.dataset.built) return;
+  rail.dataset.built = '1';
+  STEP_NAMES.forEach((name, i) => {
+    const d = document.createElement('div');
+    d.className = 'osi-rail-dot ' + (i < 7 ? 'phase-enc' : i < 10 ? 'phase-net' : 'phase-dec');
+    d.id = `osi-rail-${i}`;
+    d.title = `${i + 1}. ${name}`;
+    d.innerHTML = `<span>${i + 1}</span>`;
+    rail.appendChild(d);
+  });
+}
+
+function updateStepRail() {
+  for (let i = 0; i < STEP_NAMES.length; i++) {
+    const d = el(`osi-rail-${i}`);
+    if (!d) continue;
+    d.classList.toggle('done', i < state.step);
+    d.classList.toggle('current', i === state.step);
+  }
+  const cur = el(`osi-rail-${state.step}`);
+  if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest', inline: 'nearest' });
 }
 
 function createLayerBlock(l, side) {
@@ -254,11 +304,11 @@ function createLayerBlock(l, side) {
   div.id = `osi-${side}-l${l.id}`;
   div.style.borderLeftColor = l.color;
   div.style.setProperty('--osi-active-shadow', l.color);
+  div.style.setProperty('--osi-layer-color', l.color);
   div.innerHTML = `<div class="osi-layer-top">
       <span class="osi-layer-badge" style="background:${l.color}">${l.id}</span>
       <span class="osi-layer-icon" style="color:${l.color}">${l.icon}</span>
-      <span class="osi-layer-name">${l.name}</span>
-      <span class="osi-layer-pdu" style="margin-left:auto;font-size:0.62rem;font-weight:700;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.08);color:${l.color}" title="Protocol Data Unit: ${l.pdu}">${l.pdu}</span>
+      <span class="osi-layer-text"><span class="osi-layer-name">${l.name}</span><span class="osi-layer-sub">${l.tcpIp} · ${l.pdu}</span></span>
     </div>
     <div class="osi-layer-data" id="osi-${side}-l${l.id}-data"></div>`;
   div.title = `${l.name} Layer\nPDU: ${l.pdu}\n${l.desc}\n\n${l.analogy}`;
@@ -288,13 +338,15 @@ function bindOSIControls() {
   el('osi-auto-btn').addEventListener('click', () => {
     play('click');
     state.autoMode = !state.autoMode;
-    el('osi-auto-btn').classList.toggle('active', state.autoMode);
+    const btn = el('osi-auto-btn');
+    btn.classList.toggle('active', state.autoMode);
+    btn.innerHTML = state.autoMode ? `${I.pause} Pause` : `${I.play} Auto`;
     if (state.autoMode && state.step < STEP_NAMES.length - 1) autoStep();
   });
 
   const speedBtn = el('osi-speed-btn');
   if (speedBtn) {
-    const speeds = [1, 2, 4, 0.5];
+    const speeds = [0.5, 1, 2, 4];
     speedBtn.addEventListener('click', () => {
       play('click');
       const idx = speeds.indexOf(state.speed);
@@ -356,9 +408,52 @@ function bindOSIControls() {
     });
   }
 
+  // Network Settings drawer
+  const settingsBtn = el('osi-settings-btn');
+  const settingsPanel = el('osi-settings-panel');
+  if (settingsBtn && settingsPanel) {
+    settingsBtn.addEventListener('click', () => {
+      play('click');
+      const open = settingsPanel.classList.toggle('open');
+      settingsBtn.classList.toggle('active', open);
+    });
+  }
+
+  // Error simulation toggle
+  const errorBtn = el('osi-error-btn');
+  if (errorBtn) {
+    errorBtn.addEventListener('click', () => {
+      play('click');
+      const idx = ERROR_SEQUENCE.indexOf(state.errorType);
+      state.errorType = ERROR_SEQUENCE[(idx + 1) % ERROR_SEQUENCE.length];
+      state.errorMode = !!state.errorType;
+      errorBtn.innerHTML = `${I.warn} ${ERROR_LABELS[String(state.errorType)]}`;
+      errorBtn.classList.toggle('active', state.errorMode);
+
+      // Auto-configure network settings so the chosen error scenario is reachable
+      if (state.errorType === 'mac') {
+        el('osi-device').value = 'switch';
+      } else if (state.errorType === 'ttl') {
+        el('osi-device').value = 'router';
+        el('osi-subnet').value = 'diff';
+        if (settingsPanel && !settingsPanel.classList.contains('open')) {
+          settingsPanel.classList.add('open');
+          if (settingsBtn) settingsBtn.classList.add('active');
+        }
+      }
+      resetOSI();
+    });
+  }
+
   ['msg','srcip','dstip','protocol','transport','device','subnet'].forEach(id => {
     const inp = el('osi-' + id);
-    if (inp) inp.addEventListener('change', () => { if (state.step < 0) { readInputs(); if (state.showDetails) updateInspector(); } });
+    if (inp) inp.addEventListener('change', () => {
+      if (state.step < 0) {
+        readInputs();
+        updateSettingsSummary();
+        if (state.showDetails) updateInspector();
+      }
+    });
   });
 }
 
@@ -373,25 +468,35 @@ function readInputs() {
   state.sessionId = Math.floor(Math.random() * 90000) + 10000;
 }
 
+function updateSettingsSummary() {
+  const s = el('osi-settings-summary');
+  if (s) s.textContent = `${state.device === 'switch' ? 'Switch' : 'Router'} · ${state.sameSubnet ? 'Same subnet' : 'Different subnet'}`;
+}
+
 function resetOSI() {
   osiAbort = true;
   if (osiAnimTimer) { clearTimeout(osiAnimTimer); osiAnimTimer = null; }
   osiAbort = false;
   state.step = -1;
   state.autoMode = false;
-  el('osi-auto-btn').classList.remove('active');
+  const autoBtn = el('osi-auto-btn');
+  autoBtn.classList.remove('active');
+  autoBtn.innerHTML = `${I.play} Auto`;
   el('osi-step-btn').disabled = false;
-  el('osi-step-btn').textContent = 'Next Step';
+  el('osi-step-btn').innerHTML = `${I.arrowR} Next Step`;
   el('osi-step-text').textContent = 'Ready';
   el('osi-step-fill').style.width = '0%';
   el('osi-step-num').textContent = `0 / ${STEP_NAMES.length}`;
+  updateStepRail();
   el('osi-bits-display').innerHTML = '';
   el('osi-hex-display').innerHTML = '';
   el('osi-error-overlay').classList.remove('show');
+  el('osi-error-overlay').innerHTML = '';
   el('osi-switch-status').textContent = 'Waiting\u2026';
   el('osi-insp-body').innerHTML = '';
   hideCablePulses();
   readInputs();
+  updateSettingsSummary();
   pkt = {};
 
   LAYERS.forEach(l => {
@@ -427,6 +532,24 @@ function setSendPort() {
   state.dstPort = ports[state.protocol] || 80;
 }
 
+// error handling
+function triggerError(message) {
+  play('error');
+  const overlay = el('osi-error-overlay');
+  if (overlay) {
+    overlay.innerHTML = `${I.warn} ${message}`;
+    overlay.classList.add('show');
+  }
+  state.autoMode = false;
+  if (osiAnimTimer) { clearTimeout(osiAnimTimer); osiAnimTimer = null; }
+  const autoBtn = el('osi-auto-btn');
+  if (autoBtn) { autoBtn.classList.remove('active'); autoBtn.innerHTML = `${I.play} Auto`; }
+  const stepBtn = el('osi-step-btn');
+  if (stepBtn) { stepBtn.disabled = true; stepBtn.textContent = 'Reset to retry'; }
+  const stepText = el('osi-step-text');
+  if (stepText) stepText.textContent = `${STEP_NAMES[state.step]} — ERROR`;
+}
+
 // steps
 function stepOSI() {
   if (state.step >= STEP_NAMES.length - 1) return;
@@ -436,6 +559,7 @@ function stepOSI() {
   el('osi-step-text').textContent = `(${state.step + 1}/${STEP_NAMES.length}) ${STEP_NAMES[state.step]}`;
   el('osi-step-fill').style.width = `${((state.step + 1) / STEP_NAMES.length) * 100}%`;
   el('osi-step-num').textContent = `${state.step + 1} / ${STEP_NAMES.length}`;
+  updateStepRail();
 
   if (state.step < 7) {
     encapsulateStep(state.step);
@@ -455,11 +579,20 @@ function stepOSI() {
   updatePktVis();
   if (state.showDetails) updateInspector();
 
+  if (state.step >= STEP_NAMES.length - 1 && !el('osi-step-btn').disabled === false) {
+    // no-op guard (see below for the real completion handling)
+  }
+
   if (state.step >= STEP_NAMES.length - 1) {
-    el('osi-step-btn').textContent = 'Complete';
-    el('osi-step-btn').disabled = true;
+    const stepBtn = el('osi-step-btn');
+    if (!stepBtn.disabled) {
+      stepBtn.textContent = 'Complete';
+      stepBtn.disabled = true;
+    }
     state.autoMode = false;
-    el('osi-auto-btn').classList.remove('active');
+    const autoBtn = el('osi-auto-btn');
+    autoBtn.classList.remove('active');
+    autoBtn.innerHTML = `${I.play} Auto`;
   }
 }
 
@@ -467,7 +600,7 @@ function autoStep() {
   if (osiAbort || !state.autoMode || state.step >= STEP_NAMES.length - 1) return;
   const delay = Math.max(100, 600 - state.speed * 50);
   stepOSI();
-  osiAnimTimer = setTimeout(autoStep, delay);
+  if (state.autoMode) osiAnimTimer = setTimeout(autoStep, delay);
 }
 
 function encapsulateStep(step) {
@@ -564,10 +697,19 @@ function decapsulateStep(step) {
     case 3:
       dat.innerHTML = `${I.globe} Stripped IP header | ${state.srcIP} \u2192 ${state.dstIP} (TTL was ${pkt.ttl})`;
       break;
-    case 4:
+    case 4: {
       const proto = state.transport;
+      if (state.errorType === 'checksum') {
+        const original = parseInt(pkt.checksum, 16) || 0;
+        const corrupted = (original ^ 0xFF).toString(16).toUpperCase().padStart(4, '0');
+        dat.innerHTML = `<span style="color:#ef4444">${proto} checksum MISMATCH — expected ${pkt.checksum}, recomputed ${corrupted}</span>`;
+        blk.className = 'osi-layer-block error';
+        triggerError('Checksum verification failed at the Transport layer. The segment was corrupted in transit, so it is discarded and never reaches the Session layer.');
+        break;
+      }
       dat.innerHTML = `<span style="color:${proto === 'TCP' ? '#22c55e' : '#f97316'}">${proto}</span> Stripped | Port ${pkt.srcPort}\u2192${pkt.dstPort} | Checksum ${pkt.checksum} ${I.check}`;
       break;
+    }
     case 5:
       dat.innerHTML = `Session ${pkt.sessionId} verified <span style="color:var(--color-success)">${I.check}</span>`;
       break;
@@ -645,6 +787,11 @@ function animateSwitch() {
     el('osi-switch-label').textContent = 'Switch';
     status.innerHTML = `${I.search} Looking up MAC\u2026`;
     setTimeout(() => {
+      if (state.errorType === 'mac') {
+        status.innerHTML = `${I.cross} Destination MAC ${state.dstMAC} not found — ARP failed, frame dropped`;
+        triggerError('The switch has no entry for the destination MAC address and no ARP reply arrived in time. The frame is dropped at the switch and never reaches Bob.');
+        return;
+      }
       const known = Math.random() > 0.3;
       if (known) {
         status.innerHTML = `${I.check} MAC ${state.dstMAC} found \u2192 Forwarding to Bob's port`;
@@ -663,6 +810,12 @@ function animateSwitch() {
       status.innerHTML = `${I.globe} Different subnet! Routing\u2026`;
       setTimeout(() => {
         pkt.ttl = (pkt.ttl || 64) - 1;
+        if (state.errorType === 'ttl') {
+          pkt.ttl = 0;
+          status.innerHTML = `${I.cross} TTL reached 0 — packet expired, router discards it (ICMP Time Exceeded)`;
+          triggerError('The Time To Live counter reached zero. Routers discard packets whose TTL expires so they cannot loop forever across the network.');
+          return;
+        }
         const newMAC = state.dstMAC;
         status.innerHTML = `${I.refresh} Stripped old Ethernet frame<br>${I.box} New frame with MAC ${newMAC}<br>${I.clock} TTL decreased to ${pkt.ttl}<br>${I.globe} IP unchanged: ${state.dstIP}`;
       }, 500);
@@ -717,6 +870,12 @@ function updateInspector() {
     ]});
   }
 
+  if (state.errorMode) {
+    sections.unshift({ title: `${I.warn} Simulation`, bg: '#ef4444', fields: [
+      ['Error scenario', ERROR_LABELS[String(state.errorType)].replace('Error: ', '')],
+    ]});
+  }
+
   body.innerHTML = sections.map(s => `
     <div class="osi-insp-section" style="border-left:3px solid ${s.bg}">
       <div class="osi-insp-section-header" style="background:${s.bg}22">${s.title}</div>
@@ -749,7 +908,9 @@ function updatePktVis() {
     return all.filter(x => x.show !== false).map(x => l(x.label, x.color, x.det)).join('');
   }
 
-  if (step >= 0 && step <= 6) {
+  if (step < 0) {
+    wrap.innerHTML = `<div class="osi-packet-placeholder">${I.bolt} Press <strong>Next Step</strong> or <strong>Auto</strong> to start encapsulating &quot;${esc(state.msg)}&quot;</div>`;
+  } else if (step >= 0 && step <= 6) {
 
     const encLayers = [];
     if (step >= 0) encLayers.push({ label: 'Data', color: '#ef4444', det: `&quot;${esc(state.msg)}&quot;` });

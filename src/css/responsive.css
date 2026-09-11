@@ -274,7 +274,8 @@
   transition: all var(--transition-normal);
   transform: translateY(0);
   opacity: 1;
-}:root.dark-theme .sandbox-learning-card {
+}:root.dark .sandbox-learning-card,
+[data-theme="dark"] .sandbox-learning-card {
   background: rgba(24, 24, 27, 0.85);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
 }.sandbox-learning-card.collapsed {
@@ -1491,3 +1492,155 @@
     gap: 0.1rem;
     max-width: calc(100% - 0.4rem);
   }}
+
+/* Mobile viewport contract: the shell scrolls once, while each lab grows inside it. */
+@media (max-width: 768px) {
+  html,
+  body {
+    width: 100%;
+    min-width: 0;
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    min-height: 100dvh;
+  }
+
+  header {
+    flex: 0 0 auto;
+    min-height: 52px;
+    max-width: 100%;
+  }
+
+  main {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    margin-bottom: 70px;
+    overflow: visible;
+  }
+
+  .view-panel.active {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    height: auto !important;
+    min-height: 0;
+    max-height: none !important;
+    overflow: visible;
+  }
+
+  .network-devices-view {
+    height: auto !important;
+    min-height: 0;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .nd-lab-container,
+  .nd-main {
+    height: auto !important;
+    min-height: 0;
+    overflow: visible !important;
+  }
+
+  .nd-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .nd-tab-content.active {
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .nd-layout {
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .nd-left,
+  .nd-right,
+  .subnet-layout,
+  .crypto-layout,
+  .parity-layout {
+    max-width: 100%;
+  }
+
+  .subnet-layout,
+  .crypto-layout,
+  .parity-layout {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .subnet-right,
+  .crypto-body,
+  .parity-body {
+    min-height: 0;
+    overflow: visible;
+  }
+
+  #osi-container {
+    width: 100%;
+    max-width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .osi-main {
+    width: 100%;
+    min-height: 0;
+    overflow: visible !important;
+  }
+
+  .mobile-navbar {
+    height: calc(64px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mobile-navbar .mobile-nav-btn {
+    min-height: 52px;
+  }
+}
+
+@media (max-width: 420px) {
+  main {
+    margin-bottom: 66px;
+  }
+
+  .mobile-navbar {
+    height: calc(66px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mobile-navbar .mobile-nav-btn {
+    min-width: 0;
+    flex: 1 1 0;
+    padding-inline: 0.2rem;
+    font-size: 0.58rem;
+  }
+
+  .mobile-navbar .mobile-nav-btn svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .nd-layout {
+    padding-inline: 0.4rem;
+  }
+
+  .nd-left,
+  .nd-right,
+  .subnet-left,
+  .subnet-right,
+  .crypto-body,
+  .parity-body {
+    padding-inline: 0.45rem;
+  }
+}

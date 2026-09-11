@@ -158,11 +158,13 @@
   margin-bottom: 0.45rem !important;
 }
 
-.kids-mode .toolbox-section-title::before { content: "✨ "; }
-.kids-mode .toolbox-section-title[data-category="Inputs"]::before { content: "🎮 "; }
-.kids-mode .toolbox-section-title[data-category="Gates"]::before { content: "🧩 "; }
-.kids-mode .toolbox-section-title[data-category="Outputs"]::before { content: "💡 "; }
-.kids-mode .toolbox-section-title[data-category="Templates"]::before { content: "📚 "; }
+.kids-mode .toolbox-section-title::before { content: none !important; }
+
+.kids-mode .toolbox-section-title svg {
+  width: 14px !important;
+  height: 14px !important;
+  flex-shrink: 0 !important;
+}
 
 .kids-mode .toolbox-item {
   border-radius: 12px !important;

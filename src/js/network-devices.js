@@ -32,6 +32,7 @@ const I = {
   lock: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="9" width="12" height="9" rx="2"/><path d="M7 9V6a3 3 0 1 1 6 0v3"/></svg>',
   refresh: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2l3 3-3 3"/><path d="M3 11a6 6 0 0 1 10.5-4"/><path d="M6 18l-3-3 3-3"/><path d="M17 9a6 6 0 0 1-10.5 4"/></svg>',
   layers: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5l8 4 8-4-8-4L2 5z"/><path d="M2 10l8 4 8-4"/><path d="M2 15l8 4 8-4"/></svg>',
+  list: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h10M6 10h10M6 16h10"/><circle cx="3" cy="4" r="0.8" fill="currentColor"/><circle cx="3" cy="10" r="0.8" fill="currentColor"/><circle cx="3" cy="16" r="0.8" fill="currentColor"/></svg>',
   laptop: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="11" rx="1.5"/><path d="M2 16a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v1H2v-1z"/></svg>',
   network: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5h14M3 15h14"/><rect x="5" y="3" width="10" height="14" rx="1.5"/><circle cx="10" cy="5" r="1"/><circle cx="10" cy="15" r="1"/></svg>',
   crypto: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 1l7 3v6a7 7 0 0 1-7 6 7 7 0 0 1-7-6V4l7-3z"/><path d="M8 10l1.5 1.5L12 9"/></svg>',
@@ -618,13 +619,13 @@ function renderPacketInspector() {
       </div>
     </div>`;
   box.innerHTML =
-    row('#818cf8', '⛓ Ethernet II Frame (L2)', [
+    row('#818cf8', 'Ethernet II Frame (L2)', [
       ['Dst MAC', d.mac], ['Src MAC', s.mac], ['EtherType', '0x0800 IPv4'],
     ]) +
-    row('#3b82f6', '🌐 IPv4 Packet (L3)', [
+    row('#3b82f6', 'IPv4 Packet (L3)', [
       ['Src IP', s.ip], ['Dst IP', d.ip], ['TTL', '64'], ['Protocol', 'TCP'],
     ]) +
-    row('#22c55e', '📦 Payload (L4+)', [
+    row('#22c55e', 'Payload (L4+)', [
       ['Size', '64 B'], ['Action', devNote],
     ]);
 }

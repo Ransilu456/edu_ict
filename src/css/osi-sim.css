@@ -762,6 +762,7 @@
   text-align: center;
   z-index: 10;
   backdrop-filter: blur(3px);
+  max-width: 90%;
 }
 
 .osi-error-overlay.show {
@@ -1770,6 +1771,10 @@
   .osi-center {
     overflow: visible !important;
   }
+
+  .osi-settings-panel.open {
+    width: calc(100% - 1.5rem) !important;
+  }
 }
 
 .dark .osi-cable-area,
@@ -1862,4 +1867,767 @@
 .osi-bin-byte {
   font-weight: 700 !important;
   padding: 0.08rem 0.14rem !important;
+}
+
+.osi-cable {
+  position: relative !important;
+}
+
+.osi-cable::before,
+.osi-cable::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-secondary);
+  border: 2px solid var(--color-indigo);
+  z-index: 1;
+}
+
+.osi-cable::before { left: -4px; }
+.osi-cable::after { right: -4px; }
+
+.osi-pkt-layer {
+  box-shadow: 0 2px 6px rgba(15, 42, 67, 0.08) !important;
+}
+
+.osi-layer-block {
+  cursor: pointer !important;
+}
+
+.osi-step-fill {
+  min-width: 2% !important;
+}
+
+/* OSI FULL REDESIGN — journey deck, step rail, passport layer cards */
+.osi-brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+  padding: 0.25rem 0.7rem 0.25rem 0.3rem !important;
+  border-right: 2px solid var(--border-color) !important;
+}
+
+.osi-brand-icon {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 11px !important;
+  background: linear-gradient(135deg, #1cb0f6, #8a3ffc) !important;
+  color: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 10px rgba(28, 176, 246, 0.4) !important;
+  flex-shrink: 0 !important;
+}
+
+.osi-brand-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.osi-brand-text {
+  display: flex !important;
+  flex-direction: column !important;
+  line-height: 1.2 !important;
+}
+
+.osi-brand-text b {
+  font-family: var(--font-header) !important;
+  font-weight: 900 !important;
+  font-size: 0.85rem !important;
+  color: var(--text-primary) !important;
+  white-space: nowrap !important;
+}
+
+.osi-brand-text small {
+  font-size: 0.58rem !important;
+  color: var(--text-muted) !important;
+  white-space: nowrap !important;
+}
+
+.osi-group-tag {
+  font-family: var(--font-header) !important;
+  font-size: 0.56rem !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: var(--text-muted) !important;
+  background: var(--bg-tertiary) !important;
+  border-radius: 999px !important;
+  padding: 1px 8px !important;
+  align-self: center !important;
+  flex-shrink: 0 !important;
+}
+
+.osi-ctrl-group {
+  align-items: center !important;
+}
+
+.osi-step-rail {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin: 0.45rem 0.75rem 0 0.75rem !important;
+  padding: 0.4rem 0.7rem !important;
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 14px !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+  position: relative !important;
+}
+
+.osi-step-rail::-webkit-scrollbar { display: none !important; }
+
+.osi-rail-dot {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  border-radius: 50% !important;
+  background: var(--bg-tertiary) !important;
+  border: 2px solid var(--border-color) !important;
+  color: var(--text-muted) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.56rem !important;
+  font-weight: 800 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: default !important;
+  position: relative !important;
+  transition: all 0.2s ease !important;
+}
+
+.osi-rail-dot:not(:last-child)::after {
+  content: '' !important;
+  position: absolute !important;
+  left: 100% !important;
+  top: 50% !important;
+  width: 4px !important;
+  height: 2px !important;
+  transform: translateY(-50%) !important;
+  background: var(--border-color) !important;
+}
+
+.osi-rail-dot.phase-enc.done { background: #1cb0f6 !important; border-color: #1cb0f6 !important; color: #fff !important; }
+.osi-rail-dot.phase-net.done { background: #58cc02 !important; border-color: #58cc02 !important; color: #fff !important; }
+.osi-rail-dot.phase-dec.done { background: #8a3ffc !important; border-color: #8a3ffc !important; color: #fff !important; }
+
+.osi-rail-dot.done:not(:last-child)::after { background: var(--color-success) !important; }
+
+.osi-rail-dot.current {
+  transform: scale(1.25) !important;
+  border-color: var(--text-primary) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 0 0 4px var(--color-indigo-glow), 0 4px 10px rgba(2, 6, 23, 0.25) !important;
+  z-index: 1 !important;
+}
+
+.osi-step-indicator {
+  align-items: center !important;
+}
+
+.osi-step-bar {
+  height: 6px !important;
+}
+
+.osi-stack .osi-layer-block {
+  border-radius: 14px !important;
+  border: 1px solid var(--border-color) !important;
+  border-left: 5px solid var(--osi-layer-color, var(--text-muted)) !important;
+  background: var(--bg-secondary) !important;
+  box-shadow: 0 2px 6px rgba(15, 42, 67, 0.06) !important;
+  padding: 0.4rem 0.5rem 0.4rem 0.45rem !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+
+.osi-stack .osi-layer-block.inactive {
+  opacity: 0.5 !important;
+}
+
+.osi-stack .osi-layer-block::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 0.45rem !important;
+  right: 0.45rem !important;
+  width: 9px !important;
+  height: 9px !important;
+  border-radius: 50% !important;
+  background: var(--bg-tertiary) !important;
+  border: 2px solid var(--border-color) !important;
+}
+
+.osi-stack .osi-layer-block.active {
+  opacity: 1 !important;
+  transform: translateY(-1px) !important;
+  border-color: var(--osi-layer-color) !important;
+  border-left: 5px solid var(--osi-layer-color) !important;
+}
+
+.osi-stack .osi-layer-block.active::after {
+  background: var(--osi-layer-color) !important;
+  border-color: var(--osi-layer-color) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--osi-layer-color) 25%, transparent) !important;
+  animation: osiLed 1s ease-in-out infinite !important;
+}
+
+.osi-stack .osi-layer-block.done {
+  opacity: 0.9 !important;
+}
+
+.osi-stack .osi-layer-block.done::after {
+  background: var(--color-success) !important;
+  border-color: var(--color-success) !important;
+}
+
+.osi-layer-text {
+  display: flex !important;
+  flex-direction: column !important;
+  line-height: 1.25 !important;
+  min-width: 0 !important;
+  flex: 1 !important;
+}
+
+.osi-layer-name {
+  font-size: 0.7rem !important;
+}
+
+.osi-layer-sub {
+  font-family: var(--font-mono) !important;
+  font-size: 0.5rem !important;
+  color: var(--text-muted) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.osi-layer-badge {
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 8px !important;
+  font-size: 0.6rem !important;
+}
+
+.osi-layer-icon {
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 9px !important;
+}
+
+.osi-stage-head {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  font-family: var(--font-header) !important;
+  font-weight: 900 !important;
+  font-size: 0.72rem !important;
+  color: var(--text-primary) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  padding: 0 0.2rem !important;
+}
+
+.osi-stage-dot {
+  width: 9px !important;
+  height: 9px !important;
+  border-radius: 50% !important;
+  background: #ef4444 !important;
+  box-shadow: 0 0 8px #ef4444 !important;
+  animation: osiLed 1.6s ease-in-out infinite !important;
+}
+
+.osi-stage-hint {
+  margin-left: auto !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 600 !important;
+  font-size: 0.6rem !important;
+  color: var(--text-muted) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.osi-packet-vis {
+  border-style: solid !important;
+  border-width: 1.5px !important;
+  background:
+    radial-gradient(circle at 50% 0%, var(--color-indigo-glow), transparent 70%),
+    var(--bg-secondary) !important;
+}
+
+.osi-pkt-layer {
+  border-left-width: 4px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 3px 8px rgba(15, 42, 67, 0.1) !important;
+}
+
+.osi-cable-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  width: 100% !important;
+}
+
+.osi-cable-tag {
+  font-family: var(--font-mono) !important;
+  font-size: 0.5rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: var(--text-muted) !important;
+  min-width: 52px !important;
+  text-align: right !important;
+  flex-shrink: 0 !important;
+}
+
+.osi-cable-row .osi-cable {
+  flex: 1 !important;
+  width: auto !important;
+}
+
+.osi-switch-area {
+  border-width: 1.5px !important;
+  border-radius: 16px !important;
+  background:
+    radial-gradient(circle at 50% 120%, var(--color-indigo-glow), transparent 70%),
+    var(--bg-secondary) !important;
+}
+
+.osi-switch-icon {
+  width: 46px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+}
+
+.dark .osi-brand-text b,
+[data-theme="dark"] .osi-brand-text b {
+  color: #f8fafc !important;
+}
+
+.dark .osi-step-rail,
+[data-theme="dark"] .osi-step-rail {
+  background: #141d33 !important;
+  border-color: #26314d !important;
+}
+
+.dark .osi-rail-dot,
+[data-theme="dark"] .osi-rail-dot {
+  background: #0e1629 !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+.dark .osi-rail-dot.current,
+[data-theme="dark"] .osi-rail-dot.current {
+  color: #fff !important;
+  border-color: #38bdf8 !important;
+}
+
+.dark .osi-stack .osi-layer-block,
+[data-theme="dark"] .osi-stack .osi-layer-block {
+  background: #141d33 !important;
+  border-color: #26314d !important;
+  border-left: 5px solid var(--osi-layer-color, #475569) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+}
+
+.dark .osi-stack .osi-layer-block.active,
+[data-theme="dark"] .osi-stack .osi-layer-block.active {
+  border-color: var(--osi-layer-color) !important;
+  border-left: 5px solid var(--osi-layer-color) !important;
+}
+
+/* ================= OSI UX REFINEMENT — settings drawer, legend, placeholder, error sim ================= */
+
+.osi-ctrl-group[data-group="View"] {
+  border-right: none !important;
+}
+
+.osi-settings-btn-wrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  margin-left: auto !important;
+  padding: 0.1rem 0.2rem !important;
+}
+
+.osi-settings-summary {
+  font-family: var(--font-mono) !important;
+  font-size: 0.56rem !important;
+  font-weight: 700 !important;
+  color: var(--text-muted) !important;
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 999px !important;
+  padding: 2px 9px !important;
+  white-space: nowrap !important;
+}
+
+.osi-btn#osi-settings-btn.active {
+  border-color: #38bdf8 !important;
+  background: #e0f2fe !important;
+  color: #0369a1 !important;
+}
+
+.osi-btn#osi-error-btn.active {
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #dc2626 !important;
+  box-shadow: 0 3px 0 #fecaca !important;
+}
+
+.osi-settings-panel {
+  display: none;
+}
+
+.osi-settings-panel.open {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  margin: 0.5rem 0.75rem 0 0.75rem !important;
+  padding: 0.4rem 0.6rem !important;
+  background: #ffffff !important;
+  border: 2.5px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 3px 0 #e2e8f0 !important;
+  animation: osiSlideDown 0.18s ease-out !important;
+}
+
+@keyframes osiSlideDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.osi-legend {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.32rem !important;
+  margin: 0.45rem 0.75rem 0 0.75rem !important;
+  padding: 0.32rem 0.6rem !important;
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 10px !important;
+}
+
+.osi-legend-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.28rem !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.52rem !important;
+  font-weight: 700 !important;
+  color: var(--text-muted) !important;
+  padding: 2px 8px 2px 5px !important;
+  border-radius: 999px !important;
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.osi-legend-chip i {
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: var(--c) !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+}
+
+.osi-packet-placeholder {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  font-family: var(--font-sans, inherit) !important;
+  font-size: 0.68rem !important;
+  font-weight: 600 !important;
+  color: var(--text-muted) !important;
+  padding: 1.3rem 0.8rem !important;
+  width: 100% !important;
+  line-height: 1.5 !important;
+}
+
+.osi-packet-placeholder strong {
+  color: var(--color-indigo) !important;
+}
+
+.osi-btn:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+}
+
+.dark .osi-settings-panel.open,
+[data-theme="dark"] .osi-settings-panel.open {
+  background: #1c2541 !important;
+  border-color: #334155 !important;
+  box-shadow: 0 3px 0 #0b132b !important;
+}
+
+.dark .osi-legend,
+[data-theme="dark"] .osi-legend {
+  background: #141d33 !important;
+  border-color: #26314d !important;
+}
+
+.dark .osi-legend-chip,
+[data-theme="dark"] .osi-legend-chip {
+  background: #0e1629 !important;
+  border-color: #26314d !important;
+  color: #94a3b8 !important;
+}
+
+.dark .osi-settings-summary,
+[data-theme="dark"] .osi-settings-summary {
+  background: #0e1629 !important;
+  border-color: #26314d !important;
+  color: #94a3b8 !important;
+}
+
+@media (max-width: 640px) {
+  .osi-legend {
+    padding: 0.24rem 0.4rem !important;
+  }
+  .osi-legend-chip {
+    font-size: 0.46rem !important;
+  }
+  .osi-settings-summary {
+    display: none !important;
+  }
+}
+
+/* Responsive OSI journey: controls wrap, then each learning stage gets room to breathe. */
+.osi-topbar,
+.osi-settings-panel.open,
+.osi-legend,
+.osi-step-indicator,
+.osi-step-rail {
+  min-width: 0;
+}
+
+.osi-topbar {
+  align-items: stretch !important;
+}
+
+.osi-brand {
+  flex-shrink: 0;
+}
+
+.osi-ctrl-group {
+  flex-wrap: wrap;
+}
+
+.osi-settings-btn-wrap {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  #osi-container {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-y: auto !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  .osi-topbar {
+    margin-inline: 0.6rem !important;
+    padding: 0.55rem !important;
+  }
+
+  .osi-brand {
+    flex: 1 1 100%;
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 0.1rem 0.2rem 0.5rem !important;
+  }
+
+  .osi-ctrl-group {
+    flex: 1 1 auto;
+    min-width: 220px;
+  }
+
+  .osi-settings-btn-wrap {
+    margin-left: 0 !important;
+  }
+
+  .osi-main {
+    overflow: visible !important;
+    padding-inline: 0.6rem !important;
+  }
+
+  .osi-alice,
+  .osi-bob,
+  .osi-center {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .osi-center {
+    order: 2;
+  }
+
+  .osi-alice {
+    order: 1;
+  }
+
+  .osi-bob {
+    order: 3;
+  }
+
+  .osi-stack {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem !important;
+  }
+
+  .osi-layer-block {
+    min-height: 58px !important;
+  }
+
+  .osi-layer-data {
+    max-height: 2.1rem !important;
+  }
+
+  .osi-center {
+    padding: 0.65rem !important;
+  }
+
+  .osi-packet-vis {
+    min-height: 160px !important;
+    max-height: none !important;
+  }
+
+  .osi-packet-wrap {
+    max-width: min(100%, 380px) !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .osi-topbar,
+  .osi-step-indicator,
+  .osi-step-rail,
+  .osi-legend,
+  .osi-settings-panel.open {
+    margin-left: 0.45rem !important;
+    margin-right: 0.45rem !important;
+  }
+
+  .osi-ctrl-group {
+    min-width: 0;
+    flex-basis: 100%;
+  }
+
+  .osi-ctrl-group[data-group="View"] {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .osi-ctrl-group[data-group="View"] .osi-group-tag,
+  .osi-ctrl-group[data-group="View"] #osi-compare-btn,
+  .osi-ctrl-group[data-group="View"] #osi-crypto-btn {
+    grid-column: 1 / -1;
+  }
+
+  .osi-ctrl-group[data-group="View"] .osi-btn {
+    justify-content: center;
+    min-width: 0;
+    padding-inline: 0.35rem !important;
+  }
+
+  .osi-settings-btn-wrap {
+    width: 100%;
+  }
+
+  .osi-settings-btn-wrap .osi-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .osi-settings-panel.open {
+    align-items: stretch !important;
+  }
+
+  .osi-settings-panel.open label,
+  .osi-settings-panel.open input,
+  .osi-settings-panel.open select {
+    width: 100%;
+    max-width: none !important;
+  }
+
+  .osi-step-text {
+    font-size: 0.57rem !important;
+  }
+
+  .osi-stack {
+    grid-template-columns: 1fr;
+  }
+
+  .osi-layer-block {
+    min-height: 52px !important;
+  }
+
+  .osi-stage-hint {
+    display: none;
+  }
+
+  .osi-switch-area {
+    align-items: center;
+  }
+
+  .osi-switch-status {
+    font-size: 0.58rem !important;
+  }
+
+  .osi-inspector {
+    width: min(330px, calc(100vw - 0.9rem));
+    right: calc(-1 * min(330px, calc(100vw - 0.9rem)));
+  }
+
+  .osi-inspector.open {
+    right: 0.45rem;
+  }
+}
+
+/* OSI stage grid: stable host columns keep the live packet readable at desktop sizes. */
+@media (min-width: 901px) {
+  .osi-main {
+    display: grid !important;
+    grid-template-columns: minmax(190px, 0.82fr) minmax(380px, 1.7fr) minmax(190px, 0.82fr);
+    gap: 0.7rem !important;
+    overflow: hidden !important;
+  }
+
+  .osi-alice,
+  .osi-bob,
+  .osi-center {
+    width: auto !important;
+    min-width: 0 !important;
+  }
+
+  .osi-alice,
+  .osi-bob {
+    overflow-y: auto !important;
+  }
+
+  .osi-center {
+    overflow: hidden !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .osi-main {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.65rem !important;
+  }
+
+  .osi-alice,
+  .osi-bob,
+  .osi-center {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
 }

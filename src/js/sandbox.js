@@ -112,6 +112,7 @@ window.initSandboxCanvas = function () {
   panContainer.appendChild(wiresSvg);
 
   setupDragAndDrop();
+  setupToolboxSearch();
   setupToolbar();
   startSimulationLoop();
   initWaveform();
@@ -197,6 +198,37 @@ window.initSandboxCanvas = function () {
   }
   if (window.initICCreator) window.initICCreator();
 };
+
+function setupToolboxSearch() {
+  const search = document.getElementById('toolbox-search-input');
+  if (!search || search.dataset.initialized) return;
+  search.dataset.initialized = 'true';
+
+  const filterTools = () => {
+    const query = search.value.trim().toLowerCase();
+    document.querySelectorAll('.toolbox-section').forEach(section => {
+      const items = Array.from(section.querySelectorAll('.toolbox-item, .template-card'));
+      if (!items.length) return;
+      let visible = 0;
+      items.forEach(item => {
+        const text = `${item.innerText} ${item.getAttribute('title') || ''}`.toLowerCase();
+        const matches = !query || text.includes(query);
+        item.hidden = !matches;
+        if (matches) visible += 1;
+      });
+      section.hidden = visible === 0;
+    });
+  };
+
+  search.addEventListener('input', filterTools);
+  document.addEventListener('keydown', event => {
+    if (event.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+      event.preventDefault();
+      search.focus();
+    }
+  });
+}
+
 function setupToolboxItem(item) {
   const type = item.dataset.type;
   const label = item.querySelector('span')?.innerText || type;
@@ -209,7 +241,12 @@ function setupToolboxItem(item) {
   item.addEventListener('click', () => {
     if (!workspace) return;
     const r = workspace.getBoundingClientRect();
-    placeNode(type, label, r.width / 2 - 60, r.height / 2 - 40);
+    const slot = sandboxNodes.length;
+    const column = (slot % 3) - 1;
+    const row = Math.floor(slot / 3) % 3 - 1;
+    const x = Math.max(20, Math.min(r.width - 300, r.width / 2 - 60 + column * 150));
+    const y = Math.max(70, Math.min(r.height - 150, r.height / 2 - 40 + row * 110));
+    placeNode(type, label, x, y);
     showToast(`${label} placed ✓`);
   });
   let touchDragGhost = null;
@@ -996,7 +1033,7 @@ function renderNodeBody(node, body) {
 
       const expandBtn = document.createElement('button');
       expandBtn.className = 'sandbox-toggle-btn expand-adder-btn';
-      expandBtn.innerText = '🔍 View Timing';
+      expandBtn.innerText = 'View Timing';
       expandBtn.style.cssText = 'margin-top:6px; font-size:0.62rem; padding:0.15rem 0.4rem; pointer-events:auto; font-family:var(--font-header);';
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1015,7 +1052,7 @@ function renderNodeBody(node, body) {
 
       const expandBtn = document.createElement('button');
       expandBtn.className = 'sandbox-toggle-btn expand-adder-btn';
-      expandBtn.innerText = '🔍 View Inside';
+      expandBtn.innerText = 'View Inside';
       expandBtn.style.cssText = 'margin-top:6px; font-size:0.62rem; padding:0.15rem 0.4rem; pointer-events:auto; font-family:var(--font-header);';
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1035,7 +1072,7 @@ function renderNodeBody(node, body) {
 
       const expandBtn = document.createElement('button');
       expandBtn.className = 'sandbox-toggle-btn expand-adder-btn';
-      expandBtn.innerText = '🔍 View Inside';
+      expandBtn.innerText = 'View Inside';
       expandBtn.style.cssText = 'margin-top:6px; font-size:0.62rem; padding:0.15rem 0.4rem; pointer-events:auto; font-family:var(--font-header);';
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1140,7 +1177,7 @@ function renderNodeBody(node, body) {
 
       const expandBtn = document.createElement('button');
       expandBtn.className = 'sandbox-toggle-btn expand-adder-btn';
-      expandBtn.innerText = '🔍 Segment Map';
+      expandBtn.innerText = 'Segment Map';
       expandBtn.style.cssText = 'margin-top:6px; font-size:0.62rem; padding:0.15rem 0.4rem; pointer-events:auto; font-family:var(--font-header);';
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1611,7 +1648,7 @@ function handlePortClick(nodeId, direction, portIdx) {
       return;
     }
 
-    if (activeWiringSource.nodeId === nodeId) {
+    if (activeWiringSource.nodeId === nodeId && !REAL_ICS[sandboxNodes.find(n => n.id === nodeId)?.type]) {
       cancelWiring();
       return;
     }
@@ -1644,8 +1681,10 @@ function handlePortClick(nodeId, direction, portIdx) {
 
 function highlightEligiblePorts(targetDirection, sourceNodeId) {
   const cls = targetDirection === 'input' ? '.sandbox-port.port-input' : '.sandbox-port.port-output';
+  const sourceNode = sandboxNodes.find(node => node.id === sourceNodeId);
+  const allowSelfConnection = !!(sourceNode && REAL_ICS[sourceNode.type]);
   document.querySelectorAll(cls).forEach(port => {
-    if (port.closest('.sandbox-node').id !== sourceNodeId) {
+    if (allowSelfConnection || port.closest('.sandbox-node').id !== sourceNodeId) {
       port.classList.add('eligible');
     }
   });
@@ -1879,6 +1918,8 @@ function evaluateSandbox() {
       const isIC = !!(node.pinValues !== null && node.pinValues !== undefined && REAL_ICS[node.type]);
 
       const prev = [...node.inputValues];
+      const prevPins = isIC ? { ...(node.pinValues || {}) } : null;
+      const prevOutputs = isIC ? { ...(node.outputStates || {}) } : null;
       node.inputValues = Array(node.inputsCount).fill(0);
       if (isIC) node.pinValues = {};
 
@@ -1909,7 +1950,13 @@ function evaluateSandbox() {
 
       computeNodeOutput(node);
 
-      if (node.outputState !== prevOut || node.outputState2 !== prevOut2 || inputsChanged) {
+      const mapChanged = (before, after) => {
+        const keys = new Set([...Object.keys(before || {}), ...Object.keys(after || {})]);
+        return [...keys].some(key => (before?.[key] || 0) !== (after?.[key] || 0));
+      };
+      const icStateChanged = isIC && (mapChanged(prevPins, node.pinValues) || mapChanged(prevOutputs, node.outputStates));
+
+      if (node.outputState !== prevOut || node.outputState2 !== prevOut2 || inputsChanged || icStateChanged) {
         changed = true;
       }
     });
@@ -2085,17 +2132,21 @@ function showSandboxContextMenu(e, node) {
   menu.style.left = `${e.clientX}px`;
   menu.style.top = `${e.clientY}px`;
 
+  const svgPlus = '<svg viewBox="0 0 20 20" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>';
+  const svgMinus = '<svg viewBox="0 0 20 20" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 10h12"/></svg>';
+  const svgCopy = '<svg viewBox="0 0 20 20" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="9" height="9" rx="2"/><path d="M4 13V5a1 1 0 0 1 1-1h8"/></svg>';
+  const svgTrash = '<svg viewBox="0 0 20 20" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h12M8 6V4h4v2M6 6l1 10a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1l1-10"/></svg>';
   const items = [];
   if (isGate) {
     items.push(
-      { icon: '➕', tone: 'add', label: 'Add Input', count: node.inputsCount, action: () => addGateInput(node.id), disabled: node.inputsCount >= MAX_GATE_INPUTS },
-      { icon: '➖', tone: 'remove', label: 'Remove Input', count: node.inputsCount, action: () => removeGateInput(node.id), disabled: node.inputsCount <= MIN_GATE_INPUTS },
+      { icon: svgPlus, tone: 'add', label: 'Add Input', count: node.inputsCount, action: () => addGateInput(node.id), disabled: node.inputsCount >= MAX_GATE_INPUTS },
+      { icon: svgMinus, tone: 'remove', label: 'Remove Input', count: node.inputsCount, action: () => removeGateInput(node.id), disabled: node.inputsCount <= MIN_GATE_INPUTS },
       { separator: true },
     );
   }
   items.push(
-    { icon: '⧉', tone: 'dup', label: 'Duplicate', action: () => duplicateNode(node.id) },
-    { icon: '🗑️', tone: 'danger', label: 'Delete', danger: true, action: () => deleteNode(node.id) },
+    { icon: svgCopy, tone: 'dup', label: 'Duplicate', action: () => duplicateNode(node.id) },
+    { icon: svgTrash, tone: 'danger', label: 'Delete', danger: true, action: () => deleteNode(node.id) },
   );
 
   items.forEach(item => {
@@ -2177,7 +2228,7 @@ function updateNodeVisuals(node) {
       const waveColor = isOn ? '#f59e0b' : 'var(--border-color)';
       if (wave1) wave1.style.stroke = waveColor;
       if (wave2) wave2.style.stroke = waveColor;
-      if (lbl) { lbl.innerText = isOn ? '♪ BUZZ' : 'SILENT'; lbl.style.color = isOn ? '#f59e0b' : 'var(--text-muted)'; }
+      if (lbl) { lbl.innerText = isOn ? 'BUZZ' : 'SILENT'; lbl.style.color = isOn ? '#f59e0b' : 'var(--text-muted)'; }
       if (wrap) wrap.classList.toggle('buzzer-on', isOn);
       break;
     }
