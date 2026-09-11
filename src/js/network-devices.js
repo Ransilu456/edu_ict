@@ -316,6 +316,7 @@ function buildNDLayout() {
             <div class="crypto-flow-card sender">
               <div class="crypto-flow-card-title">${I.laptop} Alice Sends</div>
               <textarea class="crypto-input" id="crypto-plain-alice" rows="2">HELLO</textarea>
+              <div class="crypto-hint">Letters A–Z only · A=0, B=1 … Z=25 · encrypted with Bob’s key</div>
               <button class="crypto-btn primary" id="crypto-enc-btn-alice">${I.lock} Encrypt with Bob\u2019s Public Key</button>
             </div>
             <div class="crypto-flow-arrow-wrap">
@@ -451,9 +452,11 @@ function initNetLab() {
 }
 
 function resetNetLab() {
-  netState.animating = false; netState.macTable = {}; netState.colCnt = 0;
+  netState.animating = false; netState.macTable = {}; netState.colCnt = 0; netState.lastPkt = null;
   el('nd-log-list').innerHTML = '';
   el('nd-table-content').innerHTML = '<em style="color:var(--text-muted)">No activity yet</em>';
+  const pi = el('nd-packet-inspector');
+  if (pi) pi.innerHTML = '<em style="color:var(--text-muted);font-size:0.75rem">Transmit a packet to inspect L2 frame &amp; L3/L4 headers</em>';
   clearLinks();
   updateNetUI();
   setDevInfo();
@@ -602,6 +605,34 @@ function setDevInfo() {
   el('nd-info-content').innerHTML = info[netState.device] || info.hub;
 }
 
+function renderPacketInspector() {
+  const box = el('nd-packet-inspector');
+  if (!box || !netState.lastPkt) return;
+  const { s, d, device } = netState.lastPkt;
+  const devNote = device === 'hub'
+    ? 'Broadcast to all ports'
+    : device === 'switch'
+      ? `Unicast to ${d.label} by MAC`
+      : (s.sub === d.sub ? 'Same subnet — direct delivery' : `Routed ${s.ip} → ${d.ip}`);
+  const row = (color, title, fields) => `
+    <div class="pkt-layer-row">
+      <div class="pkt-layer-header" style="border-left:3px solid ${color}">${title}</div>
+      <div class="pkt-layer-fields">
+        ${fields.map(([k, v]) => `<div class="pkt-field"><span class="pkt-field-k">${k}</span><span class="pkt-field-v">${v}</span></div>`).join('')}
+      </div>
+    </div>`;
+  box.innerHTML =
+    row('#818cf8', '⛓ Ethernet II Frame (L2)', [
+      ['Dst MAC', d.mac], ['Src MAC', s.mac], ['EtherType', '0x0800 IPv4'],
+    ]) +
+    row('#3b82f6', '🌐 IPv4 Packet (L3)', [
+      ['Src IP', s.ip], ['Dst IP', d.ip], ['TTL', '64'], ['Protocol', 'TCP'],
+    ]) +
+    row('#22c55e', '📦 Payload (L4+)', [
+      ['Size', '64 B'], ['Action', devNote],
+    ]);
+}
+
 function log(msg, cls) {
   const list = el('nd-log-list'); if (!list) return;
   const d = document.createElement('div');
@@ -660,6 +691,8 @@ function sendPacket() {
   netState.animating = true; netState.abort = false;
   el('nd-send-btn').disabled = true;
   const sc = coords[s.id], dc = coords[d.id];
+  netState.lastPkt = { s, d, device: netState.device };
+  renderPacketInspector();
   log(`${I.send} ${s.label} \u2192 ${d.label} [${d.mac}]`, 'send');
 
   // Phase 1: Source to Central Device
@@ -864,6 +897,8 @@ function calculateSubnet() {
 
   if (ipNum === null) {
     if (grid) grid.innerHTML = `<div class="subnet-calc-row" style="color:var(--color-error)"><span>Invalid IPv4 format (e.g. 192.168.1.10)</span></div>`;
+    if (binVis) binVis.innerHTML = '';
+    if (tableBody) tableBody.innerHTML = '';
     return;
   }
 
@@ -930,8 +965,8 @@ function calculateSubnet() {
         const globalBitIdx = octetIdx * 8 + bitIdx;
         const isNet = globalBitIdx < cidr;
         const isSubnetBit = isNet && globalBitIdx >= defaultPrefix;
-        let bitStyle = isNet ? (isSubnetBit ? 'background:#06b6d4;color:#fff' : 'background:#3b82f6;color:#fff') : 'background:#10b981;color:#fff';
-        return `<span style="display:inline-block;width:15px;height:17px;line-height:17px;text-align:center;font-size:0.65rem;font-weight:700;border-radius:2px;margin:0 1px;${bitStyle}" title="Bit ${globalBitIdx + 1}: ${isNet ? 'Network Bit' : 'Host Bit'}">${bit}</span>`;
+        const cls = isNet ? (isSubnetBit ? 'sbit sbit-sub' : 'sbit sbit-net') : 'sbit sbit-host';
+        return `<span class="${cls}" title="Bit ${globalBitIdx + 1}: ${isNet ? (isSubnetBit ? 'Subnet Bit' : 'Network Bit') : 'Host Bit'}">${bit}</span>`;
       }).join('');
     }
 
@@ -954,9 +989,10 @@ function calculateSubnet() {
           ${netParts.map((p, i) => `<span>${renderOctetBits(p, i)}</span>`).join('<span style="font-weight:700;color:var(--text-muted)">.</span>')}
         </div>
       </div>
-      <div style="display:flex;gap:0.75rem;font-size:0.68rem;color:var(--text-secondary)">
-        <span style="display:flex;align-items:center;gap:0.25rem"><span style="width:10px;height:10px;border-radius:2px;background:#3b82f6;display:inline-block"></span> Network Bits (${cidr})</span>
-        <span style="display:flex;align-items:center;gap:0.25rem"><span style="width:10px;height:10px;border-radius:2px;background:#10b981;display:inline-block"></span> Host Bits (${32 - cidr})</span>
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;font-size:0.68rem;color:var(--text-secondary)">
+        <span style="display:flex;align-items:center;gap:0.25rem"><span style="width:10px;height:10px;border-radius:2px;background:#3b82f6;display:inline-block"></span> Network (${defaultPrefix})</span>
+        <span style="display:flex;align-items:center;gap:0.25rem"><span style="width:10px;height:10px;border-radius:2px;background:#06b6d4;display:inline-block"></span> Subnet (${Math.max(0, cidr - defaultPrefix)})</span>
+        <span style="display:flex;align-items:center;gap:0.25rem"><span style="width:10px;height:10px;border-radius:2px;background:#10b981;display:inline-block"></span> Host (${32 - cidr})</span>
       </div>
     `;
   }
@@ -1000,6 +1036,20 @@ function initParity() {
   parityReady = true;
   const c = el('parity-input-bits');
   parityBits = [];
+
+  // Live ones-count readout under the sender bits
+  const senderBox = c.closest('.parity-box');
+  const countEl = document.createElement('div');
+  countEl.className = 'parity-count';
+  countEl.id = 'parity-ones-count';
+  c.after(countEl);
+
+  const refreshCount = () => {
+    const ones = parityBits.filter(v => v === 1).length;
+    const need = ones % 2 === 0 ? 0 : 1;
+    countEl.innerHTML = `<span><b>${ones}</b> ones (${ones % 2 === 0 ? 'even' : 'odd'})</span><span class="parity-need">parity bit → <b>${need}</b></span>`;
+  };
+
   for (let i = 0; i < 7; i++) {
     const v = Math.random() < 0.5 ? 0 : 1;
     parityBits.push(v);
@@ -1007,13 +1057,17 @@ function initParity() {
     b.className = 'parity-bit' + (v ? ' on' : '');
     b.textContent = v;
     b.dataset.idx = i;
+    b.title = `Data bit ${i + 1} — click to toggle`;
     b.addEventListener('click', () => {
+      play('click');
       parityBits[i] = parityBits[i] ? 0 : 1;
       b.textContent = parityBits[i];
       b.className = 'parity-bit' + (parityBits[i] ? ' on' : '');
+      refreshCount();
     });
     c.appendChild(b);
   }
+  refreshCount();
 
   el('parity-send-btn').addEventListener('click', () => {
     play('click');
@@ -1027,6 +1081,7 @@ function initParity() {
       b.className = 'parity-bit recv' + (v ? ' on' : '') + (i === 7 ? ' parity' : '');
       b.textContent = v;
       b.dataset.idx = i;
+      b.title = i === 7 ? 'Parity bit (makes total ones even)' : `Received bit ${i + 1}`;
       rc.appendChild(b);
     });
     const totalOnes = sent.filter(v => v === 1).length;
@@ -1041,11 +1096,19 @@ function initParity() {
   el('parity-flip-btn').addEventListener('click', () => {
     play('click');
     const idx = Math.floor(Math.random() * 7);
+    const before = parityBits[idx];
     parityBits[idx] = parityBits[idx] ? 0 : 1;
     const bits = el('parity-input-bits').children;
     if (bits[idx]) {
       bits[idx].textContent = parityBits[idx];
       bits[idx].className = 'parity-bit' + (parityBits[idx] ? ' on' : '');
+      bits[idx].classList.add('flash');
+      setTimeout(() => bits[idx].classList.remove('flash'), 900);
     }
+    const ones = parityBits.filter(v => v === 1).length;
+    const need = ones % 2 === 0 ? 0 : 1;
+    const cc = el('parity-ones-count');
+    if (cc) cc.innerHTML = `<span><b>${ones}</b> ones (${ones % 2 === 0 ? 'even' : 'odd'})</span><span class="parity-need">parity bit → <b>${need}</b></span>`;
+    if (window.showToast) window.showToast(`Noise flipped bit ${idx + 1}: ${before} → ${parityBits[idx]}`);
   });
 }

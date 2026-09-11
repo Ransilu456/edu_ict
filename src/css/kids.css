@@ -1,7 +1,3 @@
-/* ===================================================================
-   LOGICQUEST — KIDS MODE (PLAYFUL DUOLINGO-STYLE DESIGN SYSTEM)
-   =================================================================== */
-
 .kids-mode {
   --bg-primary: #f0f7ff;
   --bg-secondary: #ffffff;
@@ -23,7 +19,6 @@
   font-family: 'Nunito', 'Noto Sans Sinhala', system-ui, -apple-system, sans-serif !important;
 }
 
-/* ── Workspace / Canvas ────────────────────────────────────────── */
 .kids-mode .sandbox-workspace,
 .kids-mode .nd-svg-wrap,
 .kids-mode .nd-canvas-wrap {
@@ -32,7 +27,7 @@
   background-size: 24px 24px !important;
 }
 
-/* ── Header ────────────────────────────────────────────────────── */
+/* NavBar */
 .kids-mode header {
   background: #ffffff !important;
   border-bottom: 3px solid #e2e8f0 !important;
@@ -59,7 +54,6 @@
   text-shadow: 2px 2px 0px rgba(28, 176, 246, 0.12);
 }
 
-/* ── Navigation Tabs ───────────────────────────────────────────── */
 .kids-mode .desktop-nav {
   display: flex;
   gap: 0.5rem;
@@ -105,7 +99,6 @@
   box-shadow: 0 1px 0 #0284c7 !important;
 }
 
-/* Audio and Theme toggle buttons in header */
 .kids-mode #audio-toggle,
 .kids-mode #theme-toggle {
   width: 42px !important;
@@ -138,7 +131,7 @@
   box-shadow: 0 1px 0 #cbd5e1 !important;
 }
 
-/* ── Toolbox Sidebar ───────────────────────────────────────────── */
+/* Logic Area */
 .kids-mode .sandbox-toolbox {
   background: #ffffff !important;
   border: 3px solid #e2e8f0 !important;
@@ -195,7 +188,6 @@
   color: #0284c7 !important;
 }
 
-/* ── Top Toolbar in Sandbox ────────────────────────────────────── */
 .kids-mode .sandbox-toolbar {
   background: #ffffff !important;
   border: 2.5px solid #e2e8f0 !important;
@@ -252,7 +244,6 @@
   box-shadow: 0 3px 0 #c2410c !important;
 }
 
-/* ── Canvas Nodes ──────────────────────────────────────────────── */
 .kids-mode .sandbox-node {
   background: #ffffff !important;
   border: 2.5px solid #cbd5e1 !important;
@@ -280,7 +271,6 @@
   color: #334155 !important;
 }
 
-/* Ports on nodes */
 .kids-mode .sandbox-port {
   width: 11px !important;
   height: 11px !important;
@@ -308,7 +298,6 @@
   box-shadow: 0 0 0 4px rgba(88, 204, 2, 0.35) !important;
 }
 
-/* Node Delete Button — small crisp circle */
 .kids-mode .node-delete-btn {
   position: absolute !important;
   top: -8px !important;
@@ -344,7 +333,6 @@
   transform: scale(1.15) !important;
 }
 
-/* ── Primary & Secondary Action Buttons ────────────────────────── */
 .kids-mode .btn-primary,
 .kids-mode .nd-send-btn {
   border-radius: 14px !important;
@@ -393,7 +381,6 @@
   color: #1e293b !important;
 }
 
-/* ── Template Cards ────────────────────────────────────────────── */
 .kids-mode .template-card {
   border-radius: 14px !important;
   border: 2px solid #e2e8f0 !important;
@@ -409,7 +396,6 @@
   transform: translateY(-2px) !important;
 }
 
-/* ── Networking Lab ────────────────────────────────────────────── */
 .kids-mode .nd-main {
   background: #f0f7ff !important;
 }
@@ -480,7 +466,6 @@
   color: #0369a1 !important;
 }
 
-/* ── Modals ────────────────────────────────────────────────────── */
 .kids-mode .success-modal,
 .kids-mode .sandbox-modal {
   border-radius: 24px !important;
@@ -489,7 +474,6 @@
   background: #ffffff !important;
 }
 
-/* ── Mobile Navbar ─────────────────────────────────────────────── */
 .kids-mode .mobile-navbar {
   background: #ffffff !important;
   border-top: 3px solid #e2e8f0 !important;
@@ -506,9 +490,6 @@
   color: #0369a1 !important;
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   KIDS DARK MODE OVERRIDES
-   ══════════════════════════════════════════════════════════════════ */
 .kids-mode.dark header,
 [data-theme="dark"].kids-mode header,
 [data-theme="dark"] .kids-mode header {
@@ -705,7 +686,6 @@
   border-top-color: #334155 !important;
 }
 
-/* ── Live Waveform Oscilloscope Panel ──────────────────────────── */
 .kids-mode .sandbox-waveform-panel {
   position: absolute;
   bottom: 1.25rem;
@@ -775,4 +755,142 @@
 .kids-mode.dark #waveform-canvas,
 [data-theme="dark"].kids-mode #waveform-canvas {
   background: #0f172a !important;
+}
+
+/* Network Area*/
+.kids-mode .network-devices-view {
+  background: #edf2f7 !important;
+}
+
+.kids-mode .nd-tabs {
+  background: transparent !important;
+  border-bottom: none !important;
+  gap: 0.4rem !important;
+  padding: 0.7rem 1rem 0.5rem 1rem !important;
+}
+
+.kids-mode .nd-tab {
+  border-radius: 999px !important;
+  border: 2px solid transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0.45rem 1.05rem !important;
+  color: #64748b !important;
+}
+
+.kids-mode .nd-tab:hover {
+  background: #ffffff !important;
+  color: #1e293b !important;
+  box-shadow: 0 4px 10px rgba(15, 42, 67, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+.kids-mode .nd-tab.active {
+  background: #1e293b !important;
+  border-color: #1e293b !important;
+  box-shadow: 0 6px 14px rgba(30, 41, 59, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.kids-mode .nd-layout {
+  gap: 0.9rem !important;
+  padding: 0.4rem 1rem 1rem 1rem !important;
+}
+
+.kids-mode .nd-left {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0.1rem !important;
+  gap: 0.8rem !important;
+}
+
+.kids-mode .nd-sidebar-section {
+  background: #ffffff !important;
+  border: 1px solid #e6ebf1 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 24px rgba(15, 42, 67, 0.07) !important;
+}
+
+.kids-mode .nd-panel-header {
+  background: #1e293b !important;
+  border: none !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+  margin-bottom: 0.8rem !important;
+}
+
+.kids-mode .nd-panel-title {
+  color: #ffffff !important;
+}
+
+.kids-mode .nd-panel-sub {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.kids-mode .nd-card {
+  background: #f7f9fc !important;
+  border: 1px solid #e6ebf1 !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+}
+
+.kids-mode .nd-right {
+  background: #ffffff !important;
+  border: 1px solid #e6ebf1 !important;
+  border-radius: 22px !important;
+  box-shadow: 0 14px 34px rgba(15, 42, 67, 0.09) !important;
+  overflow: hidden !important;
+}
+
+.kids-mode .nd-log {
+  background: #ffffff !important;
+  border-top: 1px solid #eef2f7 !important;
+}
+
+.kids-mode .nd-log-item {
+  background: #f7f9fc !important;
+  border: 1px solid #eef2f7 !important;
+  border-radius: 12px !important;
+}
+
+.kids-mode.dark .network-devices-view,
+[data-theme="dark"].kids-mode .network-devices-view {
+  background: #0b132b !important;
+}
+
+.kids-mode.dark .nd-tab.active,
+[data-theme="dark"].kids-mode .nd-tab.active {
+  background: #38bdf8 !important;
+  border-color: #38bdf8 !important;
+  color: #0b132b !important;
+}
+
+.kids-mode.dark .nd-sidebar-section,
+[data-theme="dark"].kids-mode .nd-sidebar-section,
+.kids-mode.dark .nd-right,
+[data-theme="dark"].kids-mode .nd-right {
+  background: #141d33 !important;
+  border-color: #26314d !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45) !important;
+}
+
+.kids-mode.dark .nd-panel-header,
+[data-theme="dark"].kids-mode .nd-panel-header {
+  background: #0e1629 !important;
+}
+
+.kids-mode.dark .nd-card,
+[data-theme="dark"].kids-mode .nd-card,
+.kids-mode.dark .nd-log-item,
+[data-theme="dark"].kids-mode .nd-log-item {
+  background: #0e1629 !important;
+  border-color: #26314d !important;
+}
+
+.kids-mode.dark .nd-log,
+[data-theme="dark"].kids-mode .nd-log {
+  background: #141d33 !important;
+  border-top-color: #26314d !important;
 }

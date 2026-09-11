@@ -1609,3 +1609,503 @@
     border-bottom: 1px solid var(--border-color);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   LOGICQUEST DASHBOARD THEME — Network Devices / Subnet / Crypto /
+   Parity labs restyled like a modern analytics dashboard: soft page
+   background, floating white stat cards, black pill headers, segmented
+   tab control, rounded activity feed.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.network-devices-view {
+  background: #edf2f7;
+}
+
+.nd-lab-container,
+.nd-main {
+  background: transparent;
+}
+
+/* ── Segmented tab bar (Day / Week / Month style) ── */
+.nd-tabs {
+  background: transparent !important;
+  border-bottom: none !important;
+  gap: 0.4rem !important;
+  padding: 0.7rem 1rem 0.5rem 1rem !important;
+}
+
+.nd-tab {
+  border: 1.5px solid transparent !important;
+  border-radius: 999px !important;
+  padding: 0.45rem 1.05rem !important;
+  margin-bottom: 0 !important;
+  color: #64748b !important;
+  background: transparent !important;
+  font-weight: 800 !important;
+}
+
+.nd-tab:hover {
+  background: #ffffff !important;
+  color: #1e293b !important;
+}
+
+.nd-tab.active {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-color: #1e293b !important;
+  box-shadow: 0 6px 14px rgba(30, 41, 59, 0.28) !important;
+}
+
+/* ── Board layout on soft canvas ── */
+.nd-layout {
+  gap: 0.9rem;
+  padding: 0.4rem 1rem 1rem 1rem;
+}
+
+/* ── Left control column: stack of floating stat cards ── */
+.nd-left {
+  background: transparent !important;
+  border-right: none !important;
+  gap: 0.8rem !important;
+  padding: 0.1rem;
+}
+
+.nd-sidebar-section {
+  background: #ffffff !important;
+  border: 1px solid #e6ebf1 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 24px rgba(15, 42, 67, 0.07) !important;
+  padding: 1rem 1rem !important;
+}
+
+.nd-panel-header {
+  background: #1e293b !important;
+  border: none !important;
+  border-radius: 14px !important;
+  padding: 0.7rem 0.9rem !important;
+  margin-bottom: 0.8rem;
+}
+
+.nd-panel-header svg {
+  color: #facc15 !important;
+}
+
+.nd-panel-title {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+.nd-panel-sub {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* Device picker tiles */
+.nd-device-btn {
+  border-radius: 14px !important;
+  border: 1.5px solid #e6ebf1 !important;
+  background: #f7f9fc !important;
+  box-shadow: none !important;
+  padding: 0.6rem 0.3rem 0.5rem !important;
+}
+
+.nd-device-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(15, 42, 67, 0.1) !important;
+}
+
+.nd-dev-layer {
+  background: #1e293b !important;
+  color: #facc15 !important;
+  border-radius: 999px !important;
+  padding: 1px 8px !important;
+}
+
+/* Send button: chunky dashboard CTA */
+.nd-send-btn {
+  border-radius: 14px !important;
+  padding: 0.7rem 0.8rem !important;
+  font-size: 0.85rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Info / table cards: mini stat tiles ── */
+.nd-card {
+  background: #f7f9fc !important;
+  border: 1px solid #e6ebf1 !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+}
+
+.nd-card-title {
+  color: #94a3b8 !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.09em !important;
+}
+
+.nd-info-content {
+  color: #334155 !important;
+  font-size: 0.74rem !important;
+}
+
+.nd-info-content strong {
+  font-size: 0.95rem;
+}
+
+.mac-entry {
+  background: #ffffff !important;
+  border: 1px solid #e6ebf1 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 6px rgba(15, 42, 67, 0.05) !important;
+}
+
+/* ── Right side: main analytics card ── */
+.nd-right {
+  background: #ffffff !important;
+  border: 1px solid #e6ebf1 !important;
+  border-radius: 22px !important;
+  box-shadow: 0 14px 34px rgba(15, 42, 67, 0.09) !important;
+  overflow: hidden;
+}
+
+.nd-svg-wrap {
+  background-color: #fbfdff !important;
+  background-image: radial-gradient(#bcd7f5 1.6px, transparent 1.6px) !important;
+  background-size: 22px 22px !important;
+  border-bottom: 1px solid #eef2f7;
+}
+
+/* ── Event log: activity feed ── */
+.nd-log {
+  border-top: none !important;
+  background: #ffffff !important;
+  max-height: 170px !important;
+}
+
+.nd-log-header {
+  background: transparent !important;
+  border-bottom: 1px solid #eef2f7 !important;
+  color: #94a3b8 !important;
+  letter-spacing: 0.09em !important;
+  padding: 0.55rem 1rem !important;
+}
+
+.nd-log-list {
+  padding: 0.5rem 0.75rem 0.75rem 0.75rem !important;
+  gap: 4px !important;
+}
+
+.nd-log-item {
+  background: #f7f9fc !important;
+  border: 1px solid #eef2f7 !important;
+  border-left-width: 3px !important;
+  border-radius: 12px !important;
+  padding: 0.35rem 0.65rem !important;
+  font-size: 0.68rem !important;
+}
+
+/* ── Subnet / Crypto / Parity: uniform dashboard cards ── */
+.subnet-layout,
+.crypto-layout,
+.parity-layout {
+  background: #edf2f7 !important;
+}
+
+.subnet-left {
+  background: transparent !important;
+  border-right: none !important;
+  gap: 0.8rem !important;
+}
+
+.subnet-card,
+.crypto-exchange,
+.crypto-flow-row,
+.crypto-info-card,
+.parity-box,
+.parity-info-card {
+  background: #ffffff !important;
+  border: 1px solid #e6ebf1 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 24px rgba(15, 42, 67, 0.07) !important;
+}
+
+.subnet-card-title,
+.crypto-title,
+.parity-title {
+  font-weight: 800 !important;
+}
+
+.crypto-header,
+.parity-header {
+  background: #1e293b !important;
+  border-bottom: none !important;
+}
+
+.crypto-title,
+.parity-title {
+  color: #ffffff !important;
+}
+
+.crypto-header svg {
+  color: #facc15 !important;
+}
+
+.parity-header svg {
+  color: #4ade80 !important;
+}
+
+.crypto-party-header {
+  font-weight: 800 !important;
+}
+
+.crypto-key-mini,
+.crypto-data,
+.crypto-input,
+.parity-bit {
+  border-radius: 12px !important;
+}
+
+.subnet-text-input {
+  border-radius: 12px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  padding: 0.55rem 0.75rem !important;
+}
+
+.subnet-calc-row {
+  border-radius: 10px !important;
+}
+
+.subnet-table th {
+  background: #1e293b !important;
+  color: #ffffff !important;
+}
+
+.subnet-table tr:hover td {
+  background: #f1f5f9 !important;
+}
+
+/* Packet inspector rows */
+.pkt-layer-row {
+  border-radius: 12px !important;
+}
+
+.pkt-layer-header {
+  background: #1e293b !important;
+  color: #fff !important;
+}
+
+/* ── Dashboard dark mode ── */
+.dark .network-devices-view,
+[data-theme="dark"] .network-devices-view {
+  background: #0b132b !important;
+}
+
+.dark .nd-tab,
+[data-theme="dark"] .nd-tab {
+  color: #94a3b8 !important;
+}
+
+.dark .nd-tab:hover,
+[data-theme="dark"] .nd-tab:hover {
+  background: #1c2541 !important;
+  color: #f8fafc !important;
+}
+
+.dark .nd-tab.active,
+[data-theme="dark"] .nd-tab.active {
+  background: #38bdf8 !important;
+  border-color: #38bdf8 !important;
+  color: #0b132b !important;
+  box-shadow: 0 6px 14px rgba(56, 189, 248, 0.35) !important;
+}
+
+.dark .nd-sidebar-section,
+[data-theme="dark"] .nd-sidebar-section,
+.dark .nd-right,
+[data-theme="dark"] .nd-right,
+.dark .subnet-card,
+[data-theme="dark"] .subnet-card,
+.dark .crypto-exchange,
+[data-theme="dark"] .crypto-exchange,
+.dark .crypto-flow-row,
+[data-theme="dark"] .crypto-flow-row,
+.dark .crypto-info-card,
+[data-theme="dark"] .crypto-info-card,
+.dark .parity-box,
+[data-theme="dark"] .parity-box,
+.dark .parity-info-card,
+[data-theme="dark"] .parity-info-card {
+  background: #141d33 !important;
+  border-color: #26314d !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45) !important;
+}
+
+.dark .nd-panel-header,
+[data-theme="dark"] .nd-panel-header,
+.dark .crypto-header,
+[data-theme="dark"] .crypto-header,
+.dark .parity-header,
+[data-theme="dark"] .parity-header,
+.dark .pkt-layer-header,
+[data-theme="dark"] .pkt-layer-header,
+.dark .subnet-table th,
+[data-theme="dark"] .subnet-table th {
+  background: #0e1629 !important;
+}
+
+.dark .nd-device-btn,
+[data-theme="dark"] .nd-device-btn,
+.dark .nd-card,
+[data-theme="dark"] .nd-card,
+.dark .nd-log-item,
+[data-theme="dark"] .nd-log-item,
+.dark .mac-entry,
+[data-theme="dark"] .mac-entry {
+  background: #0e1629 !important;
+  border-color: #26314d !important;
+}
+
+.dark .nd-svg-wrap,
+[data-theme="dark"] .nd-svg-wrap {
+  background-color: #0e1629 !important;
+  background-image: radial-gradient(#1e3a8a 1.8px, transparent 1.8px) !important;
+  border-bottom-color: #26314d !important;
+}
+
+.dark .nd-log,
+[data-theme="dark"] .nd-log {
+  background: #141d33 !important;
+}
+
+.dark .nd-dev-layer,
+[data-theme="dark"] .nd-dev-layer {
+  background: #38bdf8 !important;
+  color: #0b132b !important;
+}
+
+.dark .subnet-layout,
+[data-theme="dark"] .subnet-layout,
+.dark .crypto-layout,
+[data-theme="dark"] .crypto-layout,
+.dark .parity-layout,
+[data-theme="dark"] .parity-layout {
+  background: #0b132b !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NETWORK LABS POLISH — live parity readout, flipped-bit flash,
+   class-based subnet bits (flex, wraps on mobile), crypto hint,
+   tidy host picker spacing.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Parity live count ── */
+.parity-count {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.parity-need {
+  font-family: var(--font-mono);
+  color: var(--color-indigo);
+}
+
+.parity-need b {
+  background: var(--color-indigo-glow);
+  border-radius: 4px;
+  padding: 0 0.3rem;
+}
+
+.parity-bit {
+  position: relative;
+}
+
+.parity-bit.flash {
+  animation: parityFlash 0.9s ease;
+}
+
+@keyframes parityFlash {
+  0%, 100% { transform: none; }
+  25% { transform: scale(1.25) rotate(-6deg); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.45); border-color: #ef4444; }
+  60% { transform: scale(1.1); }
+}
+
+/* ── Subnet binary bits (flexible, theme-aware) ── */
+.binary-bits-wrap {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+.sbit {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  padding: 0.3rem 0;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  border: 1px solid transparent;
+}
+
+.sbit-net { background: #3b82f6; border-color: rgba(59, 130, 246, 0.5); }
+.sbit-sub { background: #06b6d4; border-color: rgba(6, 182, 212, 0.5); }
+.sbit-host { background: #10b981; border-color: rgba(16, 185, 129, 0.5); }
+
+.subnet-binary-vis {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+/* ── Crypto hint ── */
+.crypto-hint {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  background: var(--bg-primary);
+  border: 1px dashed var(--border-color);
+  border-radius: 7px;
+  padding: 0.25rem 0.5rem;
+}
+
+.crypto-input {
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  min-height: 2.6rem;
+}
+
+.crypto-data {
+  overflow-wrap: anywhere;
+}
+
+/* ── Host picker tidy spacing ── */
+.nd-host-btn {
+  margin: 0;
+}
+
+.nd-host-options {
+  gap: 0.3rem;
+}
+
+.nd-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.nd-send-btn {
+  margin: 0;
+}

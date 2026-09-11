@@ -879,10 +879,6 @@
 .insp-badge.on { background: rgba(34,211,165,0.15); color: #22d3a5; }
 .insp-badge.off { background: rgba(148,163,184,0.12); color: var(--text-muted); }
 
-/* ==========================================================================
-   Real Integrated Circuit (DIP-14 Package) Styles
-   ========================================================================== */
-
 .real-ic-node {
   position: absolute;
   width: 220px;
@@ -908,7 +904,6 @@
   box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.4), 0 12px 35px rgba(0, 0, 0, 0.7);
 }
 
-/* Semi-circular orientation notch at top */
 .real-ic-notch {
   position: absolute;
   top: -1px;
@@ -925,7 +920,6 @@
   z-index: 2;
 }
 
-/* Pin 1 identification dot */
 .real-ic-dot {
   position: absolute;
   top: 14px;
@@ -938,7 +932,6 @@
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-/* Silkscreen text on chip body */
 .real-ic-header-text {
   display: flex;
   flex-direction: column;
@@ -965,7 +958,6 @@
   margin-top: 1px;
 }
 
-/* IC columns layout */
 .real-ic-body {
   display: flex;
   justify-content: space-between;
@@ -980,7 +972,6 @@
   flex: 1;
 }
 
-/* Individual pin row */
 .real-ic-pin-row {
   display: flex;
   align-items: center;
@@ -1005,7 +996,6 @@
   gap: 5px;
 }
 
-/* Pin numbers (1..14) */
 .real-ic-pin-num {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.62rem;
@@ -1015,7 +1005,6 @@
   text-align: center;
 }
 
-/* Pin functional names (1A, 1B, 1Y, VCC, GND) */
 .real-ic-pin-name {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.68rem;
@@ -1028,15 +1017,13 @@
   text-align: right;
 }
 
-/* VCC and GND pin styling */
 .real-ic-pin-row[data-pin="14"] .real-ic-pin-name {
-  color: #f87171; /* Red for VCC */
+  color: #f87171; 
 }
 .real-ic-pin-row[data-pin="7"] .real-ic-pin-name {
-  color: #60a5fa; /* Blue for GND */
+  color: #60a5fa; 
 }
 
-/* Status indicator pip */
 .real-ic-pin-indicator {
   width: 6px;
   height: 6px;
@@ -1054,7 +1041,6 @@
   box-shadow: 0 0 6px #22d3a5, 0 0 10px rgba(34, 211, 165, 0.4);
 }
 
-/* Port connections on IC pins */
 .real-ic-node .sandbox-port {
   position: relative !important;
   left: auto !important;
@@ -1071,7 +1057,6 @@
   transition: all 0.15s ease;
 }
 
-/* Metallic lead frame effect */
 .real-ic-pin-row.left-pin .sandbox-port {
   margin-left: -7px;
   box-shadow: -3px 0 4px rgba(0, 0, 0, 0.4);
@@ -1100,7 +1085,6 @@
   box-shadow: 0 0 10px #22d3a5 !important;
 }
 
-/* IC Delete Button */
 .real-ic-node .node-delete-btn {
   position: absolute;
   top: 4px;
@@ -1128,3 +1112,587 @@
   transform: scale(1.1);
 }
 
+.real-ic-node {
+  width: 268px; 
+}
+
+.real-ic-body {
+  align-items: stretch;
+  gap: 6px;
+}
+
+.real-ic-gates {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 0 2px;
+  position: relative;
+}
+
+.real-ic-gates::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 50%;
+  width: 1px;
+  background: repeating-linear-gradient(to bottom, #2a2f3b 0 3px, transparent 3px 6px);
+  z-index: 0;
+}
+
+.real-ic-gate-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  position: relative;
+  z-index: 1;
+}
+
+.ansi-gate {
+  width: 32px;
+  height: 20px;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.ansi-gate path {
+  fill: rgba(56, 189, 248, 0.04);
+  stroke: #64748b;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  transition: stroke 0.15s ease, fill 0.15s ease, filter 0.15s ease;
+}
+
+.ansi-gate .ansi-xor-tail {
+  fill: none;
+  stroke: #475569;
+}
+
+.ansi-gate.active path {
+  stroke: #22d3a5;
+  fill: rgba(34, 211, 165, 0.1);
+  filter: drop-shadow(0 0 3px rgba(34, 211, 165, 0.55));
+}
+
+.ansi-bubble {
+  fill: #15181e;
+  stroke: #64748b;
+  stroke-width: 1.6;
+  transition: fill 0.15s ease, stroke 0.15s ease, filter 0.15s ease;
+}
+
+.ansi-bubble.active {
+  fill: #22d3a5;
+  stroke: #22d3a5;
+  filter: drop-shadow(0 0 3px rgba(34, 211, 165, 0.7));
+}
+
+.real-ic-pin-row:hover ~ .real-ic-gates .real-ic-gate-slot[data-gate-index],
+.real-ic-gate-slot:hover .ansi-gate path {
+  stroke: #38bdf8;
+}
+
+.real-ic-node {
+  border-radius: 12px !important;
+  box-shadow: 0 6px 0 rgba(15, 23, 42, 0.25), 0 10px 24px rgba(28, 176, 246, 0.12) !important;
+}
+
+.real-ic-gates::before {
+  background: repeating-linear-gradient(to bottom, #334155 0 3px, transparent 3px 6px) !important;
+}
+
+.ansi-gate path {
+  stroke: #94a3b8 !important;
+}
+
+.ansi-bubble {
+  fill: #0f172a !important;
+  stroke: #94a3b8 !important;
+}
+
+.sb-wire-casing {
+  fill: none;
+  stroke: var(--bg-secondary);
+  stroke-width: 6.5;
+  stroke-linecap: round;
+  opacity: 0.9;
+  background: transparent;
+}
+
+.sb-wire-core {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke 0.12s ease;
+  background: transparent;
+}
+
+.sb-wire-core.high {
+  stroke: var(--color-high);
+  filter: drop-shadow(0 0 3px var(--color-high-glow));
+  background: transparent;
+}
+
+.sb-wire-core.low {
+  stroke: #94a3b8;
+  background: transparent;
+}
+
+.dark .sb-wire-core.low,
+[data-theme="dark"] .sb-wire-core.low {
+  stroke: #64748b;
+  background: transparent;
+}
+
+.sb-wire-core.hover {
+  stroke: var(--color-error);
+  stroke-width: 4;
+  background: transparent;
+}
+
+.sb-wire-flow {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.95);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-dasharray: 2 7;
+  opacity: 0.9;
+  animation: marchingAnts 0.8s linear infinite;
+  background: transparent;
+}
+
+.sb-wire-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 16;
+  background: transparent;
+}
+
+.sb-wire-preview {
+  fill: none;
+  stroke: var(--color-cyan);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 7 5;
+  opacity: 0.85;
+  background: transparent;
+}
+
+.sandbox-node.gate-node {
+  min-width: 148px;
+  padding: 0.45rem 0.6rem;
+}
+
+.sandbox-node.gate-node .sandbox-node-body {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.gate-symbol {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.gate-symbol svg {
+  width: 84px;
+  height: auto;
+  max-height: 52px;
+  color: var(--text-primary);
+  display: block;
+}
+
+.gate-symbol .gate-type-label {
+  font-size: 0.95rem;
+}
+
+.gate-input-badge {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--color-cyan);
+  background: var(--color-cyan-glow);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 0 0.45rem;
+  line-height: 1.5;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.gate-io-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.gate-io-btn {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s ease, background 0.1s ease, border-color 0.1s ease;
+}
+
+.gate-io-btn:hover {
+  background: var(--color-cyan-glow);
+  border-color: var(--color-cyan);
+  transform: scale(1.1);
+}
+
+.gate-io-btn:active {
+  transform: scale(0.94);
+}
+
+.sandbox-node.real-ic-node,
+.kids-mode .sandbox-node.real-ic-node,
+.kids-mode.dark .sandbox-node.real-ic-node {
+  width: 264px;
+  min-width: 264px;
+  padding: 10px 14px 12px 14px;
+  background:
+    radial-gradient(ellipse 120% 40% at 50% -10%, rgba(255, 255, 255, 0.09), transparent 55%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #23262e 0%, #191c22 45%, #14161b 100%);
+  border: 1px solid #333845;
+  border-radius: 7px;
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.45),
+    0 3px 8px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+  overflow: visible;
+  cursor: move;
+}
+
+.sandbox-node.real-ic-node:hover,
+.kids-mode .sandbox-node.real-ic-node:hover {
+  border-color: #4b5263;
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.5),
+    0 0 14px rgba(56, 189, 248, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.sandbox-node.real-ic-node.selected,
+.kids-mode .sandbox-node.real-ic-node.selected {
+  border-color: #38bdf8;
+  box-shadow:
+    0 0 0 2px rgba(56, 189, 248, 0.45),
+    0 16px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.sandbox-node.real-ic-node .real-ic-notch {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 11px;
+  background: var(--bg-primary, #f0f7ff);
+  border-bottom-left-radius: 13px;
+  border-bottom-right-radius: 13px;
+  border: 1px solid #333845;
+  border-top: none;
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.65);
+  z-index: 3;
+}
+
+.sandbox-node.real-ic-node .real-ic-dot {
+  position: absolute;
+  top: 16px;
+  left: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3a3f4c, #101216 70%);
+  border: 1px solid #05060a;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.sandbox-node.real-ic-node .real-ic-header-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 4px 0 8px 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.real-ic-mfg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: #7c8598;
+}
+
+.real-ic-part {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  font-size: 0.92rem;
+  letter-spacing: 0.06em;
+  color: #cfd6e2;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.9), 0 0 6px rgba(255, 255, 255, 0.06);
+}
+
+.real-ic-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #79839a;
+  margin-top: 1px;
+}
+
+.real-ic-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  color: #5b6376;
+  margin-top: 2px;
+}
+
+.sandbox-node.real-ic-node .real-ic-body {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 2px;
+}
+
+.sandbox-node.real-ic-node .real-ic-col {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sandbox-node.real-ic-node .real-ic-pin-row {
+  display: flex;
+  align-items: center;
+  height: 21px;
+  border-radius: 3px;
+  padding: 0 1px;
+  position: relative;
+}
+
+.sandbox-node.real-ic-node .real-ic-pin-row.left-pin {
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.sandbox-node.real-ic-node .real-ic-pin-row.right-pin {
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.sandbox-node.real-ic-node .real-ic-pin-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sandbox-node.real-ic-node .real-ic-lead {
+  width: 13px;
+  height: 5px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #e8ecf3 0%, #aeb6c4 35%, #7d8595 55%, #c3cad6 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+
+.real-ic-pin-row.left-pin .real-ic-lead {
+  margin-left: -16px;
+  border-radius: 2px 0 0 2px;
+  clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 85%);
+}
+
+.real-ic-pin-row.right-pin .real-ic-lead {
+  margin-right: -16px;
+  border-radius: 0 2px 2px 0;
+  clip-path: polygon(0 0, 100% 15%, 100% 85%, 0 100%);
+}
+
+.sandbox-node.real-ic-node .real-ic-pin-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: #6d7688;
+  min-width: 13px;
+  text-align: center;
+}
+
+.sandbox-node.real-ic-node .real-ic-pin-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #a7b0c2;
+  min-width: 26px;
+}
+
+.real-ic-pin-row.right-pin .real-ic-pin-name {
+  text-align: right;
+}
+
+.real-ic-pin-row[data-pin="14"] .real-ic-pin-name {
+  color: #f87171;
+}
+
+.real-ic-pin-row[data-pin="7"] .real-ic-pin-name {
+  color: #60a5fa;
+}
+
+.sandbox-node.real-ic-node .real-ic-pin-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #0c0e12;
+  border: 1px solid #3a4152;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.sandbox-node.real-ic-node .real-ic-pin-indicator.high {
+  background: #22d3a5;
+  border-color: #a7f3d0;
+  box-shadow: 0 0 6px #22d3a5, 0 0 12px rgba(34, 211, 165, 0.5);
+}
+
+.sandbox-node.real-ic-node .sandbox-port,
+.kids-mode .sandbox-node.real-ic-node .sandbox-port {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  transform: none !important;
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 3px !important;
+  background: linear-gradient(180deg, #4b5263, #2b303c) !important;
+  border: 1.5px solid #8b94a7 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  cursor: crosshair;
+  flex-shrink: 0;
+  z-index: 4;
+}
+
+.sandbox-node.real-ic-node .sandbox-port:hover {
+  background: #38bdf8 !important;
+  border-color: #fff !important;
+  box-shadow: 0 0 8px #38bdf8 !important;
+}
+
+.sandbox-node.real-ic-node .sandbox-port.port-output {
+  border-color: #38bdf8 !important;
+}
+
+.sandbox-node.real-ic-node .sandbox-port.active-port {
+  background: #22d3a5 !important;
+  border-color: #d1fae5 !important;
+  box-shadow: 0 0 10px #22d3a5 !important;
+}
+
+.sandbox-node.real-ic-node .node-delete-btn,
+.kids-mode .sandbox-node.real-ic-node .node-delete-btn {
+  position: absolute !important;
+  top: -9px !important;
+  right: -9px !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  border-radius: 50% !important;
+  background: #ff4b4b !important;
+  color: #fff !important;
+  border: 2px solid #fff !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+  font-size: 0.85rem !important;
+  font-weight: 900 !important;
+  display: none !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  z-index: 30 !important;
+}
+
+.sandbox-node.real-ic-node:hover .node-delete-btn,
+.sandbox-node.real-ic-node.selected .node-delete-btn {
+  display: flex !important;
+}
+
+.sandbox-toolbar {
+  max-width: min(78%, 860px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.sandbox-toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.sandbox-toggle-btn {
+  min-width: 44px;
+  min-height: 34px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border-width: 2px;
+  box-shadow: 0 2px 0 var(--border-color);
+}
+
+.sandbox-toggle-btn.high {
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25), 0 0 10px var(--color-high-glow);
+}
+
+.bulb-state-label {
+  font-family: var(--font-header);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-top: 4px;
+  white-space: nowrap;
+}
+
+.clk-wrap {
+  background: var(--bg-primary);
+  border: 1.5px solid var(--border-color);
+  border-radius: 10px;
+  padding: 5px 6px 4px 6px;
+}
+
+.clk-badge {
+  font-family: var(--font-header);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.clk-hz {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  border-radius: 999px;
+  padding: 0 0.4rem;
+}

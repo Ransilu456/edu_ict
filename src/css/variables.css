@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Sinhala:wght@300;400;500;600;700&display=swap');
 
-/* Kids mode is the ONLY theme — baked in permanently */
 :root {
   /* Backgrounds */
   --bg-primary: #f0f7ff;
@@ -14,31 +13,30 @@
   --text-secondary: #475569;
   --text-muted: #64748b;
 
-  /* Brand / accent colors */
+  /* Accent */
   --color-indigo: #1cb0f6;
   --color-indigo-glow: rgba(28, 176, 246, 0.15);
   --color-cyan: #1cb0f6;
   --color-cyan-glow: rgba(28, 176, 246, 0.15);
 
-  /* Logic signal colors */
+  /* Logic colors */
   --color-high: #58cc02;
   --color-high-glow: rgba(88, 204, 2, 0.2);
   --color-low: #cbd5e1;
   --color-low-glow: transparent;
   --color-label: #334155;
 
-  /* Semantic colors */
+  /* state colors */
   --color-success: #58cc02;
   --color-error: #ff4b4b;
   --color-amber: #ff9600;
 
-  /* Typography */
+  /* Familly */
   --font-sans: 'Nunito', system-ui, sans-serif;
   --font-header: 'Nunito', system-ui, sans-serif;
   --font-sinhala: 'Noto Sans Sinhala', 'Nunito', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Kids palette tokens */
   --kids-bg: #f0f7ff;
   --kids-card-bg: #ffffff;
   --kids-border: #38bdf8;
@@ -55,13 +53,11 @@
   --kids-text: #1e293b;
   --kids-text-light: #475569;
 
-  /* Transitions */
   --transition-fast: 0.1s ease;
   --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Kids Dark Theme */
 :root.dark,
 [data-theme="dark"] {
   --bg-primary: #0b132b;

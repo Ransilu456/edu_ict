@@ -47,8 +47,8 @@ function setupViewNavigation() {
           initNetworkDevices();
           networkReady = true;
         }
-        if (btn.dataset.subtab && window.switchNDTab) {
-          window.switchNDTab(btn.dataset.subtab);
+        if (tab.dataset.subtab && window.switchNDTab) {
+          window.switchNDTab(tab.dataset.subtab);
         }
       }
     });

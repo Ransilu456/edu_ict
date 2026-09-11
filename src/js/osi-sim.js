@@ -81,6 +81,7 @@ let state = {
 let pkt = {};
 
 function el(s) { return document.getElementById(s); }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 function qs(s, p) { return (p || document).querySelector(s); }
 function qsa(s, p) { return (p || document).querySelectorAll(s); }
 function play(n) { if (window.playSound) window.playSound(n); }
@@ -486,8 +487,8 @@ function encapsulateStep(step) {
   switch (layerId) {
     case 7:
       pkt.appData = state.msg;
-      dat.innerHTML = `Data: "${state.msg}"`;
-      blk.title = `Application Layer\nCreates HTTP request data: "${state.msg}"`;
+      dat.innerHTML = `Data: &quot;${esc(state.msg)}&quot;`;
+      blk.title = `Application Layer\nCreates ${state.protocol} request data: "${state.msg}"`;
       break;
     case 6:
       if (state.protocol === 'HTTPS') {
@@ -566,7 +567,7 @@ function decapsulateStep(step) {
       dat.innerHTML = `<span style="color:${proto === 'TCP' ? '#22c55e' : '#f97316'}">${proto}</span> Stripped | Port ${pkt.srcPort}\u2192${pkt.dstPort} | Checksum ${pkt.checksum} ${I.check}`;
       break;
     case 5:
-      dat.textContent = `Session ${pkt.sessionId} verified ${I.check}`;
+      dat.innerHTML = `Session ${pkt.sessionId} verified <span style="color:var(--color-success)">${I.check}</span>`;
       break;
     case 6:
       if (state.protocol === 'HTTPS') {
@@ -576,7 +577,7 @@ function decapsulateStep(step) {
       }
       break;
     case 7:
-      dat.innerHTML = `<span style="color:var(--color-success);font-weight:800;font-size:0.85rem">${I.doc} "${state.msg}"</span>`;
+      dat.innerHTML = `<span style="color:var(--color-success);font-weight:800;font-size:0.85rem">${I.doc} &quot;${esc(state.msg)}&quot;</span>`;
       break;
   }
 }
@@ -586,7 +587,7 @@ function completeDelivery() {
   const bob7 = el('osi-bob-l7');
   const bob7d = el('osi-bob-l7-data');
   if (bob7) bob7.className = 'osi-layer-block done active';
-  if (bob7d) bob7d.innerHTML = `<span style="color:var(--color-success);font-weight:800;font-size:0.85rem">${I.doc} "${state.msg}"</span>`;
+  if (bob7d) bob7d.innerHTML = `<span style="color:var(--color-success);font-weight:800;font-size:0.85rem">${I.doc} &quot;${esc(state.msg)}&quot;</span>`;
   LAYERS.forEach(l => {
     const al = el(`osi-alice-l${l.id}`);
     if (al) al.className = 'osi-layer-block done';
@@ -677,7 +678,7 @@ function updateInspector() {
   const sections = [];
 
   sections.push({ title: `${I.doc} Application`, bg: '#ef4444', fields: [
-    ['Data', `"${state.msg}"`], ['Protocol', state.protocol], ['Transport', state.transport],
+    ['Data', `&quot;${esc(state.msg)}&quot;`], ['Protocol', esc(state.protocol)], ['Transport', esc(state.transport)],
   ]});
 
   if (state.protocol === 'HTTPS') {
@@ -743,7 +744,7 @@ function updatePktVis() {
       { label: state.transport, color: '#22c55e', det: `Port ${pkt.srcPort || state.srcPort}\u2192${pkt.dstPort || state.dstPort}`, show: recvStep === undefined || recvStep <= 2 },
       { label: 'Session', color: '#eab308', det: `ID: ${pkt.sessionId || state.sessionId}`, show: recvStep === undefined || recvStep <= 3 },
       { label: state.protocol === 'HTTPS' ? 'TLS' : 'Pres', color: '#f97316', det: state.protocol === 'HTTPS' ? 'AES-256' : 'UTF-8', show: recvStep === undefined || recvStep <= 4 },
-      { label: 'Data', color: '#ef4444', det: `"${state.msg}"` },
+      { label: 'Data', color: '#ef4444', det: `&quot;${esc(state.msg)}&quot;` },
     ];
     return all.filter(x => x.show !== false).map(x => l(x.label, x.color, x.det)).join('');
   }
@@ -751,7 +752,7 @@ function updatePktVis() {
   if (step >= 0 && step <= 6) {
     // Encapsulation — show only layers completed so far
     const encLayers = [];
-    if (step >= 0) encLayers.push({ label: 'Data', color: '#ef4444', det: `"${state.msg}"` });
+    if (step >= 0) encLayers.push({ label: 'Data', color: '#ef4444', det: `&quot;${esc(state.msg)}&quot;` });
     if (step >= 1) encLayers.push({ label: state.protocol === 'HTTPS' ? 'TLS' : 'Pres', color: '#f97316', det: state.protocol === 'HTTPS' ? 'AES-256' : 'UTF-8' });
     if (step >= 2) encLayers.push({ label: 'Session', color: '#eab308', det: `ID: ${state.sessionId}` });
     if (step >= 3) encLayers.push({ label: state.transport, color: '#22c55e', det: `Port ${pkt.srcPort || '?'}\u2192${pkt.dstPort || '?'}` });
@@ -766,7 +767,7 @@ function updatePktVis() {
     // Decapsulation — strip layers
     wrap.innerHTML = buildLayers(step - 10);
   } else {
-    wrap.innerHTML = l('Data', '#ef4444', `"${state.msg}"`);
+    wrap.innerHTML = l('Data', '#ef4444', `&quot;${esc(state.msg)}&quot;`);
   }
 }
 

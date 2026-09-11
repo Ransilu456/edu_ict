@@ -46,7 +46,7 @@ function performUndo() {
   const snapshot = JSON.parse(undoStack.pop());
   importLayout(snapshot);
   playSound('click');
-  showToast('Undone Γå⌐');
+  showToast('Undone ↺');
   const undoBtn = document.getElementById('sandbox-undo');
   if (undoBtn) undoBtn.disabled = undoStack.length === 0;
 }
@@ -203,7 +203,7 @@ function setupToolboxItem(item) {
     if (!workspace) return;
     const r = workspace.getBoundingClientRect();
     placeNode(type, label, r.width / 2 - 60, r.height / 2 - 40);
-    showToast(`${label} placed Γ£ô`);
+    showToast(`${label} placed ✓`);
   });
   let touchDragGhost = null;
   let touchDragActive = false;
@@ -268,7 +268,7 @@ function setupToolboxItem(item) {
       const dropX = touch.clientX - wr.left - panX - 60;
       const dropY = touch.clientY - wr.top - panY - 30;
       placeNode(type, label, dropX, dropY);
-      showToast(`${label} placed Γ£ô`);
+      showToast(`${label} placed ✓`);
     }
   });
 }
@@ -354,7 +354,7 @@ function setupToolbar() {
     saveCircuitToLocal(name);
     saveModal.style.display = 'none';
     playSound('success');
-    showToast(`Saved "${name}" Γ£ô`);
+    showToast(`Saved "${name}" ✓`);
   });
   saveNameInput?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') document.getElementById('confirm-save-btn')?.click();
@@ -370,7 +370,7 @@ function setupToolbar() {
     loadModal.style.display = 'none';
   });
   document.getElementById('sandbox-export')?.addEventListener('click', () => {
-    if (sandboxNodes.length === 0) { showToast('Canvas is empty ΓÇö nothing to export.'); return; }
+    if (sandboxNodes.length === 0) { showToast('Canvas is empty — nothing to export.'); return; }
     exportCircuitJSON();
     playSound('success');
   });
@@ -387,7 +387,7 @@ function setupToolbar() {
         const layout = JSON.parse(ev.target.result);
         importLayout(layout);
         playSound('success');
-        showToast('Circuit imported Γ£ô');
+        showToast('Circuit imported ✓');
       } catch {
         showAlert('Invalid circuit file.', 'Error');
       }
@@ -575,6 +575,7 @@ function renderRealICNodeDOM(node, el) {
     <div class="real-ic-mfg">LQ LOGIC</div>
     <div class="real-ic-part">${ic.partNumber}</div>
     <div class="real-ic-subtitle">${ic.label}</div>
+    <div class="real-ic-date">24+ &nbsp;PHILIPPINES</div>
   `;
   el.appendChild(header);
 
@@ -615,6 +616,12 @@ function renderRealICNodeDOM(node, el) {
       handlePortClick(node.id, isOutput ? 'output' : 'input', pin.pin);
     });
 
+    // Metallic package lead sticking out of the epoxy body (purely visual —
+    // clicks pass through to the port sitting on top of it).
+    const lead = document.createElement('span');
+    lead.className = 'real-ic-lead';
+    lead.setAttribute('aria-hidden', 'true');
+
     const ind = document.createElement('span');
     ind.className = 'real-ic-pin-indicator';
     ind.id = `${node.id}-pin-${pin.pin}-ind`;
@@ -627,10 +634,21 @@ function renderRealICNodeDOM(node, el) {
     nameSpan.className = 'real-ic-pin-name';
     nameSpan.textContent = pin.name;
 
-    row.appendChild(port);
-    row.appendChild(numSpan);
-    row.appendChild(nameSpan);
-    row.appendChild(ind);
+    if (side === 'left') {
+      // lead → port → number → name → status pip (mirrors a real DIP)
+      row.appendChild(lead);
+      row.appendChild(port);
+      row.appendChild(numSpan);
+      row.appendChild(nameSpan);
+      row.appendChild(ind);
+    } else {
+      // mirrored: status pip → name → number → port → lead
+      row.appendChild(ind);
+      row.appendChild(nameSpan);
+      row.appendChild(numSpan);
+      row.appendChild(port);
+      row.appendChild(lead);
+    }
 
     return row;
   }
@@ -674,6 +692,11 @@ function renderNodeDOM(node) {
 
   if (['half-adder', 'full-adder', 'd-flop', 'op-amp'].includes(node.type)) {
     el.classList.add('compound-node');
+  }
+  // Pure logic gates get a dedicated compact layout (symbol + io controls)
+  // so ports stay aligned with the symbol's input/output stubs.
+  if (['not', 'buffer', 'and', 'or', 'nand', 'nor', 'xor', 'xnor'].includes(node.type)) {
+    el.classList.add('gate-node');
   }
   if (node.type === 'seven-seg') el.classList.add('seven-seg-node');
   if (node.type === 'rgb-led') el.classList.add('rgb-led-node');
@@ -774,7 +797,7 @@ function renderNodeBody(node, body) {
             
             <path d="M 38 32 A 20 20 0 0 1 54 20" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.8" stroke-linecap="round" class="bulb-shine"/>
           </svg>
-          <span class="bulb-state-label" id="${node.id}-state">Γùï OFF</span>
+          <span class="bulb-state-label" id="${node.id}-state">○ OFF</span>
         </div>`;
       break;
     }
@@ -851,7 +874,7 @@ function renderNodeBody(node, body) {
             <line x1="25" y1="0" x2="25" y2="40" class="osc-cursor" id="${node.id}-cursor"/>
           </svg>
           <div class="clk-meta">
-            <span class="clk-badge" id="${node.id}-phase">Γû╝ LOW</span>
+            <span class="clk-badge" id="${node.id}-phase">▽ LOW</span>
             <span class="clk-hz">1 Hz</span>
           </div>
         </div>`;
@@ -931,7 +954,7 @@ function renderNodeBody(node, body) {
 
       const expandBtn = document.createElement('button');
       expandBtn.className = 'sandbox-toggle-btn expand-adder-btn';
-      expandBtn.innerText = '≡ƒæü View Timing';
+      expandBtn.innerText = '🔍 View Timing';
       expandBtn.style.cssText = 'margin-top:6px; font-size:0.62rem; padding:0.15rem 0.4rem; pointer-events:auto; font-family:var(--font-header);';
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -944,13 +967,13 @@ function renderNodeBody(node, body) {
     case 'half-adder': {
       body.innerHTML = `
         <div class="compound-body-grid" class="is-mono-label">
-          <div class="cb-row"><span class="cb-pin">A</span><span class="cb-name">┬╜ ADD</span><span class="cb-pin out-pin">S</span></div>
+          <div class="cb-row"><span class="cb-pin">A</span><span class="cb-name">½ ADD</span><span class="cb-pin out-pin">S</span></div>
           <div class="cb-row"><span class="cb-pin">B</span><span></span><span class="cb-pin out-pin">C</span></div>
         </div>`;
 
       const expandBtn = document.createElement('button');
       expandBtn.className = 'sandbox-toggle-btn expand-adder-btn';
-      expandBtn.innerText = '≡ƒæü View Inside';
+      expandBtn.innerText = '🔍 View Inside';
       expandBtn.style.cssText = 'margin-top:6px; font-size:0.62rem; padding:0.15rem 0.4rem; pointer-events:auto; font-family:var(--font-header);';
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -970,7 +993,7 @@ function renderNodeBody(node, body) {
 
       const expandBtn = document.createElement('button');
       expandBtn.className = 'sandbox-toggle-btn expand-adder-btn';
-      expandBtn.innerText = '≡ƒæü View Inside';
+      expandBtn.innerText = '🔍 View Inside';
       expandBtn.style.cssText = 'margin-top:6px; font-size:0.62rem; padding:0.15rem 0.4rem; pointer-events:auto; font-family:var(--font-header);';
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1075,7 +1098,7 @@ function renderNodeBody(node, body) {
 
       const expandBtn = document.createElement('button');
       expandBtn.className = 'sandbox-toggle-btn expand-adder-btn';
-      expandBtn.innerText = '≡ƒæü Segment Map';
+      expandBtn.innerText = '🔍 Segment Map';
       expandBtn.style.cssText = 'margin-top:6px; font-size:0.62rem; padding:0.15rem 0.4rem; pointer-events:auto; font-family:var(--font-header);';
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1110,32 +1133,31 @@ function renderNodeBody(node, body) {
     default: {
       const gateStyle = window.__gateStyle || 'box';
       const isMultiInputGate = MULTI_INPUT_GATE_TYPES ? MULTI_INPUT_GATE_TYPES.has(node.type) : false;
+      const symWrap = document.createElement('div');
+      symWrap.className = 'gate-symbol';
       if (gateStyle === 'realistic') {
-        body.innerHTML = renderGateSVG(node.type);
+        symWrap.innerHTML = renderGateSVG(node.type);
       } else {
         const span = document.createElement('span');
         span.className = 'gate-type-label';
         span.innerText = node.type.toUpperCase();
-        body.appendChild(span);
+        symWrap.appendChild(span);
       }
+      body.appendChild(symWrap);
       // Show input count badge and +/- controls for multi-input gates
       if (isMultiInputGate && node.inputsCount > 2) {
         const badge = document.createElement('div');
-        badge.style.cssText = 'font-size:8px;color:var(--color-cyan,#22d3a5);font-weight:700;margin-top:2px;text-align:center;letter-spacing:0.5px';
+        badge.className = 'gate-input-badge';
         badge.textContent = `${node.inputsCount}-input`;
         body.appendChild(badge);
       }
       if (isMultiInputGate) {
         const controls = document.createElement('div');
-        controls.style.cssText = 'display:flex;gap:3px;margin-top:3px;justify-content:center';
+        controls.className = 'gate-io-controls';
         controls.innerHTML = `
-          <button onclick="event.stopPropagation();window.addGateInput('${node.id}')"
-            style="font-size:10px;padding:1px 5px;border-radius:3px;border:1px solid var(--border-color);
-            background:var(--bg-tertiary);color:var(--text-primary);cursor:pointer;line-height:1.2"
+          <button class="gate-io-btn" onclick="event.stopPropagation();window.addGateInput('${node.id}')"
             title="Add input port">+</button>
-          <button onclick="event.stopPropagation();window.removeGateInput('${node.id}')"
-            style="font-size:10px;padding:1px 5px;border-radius:3px;border:1px solid var(--border-color);
-            background:var(--bg-tertiary);color:var(--text-primary);cursor:pointer;line-height:1.2"
+          <button class="gate-io-btn" onclick="event.stopPropagation();window.removeGateInput('${node.id}')"
             title="Remove input port">&minus;</button>`;
         body.appendChild(controls);
       }
@@ -1218,6 +1240,10 @@ function renderInputPorts(node, el) {
   const count = node.inputsCount;
   if (count === 0) return;
 
+  // Pure gates keep ports inside the symbol band so they line up with the
+  // SVG input stubs (image bug: ports spread 20–80% of the whole card,
+  // which drifts away from the symbol once headers/controls are added).
+  const isGate = ['not', 'buffer', 'and', 'or', 'nand', 'nor', 'xor', 'xnor'].includes(node.type);
   for (let i = 0; i < count; i++) {
     const port = document.createElement('div');
     port.className = 'sandbox-port port-input';
@@ -1226,7 +1252,9 @@ function renderInputPorts(node, el) {
     port.title = portLabels[i] || `In ${i}`;
     const pct = count === 1
       ? 50
-      : 20 + (i * 60) / (count - 1);
+      : isGate
+        ? 30 + (i * 40) / (count - 1)
+        : 20 + (i * 60) / (count - 1);
     port.style.top = `calc(${pct}% - 4px)`;
     port.style.left = '-7px';
 
@@ -1484,8 +1512,6 @@ function selectNode(id, shiftKey) {
   deselectAllNodes();
   selectedNodeId = id;
   document.getElementById(id)?.classList.add('selected');
-  const node = sandboxNodes.find(n => n.id === id);
-  if (node) showInspectorForNode(node);
 }
 
 function toggleNodeSelection(id) {
@@ -1626,11 +1652,14 @@ function drawWiringPreview(e) {
 
   const prev = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   prev.setAttribute('d', d);
-  prev.setAttribute('stroke', 'var(--color-cyan, #0284c7)');
-  prev.setAttribute('stroke-width', '2');
-  prev.setAttribute('stroke-dasharray', '6,4');
   prev.setAttribute('fill', 'none');
-  prev.setAttribute('opacity', '0.75');
+  prev.setAttribute('stroke', '#1cb0f6');
+  prev.setAttribute('stroke-width', '2.5');
+  prev.setAttribute('stroke-linecap', 'round');
+  prev.setAttribute('stroke-dasharray', '7 5');
+  prev.setAttribute('opacity', '0.85');
+  prev.setAttribute('class', 'sb-wire-preview');
+  prev.style.pointerEvents = 'none';
   wiresSvg.appendChild(prev);
 }
 
@@ -1682,40 +1711,66 @@ function updateSandboxWires() {
     const dir = x2 >= x1 ? 1 : -1;
     const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
     const d = `M ${x1} ${y1} C ${x1 + dir * dx} ${y1}, ${x2 - dir * dx} ${y2}, ${x2} ${y2}`;
+    // NOTE: theme colors come from CSS classes (.sb-wire-core.high/.low)
+    // because SVG *presentation attributes* do NOT resolve CSS var() — that
+    // was the "thick black wire" bug. Literal fallback attributes below
+    // guarantee thin stroked wires (never black filled blobs) even if the
+    // stylesheet is stale or cached.
+    const casing = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    casing.setAttribute('d', d);
+    casing.setAttribute('fill', 'none');
+    casing.setAttribute('stroke', '#ffffff');
+    casing.setAttribute('stroke-width', '6.5');
+    casing.setAttribute('stroke-linecap', 'round');
+    casing.setAttribute('class', 'sb-wire-casing');
+    casing.style.pointerEvents = 'none';
+    const visPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    visPath.setAttribute('d', d);
+    visPath.setAttribute('fill', 'none');
+    visPath.setAttribute('stroke', isActive ? '#58cc02' : '#94a3b8');
+    visPath.setAttribute('stroke-width', '3');
+    visPath.setAttribute('stroke-linecap', 'round');
+    visPath.setAttribute('class', 'sb-wire-core ' + (isActive ? 'high' : 'low'));
+    visPath.style.pointerEvents = 'none';
     const hitTarget = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     hitTarget.setAttribute('d', d);
-    hitTarget.setAttribute('stroke', 'transparent');
-    hitTarget.setAttribute('stroke-width', '14');
     hitTarget.setAttribute('fill', 'none');
+    hitTarget.setAttribute('stroke', 'transparent');
+    hitTarget.setAttribute('stroke-width', '16');
+    hitTarget.setAttribute('class', 'sb-wire-hit');
     hitTarget.style.cursor = 'pointer';
     hitTarget.style.pointerEvents = 'stroke';
-    hitTarget.addEventListener('mouseenter', () => visPath.style.stroke = 'var(--color-error, #dc2626)');
-    hitTarget.addEventListener('mouseleave', () => visPath.style.stroke = isActive ? 'var(--color-high)' : 'var(--color-low)');
+    hitTarget.addEventListener('mouseenter', () => {
+      visPath.setAttribute('class', 'sb-wire-core hover');
+      visPath.setAttribute('stroke', '#ff4b4b');
+      visPath.setAttribute('stroke-width', '4');
+    });
+    hitTarget.addEventListener('mouseleave', () => {
+      visPath.setAttribute('class', 'sb-wire-core ' + (isActive ? 'high' : 'low'));
+      visPath.setAttribute('stroke', isActive ? '#58cc02' : '#94a3b8');
+      visPath.setAttribute('stroke-width', '3');
+    });
     hitTarget.addEventListener('click', (e) => {
       e.stopPropagation();
       sandboxWires = sandboxWires.filter(w => w !== wire);
       playSound('click');
       evaluateSandbox();
     });
-    const visPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    visPath.setAttribute('d', d);
-    visPath.setAttribute('stroke', isActive ? 'var(--color-high)' : 'var(--color-low)');
-    visPath.setAttribute('stroke-width', '2.5');
-    visPath.setAttribute('stroke-linecap', 'round');
-    visPath.style.transition = 'stroke 0.1s';
-    visPath.style.pointerEvents = 'none';
 
-    wiresSvg.appendChild(hitTarget);
+    wiresSvg.appendChild(casing);
     wiresSvg.appendChild(visPath);
+    wiresSvg.appendChild(hitTarget);
     if (isActive) {
       const flow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       flow.setAttribute('d', d);
       flow.setAttribute('fill', 'none');
-      flow.setAttribute('stroke', 'var(--color-high)');
-      flow.setAttribute('stroke-width', '1.5');
-      flow.setAttribute('stroke-dasharray', '4 8');
-      flow.setAttribute('opacity', '0.6');
-      flow.style.animation = 'marchingAnts 1s linear infinite';
+      flow.setAttribute('stroke', '#ffffff');
+      flow.setAttribute('stroke-width', '1.4');
+      flow.setAttribute('stroke-linecap', 'round');
+      flow.setAttribute('stroke-dasharray', '2 7');
+      flow.setAttribute('opacity', '0.9');
+      flow.setAttribute('class', 'sb-wire-flow');
+      flow.style.pointerEvents = 'none';
       wiresSvg.appendChild(flow);
     }
   });
@@ -1816,7 +1871,6 @@ function evaluateSandbox() {
 
   sandboxNodes.forEach(node => updateNodeVisuals(node));
   updateSandboxWires();
-  updateNodeInspector();
   if (window.checkTheoryChallenge) window.checkTheoryChallenge();
 }
 window.evaluateSandbox = evaluateSandbox;
@@ -1928,7 +1982,7 @@ function addGateInput(nodeId) {
   pushUndo();
   node.inputsCount++;
   node.inputValues = Array(node.inputsCount).fill(0);
-  // Remove any wires that targeted ports that no longer make sense (none needed ΓÇö just grow)
+  // Remove any wires that targeted ports that no longer make sense (none needed — just grow)
   const el = document.getElementById(nodeId);
   if (el) {
     // Remove old input ports, re-render
@@ -1939,7 +1993,7 @@ function addGateInput(nodeId) {
   }
   evaluateSandbox();
   playSound('click');
-  showToast(`Input added ΓåÆ ${node.inputsCount} inputs`);
+  showToast(`Input added → ${node.inputsCount} inputs`);
 }
 
 function removeGateInput(nodeId) {
@@ -1960,7 +2014,7 @@ function removeGateInput(nodeId) {
   }
   evaluateSandbox();
   playSound('click');
-  showToast(`Input removed ΓåÆ ${node.inputsCount} inputs`);
+  showToast(`Input removed → ${node.inputsCount} inputs`);
 }
 window.addGateInput = addGateInput;
 window.removeGateInput = removeGateInput;
@@ -1985,22 +2039,18 @@ function showSandboxContextMenu(e, node) {
 
   const items = [
     {
-      icon: 'Γ₧ò', label: `Add Input (now ${node.inputsCount})`,
+      icon: '➕', label: `Add Input (now ${node.inputsCount})`,
       action: () => addGateInput(node.id),
       disabled: node.inputsCount >= MAX_GATE_INPUTS
     },
     {
-      icon: 'Γ₧û', label: `Remove Input (now ${node.inputsCount})`,
+      icon: '➖', label: `Remove Input (now ${node.inputsCount})`,
       action: () => removeGateInput(node.id),
       disabled: node.inputsCount <= MIN_GATE_INPUTS
     },
     { separator: true },
     {
-      icon: '≡ƒôï', label: 'Show Inspector',
-      action: () => { selectNode(node.id); }
-    },
-    {
-      icon: '≡ƒùæ∩╕Å', label: 'Delete Gate',
+      icon: '🗑️', label: 'Delete Gate',
       action: () => deleteNode(node.id)
     }
   ];
@@ -2052,7 +2102,7 @@ function updateNodeVisuals(node) {
       if (wrap) wrap.classList.toggle('high', isHigh);
       if (state) {
         state.classList.toggle('high', isHigh);
-        state.innerText = isHigh ? 'ΓùÅ ON' : 'Γùï OFF';
+        state.innerText = isHigh ? '● ON' : '○ OFF';
       }
       break;
     }
@@ -2088,7 +2138,7 @@ function updateNodeVisuals(node) {
       const waveColor = isOn ? '#f59e0b' : 'var(--border-color)';
       if (wave1) wave1.style.stroke = waveColor;
       if (wave2) wave2.style.stroke = waveColor;
-      if (lbl) { lbl.innerText = isOn ? 'ΓÖ¬ BUZZ' : 'SILENT'; lbl.style.color = isOn ? '#f59e0b' : 'var(--text-muted)'; }
+      if (lbl) { lbl.innerText = isOn ? '♪ BUZZ' : 'SILENT'; lbl.style.color = isOn ? '#f59e0b' : 'var(--text-muted)'; }
       if (wrap) wrap.classList.toggle('buzzer-on', isOn);
       break;
     }
@@ -2099,7 +2149,7 @@ function updateNodeVisuals(node) {
     case 'clock': {
       const phase = document.getElementById(`${node.id}-phase`);
       if (phase) {
-        phase.innerText = node.outputState === 1 ? 'Γû▓ HIGH' : 'Γû╝ LOW';
+        phase.innerText = node.outputState === 1 ? '▲ HIGH' : '▽ LOW';
         phase.style.color = node.outputState === 1 ? 'var(--color-cyan)' : 'var(--text-muted)';
       }
       const cursor = document.getElementById(`${node.id}-cursor`);
@@ -2282,7 +2332,7 @@ window.showTruthTable = function () {
       const binStr = bits.join('');
       const dec = bits.length > 0 ? parseInt(binStr, 2) : 0;
       binaryDisplay = `<div style="margin-top:0.5rem;padding:0.5rem;background:var(--bg-tertiary);border-radius:4px;font-family:monospace;font-size:0.8rem;border:1px solid var(--border-color)">
-        <strong>Binary:</strong> ${binStr || 'ΓÇö'} &nbsp;|&nbsp; <strong>Decimal:</strong> ${bits.length > 0 ? dec : 'ΓÇö'} &nbsp;|&nbsp; <strong>Hex:</strong> ${bits.length > 0 ? '0x' + dec.toString(16).toUpperCase() : 'ΓÇö'}
+        <strong>Binary:</strong> ${binStr || '—'} &nbsp;|&nbsp; <strong>Decimal:</strong> ${bits.length > 0 ? dec : '—'} &nbsp;|&nbsp; <strong>Hex:</strong> ${bits.length > 0 ? '0x' + dec.toString(16).toUpperCase() : '—'}
       </div>`;
     }
     rowsHtml += `<tr>${tds.join('')}</tr>`;
@@ -2320,105 +2370,6 @@ function getOutputBinaryDisplay() {
   return `<div style="margin-top:0.5rem;padding:0.5rem;background:var(--bg-tertiary);border-radius:4px;font-family:monospace;font-size:0.8rem;border:1px solid var(--border-color)">
     <strong>LED Binary:</strong> ${binStr} &nbsp;|&nbsp; <strong>Decimal:</strong> ${dec} &nbsp;|&nbsp; <strong>Hex:</strong> 0x${dec.toString(16).toUpperCase()}
   </div>`;
-}
-
-function showInspectorForNode(node) {
-  const card = document.getElementById('sandbox-learning-card');
-  const body = document.getElementById('learning-card-body');
-  if (!card || !body) return;
-
-  const t = node.type;
-  const d = node.data || {};
-  const inpVals = node.inputValues || [];
-  const outVal = node.outputState;
-  const outVal2 = node.outputState2;
-  const inpStrs = inpVals.map((v, i) => `<span class="insp-port inp">I${i}:<b>${v}</b></span>`).join('');
-
-  let detail = '';
-  const valHtml = `<div class="insp-values">${inpStrs} <span class="insp-port out">OUT:<b>${outVal}</b></span>${node.outputsCount > 1 ? ` <span class="insp-port out">OUT2:<b>${outVal2}</b></span>` : ''}</div>`;
-
-  switch (t) {
-    case 'input': detail = `<div class="insp-row"><span>State</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`; break;
-    case 'clock': detail = `<div class="insp-row"><span>Phase</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal ? 'HIGH' : 'LOW'}</span></div>`; break;
-    case 'output': detail = `<div class="insp-row"><span>LED</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal ? 'ON' : 'OFF'}</span></div>`; break;
-    case 'rgb-led': {
-      const r = outVal, g = outVal2, b = node._blueState || 0;
-      detail = `<div class="insp-row"><span>Red</span><span class="insp-badge ${r ? 'on' : 'off'}">${r ? 'HIGH' : 'LOW'}</span></div>
-        <div class="insp-row"><span>Green</span><span class="insp-badge ${g ? 'on' : 'off'}">${g ? 'HIGH' : 'LOW'}</span></div>
-        <div class="insp-row"><span>Blue</span><span class="insp-badge ${b ? 'on' : 'off'}">${b ? 'HIGH' : 'LOW'}</span></div>`;
-      const colorName = r && g && b ? 'White' : r && g ? 'Yellow' : r && b ? 'Magenta' : g && b ? 'Cyan' : r ? 'Red' : g ? 'Green' : b ? 'Blue' : 'Off';
-      detail += `<div class="insp-row"><span>Color</span><span style="color:${r||g||b ? '#22d3a5' : 'var(--text-muted)'}">${colorName}</span></div>`;
-      break;
-    }
-    case 'not': case 'and': case 'or': case 'nand': case 'nor': case 'xor': case 'xnor':
-      detail = `<div class="insp-row"><span>Inputs</span><span>${inpVals.join(', ')}</span></div>
-        <div class="insp-row"><span>Output</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`; break;
-    case 'd-flop': detail = `<div class="insp-row"><span>D</span><span>${inpVals[0] || 0}</span></div>
-      <div class="insp-row"><span>CLK</span><span>${inpVals[1] || 0}</span></div>
-      <div class="insp-row"><span>Q</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`; break;
-    case 'half-adder': case 'full-adder': {
-      const labels = t === 'half-adder' ? ['A','B'] : ['A','B','Cin'];
-      let rows = labels.map((l, i) => `<div class="insp-row"><span>${l}</span><span>${inpVals[i] || 0}</span></div>`).join('');
-      rows += `<div class="insp-row"><span>Sum</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>
-        <div class="insp-row"><span>Carry</span><span class="insp-badge ${outVal2 ? 'on' : 'off'}">${outVal2}</span></div>`;
-      detail = rows; break;
-    }
-    case 'seven-seg': {
-      const val = (inpVals[3] << 3) | (inpVals[2] << 2) | (inpVals[1] << 1) | inpVals[0];
-      detail = `<div class="insp-row"><span>Value</span><span style="font-weight:700;font-size:1.1rem">${val}</span></div>
-        <div class="insp-row"><span>Binary</span><span style="font-family:monospace">${inpVals.slice(0,4).map(v => v || 0).join('')}</span></div>`; break;
-    }
-    case 'led-bar': {
-      const vals = [inpVals[0] || 0, inpVals[1] || 0, inpVals[2] || 0, inpVals[3] || 0];
-      const dec = (vals[3] << 3) | (vals[2] << 2) | (vals[1] << 1) | vals[0];
-      detail = `<div class="insp-row"><span>Bits</span><span style="font-family:monospace">${vals.join('')}</span></div>
-        <div class="insp-row"><span>Decimal</span><span style="font-weight:700">${dec}</span></div>
-        <div class="insp-row"><span>Hex</span><span style="font-weight:700">0x${dec.toString(16).toUpperCase()}</span></div>`; break;
-    }
-    case 'text-label': detail = `<div class="insp-row"><span>Text</span><span style="font-style:italic">${node.labelText || '(empty)'}</span></div>`; break;
-    default:
-      if (t && REAL_ICS[t]) {
-        const ic = REAL_ICS[t];
-        const pinRows = ic.pins.map(p => {
-          let val = 0;
-          if (p.type === 'output') {
-            val = (node.outputStates && node.outputStates[p.pin] !== undefined) ? node.outputStates[p.pin] : 0;
-          } else if (p.type === 'input') {
-            val = (node.pinValues && node.pinValues[p.pin] !== undefined) ? node.pinValues[p.pin] : 0;
-          } else if (p.type === 'power') {
-            val = 1;
-          }
-          return `<div class="insp-row"><span>Pin ${p.pin}: ${p.name} (${p.type})</span><span class="insp-badge ${val ? 'on' : 'off'}">${val ? 'HIGH' : 'LOW'}</span></div>`;
-        }).join('');
-        detail = `<div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:6px">${ic.desc}</div>${pinRows}`;
-      } else {
-        detail = `<div class="insp-row"><span>Output</span><span class="insp-badge ${outVal ? 'on' : 'off'}">${outVal}</span></div>`;
-      }
-  }
-
-  const category = COMPONENT_DEFS[t] ? COMPONENT_DEFS[t].category : '';
-
-  card.style.display = 'flex';
-  card.classList.remove('collapsed');
-
-  body.innerHTML = `
-    <div class="inspector-header">
-      <div class="inspector-type">${category ? `<span class="insp-cat">${category}</span>` : ''} <span class="insp-type">${t}</span></div>
-      <div class="inspector-title">${node.label}</div>
-    </div>
-    <div class="inspector-section">${detail}</div>
-    ${node.inputsCount > 0 || node.outputsCount > 0 ? `<div class="inspector-section-title">Ports</div><div class="insp-values">${inpStrs} <span class="insp-port out">OUT:<b>${outVal}</b></span>${node.outputsCount > 1 ? ` <span class="insp-port out">OUT2:<b>${outVal2}</b></span>` : ''}</div>` : ''}
-    <div class="inspector-footer">
-      <span style="color:var(--text-muted)">ID: ${node.id}</span>
-      <span style="color:var(--text-muted)">Pos: ${node.x}, ${node.y}</span>
-    </div>`;
-};
-
-function updateNodeInspector() {
-  if (selectedNodeId) {
-    const node = sandboxNodes.find(n => n.id === selectedNodeId);
-    if (node) showInspectorForNode(node);
-  }
 }
 
 function updateSevenSeg(node) {
@@ -2540,7 +2491,7 @@ function renderSavedCircuitsList() {
       loadCircuitFromLocal(name);
       document.getElementById('load-modal').style.display = 'none';
       playSound('success');
-      showToast(`Loaded "${name}" Γ£ô`);
+      showToast(`Loaded "${name}" ✓`);
     });
 
     const delBtn = document.createElement('button');
@@ -3188,7 +3139,7 @@ const TEMPLATE_THEORY = {
   'not-demo': {
     title: 'NOT Inverter Demo',
     theory: 'The NOT gate (also called an inverter) takes a single input and outputs its opposite state. It performs logic negation.',
-    expression: 'Y = A\'  (or  Y = ┬¼A)',
+    expression: 'Y = A\'  (or  Y = ¬A)',
     headers: ['Input A', 'Output Y'],
     truthTable: [
       [0, 1],
@@ -3203,7 +3154,7 @@ const TEMPLATE_THEORY = {
   'and-demo': {
     title: 'AND Gate Verification',
     theory: 'The AND gate outputs 1 only when BOTH inputs are high (1). If any input is 0, the output remains low (0).',
-    expression: 'Y = A ΓÇó B',
+    expression: 'Y = A · B',
     headers: ['A', 'B', 'Output Y'],
     truthTable: [
       [0, 0, 0],
@@ -3220,7 +3171,7 @@ const TEMPLATE_THEORY = {
   'xor-parity': {
     title: 'XOR 3-Bit Parity Checker',
     theory: 'An XOR gate acts as an odd detector. A cascaded XOR array counts the parity of inputs. If the count of high inputs is odd, the parity bit is 1.',
-    expression: 'Y = A Γèò B Γèò C',
+    expression: 'Y = A ⊕ B ⊕ C',
     headers: ['A', 'B', 'C', 'Parity Y'],
     truthTable: [
       [0, 0, 0, 0],
@@ -3242,7 +3193,7 @@ const TEMPLATE_THEORY = {
   'sr-latch': {
     title: 'SR feedback Memory Latch',
     theory: 'A Set-Reset Latch stores 1 bit of memory using cross-coupled NAND gates. Set (S) and Reset (R) are active-low control inputs.',
-    expression: 'Q = (S ΓÇó Q\')\'  |  Q\' = (R ΓÇó Q)\'',
+    expression: 'Q = (S · Q\')\'  |  Q\' = (R · Q)\'',
     headers: ['S', 'R', 'Q (State)', 'Q\''],
     truthTable: [
       [1, 1, 'Hold State', 'No change'],
@@ -3261,7 +3212,7 @@ const TEMPLATE_THEORY = {
   'half-adder-demo': {
     title: 'Half Adder Arithmetic',
     theory: 'A half adder performs single-digit binary addition. It outputs a Sum (S) using XOR and a Carry (C) using AND.',
-    expression: 'S = A Γèò B  |  C = A ΓÇó B',
+    expression: 'S = A ⊕ B  |  C = A · B',
     headers: ['A', 'B', 'Sum (S)', 'Carry (C)'],
     truthTable: [
       [0, 0, 0, 0],
@@ -3280,7 +3231,7 @@ const TEMPLATE_THEORY = {
   'full-adder-gate': {
     title: 'Gate-Level Full Adder',
     theory: 'A Full Adder adds three bits: A, B, and a Carry-In (Cin) from a previous stage. It handles multi-bit addition.',
-    expression: 'S = A Γèò B Γèò Cin  |  Cout = (AΓÇóB) + CinΓÇó(AΓèòB)',
+    expression: 'S = A ⊕ B ⊕ Cin  |  Cout = (A·B) + Cin·(A⊕B)',
     headers: ['A', 'B', 'Cin', 'Sum (S)', 'Cout'],
     truthTable: [
       [0, 0, 0, 0, 0],
@@ -3299,7 +3250,7 @@ const TEMPLATE_THEORY = {
   'nand-universality-and': {
     title: 'NAND Universality (AND gate)',
     theory: 'The NAND gate is a universal gate. Here, a NAND gate is wired to a second NAND gate configured as an inverter, forming a standard AND gate.',
-    expression: 'Y = ΓÄ╣ (A ΓÇó B) = A ΓÇó B',
+    expression: 'Y = ¬¬ (A · B) = A · B',
     headers: ['A', 'B', 'NAND 1', 'AND Out'],
     truthTable: [
       [0, 0, 1, 0],
@@ -3317,11 +3268,11 @@ const TEMPLATE_THEORY = {
   'd-flipflop-reg': {
     title: '1-Bit D Flip-Flop Register',
     theory: 'A D Flip-Flop captures the level of the Data (D) input at the rising edge of the Clock (CLK) transition, and holds it.',
-    expression: 'Q(next) = D  (at CLK Γåæ)',
+    expression: 'Q(next) = D  (at CLK ↑)',
     headers: ['D', 'CLK', 'State Q', 'Action'],
     truthTable: [
-      [0, 'Γåæ', 0, 'Capture 0'],
-      [1, 'Γåæ', 1, 'Capture 1'],
+      [0, '↑', 0, 'Capture 0'],
+      [1, '↑', 1, 'Capture 1'],
       ['X', '0 or 1', 'Hold', 'No change']
     ],
     challengeText: 'Toggle <strong>Data (D) to 1 (ON)</strong>, then wait for or click the Clock Signal to rise to 1 to capture and hold it (Q LED ON)!',
@@ -3349,7 +3300,7 @@ const TEMPLATE_THEORY = {
     }
   },
   'or-gate-demo': {
-    title: 'OR Gate ΓÇö Inclusive OR',
+    title: 'OR Gate — Inclusive OR',
     theory: 'The OR gate outputs 1 if AT LEAST ONE input is high (1). It is only 0 when ALL inputs are 0.',
     expression: 'Y = A + B',
     headers: ['A', 'B', 'Output Y'],
@@ -3359,7 +3310,7 @@ const TEMPLATE_THEORY = {
       [1, 0, 1],
       [1, 1, 1]
     ],
-    challengeText: 'Toggle <strong>only Switch A to 1 (ON)</strong> while B is OFF. The LED should still light up ΓÇö this shows OR only needs one HIGH input!',
+    challengeText: 'Toggle <strong>only Switch A to 1 (ON)</strong> while B is OFF. The LED should still light up — this shows OR only needs one HIGH input!',
     checkPassed: () => {
       const inputs = sandboxNodes.filter(n => n.type === 'input');
       const led = sandboxNodes.find(n => n.type === 'output');
@@ -3369,7 +3320,7 @@ const TEMPLATE_THEORY = {
   },
 
   'nor-gate-demo': {
-    title: 'NOR Gate ΓÇö Not-OR (Universal Gate)',
+    title: 'NOR Gate — Not-OR (Universal Gate)',
     theory: 'The NOR gate outputs 1 ONLY when ALL inputs are 0 (LOW). It is the complement of OR and is also a universal gate.',
     expression: 'Y = (A + B)\'',
     headers: ['A', 'B', 'Output Y'],
@@ -3379,7 +3330,7 @@ const TEMPLATE_THEORY = {
       [1, 0, 0],
       [1, 1, 0]
     ],
-    challengeText: 'Keep <strong>both switches at 0 (OFF)</strong>. NOR outputs 1 only when all inputs are LOW ΓÇö confirm the LED is ON!',
+    challengeText: 'Keep <strong>both switches at 0 (OFF)</strong>. NOR outputs 1 only when all inputs are LOW — confirm the LED is ON!',
     checkPassed: () => {
       const inputs = sandboxNodes.filter(n => n.type === 'input');
       const led = sandboxNodes.find(n => n.type === 'output');
@@ -3390,7 +3341,7 @@ const TEMPLATE_THEORY = {
   'xnor-equality': {
     title: 'XNOR Bit Equality Checker',
     theory: 'The XNOR gate outputs 1 when both inputs are EQUAL (both 0 or both 1). It is used as a 1-bit equality comparator.',
-    expression: 'Y = A ΓèÖ B  (Y = 1 when A = B)',
+    expression: 'Y = A ⊙ B  (Y = 1 when A = B)',
     headers: ['A', 'B', 'Equal?'],
     truthTable: [
       [0, 0, 1],
@@ -3398,7 +3349,7 @@ const TEMPLATE_THEORY = {
       [1, 0, 0],
       [1, 1, 1]
     ],
-    challengeText: 'Toggle <strong>both Value A and Value B to 1 (ON)</strong>. Since A equals B, the XNOR outputs 1 ΓÇö Equal LED lights up!',
+    challengeText: 'Toggle <strong>both Value A and Value B to 1 (ON)</strong>. Since A equals B, the XNOR outputs 1 — Equal LED lights up!',
     checkPassed: () => {
       const inputs = sandboxNodes.filter(n => n.type === 'input');
       const led = sandboxNodes.find(n => n.type === 'output');
@@ -3418,7 +3369,7 @@ const TEMPLATE_THEORY = {
       [1, 1, 0, 1],
       [1, 1, 1, 1]
     ],
-    challengeText: 'Toggle <strong>any 2 out of 3 Voters to 1 (ON)</strong>. The Majority LED should light ΓÇö you have a winning majority!',
+    challengeText: 'Toggle <strong>any 2 out of 3 Voters to 1 (ON)</strong>. The Majority LED should light — you have a winning majority!',
     checkPassed: () => {
       const inputs = sandboxNodes.filter(n => n.type === 'input' && n.label.includes('Voter'));
       const led = sandboxNodes.find(n => n.type === 'output');
@@ -3489,7 +3440,7 @@ const TEMPLATE_THEORY = {
   'led-binary-display': {
     title: '4-Bit LED Bar Binary Counter',
     theory: 'The LED Bar Display shows 4 binary bits as 4 individual LEDs. D3 is the Most Significant Bit (MSB) and D0 is the Least Significant Bit (LSB).',
-    expression: 'Decimal = D3├ù8 + D2├ù4 + D1├ù2 + D0├ù1',
+    expression: 'Decimal = D3×8 + D2×4 + D1×2 + D0×1',
     headers: ['D3', 'D2', 'D1', 'D0', 'Decimal'],
     truthTable: [
       [0, 0, 0, 0, 0],
@@ -3507,7 +3458,7 @@ const TEMPLATE_THEORY = {
   'and-alarm': {
     title: 'AND-Gate Dual-Security Alarm',
     theory: 'An AND alarm requires ALL sensors active before triggering. Unlike OR alarms, this prevents false triggers from a single sensor failure.',
-    expression: 'ALARM = Security_A ΓÇó Security_B',
+    expression: 'ALARM = Security_A · Security_B',
     headers: ['Security A', 'Security B', 'Alarm'],
     truthTable: [
       [0, 0, 0],
@@ -3523,9 +3474,9 @@ const TEMPLATE_THEORY = {
   },
 
   'multi-led-and': {
-    title: 'Gate Comparator ΓÇö AND vs OR vs XOR',
+    title: 'Gate Comparator — AND vs OR vs XOR',
     theory: 'This circuit connects the same two inputs to AND, OR, and XOR gates simultaneously, showing the different outputs. Compare them side by side!',
-    expression: 'AND=A┬╖B  |  OR=A+B  |  XOR=AΓèòB',
+    expression: 'AND=A·B  |  OR=A+B  |  XOR=A⊕B',
     headers: ['A', 'B', 'AND', 'OR', 'XOR'],
     truthTable: [
       [0, 0, 0, 0, 0],
@@ -3544,13 +3495,13 @@ const TEMPLATE_THEORY = {
   'clock-rgb-chase': {
     title: 'Clock-Driven RGB Color Chase',
     theory: 'The Clock signal alternates between HIGH and LOW. By inverting it through NOT gates, you can create complementary signals that drive an RGB LED through color sequences.',
-    expression: 'CLK=directΓåÆG  |  NOT(CLK)ΓåÆR  |  NOT(NOT(CLK))ΓåÆB',
-    headers: ['CLK', 'R (NOT CLK)', 'G (CLK)', 'B (NOT┬▓CLK)', 'Color'],
+    expression: 'CLK=direct→G  |  NOT(CLK)→R  |  NOT(NOT(CLK))→B',
+    headers: ['CLK', 'R (NOT CLK)', 'G (CLK)', 'B (NOT²CLK)', 'Color'],
     truthTable: [
       [0, 1, 0, 0, 'RED'],
       [1, 0, 1, 1, 'CYAN']
     ],
-    challengeText: 'Watch the RGB LED! As the Clock ticks, it <strong>automatically alternates between RED and CYAN</strong> ΓÇö a living light pattern!',
+    challengeText: 'Watch the RGB LED! As the Clock ticks, it <strong>automatically alternates between RED and CYAN</strong> — a living light pattern!',
     checkPassed: () => {
       const rgbNode = sandboxNodes.find(n => n.type === 'rgb-led');
       const clkNode = sandboxNodes.find(n => n.type === 'clock');
@@ -3560,14 +3511,14 @@ const TEMPLATE_THEORY = {
 
   'nand-not-gate': {
     title: 'NAND as NOT (Universality Demo)',
-    theory: 'A NAND gate with BOTH inputs tied together acts as a NOT gate (inverter). NAND is universal ΓÇö you can make any logic gate with only NAND gates.',
-    expression: 'Y = (A ΓÇó A)\' = A\'  (when both inputs tied)',
+    theory: 'A NAND gate with BOTH inputs tied together acts as a NOT gate (inverter). NAND is universal — you can make any logic gate with only NAND gates.',
+    expression: 'Y = (A · A)\' = A\'  (when both inputs tied)',
     headers: ['A', 'A (tied)', 'NOT Output'],
     truthTable: [
       [0, 0, 1],
       [1, 1, 0]
     ],
-    challengeText: 'Toggle the switch to <strong>1 (ON)</strong>. The NAND with tied inputs inverts it ΓÇö NOT LED should go OFF!',
+    challengeText: 'Toggle the switch to <strong>1 (ON)</strong>. The NAND with tied inputs inverts it — NOT LED should go OFF!',
     checkPassed: () => {
       const sw = sandboxNodes.find(n => n.type === 'input');
       const led = sandboxNodes.find(n => n.type === 'output');

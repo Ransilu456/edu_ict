@@ -284,14 +284,18 @@ export function exportCircuitImage() {
   ctx.font = '600 11px Nunito, sans-serif';
   ctx.fillText('Digital Logic Circuit Simulation', 125, 28);
 
-  // Draw wire paths from SVG
+  // Draw wire paths from SVG (only the colored cores — casing / hit /
+  // flow layers share the same geometry and are purely interactive)
   const wiresSvg = document.getElementById('sandbox-wires-svg');
   if (wiresSvg) {
-    const paths = Array.from(wiresSvg.querySelectorAll('path'));
+    const paths = Array.from(wiresSvg.querySelectorAll('path.sb-wire-core, path.sb-wire-preview'));
     paths.forEach(p => {
       const d = p.getAttribute('d');
-      const stroke = p.getAttribute('stroke') || '#1cb0f6';
       if (!d) return;
+      const cls = p.getAttribute('class') || '';
+      const stroke = cls.includes('high') ? '#58cc02'
+        : cls.includes('hover') ? '#ff4b4b'
+        : cls.includes('preview') ? '#1cb0f6' : '#94a3b8';
       
       const p2d = new Path2D(d);
       ctx.save();
