@@ -1,4 +1,4 @@
-// shared UI - theme, sound, toast, alert, confirm
+//  theme, sound, toast, alert, confirm
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let soundEnabled = localStorage.getItem("soundEnabled") !== "false";
 

@@ -1,4 +1,3 @@
-// app shell - mounts components, handles view navigation
 import './common.js';
 import './sandbox.js';
 import { initNetworkDevices } from './network-devices.js';

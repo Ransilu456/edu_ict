@@ -1,4 +1,3 @@
-// mounts HTML component partials into the app shell
 import headerHtml from '../components/app-header.html?raw';
 import mobileNavHtml from '../components/mobile-nav.html?raw';
 import sandboxViewHtml from '../components/sandbox-view.html?raw';
