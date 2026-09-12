@@ -1,4 +1,3 @@
-// logic sandbox - canvas nodes, wires, simulation
 import { parseBooleanExpression } from './bool-parser.js';
 import { REAL_ICS } from './real-ic-defs.js';
 import { initWaveform, sampleWaveform } from './waveform.js';
@@ -21,17 +20,94 @@ let wiresSvg = null;
 let panContainer = null;
 let isDragging = false;
 let panX = 0, panY = 0;
+let zoom = 1;
+const MIN_ZOOM = 0.45;
+const MAX_ZOOM = 2.2;
+const GRID_SIZE = 10;
 let isPanning = false;
 let didPan = false;
 let panStart = { x: 0, y: 0 };
 let panStartOffset = { x: 0, y: 0 };
 let isSelecting = false;
+let isSpacePressed = false;
 let selectionRectStart = { x: 0, y: 0 };
 let selectionRectEl = null;
 const MAX_UNDO = 30;
 let undoStack = [];
 let _ignorePortClick = false;
 let simSpeed = 1;
+
+function getWorkspaceRect() {
+  return workspace?.getBoundingClientRect() || { left: 0, top: 0, width: 0, height: 0 };
+}
+
+function screenToWorld(clientX, clientY) {
+  const rect = getWorkspaceRect();
+  return {
+    x: (clientX - rect.left - panX) / zoom,
+    y: (clientY - rect.top - panY) / zoom,
+  };
+}
+
+function worldToScreen(x, y) {
+  const rect = getWorkspaceRect();
+  return {
+    x: rect.left + panX + x * zoom,
+    y: rect.top + panY + y * zoom,
+  };
+}
+
+function getViewportCenterWorld() {
+  const rect = getWorkspaceRect();
+  return screenToWorld(rect.left + rect.width / 2, rect.top + rect.height / 2);
+}
+
+function applyViewportTransform() {
+  if (panContainer) {
+    panContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  }
+  if (workspace) {
+    workspace.style.backgroundSize = `${20 * zoom}px ${20 * zoom}px`;
+    workspace.style.backgroundPosition = `${panX}px ${panY}px`;
+  }
+}
+
+function snapWorld(value) {
+  return Math.round(value / GRID_SIZE) * GRID_SIZE;
+}
+
+function getNodePlacementPoint(type, worldX, worldY) {
+  const centeredTypes = new Set(['ic-7408', 'ic-7432', 'ic-7404', 'ic-7400', 'ic-7402', 'ic-7486']);
+  const halfWidth = centeredTypes.has(type) ? 132 : 60;
+  const halfHeight = centeredTypes.has(type) ? 70 : 40;
+  return { x: snapWorld(worldX - halfWidth), y: snapWorld(worldY - halfHeight) };
+}
+
+function findFreePlacement(type, worldX, worldY) {
+  const base = getNodePlacementPoint(type, worldX, worldY);
+  const candidates = [
+    { x: 0, y: 0 }, { x: 140, y: 0 }, { x: -140, y: 0 },
+    { x: 0, y: 110 }, { x: 0, y: -110 }, { x: 140, y: 110 }, { x: -140, y: 110 },
+  ];
+  const overlaps = (x, y) => sandboxNodes.some(node => Math.abs(node.x - x) < 110 && Math.abs(node.y - y) < 80);
+  const rect = getWorkspaceRect();
+  const topLeft = screenToWorld(rect.left, rect.top);
+  const bottomRight = screenToWorld(rect.right, rect.bottom);
+  const visible = {
+    left: Math.min(topLeft.x, bottomRight.x),
+    top: Math.min(topLeft.y, bottomRight.y),
+    right: Math.max(topLeft.x, bottomRight.x),
+    bottom: Math.max(topLeft.y, bottomRight.y),
+  };
+  for (const offset of candidates) {
+    const x = snapWorld(base.x + offset.x);
+    const y = snapWorld(base.y + offset.y);
+    if (!overlaps(x, y) && x >= visible.left - 20 && y >= visible.top - 20 && x <= visible.right - 90 && y <= visible.bottom - 70) {
+      return { x, y };
+    }
+  }
+  return base;
+}
 
 function pushUndo() {
   const snapshot = JSON.stringify(serializeLayout());
@@ -110,12 +186,14 @@ window.initSandboxCanvas = function () {
   panContainer.dataset.panContainer = 'true';
   workspace.insertBefore(panContainer, wiresSvg);
   panContainer.appendChild(wiresSvg);
+  applyViewportTransform();
 
   setupDragAndDrop();
   setupToolboxSearch();
   setupToolbar();
   startSimulationLoop();
   initWaveform();
+  updateSandboxWires();
   workspace.addEventListener('click', (e) => {
     if (didPan) { didPan = false; return; }
     if (e.ctrlKey || e.metaKey) return;
@@ -135,6 +213,9 @@ window.initSandboxCanvas = function () {
   workspace.addEventListener('touchmove', drawWiringPreview, { passive: true });
   setupPanning();
   window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && !e.repeat && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) {
+      isSpacePressed = true;
+    }
     if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
       e.preventDefault();
       performUndo();
@@ -152,6 +233,9 @@ window.initSandboxCanvas = function () {
       e.preventDefault();
       deleteNode(selectedNodeId);
     }
+  });
+  window.addEventListener('keyup', (e) => {
+    if (e.code === 'Space') isSpacePressed = false;
   });
   const theoryBtn = document.getElementById('sandbox-theory-btn');
   const learningCard = document.getElementById('sandbox-learning-card');
@@ -203,6 +287,8 @@ function setupToolboxSearch() {
   const search = document.getElementById('toolbox-search-input');
   if (!search || search.dataset.initialized) return;
   search.dataset.initialized = 'true';
+  const toolbox = search.closest('.sandbox-toolbox');
+  toolbox?.addEventListener('wheel', (event) => event.stopPropagation(), { passive: true });
 
   const filterTools = () => {
     const query = search.value.trim().toLowerCase();
@@ -240,13 +326,12 @@ function setupToolboxItem(item) {
   });
   item.addEventListener('click', () => {
     if (!workspace) return;
-    const r = workspace.getBoundingClientRect();
     const slot = sandboxNodes.length;
     const column = (slot % 3) - 1;
     const row = Math.floor(slot / 3) % 3 - 1;
-    const x = Math.max(20, Math.min(r.width - 300, r.width / 2 - 60 + column * 150));
-    const y = Math.max(70, Math.min(r.height - 150, r.height / 2 - 40 + row * 110));
-    placeNode(type, label, x, y);
+    const center = getViewportCenterWorld();
+    const placement = findFreePlacement(type, center.x + column * 150, center.y + row * 110);
+    placeNode(type, label, placement.x, placement.y);
     showToast(`${label} placed ✓`);
   });
   let touchDragGhost = null;
@@ -323,9 +408,9 @@ function setupToolboxItem(item) {
     const inWorkspace = touch.clientX >= wr.left && touch.clientX <= wr.right &&
       touch.clientY >= wr.top && touch.clientY <= wr.bottom;
     if (inWorkspace) {
-      const dropX = touch.clientX - wr.left - panX - 60;
-      const dropY = touch.clientY - wr.top - panY - 30;
-      placeNode(type, label, dropX, dropY);
+      const point = screenToWorld(touch.clientX, touch.clientY);
+      const placement = getNodePlacementPoint(type, point.x, point.y);
+      placeNode(type, label, placement.x, placement.y);
       showToast(`${label} placed ✓`);
     }
   });
@@ -363,16 +448,15 @@ function setupDragAndDrop() {
     e.preventDefault();
     workspace.classList.remove('drag-over');
     const type = e.dataTransfer.getData('type');
-    const r = workspace.getBoundingClientRect();
-    const dropX = e.clientX - r.left - panX;
-    const dropY = e.clientY - r.top - panY;
+    const dropPoint = screenToWorld(e.clientX, e.clientY);
 
     if (type === 'template') {
       const templateName = e.dataTransfer.getData('templateName');
-      appendSandboxTemplate(templateName, dropX, dropY);
+      appendSandboxTemplate(templateName, dropPoint.x, dropPoint.y);
     } else if (type) {
       const label = e.dataTransfer.getData('label');
-      placeNode(type, label, dropX - 60, dropY - 30);
+      const placement = getNodePlacementPoint(type, dropPoint.x, dropPoint.y);
+      placeNode(type, label, placement.x, placement.y);
     }
   });
 }
@@ -1433,7 +1517,7 @@ function setupPanning() {
 
   const onPanStart = (e) => {
     if (isDragging) return;
-    if (!e.touches && e.button !== 0) return;
+    if (!e.touches && e.button !== 0 && e.button !== 1) return;
     if (e.target !== workspace && e.target !== panContainer && e.target !== wiresSvg) return;
     if (e.target.closest('.sandbox-node') || e.target.closest('.sandbox-port') || e.target.closest('.sandbox-btn') || e.target.closest('.template-card')) return;
     if (e.cancelable) e.preventDefault();
@@ -1445,9 +1529,9 @@ function setupPanning() {
     isPanning = false;
 
     if (e.ctrlKey || e.metaKey) {
-      const wr = workspace.getBoundingClientRect();
-      selectionRectStart.x = pos.x - wr.left - panX;
-      selectionRectStart.y = pos.y - wr.top - panY;
+      const selectionStart = screenToWorld(pos.x, pos.y);
+      selectionRectStart.x = selectionStart.x;
+      selectionRectStart.y = selectionStart.y;
       isSelecting = true;
       selectionRectEl.style.display = 'block';
     } else {
@@ -1463,9 +1547,9 @@ function setupPanning() {
     const dy = pos.y - panStart.y;
 
     if (isSelecting) {
-      const wr = workspace.getBoundingClientRect();
-      const cx = pos.x - wr.left - panX;
-      const cy = pos.y - wr.top - panY;
+      const current = screenToWorld(pos.x, pos.y);
+      const cx = current.x;
+      const cy = current.y;
       const rx = Math.min(cx, selectionRectStart.x);
       const ry = Math.min(cy, selectionRectStart.y);
       const rw = Math.abs(cx - selectionRectStart.x);
@@ -1482,7 +1566,7 @@ function setupPanning() {
       didPan = true;
       panX = panStartOffset.x + dx;
       panY = panStartOffset.y + dy;
-      panContainer.style.transform = `translate(${panX}px, ${panY}px)`;
+      applyViewportTransform();
     }
   };
 
@@ -1498,8 +1582,8 @@ function setupPanning() {
       const rw = parseFloat(selectionRectEl.getAttribute('width')) || 0;
       const rh = parseFloat(selectionRectEl.getAttribute('height')) || 0;
       if (rw > 3 && rh > 3) {
-        const absRx = rx + panX;
-        const absRy = ry + panY;
+        const absRx = rx;
+        const absRy = ry;
         selectedNodeIds = [];
         sandboxNodes.forEach(n => {
           if (n.x >= absRx && n.x <= absRx + rw && n.y >= absRy && n.y <= absRy + rh) {
@@ -1528,6 +1612,20 @@ function setupPanning() {
   workspace.addEventListener('touchstart', onPanStart, { passive: false });
   window.addEventListener('touchmove', onPanMove, { passive: true });
   window.addEventListener('touchend', onPanEnd, { passive: true });
+
+  workspace.addEventListener('wheel', (e) => {
+    if (e.target.closest('.sandbox-waveform-panel, .sandbox-toolbar, input, textarea, select')) return;
+    e.preventDefault();
+    const before = screenToWorld(e.clientX, e.clientY);
+    const nextZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * (e.deltaY < 0 ? 1.1 : 0.9)));
+    if (nextZoom === zoom) return;
+    const rect = getWorkspaceRect();
+    zoom = nextZoom;
+    panX = e.clientX - rect.left - before.x * zoom;
+    panY = e.clientY - rect.top - before.y * zoom;
+    applyViewportTransform();
+    updateSandboxWires();
+  }, { passive: false });
 }
 
 function startDrag(e, node) {
@@ -1548,19 +1646,18 @@ function startDrag(e, node) {
     }
     return { x: ev.clientX, y: ev.clientY };
   };
-  const workspaceRect = workspace.getBoundingClientRect();
   const startClient = getClientPos(e);
-  const offsetX = startClient.x - workspaceRect.left - panX - node.x;
-  const offsetY = startClient.y - workspaceRect.top - panY - node.y;
+  const startWorld = screenToWorld(startClient.x, startClient.y);
+  const offsetX = startWorld.x - node.x;
+  const offsetY = startWorld.y - node.y;
 
   function onMove(mv) {
     if (mv.cancelable) mv.preventDefault();
     isDragging = true;
     const cur = getClientPos(mv);
-    const wr = workspace.getBoundingClientRect();
-    node.x = Math.round((cur.x - wr.left - panX - offsetX) / 10) * 10;
-
-    node.y = Math.round((cur.y - wr.top - panY - offsetY) / 10) * 10;
+    const currentWorld = screenToWorld(cur.x, cur.y);
+    node.x = snapWorld(currentWorld.x - offsetX);
+    node.y = snapWorld(currentWorld.y - offsetY);
 
     const domEl = document.getElementById(node.id);
     if (domEl) {
@@ -1718,15 +1815,13 @@ function drawWiringPreview(e) {
   if (!port) return;
 
   const pos = getEventPos(e);
-  const canvasRect = workspace.getBoundingClientRect();
   const portRect = port.getBoundingClientRect();
-
-  const x1 = portRect.left + portRect.width / 2 - canvasRect.left - panX;
-
-  const y1 = portRect.top + portRect.height / 2 - canvasRect.top - panY;
-
-  const x2 = pos.x - canvasRect.left - panX;
-  const y2 = pos.y - canvasRect.top - panY;
+  const sourcePoint = screenToWorld(portRect.left + portRect.width / 2, portRect.top + portRect.height / 2);
+  const pointerPoint = screenToWorld(pos.x, pos.y);
+  const x1 = sourcePoint.x;
+  const y1 = sourcePoint.y;
+  const x2 = pointerPoint.x;
+  const y2 = pointerPoint.y;
 
   updateSandboxWires();
 
@@ -1751,10 +1846,15 @@ function drawWiringPreview(e) {
 function updateSandboxWires() {
   if (!wiresSvg || !workspace) return;
   wiresSvg.innerHTML = '';
+  if (selectionRectEl) {
+    wiresSvg.appendChild(selectionRectEl);
+    selectionRectEl.style.display = 'none';
+  }
   const hint = document.getElementById('sandbox-empty-hint');
-  if (hint) hint.style.display = sandboxNodes.length ? 'none' : 'flex';
-
-  const canvasRect = workspace.getBoundingClientRect();
+  if (hint) {
+    hint.style.display = sandboxNodes.length === 0 ? 'flex' : 'none';
+    hint.setAttribute('aria-hidden', sandboxNodes.length === 0 ? 'false' : 'true');
+  }
 
   document.querySelectorAll('.sandbox-port.connected, .real-ic-pin-row.connected, .real-ic-pin-indicator.connected').forEach(el => {
     el.classList.remove('connected');
@@ -1785,13 +1885,12 @@ function updateSandboxWires() {
     const oR = outPort.getBoundingClientRect();
     const iR = inPort.getBoundingClientRect();
 
-    const x1 = oR.left + oR.width / 2 - canvasRect.left - panX;
-
-    const y1 = oR.top + oR.height / 2 - canvasRect.top - panY;
-
-    const x2 = iR.left + iR.width / 2 - canvasRect.left - panX;
-
-    const y2 = iR.top + iR.height / 2 - canvasRect.top - panY;
+    const sourcePoint = screenToWorld(oR.left + oR.width / 2, oR.top + oR.height / 2);
+    const targetPoint = screenToWorld(iR.left + iR.width / 2, iR.top + iR.height / 2);
+    const x1 = sourcePoint.x;
+    const y1 = sourcePoint.y;
+    const x2 = targetPoint.x;
+    const y2 = targetPoint.y;
 
     const srcNode = sandboxNodes.find(n => n.id === wire.fromNodeId);
     let srcVal = 0;
@@ -2582,6 +2681,11 @@ function clearSandbox() {
   selectedNodeIds = [];
   cancelWiring();
   if (wiresSvg) wiresSvg.innerHTML = '';
+  const hint = document.getElementById('sandbox-empty-hint');
+  if (hint) {
+    hint.style.display = 'flex';
+    hint.setAttribute('aria-hidden', 'false');
+  }
 }
 // save + load
 function saveCircuitToLocal(name) {

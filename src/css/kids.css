@@ -746,10 +746,18 @@
 
 .kids-mode #waveform-canvas {
   width: 100%;
-  height: 140px;
+  min-height: 160px;
+  height: auto;
   border-radius: 12px;
   background: #f8fafc;
   display: block;
+}
+
+@media (min-width: 1200px) {
+  .kids-mode .sandbox-waveform-panel {
+    width: min(980px, calc(100% - 3rem));
+    padding: 1rem 1.25rem;
+  }
 }
 
 .kids-mode.dark #waveform-canvas,

@@ -1756,3 +1756,234 @@
     flex-basis: 160px !important;
   }
 }
+
+/* Wide desktop contract: scale work surfaces with the monitor, not the browser zoom. */
+@media (min-width: 1920px) {
+  html {
+    font-size: clamp(16px, 0.9vw, 20px);
+  }
+
+  header {
+    min-height: clamp(72px, 3.2vw, 92px);
+    padding-inline: clamp(1.5rem, 3vw, 4rem);
+  }
+
+  .logo {
+    font-size: clamp(1.35rem, 1.1vw, 1.7rem);
+  }
+
+  .desktop-nav {
+    gap: clamp(0.5rem, 0.55vw, 0.8rem);
+  }
+
+  .nav-tab {
+    padding-inline: clamp(1rem, 1vw, 1.45rem);
+    min-height: 2.6rem;
+  }
+
+  main {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .view-panel.active:not(.sandbox-view):not(.network-devices-view) {
+    width: min(100%, 3200px);
+    margin-inline: auto;
+  }
+
+  .sandbox-view,
+  .network-devices-view {
+    height: calc(100dvh - clamp(72px, 3.2vw, 92px));
+    max-height: calc(100dvh - clamp(72px, 3.2vw, 92px));
+  }
+
+  .sandbox-toolbox {
+    width: clamp(320px, 10vw, 440px);
+    flex: 0 0 clamp(320px, 10vw, 440px);
+    padding: clamp(1.25rem, 1.5vw, 2rem) clamp(1.25rem, 1.4vw, 2rem);
+    gap: clamp(1rem, 1vw, 1.5rem);
+  }
+
+  .sandbox-toolbox > h3 {
+    font-size: clamp(1.05rem, 0.9vw, 1.35rem) !important;
+  }
+
+  .sandbox-toolbox > p {
+    font-size: clamp(0.75rem, 0.65vw, 0.95rem) !important;
+  }
+
+  .toolbox-section-title {
+    min-height: clamp(28px, 1.8vw, 36px);
+    font-size: clamp(0.68rem, 0.6vw, 0.86rem);
+  }
+
+  .toolbox-item {
+    min-height: clamp(38px, 2.2vw, 52px);
+    padding-inline: clamp(0.6rem, 0.75vw, 1rem);
+    font-size: clamp(0.76rem, 0.65vw, 0.95rem);
+  }
+
+  .sandbox-workspace {
+    background-size: clamp(20px, 0.72vw, 30px) clamp(20px, 0.72vw, 30px);
+  }
+
+  .sandbox-toolbar {
+    top: clamp(0.75rem, 1vw, 1.5rem);
+    right: clamp(0.75rem, 1vw, 1.5rem);
+    max-width: min(42%, 1200px);
+    padding: clamp(0.35rem, 0.45vw, 0.65rem);
+    gap: clamp(0.35rem, 0.4vw, 0.6rem);
+  }
+
+  .sandbox-btn {
+    min-height: clamp(34px, 2vw, 44px);
+    padding: 0.45rem 0.75rem;
+    font-size: clamp(0.8rem, 0.65vw, 0.95rem);
+  }
+
+  .sandbox-node {
+    min-width: clamp(90px, 5vw, 150px);
+    padding: clamp(0.5rem, 0.45vw, 0.75rem);
+  }
+
+  .sandbox-node-header {
+    font-size: clamp(0.75rem, 0.55vw, 0.9rem);
+  }
+
+  .nd-left {
+    width: clamp(320px, 12vw, 480px);
+    min-width: clamp(320px, 12vw, 480px);
+  }
+
+  .osi-sidebar,
+  .osi-sim-sidebar {
+    width: clamp(230px, 12vw, 420px);
+    min-width: clamp(230px, 12vw, 420px);
+  }
+
+  #course-map-container {
+    max-width: 1600px;
+  }
+
+  .global-footer {
+    width: min(100%, 3200px);
+    margin-inline: auto;
+  }
+}
+
+.sandbox-view.active {
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sandbox-view.active > .sandbox-toolbox {
+  flex: 0 0 clamp(230px, 18vw, 440px);
+  width: clamp(230px, 18vw, 440px);
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  overflow-x: hidden !important;
+  overflow-y: scroll !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sandbox-view.active > .sandbox-workspace {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  overflow: hidden;
+}
+
+.sandbox-view.active > .sandbox-toolbox > .toolbox-search {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+@media (max-width: 820px) {
+  .sandbox-view.active {
+    width: 100% !important;
+    height: calc(100dvh - 132px) !important;
+    min-height: 420px !important;
+    max-height: none !important;
+    margin: 0 !important;
+    flex-direction: column !important;
+  }
+
+  .sandbox-view.active > .sandbox-toolbox {
+    flex: 0 1 34vh;
+    width: 100% !important;
+    height: 34vh !important;
+    min-height: 190px !important;
+    max-height: 360px !important;
+    padding: 0.65rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.6rem !important;
+    overflow-x: hidden !important;
+    overflow-y: scroll !important;
+    border: 0 !important;
+    border-bottom: 2px solid var(--border-color) !important;
+    border-radius: 0 !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain;
+  }
+
+  .sandbox-view.active > .sandbox-toolbox > h3,
+  .sandbox-view.active > .sandbox-toolbox > p {
+    display: block !important;
+    flex: 0 0 auto;
+  }
+
+  .sandbox-view.active > .sandbox-toolbox > h3 {
+    font-size: 1rem !important;
+  }
+
+  .sandbox-view.active > .sandbox-toolbox > p {
+    font-size: 0.72rem !important;
+    margin: 0 !important;
+  }
+
+  .sandbox-view.active > .sandbox-toolbox > .toolbox-search {
+    order: 0;
+    flex: 0 0 38px !important;
+    width: 100%;
+    min-height: 38px;
+    background: var(--bg-secondary);
+  }
+
+  .sandbox-view.active > .sandbox-toolbox > .toolbox-section {
+    display: flex !important;
+    flex: 0 0 auto;
+    width: 100%;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.3rem !important;
+    padding-bottom: 0.55rem !important;
+  }
+
+  .sandbox-view.active > .sandbox-toolbox .toolbox-section-title {
+    display: flex !important;
+    min-height: 28px;
+  }
+
+  .sandbox-view.active > .sandbox-toolbox .toolbox-item {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 38px !important;
+    white-space: normal;
+  }
+
+  .sandbox-view.active > .sandbox-workspace {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+}

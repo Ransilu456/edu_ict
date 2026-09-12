@@ -27,6 +27,14 @@
   --color-error: #ff4b4b;
   --color-amber: #ff9600;
 
+  --icon-default: #0ea5e9;
+  --icon-input: #10b981;
+  --icon-logic: #6366f1;
+  --icon-output: #f59e0b;
+  --icon-network: #06b6d4;
+  --icon-security: #f43f5e;
+  --icon-neutral: #64748b;
+
   --font-sans: 'Nunito', system-ui, sans-serif;
   --font-header: 'Nunito', system-ui, sans-serif;
   --font-sinhala: 'Noto Sans Sinhala', 'Nunito', sans-serif;
@@ -80,6 +88,14 @@
   --color-error: #f87171;
   --color-amber: #fbbf24;
 
+  --icon-default: #38bdf8;
+  --icon-input: #34d399;
+  --icon-logic: #a78bfa;
+  --icon-output: #fbbf24;
+  --icon-network: #22d3ee;
+  --icon-security: #fb7185;
+  --icon-neutral: #94a3b8;
+
   --kids-bg: #0b132b;
   --kids-card-bg: #1c2541;
   --kids-border: #334155;
@@ -115,6 +131,73 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Keep currentColor SVG icons expressive instead of inheriting flat text gray. */
+svg {
+  color: var(--icon-default);
+}
+
+button > svg,
+nav svg,
+.mobile-navbar svg,
+.header-badge svg,
+.toolbox-section-title svg,
+.toolbox-item svg,
+.template-card svg,
+.nd-tab svg,
+.nd-panel-header svg,
+.nd-device-btn svg,
+.nd-card-title svg,
+.osi-btn svg,
+.osi-host-header svg,
+.osi-inspector-header svg {
+  color: var(--icon-default);
+}
+
+.nav-tab:nth-child(1) svg,
+.mobile-nav-btn:nth-child(1) svg,
+.toolbox-section-title[data-category="Gates"] svg,
+.toolbox-item[data-type="and"] svg,
+.toolbox-item[data-type="or"] svg,
+.toolbox-item[data-type="not"] svg,
+.toolbox-item[data-type="nand"] svg,
+.toolbox-item[data-type="nor"] svg,
+.toolbox-item[data-type="xor"] svg,
+.toolbox-item[data-type="xnor"] svg {
+  color: var(--icon-logic);
+}
+
+.nav-tab:nth-child(2) svg,
+.mobile-nav-btn:nth-child(2) svg,
+.toolbox-section-title[data-category="ICs"] svg,
+.toolbox-item[data-type^="ic-"] svg,
+.nd-tab:nth-child(1) svg,
+.nd-device-btn svg {
+  color: var(--icon-network);
+}
+
+.nav-tab:nth-child(3) svg,
+.mobile-nav-btn:nth-child(3) svg,
+.toolbox-section-title[data-category="Inputs"] svg,
+.toolbox-item[data-type="input"] svg,
+.toolbox-item[data-type="clock"] svg {
+  color: var(--icon-input);
+}
+
+.nav-tab:nth-child(4) svg,
+.mobile-nav-btn:nth-child(4) svg,
+.toolbox-section-title[data-category="Outputs"] svg,
+.toolbox-item[data-type="output"] svg,
+.toolbox-section-title[data-category="Templates"] svg {
+  color: var(--icon-output);
+}
+
+.nd-tab:nth-child(2) svg,
+.osi-btn#osi-crypto-btn svg,
+.crypto-header svg,
+.crypto-party-header svg {
+  color: var(--icon-security);
 }
 
 h1, h2, h3, h4, h5, h6 {

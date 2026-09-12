@@ -4,6 +4,7 @@ const MAX_WAVEFORM_POINTS = 45;
 let waveformCanvas = null;
 let waveformCtx = null;
 let isWaveformActive = false;
+let waveformDpr = 1;
 
 export function initWaveform() {
   waveformCanvas = document.getElementById('waveform-canvas');
@@ -66,8 +67,14 @@ function resizeCanvas() {
   if (!waveformCanvas) return;
   const rect = waveformCanvas.parentElement?.getBoundingClientRect();
   if (rect && rect.width > 100) {
-    waveformCanvas.width = Math.min(Math.floor(rect.width - 24), 700);
-    waveformCanvas.height = 150;
+    const cssWidth = Math.min(Math.floor(rect.width - 24), 1000);
+    const cssHeight = Math.max(160, Math.min(220, Math.round(cssWidth * 0.24)));
+    waveformDpr = Math.min(window.devicePixelRatio || 1, 2);
+    waveformCanvas.width = Math.round(cssWidth * waveformDpr);
+    waveformCanvas.height = Math.round(cssHeight * waveformDpr);
+    waveformCanvas.style.height = `${cssHeight}px`;
+    waveformCtx = waveformCanvas.getContext('2d');
+    waveformCtx.setTransform(waveformDpr, 0, 0, waveformDpr, 0, 0);
   }
 }
 
@@ -115,8 +122,8 @@ export function drawWaveform() {
   }
 
   const ctx = waveformCtx;
-  const w = waveformCanvas.width;
-  const h = waveformCanvas.height;
+  const w = waveformCanvas.width / waveformDpr;
+  const h = waveformCanvas.height / waveformDpr;
 
   const isDark = document.documentElement.classList.contains('dark') ||
                  document.documentElement.getAttribute('data-theme') === 'dark';
@@ -149,6 +156,16 @@ export function drawWaveform() {
     ctx.beginPath();
     ctx.moveTo(labelWidth, y);
     ctx.lineTo(w - 10, y);
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle = isDark ? '#24344d' : '#dbe4ee';
+  ctx.lineWidth = 1;
+  for (let tick = 0; tick <= 8; tick++) {
+    const x = labelWidth + (plotWidth * tick / 8);
+    ctx.beginPath();
+    ctx.moveTo(x, 10);
+    ctx.lineTo(x, h - 10);
     ctx.stroke();
   }
 
