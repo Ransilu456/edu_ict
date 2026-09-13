@@ -190,7 +190,7 @@ window.initSandboxCanvas = function () {
   applyViewportTransform();
 
   setupDragAndDrop();
-  setupToolboxSearch();
+  setupSidebarSearch();
   setupToolbar();
   startSimulationLoop();
   initWaveform();
@@ -238,65 +238,23 @@ window.initSandboxCanvas = function () {
   window.addEventListener('keyup', (e) => {
     if (e.code === 'Space') isSpacePressed = false;
   });
-  const theoryBtn = document.getElementById('sandbox-theory-btn');
-  const learningCard = document.getElementById('sandbox-learning-card');
-  const closeLearningCard = document.getElementById('close-learning-card');
-  const collapseLearningCard = document.getElementById('collapse-learning-card');
-  const learningCardHeader = document.getElementById('learning-card-header');
-
-  if (theoryBtn && learningCard) {
-    theoryBtn.addEventListener('click', () => {
-      playSound('click');
-      if (learningCard.style.display === 'none') {
-        learningCard.style.display = 'flex';
-        learningCard.classList.remove('collapsed');
-      } else {
-        learningCard.style.display = 'none';
-      }
-    });
-  }
-
-  if (closeLearningCard && learningCard) {
-    closeLearningCard.addEventListener('click', (e) => {
-      e.stopPropagation();
-      playSound('click');
-      learningCard.style.display = 'none';
-    });
-  }
-
-  const toggleCollapse = () => {
-    playSound('click');
-    learningCard.classList.toggle('collapsed');
-  };
-
-  if (collapseLearningCard && learningCard) {
-    collapseLearningCard.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleCollapse();
-    });
-  }
-
-  if (learningCardHeader && learningCard) {
-    learningCardHeader.addEventListener('click', () => {
-      toggleCollapse();
-    });
-  }
   if (window.initICCreator) window.initICCreator();
 };
 
-function setupToolboxSearch() {
-  const search = document.getElementById('toolbox-search-input');
-  if (!search || search.dataset.initialized) return;
+function setupSidebarSearch() {
+  const sidebar = document.getElementById('sandboxSidebar');
+  const search = sidebar?.querySelector('#sidebar-search-input');
+  if (!sidebar || !search || search.dataset.initialized) return;
   search.dataset.initialized = 'true';
 
   let currentCategory = 'all';
 
   const filterTools = () => {
     const query = search.value.trim().toLowerCase();
-    document.querySelectorAll('.toolbox-section').forEach(section => {
-      const catTitle = section.querySelector('.toolbox-section-title');
+    sidebar.querySelectorAll('.sidebar-section').forEach(section => {
+      const catTitle = section.querySelector('.sidebar-section-title');
       const category = catTitle?.dataset?.category || '';
-      const items = Array.from(section.querySelectorAll('.toolbox-item, .template-card'));
+      const items = Array.from(section.querySelectorAll('.sidebar-item, .template-card'));
       if (!items.length) return;
 
       const categoryMatches = (currentCategory === 'all') || (category.toLowerCase() === currentCategory.toLowerCase());
@@ -317,12 +275,12 @@ function setupToolboxSearch() {
   search.addEventListener('input', () => {
     if (search.value.trim() && currentCategory !== 'all') {
       currentCategory = 'all';
-      document.querySelectorAll('.toolbox-tab').forEach(t => t.classList.toggle('active', t.dataset.filter === 'all'));
+      sidebar.querySelectorAll('.sidebar-tab').forEach(t => t.classList.toggle('active', t.dataset.filter === 'all'));
     }
     filterTools();
   });
 
-  const filterTabs = document.querySelectorAll('.toolbox-tab');
+  const filterTabs = sidebar.querySelectorAll('.sidebar-tab');
   filterTabs.forEach(tab => {
     tab.addEventListener('click', () => {
       if (window.playSound) window.playSound('click');
@@ -332,9 +290,9 @@ function setupToolboxSearch() {
       filterTools();
 
       if (currentCategory !== 'all') {
-        const targetSection = document.querySelector(`.toolbox-section-title[data-category="${currentCategory}"]`)?.closest('.toolbox-section');
+        const targetSection = sidebar.querySelector(`.sidebar-section-title[data-category="${currentCategory}"]`)?.closest('.sidebar-section');
         if (targetSection) {
-          targetSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          sidebar.scrollTo({ top: targetSection.offsetTop - sidebar.offsetTop, behavior: 'smooth' });
         }
       }
     });
@@ -348,7 +306,7 @@ function setupToolboxSearch() {
   });
 }
 
-function setupToolboxItem(item) {
+function setupSidebarItem(item) {
   const type = item.dataset.type;
   const label = item.querySelector('span')?.innerText || type;
   item.setAttribute('draggable', 'true');
@@ -450,15 +408,18 @@ function setupToolboxItem(item) {
 }
 
 function setupDragAndDrop() {
-  document.querySelectorAll('.toolbox-section-title').forEach(title => {
+  const sidebar = document.getElementById('sandboxSidebar');
+  if (!sidebar) return;
+
+  sidebar.querySelectorAll('.sidebar-section-title').forEach(title => {
     title.style.cursor = 'pointer';
     title.title = 'Collapse / expand section';
     title.addEventListener('click', () => {
       title.parentElement?.classList.toggle('collapsed');
     });
   });
-  document.querySelectorAll('.toolbox-item').forEach(item => setupToolboxItem(item));
-  document.querySelectorAll('.template-card').forEach(card => {
+  sidebar.querySelectorAll('.sidebar-item').forEach(item => setupSidebarItem(item));
+  sidebar.querySelectorAll('.template-card').forEach(card => {
     card.setAttribute('draggable', 'true');
     card.addEventListener('dragstart', (e) => {
       e.dataTransfer.effectAllowed = 'copy';
@@ -737,7 +698,10 @@ function placeNode(type, label, x, y) {
     pinValues: isIC ? {} : null,
     prevClockState: 0,
     labelText: type === 'text-label' ? 'Label' : '',
-    data: def.data ? { ...def.data } : {},
+    data: {
+      ...(def.data ? { ...def.data } : {}),
+      ...(type === 'clock' ? { startState: Math.random() < 0.5 ? 0 : 1 } : {}),
+    },
   };
 
   sandboxNodes.push(node);
@@ -1061,6 +1025,7 @@ function renderNodeBody(node, body) {
     }
 
     case 'clock': {
+      const startState = node.data?.startState ?? node.outputState ?? 0;
       body.innerHTML = `
         <div class="clk-wrap" id="${node.id}-clk-wrap">
           <svg class="clk-osc-svg" viewBox="0 0 100 40">
@@ -1081,6 +1046,13 @@ function renderNodeBody(node, body) {
           <div class="clk-meta">
             <span class="clk-badge" id="${node.id}-phase">▽ LOW</span>
             <span class="clk-hz">1 Hz</span>
+          </div>
+          <div class="clk-start-controls" role="group" aria-label="Clock start state">
+            <span class="clk-start-label">Start</span>
+            <button type="button" class="clk-start-btn${startState === 0 ? ' active' : ''}" data-clock-start="0"
+              aria-pressed="${startState === 0}" onclick="event.stopPropagation();window.setClockStart('${node.id}',0)">LOW</button>
+            <button type="button" class="clk-start-btn${startState === 1 ? ' active' : ''}" data-clock-start="1"
+              aria-pressed="${startState === 1}" onclick="event.stopPropagation();window.setClockStart('${node.id}',1)">HIGH</button>
           </div>
         </div>`;
       break;
@@ -2394,6 +2366,12 @@ function updateNodeVisuals(node) {
       break;
     }
     case 'clock': {
+      const startButtons = el.querySelectorAll('.clk-start-btn');
+      startButtons.forEach(button => {
+        const isSelected = Number(button.dataset.clockStart) === (node.data?.startState ?? 0);
+        button.classList.toggle('active', isSelected);
+        button.setAttribute('aria-pressed', String(isSelected));
+      });
       const phase = document.getElementById(`${node.id}-phase`);
       if (phase) {
         phase.innerText = node.outputState === 1 ? '▲ HIGH' : '▽ LOW';
@@ -2671,10 +2649,28 @@ function startSimulationLoop() {
     if (!isSimRunning) return;
     clockTick = 1 - clockTick;
     sandboxNodes.forEach(n => {
-      if (n.type === 'clock') n.outputState = clockTick;
+      if (n.type === 'clock') {
+        const startState = n.data?.startState ?? 0;
+        n.outputState = startState ? 1 - clockTick : clockTick;
+      }
     });
   }, Math.max(50, clockIntervalMs));
 }
+
+window.setClockStart = function (id, state) {
+  const node = sandboxNodes.find(item => item.id === id && item.type === 'clock');
+  if (!node) return;
+
+  node.data = node.data || {};
+  node.data.startState = state === 1 ? 1 : 0;
+  node.outputState = node.data.startState;
+  node.prevClockState = node.outputState;
+  clockTick = 0;
+  updateNodeVisuals(node);
+  updateSandboxWires();
+  evaluateSandbox();
+  playSound('toggle');
+};
 
 function stopSimulationLoop() {
   clearInterval(simInterval);
@@ -2824,6 +2820,10 @@ function importLayout(layout) {
     n.outputStates = n.outputStates ?? {};
     n.inputValues = n.inputValues ?? Array(n.inputsCount).fill(0);
     n.data = n.data ?? (def.data ? { ...def.data } : {});
+    if (n.type === 'clock' && n.data.startState === undefined) {
+      n.data.startState = Math.random() < 0.5 ? 0 : 1;
+      n.outputState = n.data.startState;
+    }
 
     if (REAL_ICS[n.type]) {
       n.pinValues = n.pinValues ?? {};

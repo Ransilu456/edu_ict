@@ -1,0 +1,127 @@
+.footer {
+  position: relative;
+  width: 100%;
+  margin-top: auto;
+  padding: 1.1rem clamp(1rem, 4vw, 2.5rem) 1.25rem;
+  border-top: 1px solid color-mix(in srgb, var(--border-color) 75%, transparent);
+  background: color-mix(in srgb, var(--bg-secondary) 92%, var(--bg-primary));
+  overflow: hidden;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-cyan), transparent);
+  opacity: 0.7;
+}
+
+.footer-content {
+  width: min(100%, 1400px);
+  min-height: 3rem;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.footer-brand,
+.footer-details,
+.footer-meta,
+.footer-status {
+  display: flex;
+  align-items: center;
+}
+
+.footer-brand {
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.footer-logo {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  flex: 0 0 auto;
+  border: 1px solid color-mix(in srgb, var(--color-cyan) 50%, var(--border-color));
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--color-cyan) 12%, var(--bg-primary));
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--color-cyan) 20%, transparent);
+  color: var(--color-cyan);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.footer-brand > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.16rem;
+  min-width: 0;
+}
+
+.footer-brand strong {
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.footer-brand > div > span {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.footer-details {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.footer-status {
+  gap: 0.4rem;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--color-success) 28%, var(--border-color));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-success) 8%, transparent);
+  color: var(--text-secondary);
+  font-size: 0.66rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.footer-status-dot {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: var(--color-success);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-success) 16%, transparent);
+}
+
+.footer-meta {
+  justify-content: flex-end;
+  gap: 0.5rem;
+  text-align: right;
+}
+
+.footer-meta strong {
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.footer-separator {
+  color: var(--color-cyan);
+  font-weight: 700;
+  user-select: none;
+}

@@ -186,6 +186,7 @@ main {
 }
 
 .view-panel:not(.active) {
+  display: none !important;
   visibility: hidden;
   height: 0;
   width: 0;
@@ -198,10 +199,6 @@ home-view {
   flex-direction: column;
   overflow: hidden;
 
-}
-
-home-view .home-view.active {
-  display: flex;
 }
 
 home-view:has(.home-view.active) {

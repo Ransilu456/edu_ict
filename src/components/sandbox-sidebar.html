@@ -1,0 +1,398 @@
+<aside class="sandbox-sidebar" id="sandboxSidebar" aria-labelledby="sandbox-sidebar-title">
+    <h3 id="sandbox-sidebar-title">Components</h3>
+    <p>Drag onto the canvas or click to place. Connect an output port to an input port.</p>
+
+    <label class="sidebar-search" for="sidebar-search-input">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-4-4"></path>
+        </svg>
+        <input id="sidebar-search-input" type="search" placeholder="Find a component" autocomplete="off">
+        <kbd>/</kbd>
+    </label>
+
+    <div class="sidebar-filter-tabs" id="sidebar-filter-tabs" role="tablist">
+        <button class="sidebar-tab active" data-filter="all" type="button">All</button>
+        <button class="sidebar-tab" data-filter="Gates" type="button">Gates</button>
+        <button class="sidebar-tab" data-filter="Inputs" type="button">Inputs</button>
+        <button class="sidebar-tab" data-filter="Outputs" type="button">Outputs</button>
+        <button class="sidebar-tab" data-filter="ICs" type="button">ICs</button>
+        <button class="sidebar-tab" data-filter="Compound" type="button">Compound</button>
+        <button class="sidebar-tab" data-filter="Templates" type="button">Templates</button>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title" data-category="Inputs"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M4 8h9M17 8h3M4 16h3M11 16h9" />
+                <circle cx="15" cy="8" r="2" />
+                <circle cx="9" cy="16" r="2" />
+            </svg>Inputs</div>
+        <div class="sidebar-item" data-type="input" draggable="true" title="Toggle Switch"><svg viewBox="0 0 24 24">
+                <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
+            </svg><span>Toggle Switch</span></div>
+        <div class="sidebar-item" data-type="clock" draggable="true" title="Clock Signal"><svg viewBox="0 0 24 24">
+                <path
+                    d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+            </svg><span>Clock Signal</span></div>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title" data-category="Gates"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="4" />
+                <path d="M8 9h5a3 3 0 0 1 0 6H8V9z" />
+            </svg>Logic Gates</div>
+        <div class="sidebar-item" data-type="and" draggable="true"><svg viewBox="0 0 24 24">
+                <path d="M19 13H5v-2h14v2z" />
+            </svg><span>AND Gate</span></div>
+        <div class="sidebar-item" data-type="or" draggable="true"><svg viewBox="0 0 24 24">
+                <path d="M19 13H5v-2h14v2z" />
+            </svg><span>OR Gate</span></div>
+        <div class="sidebar-item" data-type="not" draggable="true"><svg viewBox="0 0 24 24">
+                <path d="M19 13H5v-2h14v2z" />
+            </svg><span>NOT Gate</span></div>
+        <div class="sidebar-item" data-type="nand" draggable="true"><svg viewBox="0 0 24 24">
+                <path d="M19 13H5v-2h14v2z" />
+            </svg><span>NAND Gate</span></div>
+        <div class="sidebar-item" data-type="nor" draggable="true"><svg viewBox="0 0 24 24">
+                <path d="M19 13H5v-2h14v2z" />
+            </svg><span>NOR Gate</span></div>
+        <div class="sidebar-item" data-type="xor" draggable="true"><svg viewBox="0 0 24 24">
+                <path d="M19 13H5v-2h14v2z" />
+            </svg><span>XOR Gate</span></div>
+        <div class="sidebar-item" data-type="xnor" draggable="true"><svg viewBox="0 0 24 24">
+                <path d="M19 13H5v-2h14v2z" />
+            </svg><span>XNOR Gate</span></div>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title" data-category="Outputs"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path
+                    d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.8.6 1.5 1.4 1.5 2.1h4c0-.7.7-1.5 1.5-2.1A6 6 0 0 0 12 3z" />
+            </svg>Outputs</div>
+        <div class="sidebar-item" data-type="output" draggable="true" title="LED Light">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z" />
+            </svg>
+            <span>LED Light</span>
+        </div>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title" data-category="Compound"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="6" width="18" height="12" rx="2" />
+                <path d="M7 10v4M11 10v4M15 10v4" />
+            </svg>Compound Circuits</div>
+        <div class="sidebar-item" data-type="half-adder" draggable="true" title="Half Adder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M7 8l2 4-2 4M15 8h2" />
+            </svg>
+            <span>Half Adder</span>
+        </div>
+        <div class="sidebar-item" data-type="full-adder" draggable="true" title="Full Adder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M7 8l2 4-2 4M14 8l2 4-2 4" />
+            </svg>
+            <span>Full Adder</span>
+        </div>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title" data-category="Advanced"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4L12 2z" />
+            </svg>Advanced</div>
+        <div class="sidebar-item" data-type="d-flop" draggable="true" title="D Flip-Flop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M7 12h4M15 8v8" />
+            </svg>
+            <span>D Flip-Flop</span>
+        </div>
+        <div class="sidebar-item" data-type="seven-seg" draggable="true" title="7-Segment Display">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M9 7h6M9 12h6M9 17h6" />
+            </svg>
+            <span>7-Seg Display</span>
+        </div>
+        <div class="sidebar-item" data-type="text-label" draggable="true" title="Text Label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 7V5h16v2M9 20h6M12 5v15" />
+            </svg>
+            <span>Text Label</span>
+        </div>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title" data-category="ICs"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <rect x="6" y="5" width="12" height="14" rx="2" />
+                <path d="M6 9H3M6 13H3M6 17H3M18 9h3M18 13h3M18 17h3M9 5V3M15 5V3" />
+            </svg>Real ICs (DIP-14)</div>
+        <div class="sidebar-item" data-type="ic-7408" draggable="true" title="7408 Quad 2-Input AND Gate (DIP-14)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="2" />
+                <line x1="2" y1="5" x2="5" y2="5" />
+                <line x1="2" y1="9" x2="5" y2="9" />
+                <line x1="2" y1="13" x2="5" y2="13" />
+                <line x1="2" y1="17" x2="5" y2="17" />
+                <line x1="19" y1="5" x2="22" y2="5" />
+                <line x1="19" y1="9" x2="22" y2="9" />
+                <line x1="19" y1="13" x2="22" y2="13" />
+                <line x1="19" y1="17" x2="22" y2="17" />
+            </svg>
+            <span>7408 Quad AND</span>
+        </div>
+        <div class="sidebar-item" data-type="ic-7432" draggable="true" title="7432 Quad 2-Input OR Gate (DIP-14)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="2" />
+                <line x1="2" y1="5" x2="5" y2="5" />
+                <line x1="2" y1="9" x2="5" y2="9" />
+                <line x1="2" y1="13" x2="5" y2="13" />
+                <line x1="2" y1="17" x2="5" y2="17" />
+                <line x1="19" y1="5" x2="22" y2="5" />
+                <line x1="19" y1="9" x2="22" y2="9" />
+                <line x1="19" y1="13" x2="22" y2="13" />
+                <line x1="19" y1="17" x2="22" y2="17" />
+            </svg>
+            <span>7432 Quad OR</span>
+        </div>
+        <div class="sidebar-item" data-type="ic-7404" draggable="true" title="7404 Hex Inverter / NOT Gate (DIP-14)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="2" />
+                <line x1="2" y1="5" x2="5" y2="5" />
+                <line x1="2" y1="9" x2="5" y2="9" />
+                <line x1="2" y1="13" x2="5" y2="13" />
+                <line x1="2" y1="17" x2="5" y2="17" />
+                <line x1="19" y1="5" x2="22" y2="5" />
+                <line x1="19" y1="9" x2="22" y2="9" />
+                <line x1="19" y1="13" x2="22" y2="13" />
+                <line x1="19" y1="17" x2="22" y2="17" />
+            </svg>
+            <span>7404 Hex NOT</span>
+        </div>
+        <div class="sidebar-item" data-type="ic-7400" draggable="true" title="7400 Quad 2-Input NAND Gate (DIP-14)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="2" />
+                <line x1="2" y1="5" x2="5" y2="5" />
+                <line x1="2" y1="9" x2="5" y2="9" />
+                <line x1="2" y1="13" x2="5" y2="13" />
+                <line x1="2" y1="17" x2="5" y2="17" />
+                <line x1="19" y1="5" x2="22" y2="5" />
+                <line x1="19" y1="9" x2="22" y2="9" />
+                <line x1="19" y1="13" x2="22" y2="13" />
+                <line x1="19" y1="17" x2="22" y2="17" />
+            </svg>
+            <span>7400 Quad NAND</span>
+        </div>
+        <div class="sidebar-item" data-type="ic-7402" draggable="true" title="7402 Quad 2-Input NOR Gate (DIP-14)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="2" />
+                <line x1="2" y1="5" x2="5" y2="5" />
+                <line x1="2" y1="9" x2="5" y2="9" />
+                <line x1="2" y1="13" x2="5" y2="13" />
+                <line x1="2" y1="17" x2="5" y2="17" />
+                <line x1="19" y1="5" x2="22" y2="5" />
+                <line x1="19" y1="9" x2="22" y2="9" />
+                <line x1="19" y1="13" x2="22" y2="13" />
+                <line x1="19" y1="17" x2="22" y2="17" />
+            </svg>
+            <span>7402 Quad NOR</span>
+        </div>
+        <div class="sidebar-item" data-type="ic-7486" draggable="true" title="7486 Quad 2-Input XOR Gate (DIP-14)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="2" />
+                <line x1="2" y1="5" x2="5" y2="5" />
+                <line x1="2" y1="9" x2="5" y2="9" />
+                <line x1="2" y1="13" x2="5" y2="13" />
+                <line x1="2" y1="17" x2="5" y2="17" />
+                <line x1="19" y1="5" x2="22" y2="5" />
+                <line x1="19" y1="9" x2="22" y2="9" />
+                <line x1="19" y1="13" x2="22" y2="13" />
+                <line x1="19" y1="17" x2="22" y2="17" />
+            </svg>
+            <span>7486 Quad XOR</span>
+        </div>
+    </div>
+
+    <div class="sidebar-section" style="margin-top:0.5rem">
+        <div class="sidebar-section-title" data-category="Templates"
+            style="display:flex;align-items:center;gap:0.35rem">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                <polyline points="2 17 12 22 22 17" />
+                <polyline points="2 12 12 17 22 12" />
+            </svg>
+            Templates
+        </div>
+        <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:0.35rem;padding:0 2px;">
+            Drag to drop anywhere on canvas, or click to load template.
+        </div>
+        <div class="template-grid">
+            <div class="template-card" id="tpl-not" draggable="true" data-template-name="not-demo"
+                onclick="window.loadSandboxTemplate('not-demo')" title="NOT Gate Demo">
+                <div class="template-card-icon" style="background:rgba(99,102,241,0.15);color:#818cf8"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="18" cy="12" r="2" />
+                        <path d="M4 12h10l4-6v12l-4-6" />
+                    </svg></div>
+                <div class="template-card-info">
+                    <div class="template-card-name">NOT Inverter</div>
+                    <div class="template-card-desc">Switch → NOT → LED</div>
+                </div>
+                <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </div>
+            <div class="template-card" id="tpl-and" draggable="true" data-template-name="and-demo"
+                onclick="window.loadSandboxTemplate('and-demo')" title="AND Gate Demo">
+                <div class="template-card-icon" style="background:rgba(6,182,212,0.15);color:#06b6d4"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M6 4h8a6 6 0 0 1 0 12H6V4z" />
+                        <line x1="2" y1="10" x2="6" y2="10" />
+                    </svg></div>
+                <div class="template-card-info">
+                    <div class="template-card-name">AND Gate Test</div>
+                    <div class="template-card-desc">2 switches → AND → LED</div>
+                </div>
+                <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </div>
+            <div class="template-card" id="tpl-xor" draggable="true" data-template-name="xor-parity"
+                onclick="window.loadSandboxTemplate('xor-parity')" title="XOR Parity">
+                <div class="template-card-icon" style="background:rgba(16,185,129,0.15);color:#10b981"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M6 4h8a6 6 0 0 1 0 12H6V4z" />
+                        <path d="M3 4c1.5 3 1.5 9 0 12" />
+                    </svg></div>
+                <div class="template-card-info">
+                    <div class="template-card-name">XOR Parity</div>
+                    <div class="template-card-desc">3-bit parity checker</div>
+                </div>
+                <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </div>
+            <div class="template-card" id="tpl-sr" draggable="true" data-template-name="sr-latch"
+                onclick="window.loadSandboxTemplate('sr-latch')" title="SR Latch">
+                <div class="template-card-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="17 1 21 5 17 9" />
+                        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                        <polyline points="7 23 3 19 7 15" />
+                        <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                    </svg></div>
+                <div class="template-card-info">
+                    <div class="template-card-name">SR Latch</div>
+                    <div class="template-card-desc">NAND feedback latch</div>
+                </div>
+                <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </div>
+            <div class="template-card" id="tpl-ha" draggable="true" data-template-name="half-adder-demo"
+                onclick="window.loadSandboxTemplate('half-adder-demo')" title="Half Adder">
+                <div class="template-card-icon" style="background:rgba(139,92,246,0.15);color:#8b5cf6"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="2" />
+                        <path d="M7 8l2 4-2 4M15 8h2" />
+                    </svg></div>
+                <div class="template-card-info">
+                    <div class="template-card-name">Half Adder</div>
+                    <div class="template-card-desc">S + Carry logic</div>
+                </div>
+                <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </div>
+            <div class="template-card" id="tpl-fa" draggable="true" data-template-name="full-adder-gate"
+                onclick="window.loadSandboxTemplate('full-adder-gate')" title="Full Adder">
+                <div class="template-card-icon" style="background:rgba(236,72,153,0.15);color:#ec4899"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="2" />
+                        <path d="M7 8l2 4-2 4M14 8l2 4-2 4" />
+                    </svg></div>
+                <div class="template-card-info">
+                    <div class="template-card-name">Full Adder</div>
+                    <div class="template-card-desc">Gate-level 3-bit adder</div>
+                </div>
+                <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </div>
+            <div class="template-card" id="tpl-nand-univ" draggable="true" data-template-name="nand-universality-and"
+                onclick="window.loadSandboxTemplate('nand-universality-and')" title="NAND Universality">
+                <div class="template-card-icon" style="background:rgba(20,184,166,0.15);color:#20b2aa"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M8 12h8" />
+                    </svg></div>
+                <div class="template-card-info">
+                    <div class="template-card-name">NAND → AND</div>
+                    <div class="template-card-desc">Universal NAND gate demo</div>
+                </div>
+                <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </div>
+            <div class="template-card" id="tpl-dff" draggable="true" data-template-name="d-flipflop-reg"
+                onclick="window.loadSandboxTemplate('d-flipflop-reg')" title="D Flip-Flop Register">
+                <div class="template-card-icon" style="background:rgba(239,68,68,0.15);color:#f87171"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <path d="M7 12h4M15 8v8" />
+                    </svg></div>
+                <div class="template-card-info">
+                    <div class="template-card-name">1-Bit Register</div>
+                    <div class="template-card-desc">D Flip-Flop rising clock</div>
+                </div>
+                <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </div>
+            <div class="template-card" id="tpl-dec" draggable="true" data-template-name="seven-seg-decoder-demo"
+                onclick="window.loadSandboxTemplate('seven-seg-decoder-demo')" title="7-Seg Decoder">
+                <div class="template-card-icon" style="background:rgba(107,114,128,0.15);color:#9ca3af"><svg
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <path d="M9 7h6M9 12h6M9 17h6" />
+                    </svg></div>
+                <div class="template-card-info">
+                    <div class="template-card-name">7-Seg Decoder</div>
+                    <div class="template-card-desc">4-bit hex display tester</div>
+                </div>
+                <svg class="template-load-icon" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </div>
+        </div>
+    </div>
+</aside>

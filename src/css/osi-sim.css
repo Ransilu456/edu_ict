@@ -1547,6 +1547,7 @@
   line-height: 1.45 !important;
   margin-top: 0.2rem !important;
   display: -webkit-box !important;
+  line-clamp: 2 !important;
   -webkit-line-clamp: 2 !important;
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;

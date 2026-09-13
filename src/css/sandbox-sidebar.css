@@ -1,0 +1,310 @@
+.sandbox-sidebar {
+	width: 260px;
+	flex: 0 0 260px;
+	align-self: stretch;
+	min-height: 0;
+	height: 100%;
+	max-height: 100%;
+	padding: 1rem 0.85rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.85rem;
+	overflow-x: hidden;
+	overflow-y: auto;
+	overflow-anchor: none;
+	border-right: 1px solid var(--border-color);
+	background: var(--bg-secondary);
+	scrollbar-gutter: stable;
+	touch-action: pan-y;
+	overscroll-behavior: contain;
+	z-index: 10;
+}
+
+.sandbox-sidebar::-webkit-scrollbar {
+	width: 6px;
+}
+
+.sandbox-sidebar::-webkit-scrollbar-thumb {
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--border-color) 80%, transparent);
+}
+
+.sandbox-sidebar > h3 {
+	margin: 0;
+	padding-bottom: 0.55rem;
+	border-bottom: 1px solid var(--border-color);
+	color: var(--text-primary);
+	font: 800 1.05rem var(--font-header);
+}
+
+.sandbox-sidebar > p {
+	margin: 0;
+	color: var(--text-muted);
+	font-size: 0.72rem;
+	line-height: 1.45;
+}
+
+.sidebar-search {
+	min-height: 38px;
+	padding: 0 0.6rem;
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	border: 1px solid var(--border-color);
+	border-radius: 10px;
+	background: var(--bg-primary);
+	color: var(--text-muted);
+}
+
+.sidebar-search:focus-within {
+	border-color: var(--color-indigo);
+	box-shadow: 0 0 0 3px var(--color-indigo-glow);
+}
+
+.sidebar-search svg {
+	width: 15px;
+	height: 15px;
+	flex: 0 0 15px;
+}
+
+.sidebar-search input {
+	width: 100%;
+	min-width: 0;
+	border: 0;
+	outline: 0;
+	background: transparent;
+	color: var(--text-primary);
+	font: 600 0.74rem var(--font-header);
+}
+
+.sidebar-search input::placeholder {
+	color: var(--text-muted);
+}
+
+.sidebar-search kbd {
+	min-width: 20px;
+	height: 20px;
+	padding: 0 0.25rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid var(--border-color);
+	border-radius: 5px;
+	background: var(--bg-secondary);
+	color: var(--text-muted);
+	font: 700 0.62rem var(--font-mono);
+}
+
+.sidebar-filter-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.3rem;
+	padding-bottom: 0.4rem;
+	border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-tab {
+	padding: 0.22rem 0.52rem;
+	border: 1px solid var(--border-color);
+	border-radius: 6px;
+	background: var(--bg-primary);
+	color: var(--text-secondary);
+	cursor: pointer;
+	font: 700 0.69rem var(--font-header);
+}
+
+.sidebar-tab:hover,
+.sidebar-tab.active {
+	border-color: var(--color-indigo);
+	color: var(--color-indigo);
+}
+
+.sidebar-tab.active {
+	background: var(--color-indigo);
+	color: #fff;
+	box-shadow: 0 2px 8px var(--color-indigo-glow);
+}
+
+.sidebar-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.32rem;
+	padding-bottom: 0.65rem;
+	border-bottom: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+}
+
+.sidebar-section:last-child {
+	border-bottom: 0;
+}
+
+.sidebar-section[hidden],
+.sidebar-item[hidden],
+.template-card[hidden] {
+	display: none;
+}
+
+.sidebar-section-title {
+	min-height: 28px;
+	padding: 0 0.25rem;
+	display: flex;
+	align-items: center;
+	gap: 0.3rem;
+	color: var(--text-muted);
+	cursor: pointer;
+	font: 800 0.68rem var(--font-header);
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	user-select: none;
+}
+
+.sidebar-section-title::after {
+	content: '\25BE';
+	margin-left: auto;
+	font-size: 0.7rem;
+	transition: transform var(--transition-fast);
+}
+
+.sidebar-section.collapsed .sidebar-section-title::after {
+	transform: rotate(-90deg);
+}
+
+.sidebar-section.collapsed .sidebar-item,
+.sidebar-section.collapsed .template-grid {
+	display: none;
+}
+
+.sidebar-section-title svg {
+	width: 13px;
+	height: 13px;
+	flex: 0 0 13px;
+}
+
+.sidebar-item {
+	min-height: 38px;
+	padding: 0.45rem 0.6rem;
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	border: 1px solid var(--border-color);
+	border-radius: 9px;
+	background: var(--bg-primary);
+	color: var(--text-primary);
+	cursor: grab;
+	font: 600 0.76rem var(--font-header);
+	user-select: none;
+	transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+.sidebar-item:hover {
+	border-color: var(--text-primary);
+	background: var(--bg-tertiary);
+}
+
+.sidebar-item:active {
+	cursor: grabbing;
+}
+
+.sidebar-item svg {
+	width: 16px;
+	height: 16px;
+	flex: 0 0 16px;
+	fill: none;
+	stroke: var(--text-secondary);
+	stroke-width: 2;
+}
+
+.sidebar-item[data-type^='ic-'] {
+	border-color: color-mix(in srgb, var(--color-cyan) 35%, var(--border-color));
+	background: color-mix(in srgb, var(--color-cyan) 8%, var(--bg-primary));
+}
+
+.sidebar-item:focus-visible,
+.sidebar-tab:focus-visible {
+	outline: 2px solid var(--color-indigo);
+	outline-offset: 2px;
+}
+
+.template-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0.45rem;
+}
+
+.template-card {
+	min-width: 0;
+	padding: 0.55rem;
+	display: grid;
+	grid-template-columns: 30px minmax(0, 1fr) 14px;
+	align-items: center;
+	gap: 0.55rem;
+	border: 1px solid var(--border-color);
+	border-radius: 9px;
+	background: var(--bg-primary);
+	color: var(--text-primary);
+	cursor: grab;
+	transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+.template-card:hover {
+	border-color: var(--color-indigo);
+	background: var(--bg-tertiary);
+	transform: translateY(-1px);
+}
+
+.template-card:active {
+	cursor: grabbing;
+}
+
+.template-card-icon {
+	width: 30px;
+	height: 30px;
+	display: grid;
+	place-items: center;
+	border-radius: 7px;
+}
+
+.template-card-icon svg {
+	width: 16px;
+	height: 16px;
+}
+
+.template-card-info {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+}
+
+.template-card-name,
+.template-card-desc {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.template-card-name {
+	font: 700 0.72rem var(--font-header);
+	color: var(--text-primary);
+}
+
+.template-card-desc {
+	font: 500 0.62rem var(--font-header);
+	color: var(--text-muted);
+}
+
+.template-load-icon {
+	color: var(--text-muted);
+}
+
+.template-card:focus-visible {
+	outline: 2px solid var(--color-indigo);
+	outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+	.sandbox-sidebar {
+		width: 220px;
+		flex-basis: 220px;
+		padding-inline: 0.65rem;
+	}
+}
