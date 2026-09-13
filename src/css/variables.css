@@ -133,7 +133,6 @@ body {
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
-/* Keep currentColor SVG icons expressive instead of inheriting flat text gray. */
 svg {
   color: var(--icon-default);
 }
@@ -171,7 +170,6 @@ nav svg,
 .nav-tab:nth-child(2) svg,
 .mobile-nav-btn:nth-child(2) svg,
 .toolbox-section-title[data-category="ICs"] svg,
-.toolbox-item[data-type^="ic-"] svg,
 .nd-tab:nth-child(1) svg,
 .nd-device-btn svg {
   color: var(--icon-network);

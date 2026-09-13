@@ -1,6 +1,7 @@
 import { parseBooleanExpression } from './bool-parser.js';
 import { REAL_ICS } from './real-ic-defs.js';
 import { initWaveform, sampleWaveform } from './waveform.js';
+import { generateICSchematicSVG } from './ic-schematic.js';
 
 // canvas state
 let sandboxNodes = [];
@@ -287,26 +288,58 @@ function setupToolboxSearch() {
   const search = document.getElementById('toolbox-search-input');
   if (!search || search.dataset.initialized) return;
   search.dataset.initialized = 'true';
-  const toolbox = search.closest('.sandbox-toolbox');
-  toolbox?.addEventListener('wheel', (event) => event.stopPropagation(), { passive: true });
+
+  let currentCategory = 'all';
 
   const filterTools = () => {
     const query = search.value.trim().toLowerCase();
     document.querySelectorAll('.toolbox-section').forEach(section => {
+      const catTitle = section.querySelector('.toolbox-section-title');
+      const category = catTitle?.dataset?.category || '';
       const items = Array.from(section.querySelectorAll('.toolbox-item, .template-card'));
       if (!items.length) return;
-      let visible = 0;
+
+      const categoryMatches = (currentCategory === 'all') || (category.toLowerCase() === currentCategory.toLowerCase());
+
+      let visibleCount = 0;
       items.forEach(item => {
         const text = `${item.innerText} ${item.getAttribute('title') || ''}`.toLowerCase();
-        const matches = !query || text.includes(query);
-        item.hidden = !matches;
-        if (matches) visible += 1;
+        const queryMatches = !query || text.includes(query);
+        const shouldShow = categoryMatches && queryMatches;
+        item.hidden = !shouldShow;
+        if (shouldShow) visibleCount += 1;
       });
-      section.hidden = visible === 0;
+
+      section.hidden = visibleCount === 0;
     });
   };
 
-  search.addEventListener('input', filterTools);
+  search.addEventListener('input', () => {
+    if (search.value.trim() && currentCategory !== 'all') {
+      currentCategory = 'all';
+      document.querySelectorAll('.toolbox-tab').forEach(t => t.classList.toggle('active', t.dataset.filter === 'all'));
+    }
+    filterTools();
+  });
+
+  const filterTabs = document.querySelectorAll('.toolbox-tab');
+  filterTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      if (window.playSound) window.playSound('click');
+      filterTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentCategory = tab.dataset.filter || 'all';
+      filterTools();
+
+      if (currentCategory !== 'all') {
+        const targetSection = document.querySelector(`.toolbox-section-title[data-category="${currentCategory}"]`)?.closest('.toolbox-section');
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    });
+  });
+
   document.addEventListener('keydown', event => {
     if (event.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
       event.preventDefault();
@@ -824,6 +857,15 @@ function renderRealICNodeDOM(node, el) {
   body.appendChild(leftCol);
   body.appendChild(rightCol);
   el.appendChild(body);
+
+  const isAnsi = (window.__gateStyle || localStorage.getItem('sandboxGateStyle')) === 'realistic';
+  el.classList.toggle('ansi-mode', isAnsi);
+  if (isAnsi) {
+    const schemWrapper = document.createElement('div');
+    schemWrapper.className = 'real-ic-schematic-wrapper';
+    schemWrapper.innerHTML = generateICSchematicSVG(node, ic);
+    el.appendChild(schemWrapper);
+  }
 
   const onStartDrag = (e) => {
     if (e.target.closest('.sandbox-port') || e.target.closest('button')) return;
@@ -1916,18 +1958,21 @@ function updateSandboxWires() {
     const casing = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     casing.setAttribute('d', d);
     casing.setAttribute('fill', 'none');
-    casing.setAttribute('stroke', '#ffffff');
-    casing.setAttribute('stroke-width', '6.5');
+    casing.setAttribute('stroke', 'var(--bg-primary, #0b132b)');
+    casing.setAttribute('stroke-width', '6');
     casing.setAttribute('stroke-linecap', 'round');
     casing.setAttribute('class', 'sb-wire-casing');
     casing.style.pointerEvents = 'none';
     const visPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     visPath.setAttribute('d', d);
     visPath.setAttribute('fill', 'none');
-    visPath.setAttribute('stroke', isActive ? '#58cc02' : '#94a3b8');
-    visPath.setAttribute('stroke-width', '3');
+    visPath.setAttribute('stroke', isActive ? '#00ff66' : '#64748b');
+    visPath.setAttribute('stroke-width', isActive ? '3.2' : '2.5');
     visPath.setAttribute('stroke-linecap', 'round');
     visPath.setAttribute('class', 'sb-wire-core ' + (isActive ? 'high' : 'low'));
+    if (isActive) {
+      visPath.style.filter = 'drop-shadow(0 0 5px rgba(0, 255, 102, 0.75))';
+    }
     visPath.style.pointerEvents = 'none';
     const hitTarget = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     hitTarget.setAttribute('d', d);
@@ -1941,11 +1986,13 @@ function updateSandboxWires() {
       visPath.setAttribute('class', 'sb-wire-core hover');
       visPath.setAttribute('stroke', '#ff4b4b');
       visPath.setAttribute('stroke-width', '4');
+      visPath.style.filter = 'drop-shadow(0 0 6px #ff4b4b)';
     });
     hitTarget.addEventListener('mouseleave', () => {
       visPath.setAttribute('class', 'sb-wire-core ' + (isActive ? 'high' : 'low'));
-      visPath.setAttribute('stroke', isActive ? '#58cc02' : '#94a3b8');
-      visPath.setAttribute('stroke-width', '3');
+      visPath.setAttribute('stroke', isActive ? '#00ff66' : '#64748b');
+      visPath.setAttribute('stroke-width', isActive ? '3.2' : '2.5');
+      visPath.style.filter = isActive ? 'drop-shadow(0 0 5px rgba(0, 255, 102, 0.75))' : 'none';
     });
     hitTarget.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -2388,6 +2435,11 @@ function updateNodeVisuals(node) {
           const port = el.querySelector(`.sandbox-port[data-port-idx="${p.pin}"]`);
           if (port) port.classList.toggle('active-port', val === 1);
         });
+
+        const schemWrapper = el.querySelector('.real-ic-schematic-wrapper');
+        if (schemWrapper) {
+          schemWrapper.innerHTML = generateICSchematicSVG(node, icDef);
+        }
       }
       break;
     }

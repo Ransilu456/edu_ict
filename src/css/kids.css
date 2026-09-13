@@ -137,6 +137,16 @@
   border-radius: 0 20px 20px 0 !important;
   box-shadow: 4px 0 16px rgba(226, 232, 240, 0.6) !important;
   padding: 1.15rem !important;
+  overflow-y: auto !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+.kids-mode .toolbox-tab {
+  border-radius: 10px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  border-width: 2px !important;
 }
 
 .kids-mode .sandbox-toolbox h3 {
@@ -474,21 +484,6 @@
   background: #ffffff !important;
 }
 
-.kids-mode .mobile-navbar {
-  background: #ffffff !important;
-  border-top: 3px solid #e2e8f0 !important;
-  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05) !important;
-}
-
-.kids-mode .mobile-nav-btn {
-  font-family: 'Nunito', sans-serif !important;
-  font-weight: 800 !important;
-  color: #64748b !important;
-}
-
-.kids-mode .mobile-nav-btn.active {
-  color: #0369a1 !important;
-}
 
 .kids-mode.dark header,
 [data-theme="dark"].kids-mode header,
@@ -680,84 +675,85 @@
   color: #f8fafc !important;
 }
 
-.kids-mode.dark .mobile-navbar,
-[data-theme="dark"].kids-mode .mobile-navbar {
-  background: #1c2541 !important;
-  border-top-color: #334155 !important;
-}
-
 .kids-mode .sandbox-waveform-panel {
   position: absolute;
-  bottom: 1.25rem;
+  bottom: 1rem;
   left: 50%;
   transform: translateX(-50%);
-  width: min(680px, calc(100% - 2.5rem));
-  background: #ffffff;
-  border: 3px solid #e2e8f0;
-  border-radius: 20px;
-  box-shadow: 0 12px 32px rgba(28, 176, 246, 0.15);
-  padding: 0.85rem 1.15rem;
+  width: min(960px, calc(100% - 2rem));
+  background: #05080c !important;
+  border: 2px solid #1e293b !important;
+  border-radius: 12px !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
+  padding: 0.65rem 1rem !important;
   z-index: 50;
 }
 
 .kids-mode.dark .sandbox-waveform-panel,
 [data-theme="dark"].kids-mode .sandbox-waveform-panel {
-  background: #1c2541 !important;
-  border-color: #334155 !important;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+  background: #05080c !important;
+  border-color: #1e293b !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8) !important;
 }
 
 .kids-mode .waveform-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
-  font-size: 0.9rem;
-  color: #1e293b;
-  margin-bottom: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: #00ff66 !important;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.05em;
 }
 
 .kids-mode.dark .waveform-header,
 [data-theme="dark"].kids-mode .waveform-header {
-  color: #f8fafc !important;
+  color: #00ff66 !important;
 }
 
 .kids-mode .waveform-clear-btn {
-  background: #f1f5f9;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.2rem 0.6rem;
+  background: #0f172a !important;
+  border: 1px solid #334155 !important;
+  border-radius: 6px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  padding: 0.2rem 0.65rem !important;
   cursor: pointer;
-  color: #475569;
+  color: #94a3b8 !important;
+  transition: all 0.15s ease;
+}
+
+.kids-mode .waveform-clear-btn:hover {
+  border-color: #00ff66 !important;
+  color: #00ff66 !important;
 }
 
 .kids-mode .waveform-close-btn {
-  background: none;
-  border: none;
-  font-size: 1.25rem;
+  background: none !important;
+  border: none !important;
+  font-size: 1.3rem !important;
   cursor: pointer;
-  color: #64748b;
+  color: #64748b !important;
   line-height: 1;
-  padding: 0 0.25rem;
+  padding: 0 0.35rem !important;
+  transition: color 0.15s ease;
+}
+
+.kids-mode .waveform-close-btn:hover {
+  color: #ef4444 !important;
 }
 
 .kids-mode #waveform-canvas {
   width: 100%;
   min-height: 160px;
   height: auto;
-  border-radius: 12px;
-  background: #f8fafc;
+  border-radius: 8px !important;
+  background: #05080c !important;
+  border: 1px solid rgba(0, 255, 100, 0.15) !important;
   display: block;
-}
-
-@media (min-width: 1200px) {
-  .kids-mode .sandbox-waveform-panel {
-    width: min(980px, calc(100% - 3rem));
-    padding: 1rem 1.25rem;
-  }
 }
 
 .kids-mode.dark #waveform-canvas,

@@ -1,9 +1,12 @@
-// waveform scope and circuit image export
+// Digital Logic Oscilloscope & Waveform Scope Analyzer
+// Authentic electronic lab timing diagram matching Falstad / Logisim scope
+
 let waveformHistory = [];
-const MAX_WAVEFORM_POINTS = 45;
+const MAX_WAVEFORM_POINTS = 80;
 let waveformCanvas = null;
 let waveformCtx = null;
 let isWaveformActive = false;
+let isWaveformPaused = false;
 let waveformDpr = 1;
 
 export function initWaveform() {
@@ -20,7 +23,7 @@ export function initWaveform() {
     toggleBtn.addEventListener('click', () => {
       if (window.playSound) window.playSound('click');
       const willShow = panel.style.display === 'none' || !panel.style.display;
-      panel.style.display = willShow ? 'block' : 'none';
+      panel.style.display = willShow ? 'flex' : 'none';
       toggleBtn.classList.toggle('active', willShow);
       isWaveformActive = willShow;
       if (willShow) {
@@ -65,10 +68,13 @@ export function initWaveform() {
 
 function resizeCanvas() {
   if (!waveformCanvas) return;
-  const rect = waveformCanvas.parentElement?.getBoundingClientRect();
+  const container = waveformCanvas.parentElement;
+  if (!container) return;
+
+  const rect = container.getBoundingClientRect();
   if (rect && rect.width > 100) {
-    const cssWidth = Math.min(Math.floor(rect.width - 24), 1000);
-    const cssHeight = Math.max(160, Math.min(220, Math.round(cssWidth * 0.24)));
+    const cssWidth = Math.max(320, Math.floor(rect.width - 24));
+    const cssHeight = Math.max(160, Math.min(240, Math.round(rect.height - 46 || 180)));
     waveformDpr = Math.min(window.devicePixelRatio || 1, 2);
     waveformCanvas.width = Math.round(cssWidth * waveformDpr);
     waveformCanvas.height = Math.round(cssHeight * waveformDpr);
@@ -80,21 +86,55 @@ function resizeCanvas() {
 
 export function sampleWaveform(nodes = []) {
   const panel = document.getElementById('sandbox-waveform-panel');
-  if (!panel || panel.style.display === 'none') return;
-
+  if (!panel || panel.style.display === 'none' || isWaveformPaused) return;
   if (!nodes || nodes.length === 0) return;
 
   const channels = [];
 
-  nodes.forEach(n => {
-    if (channels.length >= 5) return;
-    if (n.type === 'clock' || n.type === 'input' || n.type === 'output' ||
-        ['and','or','not','xor','nand','nor'].includes(n.type)) {
+  // Priority 1: Clocks
+  nodes.filter(n => n.type === 'clock').forEach(n => {
+    if (channels.length < 8) {
       channels.push({
         id: n.id,
-        name: (n.label || n.type).slice(0, 10),
+        name: n.label || 'CLK',
         val: n.outputState ? 1 : 0,
-        type: n.type
+        type: 'clock'
+      });
+    }
+  });
+
+  // Priority 2: Inputs (Switches)
+  nodes.filter(n => n.type === 'input').forEach(n => {
+    if (channels.length < 8) {
+      channels.push({
+        id: n.id,
+        name: n.label || 'IN',
+        val: n.outputState ? 1 : 0,
+        type: 'input'
+      });
+    }
+  });
+
+  // Priority 3: Outputs (LEDs, Probes)
+  nodes.filter(n => n.type === 'output' || n.type === 'rgb-led').forEach(n => {
+    if (channels.length < 8) {
+      channels.push({
+        id: n.id,
+        name: n.label || 'OUT',
+        val: n.outputState ? 1 : 0,
+        type: 'output'
+      });
+    }
+  });
+
+  // Priority 4: Compound / ICs / Gates
+  nodes.filter(n => ['d-flop', 'half-adder', 'full-adder', 'and', 'or', 'not', 'nand', 'nor', 'xor'].includes(n.type)).forEach(n => {
+    if (channels.length < 8) {
+      channels.push({
+        id: n.id,
+        name: n.label || n.type.toUpperCase(),
+        val: n.outputState ? 1 : 0,
+        type: 'gate'
       });
     }
   });
@@ -125,17 +165,46 @@ export function drawWaveform() {
   const w = waveformCanvas.width / waveformDpr;
   const h = waveformCanvas.height / waveformDpr;
 
-  const isDark = document.documentElement.classList.contains('dark') ||
-                 document.documentElement.getAttribute('data-theme') === 'dark';
-
-  ctx.fillStyle = isDark ? '#0f172a' : '#f8fafc';
+  // Deep engineering oscilloscope black
+  ctx.fillStyle = '#05080c';
   ctx.fillRect(0, 0, w, h);
 
+  const labelWidth = 100;
+  const legendWidth = 90;
+  const plotWidth = Math.max(80, w - labelWidth - legendWidth);
+
+  // 1. Oscilloscope Grid Lines (Dark Green phosphor grid)
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(0, 255, 100, 0.08)';
+
+  // Vertical time division ticks
+  const divisions = 16;
+  for (let div = 0; div <= divisions; div++) {
+    const gx = labelWidth + (plotWidth * div / divisions);
+    ctx.beginPath();
+    ctx.moveTo(gx, 6);
+    ctx.lineTo(gx, h - 6);
+    ctx.stroke();
+
+    // Small subdivision tick marks
+    ctx.strokeStyle = 'rgba(0, 255, 100, 0.04)';
+    for (let sub = 1; sub < 4; sub++) {
+      const subX = gx + (plotWidth / divisions) * (sub / 4);
+      if (subX < labelWidth + plotWidth) {
+        ctx.beginPath();
+        ctx.moveTo(subX, 6);
+        ctx.lineTo(subX, h - 6);
+        ctx.stroke();
+      }
+    }
+    ctx.strokeStyle = 'rgba(0, 255, 100, 0.08)';
+  }
+
   if (waveformHistory.length < 2) {
-    ctx.fillStyle = isDark ? '#64748b' : '#94a3b8';
-    ctx.font = '700 12px Nunito, sans-serif';
+    ctx.fillStyle = '#22c55e';
+    ctx.font = '700 12px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('Toggle switches or run simulation to view logic waveforms...', w / 2, h / 2);
+    ctx.fillText('RUNNING OSCILLOSCOPE — PROBING SIGNALS...', w / 2, h / 2);
     return;
   }
 
@@ -144,63 +213,54 @@ export function drawWaveform() {
   const numChannels = channels.length;
   if (numChannels === 0) return;
 
-  const rowHeight = Math.floor((h - 20) / numChannels);
+  const rowHeight = Math.floor((h - 16) / numChannels);
 
-  const labelWidth = 85;
-  const plotWidth = w - labelWidth - 15;
-
-  ctx.strokeStyle = isDark ? '#1e293b' : '#e2e8f0';
-  ctx.lineWidth = 1;
-  for (let c = 0; c <= numChannels; c++) {
-    const y = 10 + c * rowHeight;
-    ctx.beginPath();
-    ctx.moveTo(labelWidth, y);
-    ctx.lineTo(w - 10, y);
-    ctx.stroke();
-  }
-
-  ctx.strokeStyle = isDark ? '#24344d' : '#dbe4ee';
-  ctx.lineWidth = 1;
-  for (let tick = 0; tick <= 8; tick++) {
-    const x = labelWidth + (plotWidth * tick / 8);
-    ctx.beginPath();
-    ctx.moveTo(x, 10);
-    ctx.lineTo(x, h - 10);
-    ctx.stroke();
-  }
-
-  const colors = [
-    '#1cb0f6',
-    '#58cc02',
-    '#ff9600',
-    '#a855f7',
-    '#ec4899',
-  ];
-
+  // Draw each channel trace
   channels.forEach((ch, chIdx) => {
-    const color = colors[chIdx % colors.length];
-    const topY = 14 + chIdx * rowHeight;
-    const bottomY = topY + rowHeight - 10;
+    const topY = 10 + chIdx * rowHeight;
+    const bottomY = topY + rowHeight - 6;
     const highY = topY + 4;
     const lowY = bottomY - 2;
 
-    ctx.fillStyle = isDark ? '#f8fafc' : '#1e293b';
-    ctx.font = '800 11px Nunito, sans-serif';
+    // Horizontal baseline & division
+    ctx.strokeStyle = 'rgba(0, 255, 100, 0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(labelWidth, lowY);
+    ctx.lineTo(labelWidth + plotWidth, lowY);
+    ctx.stroke();
+
+    // Sub-grid high line
+    ctx.strokeStyle = 'rgba(0, 255, 100, 0.04)';
+    ctx.beginPath();
+    ctx.moveTo(labelWidth, highY);
+    ctx.lineTo(labelWidth + plotWidth, highY);
+    ctx.stroke();
+
+    // Left Channel Label + Indicator Badge
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '700 11px "JetBrains Mono", monospace';
     ctx.textAlign = 'left';
-    ctx.fillText(ch.name, 10, topY + rowHeight / 2);
+    ctx.fillText(ch.name.slice(0, 8), 10, topY + rowHeight / 2 + 3);
 
-    ctx.fillStyle = ch.val ? '#58cc02' : (isDark ? '#475569' : '#94a3b8');
-    ctx.beginPath();
-    ctx.arc(labelWidth - 12, topY + rowHeight / 2 - 3, 4, 0, Math.PI * 2);
+    // Live logic value pill [ 1 / 0 ]
+    const isHigh = ch.val === 1;
+    ctx.fillStyle = isHigh ? 'rgba(0, 255, 102, 0.2)' : 'rgba(100, 116, 139, 0.2)';
+    ctx.fillRect(labelWidth - 32, topY + rowHeight / 2 - 8, 24, 16);
+    ctx.strokeStyle = isHigh ? '#00ff66' : '#475569';
+    ctx.strokeRect(labelWidth - 32, topY + rowHeight / 2 - 8, 24, 16);
 
-    ctx.fill();
+    ctx.fillStyle = isHigh ? '#00ff66' : '#94a3b8';
+    ctx.font = '800 10px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(isHigh ? 'H' : 'L', labelWidth - 20, topY + rowHeight / 2 + 4);
 
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-
+    // Waveform Trace: Bright Neon Phosphor Green with glow
     const pts = waveformHistory.length;
     const step = plotWidth / (MAX_WAVEFORM_POINTS - 1);
+
+    ctx.save();
+    ctx.beginPath();
 
     for (let i = 0; i < pts; i++) {
       const sample = waveformHistory[i];
@@ -221,16 +281,36 @@ export function drawWaveform() {
         ctx.lineTo(x, targetY);
       }
     }
+
+    // Outer phosphor glow
+    ctx.strokeStyle = '#00ff66';
+    ctx.lineWidth = 2.2;
+    ctx.shadowColor = '#00ff66';
+    ctx.shadowBlur = 8;
     ctx.stroke();
 
-    if (ch.val) {
-      ctx.strokeStyle = color;
-      ctx.shadowColor = color;
-      ctx.shadowBlur = 6;
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-    }
+    // Inner bright core
+    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = '#e6fff2';
+    ctx.stroke();
+    ctx.restore();
   });
+
+  // Right Side: Voltage / Logic Level Legend (like in screenshot)
+  const legendX = labelWidth + plotWidth + 12;
+  ctx.fillStyle = '#64748b';
+  ctx.font = '700 9px "JetBrains Mono", monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('LOGIC LEVEL', legendX, 22);
+
+  ctx.fillStyle = '#00ff66';
+  ctx.fillText('HIGH (5V)', legendX, 40);
+
+  ctx.fillStyle = '#475569';
+  ctx.fillText('LOW  (0V)', legendX, 56);
+
+  ctx.fillStyle = '#38bdf8';
+  ctx.fillText(`RATE: 20Hz`, legendX, 74);
 }
 window.drawWaveform = drawWaveform;
 
@@ -268,10 +348,10 @@ export function exportCircuitImage() {
   const ctx = canvas.getContext('2d');
 
   const isDark = document.documentElement.classList.contains('dark');
-  ctx.fillStyle = isDark ? '#0b132b' : '#f8fbff';
+  ctx.fillStyle = isDark ? '#05080c' : '#f8fbff';
   ctx.fillRect(0, 0, width, height);
 
-  ctx.fillStyle = isDark ? '#1e3a8a' : '#bae6fd';
+  ctx.fillStyle = isDark ? '#0d1f38' : '#bae6fd';
   for (let gx = 0; gx < width; gx += 24) {
     for (let gy = 0; gy < height; gy += 24) {
       ctx.beginPath();
@@ -280,7 +360,7 @@ export function exportCircuitImage() {
     }
   }
 
-  ctx.fillStyle = '#1cb0f6';
+  ctx.fillStyle = '#00ff66';
   ctx.font = '900 16px Nunito, sans-serif';
   ctx.fillText('LOGICQUEST', 20, 28);
   ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
@@ -294,15 +374,19 @@ export function exportCircuitImage() {
       const d = p.getAttribute('d');
       if (!d) return;
       const cls = p.getAttribute('class') || '';
-      const stroke = cls.includes('high') ? '#58cc02'
+      const stroke = cls.includes('high') ? '#00ff66'
         : cls.includes('hover') ? '#ff4b4b'
-        : cls.includes('preview') ? '#1cb0f6' : '#94a3b8';
+        : cls.includes('preview') ? '#1cb0f6' : '#64748b';
 
       const p2d = new Path2D(d);
       ctx.save();
       ctx.translate(-minX, -minY);
       ctx.strokeStyle = stroke;
       ctx.lineWidth = 3.5;
+      if (cls.includes('high')) {
+        ctx.shadowColor = '#00ff66';
+        ctx.shadowBlur = 6;
+      }
       ctx.stroke(p2d);
       ctx.restore();
     });
@@ -317,11 +401,11 @@ export function exportCircuitImage() {
     const nh = rect.height;
 
     ctx.save();
-    ctx.fillStyle = isDark ? '#1e293b' : '#ffffff';
-    ctx.strokeStyle = isDark ? '#475569' : '#cbd5e1';
-    ctx.lineWidth = 2.5;
+    ctx.fillStyle = isDark ? '#0f172a' : '#ffffff';
+    ctx.strokeStyle = isDark ? '#334155' : '#cbd5e1';
+    ctx.lineWidth = 2;
 
-    const r = 12;
+    const r = 10;
     ctx.beginPath();
     ctx.roundRect(x, y, nw, nh, r);
     ctx.fill();
@@ -333,7 +417,6 @@ export function exportCircuitImage() {
       ctx.font = '800 11px Nunito, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(headerEl.textContent.trim(), x + nw / 2, y + 16);
-
     }
 
     const bodyEl = n.querySelector('.sandbox-node-body');
@@ -354,7 +437,7 @@ export function exportCircuitImage() {
     a.download = `logicquest-circuit-${Date.now().toString().slice(-4)}.png`;
     a.href = dataUrl;
     a.click();
-      if (window.showToast) window.showToast('Screenshot saved to Downloads');
+    if (window.showToast) window.showToast('Screenshot saved to Downloads');
   } catch (err) {
     console.error('Screenshot error:', err);
   }

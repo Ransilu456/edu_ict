@@ -1,37 +1,43 @@
-<div class="success-modal-overlay" id="logic-modal">
-        <div class="success-modal" style="max-width:640px;width:92%;padding:2rem">
-          <h2 class="success-modal-title" id="logic-modal-title"
-            style="font-size:1.4rem;text-align:left;margin-bottom:0">Gate-Level Logic Inside</h2>
-          <div id="logic-modal-content"
-            style="margin:1.25rem 0;width:100%;display:flex;justify-content:center;align-items:flex-start;flex-direction:column">
-          </div>
-          <div style="display:flex;justify-content:flex-end">
-            <button class="btn-primary" style="width:auto;padding:.6rem 1.5rem;border-radius:6px;flex:0"
-              id="close-logic-modal">Close</button>
-          </div>
-        </div>
-      </div>
+<div class="success-modal-overlay" id="logic-modal" style="display:none">
+  <div class="success-modal" style="max-width:680px;width:94%;padding:1.75rem;position:relative">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;border-bottom:1px solid var(--border-color);padding-bottom:0.6rem">
+      <h2 class="success-modal-title" id="logic-modal-title" style="font-size:1.25rem;text-align:left;margin-bottom:0">Gate-Level Logic Inside</h2>
+      <button class="modal-close-btn" data-close-modal="logic-modal" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-secondary);line-height:1;padding:0.2rem 0.5rem" title="Close (Esc)">&times;</button>
+    </div>
+    <div id="logic-modal-content" style="margin:1rem 0;width:100%;display:flex;justify-content:center;align-items:flex-start;flex-direction:column">
+    </div>
+    <div style="display:flex;justify-content:flex-end">
+      <button class="btn-primary" style="width:auto;padding:.55rem 1.4rem;border-radius:8px;flex:0" id="close-logic-modal" data-close-modal="logic-modal">Close</button>
+    </div>
+  </div>
+</div>
 
-      <div class="success-modal-overlay" id="save-modal" style="display:none">
-        <div class="success-modal" style="max-width:400px;padding:2rem;text-align:left">
-          <h2 class="success-modal-title" style="font-size:1.2rem;margin-bottom:1rem">Save Circuit</h2>
-          <input type="text" id="save-circuit-name" placeholder="Enter circuit name…"
-            style="width:100%;padding:.6rem .75rem;border-radius:5px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-sans);font-size:.95rem;margin-bottom:1rem;outline:none">
-          <div style="display:flex;gap:.5rem;justify-content:flex-end">
-            <button class="btn-secondary" id="cancel-save-btn" style="flex:0;padding:.6rem 1.25rem">Cancel</button>
-            <button class="btn-primary" id="confirm-save-btn" style="flex:0;padding:.6rem 1.5rem">Save</button>
-          </div>
-        </div>
-      </div>
+<div class="success-modal-overlay" id="save-modal" style="display:none">
+  <div class="success-modal" style="max-width:420px;padding:1.75rem;text-align:left;position:relative">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;border-bottom:1px solid var(--border-color);padding-bottom:0.5rem">
+      <h2 class="success-modal-title" style="font-size:1.15rem;margin-bottom:0">Save Circuit</h2>
+      <button class="modal-close-btn" data-close-modal="save-modal" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-secondary);line-height:1;padding:0.2rem 0.5rem" title="Close (Esc)">&times;</button>
+    </div>
+    <input type="text" id="save-circuit-name" placeholder="Enter circuit name…"
+      style="width:100%;padding:.65rem .8rem;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-sans);font-size:.95rem;margin-bottom:1.25rem;outline:none">
+    <div style="display:flex;gap:.6rem;justify-content:flex-end">
+      <button class="btn-secondary" id="cancel-save-btn" data-close-modal="save-modal" style="flex:0;padding:.55rem 1.25rem">Cancel</button>
+      <button class="btn-primary" id="confirm-save-btn" style="flex:0;padding:.55rem 1.5rem">Save</button>
+    </div>
+  </div>
+</div>
 
-      <div class="success-modal-overlay" id="load-modal" style="display:none">
-        <div class="success-modal" style="max-width:420px;padding:2rem;text-align:left">
-          <h2 class="success-modal-title" style="font-size:1.2rem;margin-bottom:1rem">Load Circuit</h2>
-          <div id="saved-circuits-list"
-            style="max-height:280px;overflow-y:auto;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-primary)">
-          </div>
-          <div style="display:flex;justify-content:flex-end;margin-top:1rem">
-            <button class="btn-secondary" id="cancel-load-btn" style="flex:0;padding:.6rem 1.25rem">Close</button>
-          </div>
-        </div>
-      </div>
+<div class="success-modal-overlay" id="load-modal" style="display:none">
+  <div class="success-modal" style="max-width:460px;padding:1.75rem;text-align:left;position:relative">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;border-bottom:1px solid var(--border-color);padding-bottom:0.5rem">
+      <h2 class="success-modal-title" style="font-size:1.15rem;margin-bottom:0">Load Circuit</h2>
+      <button class="modal-close-btn" data-close-modal="load-modal" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-secondary);line-height:1;padding:0.2rem 0.5rem" title="Close (Esc)">&times;</button>
+    </div>
+    <div id="saved-circuits-list"
+      style="max-height:280px;overflow-y:auto;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-primary);padding:0.25rem">
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:1.2rem">
+      <button class="btn-secondary" id="cancel-load-btn" data-close-modal="load-modal" style="flex:0;padding:.55rem 1.25rem">Close</button>
+    </div>
+  </div>
+</div>

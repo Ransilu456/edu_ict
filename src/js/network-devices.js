@@ -563,7 +563,7 @@ window.selectNDDevice = function(id) {
             <span><strong style="color:var(--text-secondary)">MAC:</strong> <code style="color:var(--color-success); font-family:var(--font-mono);">${h.mac}</code></span>
             <span><strong style="color:var(--text-secondary)">IP:</strong> <code style="color:var(--color-indigo); font-family:var(--font-mono);">${h.ip}</code></span>
             <span><strong style="color:var(--text-secondary)">Subnet:</strong> <code style="font-family:var(--font-mono);">${h.sub}/24</code></span>
-            <span><strong style="color:var(--text-secondary)">Status:</strong> <span style="color:#22d3a5; font-weight:700;">ONLINE ✓</span></span>
+            <span><strong style="color:var(--text-secondary)">Status:</strong> <span style="color:#22d3a5; font-weight:700; display:inline-flex; align-items:center; gap:0.25rem;">ONLINE <svg viewBox="0 0 20 20" width="12" height="12" fill="none" stroke="#22d3a5" stroke-width="2.5"><path d="M4 10l4 4 8-8"/></svg></span></span>
           </div>
         </div>
       `;

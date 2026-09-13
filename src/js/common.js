@@ -1,4 +1,6 @@
-//  theme, sound, toast, alert, confirm
+// Common utilities: theme, sound, toast, alert, confirm
+import './modal-manager.js';
+
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let soundEnabled = localStorage.getItem("soundEnabled") !== "false";
 
@@ -75,7 +77,7 @@ function applyTheme(theme) {
     document.documentElement.setAttribute("data-theme", "dark");
   } else {
     document.documentElement.classList.remove("dark");
-    document.documentElement.setAttribute("data-theme", "light");
+    document.documentElement.removeAttribute("data-theme");
   }
   localStorage.setItem("logicQuest_theme", theme);
   const themeBtn = document.getElementById("theme-toggle");
@@ -145,7 +147,9 @@ function showAlert(message, title, callback) {
   };
   okBtn.onclick = () => close(true);
   box.onclick = (e) => e.stopPropagation();
-  modal.onclick = () => close(true);
+  modal.onclick = (e) => {
+    if (e.target === modal) close(true);
+  };
 }
 window.showAlert = showAlert;
 
@@ -177,7 +181,9 @@ function showConfirm(message, callback, title) {
   okBtn.onclick = () => close(true);
   cancelBtn.onclick = () => close(false);
   box.onclick = (e) => e.stopPropagation();
-  modal.onclick = () => close(false);
+  modal.onclick = (e) => {
+    if (e.target === modal) close(false);
+  };
 }
 window.showConfirm = showConfirm;
 
@@ -188,18 +194,33 @@ function showToast(msg) {
     toast.id = 'sb-toast';
     toast.style.cssText = `
       position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%);
-      background:#1e293b; color:#fff;
-      padding:0.55rem 1.3rem; border-radius:999px; font-size:0.85rem;
+      background:#0f172a; color:#fff;
+      padding:0.6rem 1.4rem; border-radius:999px; font-size:0.85rem;
       font-family:var(--font-header); font-weight:700;
-      box-shadow:0 10px 28px rgba(2,6,23,0.35);
+      box-shadow:0 12px 32px rgba(2,6,23,0.4);
+      border: 1px solid rgba(255,255,255,0.15);
+      display:flex; align-items:center; gap:0.5rem;
       z-index:999; pointer-events:none; opacity:0;
-      transition:opacity 0.2s ease; max-width:90vw; text-align:center;`;
+      transition:opacity 0.2s ease, transform 0.2s ease; max-width:90vw; text-align:center;`;
     document.body.appendChild(toast);
   }
-  toast.innerText = msg;
+  
+  // Format checkmark if present as crisp SVG
+  const cleanMsg = msg.replace(/\s*✓\s*/g, '');
+  const isSuccess = msg.includes('✓') || msg.toLowerCase().includes('saved') || msg.toLowerCase().includes('success') || msg.toLowerCase().includes('placed');
+  
+  const iconSvg = isSuccess 
+    ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>`
+    : `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+
+  toast.innerHTML = `${iconSvg}<span>${cleanMsg}</span>`;
   toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
   clearTimeout(toast._t);
-  toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2200);
+  toast._t = setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(10px)';
+  }, 2200);
 }
 window.showToast = showToast;
 

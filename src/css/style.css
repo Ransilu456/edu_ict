@@ -4,30 +4,9 @@
 @import './network-devices.css';
 @import './osi-sim.css';
 @import './modals.css';
-@import './responsive.css';
 @import './utilities.css';
 @import './kids.css';
 
 main {
 	min-height: 0;
-}
-
-@media (min-width: 821px) {
-	.sandbox-toolbox {
-		height: 100%;
-		max-height: 100%;
-		min-height: 0;
-		overflow-y: auto !important;
-		overflow-x: hidden !important;
-		overscroll-behavior: contain;
-		scrollbar-gutter: stable;
-	}
-
-	.sandbox-toolbox > .toolbox-search {
-		position: sticky;
-		top: 0;
-		z-index: 12;
-		flex: 0 0 auto;
-		box-shadow: 0 6px 14px color-mix(in srgb, var(--bg-secondary) 80%, transparent);
-	}
 }
