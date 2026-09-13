@@ -118,31 +118,33 @@ function buildOSILayout() {
     <span class="osi-brand-icon">${I.layers}</span>
     <span class="osi-brand-text"><b>OSI Journey</b><small>7 layers · live encapsulation</small></span>
   </div>
-  <div class="osi-ctrl-group" data-group="Message">
-    <span class="osi-group-tag">Message</span>
-    <label>Msg <input type="text" id="osi-msg" value="HELLO" size="6"></label>
-    <label>App <select id="osi-protocol"><option>HTTP</option><option>HTTPS</option><option>FTP</option><option>SMTP</option><option>DNS</option></select></label>
-    <label>Xport <select id="osi-transport"><option>TCP</option><option>UDP</option></select></label>
-  </div>
-  <div class="osi-ctrl-group" data-group="Run">
-    <span class="osi-group-tag">Run</span>
-    <button class="osi-btn primary" id="osi-step-btn">${I.arrowR} Next Step</button>
-    <button class="osi-btn" id="osi-auto-btn">${I.play} Auto</button>
-    <button class="osi-btn" id="osi-speed-btn" title="Cycle simulation speed (0.5x, 1x, 2x, 4x)">1x</button>
-    <button class="osi-btn" id="osi-reset-btn">${I.refresh} Reset</button>
-  </div>
-  <div class="osi-ctrl-group" data-group="View">
-    <span class="osi-group-tag">View</span>
-    <button class="osi-btn" id="osi-binary-btn">Bin</button>
-    <button class="osi-btn" id="osi-hex-btn">Hex</button>
-    <button class="osi-btn" id="osi-error-btn" title="Cycle through simulated transmission errors">${I.warn} Error: Off</button>
-    <button class="osi-btn" id="osi-insp-btn">${I.list} Inspect</button>
-    <button class="osi-btn" id="osi-compare-btn">${I.layers} OSI vs TCP/IP</button>
-    <button class="osi-btn" id="osi-crypto-btn">${I.shield} RSA</button>
-  </div>
-  <div class="osi-settings-btn-wrap">
-    <button class="osi-btn" id="osi-settings-btn" title="Show network addressing options">${I.gear} Network Settings</button>
-    <span class="osi-settings-summary" id="osi-settings-summary">Switch · Same subnet</span>
+  <div class="osi-control-strip">
+    <div class="osi-ctrl-group" data-group="Message">
+      <span class="osi-group-tag">Simulation</span>
+      <label>Message <input type="text" id="osi-msg" value="HELLO" size="6"></label>
+      <label>Application <select id="osi-protocol"><option>HTTP</option><option>HTTPS</option><option>FTP</option><option>SMTP</option><option>DNS</option></select></label>
+      <label>Transport <select id="osi-transport"><option>TCP</option><option>UDP</option></select></label>
+    </div>
+    <div class="osi-ctrl-group" data-group="Run">
+      <span class="osi-group-tag">Playback</span>
+      <button class="osi-btn primary" id="osi-step-btn">${I.arrowR} Run</button>
+      <button class="osi-btn" id="osi-auto-btn">${I.play} Auto</button>
+      <button class="osi-btn" id="osi-speed-btn" title="Cycle simulation speed (0.5x, 1x, 2x, 4x)">1x</button>
+      <button class="osi-btn" id="osi-reset-btn">${I.refresh} Reset</button>
+    </div>
+    <div class="osi-ctrl-group osi-tools-group" data-group="View">
+      <span class="osi-group-tag">Tools</span>
+      <button class="osi-btn" id="osi-binary-btn">Bin</button>
+      <button class="osi-btn" id="osi-hex-btn">Hex</button>
+      <button class="osi-btn" id="osi-error-btn" title="Cycle through simulated transmission errors">${I.warn} Error: Off</button>
+      <button class="osi-btn" id="osi-insp-btn">${I.list} Inspect</button>
+      <button class="osi-btn" id="osi-compare-btn">${I.layers} Compare</button>
+      <button class="osi-btn" id="osi-crypto-btn">${I.shield} RSA</button>
+    </div>
+    <div class="osi-settings-btn-wrap">
+      <button class="osi-btn" id="osi-settings-btn" title="Show network addressing options">${I.gear} Network Settings</button>
+      <span class="osi-settings-summary" id="osi-settings-summary">Switch · Same subnet</span>
+    </div>
   </div>
 </div>
 <div class="osi-ctrl-group osi-settings-panel" id="osi-settings-panel" data-group="Network">
@@ -153,10 +155,14 @@ function buildOSILayout() {
   <label>Subnets <select id="osi-subnet"><option value="same">Same</option><option value="diff">Different</option></select></label>
 </div>
 <div class="osi-step-rail" id="osi-step-rail"></div>
-<div class="osi-step-indicator">
-  <span class="osi-step-text" id="osi-step-text" aria-live="polite">Ready</span>
-  <div class="osi-step-bar"><div class="osi-step-fill" id="osi-step-fill" style="width:0%"></div></div>
-  <span class="osi-step-text" id="osi-step-num">0 / ${STEP_NAMES.length}</span>
+<div class="osi-progress-row">
+  <div class="osi-step-indicator">
+    <span class="osi-step-kicker">Current step</span>
+    <span class="osi-step-text" id="osi-step-text" aria-live="polite">Ready to transmit</span>
+    <div class="osi-step-bar"><div class="osi-step-fill" id="osi-step-fill" style="width:0%"></div></div>
+    <span class="osi-step-text" id="osi-step-num">0 / ${STEP_NAMES.length}</span>
+  </div>
+  <div class="osi-status-card" aria-live="polite"><span class="osi-status-dot"></span><span>Ready</span></div>
 </div>
 <div class="osi-legend" id="osi-legend">
   ${LAYERS.map(l => `<span class="osi-legend-chip" style="--c:${l.color}"><i></i>${l.id}. ${l.short}</span>`).join('')}
@@ -167,7 +173,8 @@ function buildOSILayout() {
     <div class="osi-stack" id="osi-alice-stack"></div>
   </div>
   <div class="osi-center">
-    <div class="osi-stage-head"><span class="osi-stage-dot"></span>Live packet<span class="osi-stage-hint">headers stack as layers wrap the data</span></div>
+    <div class="osi-stage-head"><span class="osi-stage-dot"></span><strong>Packet journey</strong><span class="osi-stage-hint">Alice → network → Bob</span></div>
+    <div class="osi-ready-card"><span class="osi-ready-icon">${I.send}</span><div><strong>Ready to transmit</strong><small>Press Run to follow HELLO through HTTP → TCP.</small></div></div>
     <div class="osi-packet-vis" id="osi-packet-vis">
       <div class="osi-packet-wrap" id="osi-packet-wrap"></div>
     </div>
@@ -473,6 +480,13 @@ function updateSettingsSummary() {
   if (s) s.textContent = `${state.device === 'switch' ? 'Switch' : 'Router'} · ${state.sameSubnet ? 'Same subnet' : 'Different subnet'}`;
 }
 
+function updateOSIStatus(label, tone = 'ready') {
+  const status = qs('.osi-status-card');
+  if (!status) return;
+  status.dataset.tone = tone;
+  status.innerHTML = `<span class="osi-status-dot"></span><span>${label}</span>`;
+}
+
 function resetOSI() {
   osiAbort = true;
   if (osiAnimTimer) { clearTimeout(osiAnimTimer); osiAnimTimer = null; }
@@ -485,6 +499,7 @@ function resetOSI() {
   el('osi-step-btn').disabled = false;
   el('osi-step-btn').innerHTML = `${I.arrowR} Next Step`;
   el('osi-step-text').textContent = 'Ready';
+  updateOSIStatus('Ready to transmit', 'ready');
   el('osi-step-fill').style.width = '0%';
   el('osi-step-num').textContent = `0 / ${STEP_NAMES.length}`;
   updateStepRail();
@@ -548,6 +563,7 @@ function triggerError(message) {
   if (stepBtn) { stepBtn.disabled = true; stepBtn.textContent = 'Reset to retry'; }
   const stepText = el('osi-step-text');
   if (stepText) stepText.textContent = `${STEP_NAMES[state.step]} — ERROR`;
+  updateOSIStatus('Transmission error', 'error');
 }
 
 // steps
@@ -556,6 +572,7 @@ function stepOSI() {
   play('click');
   state.step++;
   osiAbort = false;
+  updateOSIStatus('Processing packet', 'processing');
   el('osi-step-text').textContent = `(${state.step + 1}/${STEP_NAMES.length}) ${STEP_NAMES[state.step]}`;
   el('osi-step-fill').style.width = `${((state.step + 1) / STEP_NAMES.length) * 100}%`;
   el('osi-step-num').textContent = `${state.step + 1} / ${STEP_NAMES.length}`;
@@ -728,6 +745,7 @@ function decapsulateStep(step) {
 
 function completeDelivery() {
   el('osi-step-text').textContent = 'Message Delivered!';
+  updateOSIStatus('Message delivered', 'success');
   const bob7 = el('osi-bob-l7');
   const bob7d = el('osi-bob-l7-data');
   if (bob7) bob7.className = 'osi-layer-block done active';

@@ -14,15 +14,24 @@
       </div>
     </div>
 
-    <nav class="desktop-nav" style="flex-shrink:1; min-width:0; overflow:hidden">
-      <button class="nav-tab active" data-target="sandbox-view" title="Logic Gates & Circuit Builder">
+    <nav class="desktop-nav" style="flex-shrink:1; min-width:0; overflow:hidden" aria-label="Primary navigation">
+      <button class="nav-tab" data-route="/" title="LogicQuest home">
+        <span>Home</span>
+      </button>
+      <button class="nav-tab" data-route="/logic/sandbox" title="Logic Gates & Circuit Builder">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <path d="M3 9h18M9 21V9" />
         </svg>
         <span>Logic Gates</span>
       </button>
-      <button class="nav-tab" data-target="network-devices-view" data-subtab="network-tab" title="Network Devices (Hub, Switch, Router)">
+      <button class="nav-tab" data-route="/logic/boolean" title="Boolean expression parser">
+        <span>Boolean</span>
+      </button>
+      <button class="nav-tab" data-route="/binary/bitwise" title="Binary and bitwise operations">
+        <span>Binary</span>
+      </button>
+      <button class="nav-tab" data-route="/networking/topology" title="Network Devices (Hub, Switch, Router)">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="2" y="2" width="20" height="20" rx="3" />
           <circle cx="12" cy="12" r="3" />

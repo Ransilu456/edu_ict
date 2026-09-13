@@ -193,6 +193,10 @@ main {
   overflow: hidden;
 }
 
+#app-footer.is-hidden {
+  display: none;
+}
+
 home-view {
   flex: 1;
   display: none;

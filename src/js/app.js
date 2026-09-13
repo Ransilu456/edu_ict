@@ -1,5 +1,7 @@
 import './common.js';
 import './sandbox.js';
+import { initBooleanTool } from './boolean-tool.js';
+import { initBinaryTool } from './binary-tool.js';
 import { initNetworkDevices } from './network-devices.js';
 import { mountComponents } from './components.js';
 
@@ -21,57 +23,84 @@ function getAllPanels() {
 }
 
 function setupViewNavigation() {
-  const tabs = document.querySelectorAll('.nav-tab, .mobile-nav-btn');
+  const tabs = document.querySelectorAll('[data-route]');
   let networkReady = false;
+
+  const routes = {
+    '/': { panel: 'home-view' },
+    '/logic': { panel: 'sandbox-view' },
+    '/logic/sandbox': { panel: 'sandbox-view' },
+    '/logic/boolean': { panel: 'boolean-view' },
+    '/binary': { panel: 'binary-view' },
+    '/binary/bitwise': { panel: 'binary-view' },
+    '/networking': { panel: 'network-devices-view', subtab: 'network-tab' },
+    '/networking/topology': { panel: 'network-devices-view', subtab: 'network-tab' },
+    '/networking/osi': { panel: 'network-devices-view', subtab: 'osi-tab' },
+    '/networking/subnetting': { panel: 'network-devices-view', subtab: 'subnet-tab' },
+    '/networking/signal-encoding': { panel: 'network-devices-view', subtab: 'parity-tab' },
+  };
+
+  function normalizePath(pathname) {
+    const path = pathname.replace(/\/$/, '') || '/';
+    return routes[path] ? path : '/';
+  }
+
+  function renderRoute(pathname, { replace = false } = {}) {
+    const path = normalizePath(pathname);
+    const route = routes[path];
+    cleanupCurrentView();
+    getAllPanels().forEach(panel => panel?.classList.remove('active'));
+    document.querySelector(`.${route.panel}`)?.classList.add('active');
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.route === path || (path === '/logic' && tab.dataset.route === '/logic/sandbox'));
+    });
+    document.getElementById('app-footer')?.classList.toggle('is-hidden', path !== '/');
+    if (replace && window.location.pathname !== path) history.replaceState({}, '', path);
+
+    if (route.panel === 'sandbox-view') {
+      window.initSandboxCanvas?.();
+    } else if (route.panel === 'boolean-view') {
+      initBooleanTool();
+    } else if (route.panel === 'binary-view') {
+      initBinaryTool();
+    } else if (route.panel === 'network-devices-view') {
+      if (!networkReady) {
+        initNetworkDevices();
+        networkReady = true;
+      }
+      if (route.subtab) window.switchNDTab?.(route.subtab);
+    }
+  }
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       if (window.playSound) window.playSound('click');
-      const target = tab.dataset.target;
-
-      cleanupCurrentView();
-
-      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.mobile-nav-btn').forEach(t => t.classList.remove('active'));
-
-      const desktopTab = document.querySelector(`.nav-tab[data-target="${target}"]`);
-      if (desktopTab) desktopTab.classList.add('active');
-      const mobileTab = document.querySelector(`.mobile-nav-btn[data-target="${target}"]`);
-      if (mobileTab) mobileTab.classList.add('active');
-
-      getAllPanels().forEach(p => { if (p) p.classList.remove('active'); });
-
-      const targetPanel = document.querySelector(`.${target}`);
-      if (targetPanel) targetPanel.classList.add('active');
-
-      if (target === 'sandbox-view') {
-        if (window.initSandboxCanvas) window.initSandboxCanvas();
-      } else if (target === 'network-devices-view') {
-        if (!networkReady) {
-          initNetworkDevices();
-          networkReady = true;
-        }
-        if (tab.dataset.subtab && window.switchNDTab) {
-          window.switchNDTab(tab.dataset.subtab);
-        }
-      }
+      const route = normalizePath(tab.dataset.route || '/');
+      if (tab.matches('a')) event.preventDefault();
+      if (window.location.pathname !== route) history.pushState({}, '', route);
+      renderRoute(route);
     });
   });
-
-  const defaultTab = document.querySelector('.nav-tab[data-target="sandbox-view"]');
-  if (defaultTab) {
-    defaultTab.classList.add('active');
-    const mobileDefault = document.querySelector('.mobile-nav-btn[data-target="sandbox-view"]');
-    if (mobileDefault) mobileDefault.classList.add('active');
-    const panel = document.querySelector('.sandbox-view');
-    if (panel) panel.classList.add('active');
-    if (window.initSandboxCanvas) window.initSandboxCanvas();
-  }
-
-  window.navigateToView = (targetClass) => {
-    const tab = document.querySelector(`.nav-tab[data-target="${targetClass}"]`);
-    if (tab) tab.click();
+  window.addEventListener('popstate', () => renderRoute(window.location.pathname));
+  document.querySelectorAll('[data-route-link]').forEach(link => {
+    link.addEventListener('click', event => {
+      event.preventDefault();
+      const route = normalizePath(link.getAttribute('href') || '/');
+      history.pushState({}, '', route);
+      renderRoute(route);
+    });
+  });
+  window.navigateToView = target => {
+    const route = Object.entries(routes).find(([, value]) => value.panel === target)?.[0] || '/';
+    history.pushState({}, '', route);
+    renderRoute(route);
   };
+  window.navigateToRoute = route => {
+    const nextRoute = normalizePath(route);
+    if (window.location.pathname !== nextRoute) history.pushState({}, '', nextRoute);
+    renderRoute(nextRoute);
+  };
+  renderRoute(window.location.pathname, { replace: true });
 }
 
 function cleanupCurrentView() {

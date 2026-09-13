@@ -1,4 +1,3 @@
-import { parseBooleanExpression } from './bool-parser.js';
 import { REAL_ICS } from './real-ic-defs.js';
 import { initWaveform, sampleWaveform } from './waveform.js';
 import { generateICSchematicSVG } from './ic-schematic.js';
@@ -37,6 +36,7 @@ const MAX_UNDO = 30;
 let undoStack = [];
 let _ignorePortClick = false;
 let simSpeed = 1;
+let wireStyle = localStorage.getItem('logicQuest_wireStyle') || 'curve';
 
 function getWorkspaceRect() {
   return workspace?.getBoundingClientRect() || { left: 0, top: 0, width: 0, height: 0 };
@@ -169,6 +169,11 @@ const COMPONENT_DEFS = {
 window.initSandboxCanvas = function () {
   workspace = document.getElementById('sandbox-workspace-canvas');
   wiresSvg = document.getElementById('sandbox-wires-svg');
+  if (!workspace || !wiresSvg) return;
+  if (workspace.dataset.initialized) {
+    loadPendingCircuit();
+    return;
+  }
   selectionRectEl = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
   selectionRectEl.setAttribute('fill', 'rgba(0,120,255,0.12)');
   selectionRectEl.setAttribute('stroke', 'rgba(0,120,255,0.6)');
@@ -178,7 +183,6 @@ window.initSandboxCanvas = function () {
   selectionRectEl.style.pointerEvents = 'none';
   wiresSvg.appendChild(selectionRectEl);
 
-  if (!workspace || workspace.dataset.initialized) return;
   workspace.dataset.initialized = 'true';
 
   panContainer = document.createElement('div');
@@ -239,7 +243,21 @@ window.initSandboxCanvas = function () {
     if (e.code === 'Space') isSpacePressed = false;
   });
   if (window.initICCreator) window.initICCreator();
+  loadPendingCircuit();
 };
+
+function loadPendingCircuit() {
+  const pendingCircuit = sessionStorage.getItem('logicQuest_pendingCircuit');
+  if (!pendingCircuit) return;
+  try {
+    importLayout(JSON.parse(pendingCircuit));
+    sessionStorage.removeItem('logicQuest_pendingCircuit');
+    showToast('Generated circuit loaded');
+  } catch {
+    sessionStorage.removeItem('logicQuest_pendingCircuit');
+    showAlert('The generated circuit could not be loaded.', 'Circuit Import');
+  }
+}
 
 function setupSidebarSearch() {
   const sidebar = document.getElementById('sandboxSidebar');
@@ -568,6 +586,43 @@ function setupToolbar() {
       reRenderAllNodes();
     });
   }
+  const wireStyleBtn = document.getElementById('sandbox-wire-style-btn');
+  const layoutMenu = document.querySelector('.sandbox-tool-menu');
+  const layoutPanel = layoutMenu?.querySelector('.sandbox-menu-panel');
+  layoutMenu?.addEventListener('toggle', () => {
+    if (!layoutPanel) return;
+    if (layoutMenu.open) {
+      const trigger = layoutMenu.getBoundingClientRect();
+      layoutPanel.classList.add('is-portal');
+      layoutPanel.style.top = `${trigger.bottom + 6}px`;
+      layoutPanel.style.right = `${Math.max(8, window.innerWidth - trigger.right)}px`;
+      document.body.appendChild(layoutPanel);
+    } else {
+      layoutPanel.classList.remove('is-portal');
+      layoutPanel.removeAttribute('style');
+      layoutMenu.appendChild(layoutPanel);
+    }
+  });
+  if (wireStyleBtn) {
+    updateWireStyleBtn(wireStyleBtn);
+    wireStyleBtn.addEventListener('click', () => {
+      const styles = ['curve', 'orthogonal', 'straight'];
+      wireStyle = styles[(styles.indexOf(wireStyle) + 1) % styles.length];
+      localStorage.setItem('logicQuest_wireStyle', wireStyle);
+      updateWireStyleBtn(wireStyleBtn);
+      updateSandboxWires();
+      layoutMenu?.removeAttribute('open');
+      playSound('click');
+    });
+  }
+  document.getElementById('sandbox-organize-btn')?.addEventListener('click', () => {
+    if (!sandboxNodes.length) { showToast('Add components before organizing the circuit.'); return; }
+    pushUndo();
+    organizeCircuit();
+    layoutMenu?.removeAttribute('open');
+    playSound('success');
+    showToast('Circuit organized into columns');
+  });
   const createICBtn = document.getElementById('sandbox-create-ic');
   if (createICBtn) {
     createICBtn.disabled = true;
@@ -617,36 +672,6 @@ function setupToolbar() {
     });
   }
 
-  document.getElementById('sandbox-bool-btn')?.addEventListener('click', () => {
-    playSound('click');
-    const expr = window.prompt('Enter a boolean expression (e.g. A+B, A·B, A⊕B, (A+B)·C):');
-    if (!expr) return;
-    try {
-      const layout = parseBooleanExpression(expr);
-      layout.nodes.forEach(n => {
-        n.x += 120;
-        n.y += 40;
-      });
-      layout.nodes.forEach(n => {
-        const def = COMPONENT_DEFS[n.type];
-        if (def) {
-          n.inputsCount = n.inputsCount ?? def.inputs;
-          n.outputsCount = n.outputsCount ?? def.outputs;
-          n.outputState = 0;
-          n.outputState2 = 0;
-          n.inputValues = Array(n.inputsCount).fill(0);
-          n.data = n.data || (def.data ? { ...def.data } : {});
-        }
-      });
-      layout.nodes.forEach(n => { sandboxNodes.push(n); renderNodeDOM(n); });
-      layout.wires.forEach(w => sandboxWires.push(w));
-      evaluateSandbox();
-      showToast('Boolean expression circuit generated ✓');
-    } catch (error) {
-      showAlert(error.message || 'Could not parse that expression.', 'Boolean Parser');
-    }
-  });
-
   [saveModal, loadModal].forEach(modal => {
     if (!modal) return;
     modal.addEventListener('click', (e) => {
@@ -661,6 +686,46 @@ function updateGateStyleBtn(btn, style) {
   } else {
     btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7l5 5-5 5"/></svg> <span>Gate: Box</span>`;
   }
+}
+
+function updateWireStyleBtn(btn) {
+  const labels = { curve: 'Wire: Curve', orthogonal: 'Wire: Right Angle', straight: 'Wire: Straight' };
+  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 18V6h16M4 12h16" /></svg><span>${labels[wireStyle]}</span>`;
+}
+
+function organizeCircuit() {
+  const incoming = new Map(sandboxNodes.map(node => [node.id, []]));
+  sandboxWires.forEach(wire => incoming.get(wire.toNodeId)?.push(wire.fromNodeId));
+  const depths = new Map();
+  const depthOf = (nodeId, visiting = new Set()) => {
+    if (depths.has(nodeId)) return depths.get(nodeId);
+    if (visiting.has(nodeId)) return 0;
+    visiting.add(nodeId);
+    const depth = Math.max(0, ...(incoming.get(nodeId) || []).map(parent => depthOf(parent, new Set(visiting)) + 1));
+    depths.set(nodeId, depth);
+    return depth;
+  };
+  sandboxNodes.forEach(node => depthOf(node.id));
+  const columns = new Map();
+  sandboxNodes.forEach(node => {
+    const depth = depths.get(node.id) || 0;
+    if (!columns.has(depth)) columns.set(depth, []);
+    columns.get(depth).push(node);
+  });
+  [...columns.entries()].sort(([a], [b]) => a - b).forEach(([depth, nodes]) => {
+    nodes.forEach((node, index) => {
+      node.x = 70 + depth * 190;
+      node.y = 90 + index * 115;
+    });
+  });
+  sandboxNodes.forEach(node => {
+    const element = document.getElementById(node.id);
+    if (element) {
+      element.style.left = `${node.x}px`;
+      element.style.top = `${node.y}px`;
+    }
+  });
+  updateSandboxWires();
 }
 
 function reRenderAllNodes() {
@@ -1925,7 +1990,12 @@ function updateSandboxWires() {
 
     const dir = x2 >= x1 ? 1 : -1;
     const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
-    const d = `M ${x1} ${y1} C ${x1 + dir * dx} ${y1}, ${x2 - dir * dx} ${y2}, ${x2} ${y2}`;
+    const midX = x1 + (x2 - x1) * 0.5;
+    const d = wireStyle === 'straight'
+      ? `M ${x1} ${y1} L ${x2} ${y2}`
+      : wireStyle === 'orthogonal'
+        ? `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`
+        : `M ${x1} ${y1} C ${x1 + dir * dx} ${y1}, ${x2 - dir * dx} ${y2}, ${x2} ${y2}`;
 
     const casing = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     casing.setAttribute('d', d);
@@ -2534,7 +2604,7 @@ window.showTruthTable = function () {
 
   const headerCells = [...inputLabels];
   outputEntries.forEach(e => headerCells.push(e.label));
-  const ths = headerCells.map(h => `<th>${h}</th>`).join('');
+  const ths = headerCells.map((h, index) => `<th class="truth-heading ${index < n ? 'truth-input-heading' : 'truth-output-heading'}">${h}</th>`).join('');
 
   let rowsHtml = '';
   for (let row = 0; row < totalRows; row++) {
@@ -2544,12 +2614,13 @@ window.showTruthTable = function () {
     evaluateSandbox();
     const tds = [];
     for (let i = 0; i < n; i++) {
-      tds.push(`<td>${inputs[i].outputState}</td>`);
+      const value = inputs[i].outputState;
+      tds.push(`<td><span class="truth-bit truth-bit-${value}">${value}</span></td>`);
     }
     outputEntries.forEach(e => {
       const outNode = sandboxNodes.find(nd => nd.id === e.id);
       const val = e.port === 0 ? (outNode ? outNode.outputState : 0) : (e.port === 1 ? (outNode ? outNode.outputState2 : 0) : (outNode ? outNode._blueState : 0));
-      tds.push(`<td>${val}</td>`);
+      tds.push(`<td><span class="truth-bit truth-bit-${val}">${val}</span></td>`);
     });
     if (hasLedBar) {
       const ledBars = outputs.filter(n => n.type === 'led-bar');
@@ -2576,14 +2647,16 @@ window.showTruthTable = function () {
   const ledBin = getOutputBinaryDisplay();
 
   content.innerHTML = `
-    <div style="width:100%;max-height:400px;overflow:auto">
-      <table class="learning-table" style="width:100%;font-size:0.78rem">
+    <div class="truth-table-shell">
+      <div class="truth-table-scroll">
+      <table class="logic-truth-table">
         <thead><tr>${ths}</tr></thead>
         <tbody>${rowsHtml}</tbody>
       </table>
+      </div>
       ${binaryDisplay}
       ${ledBin}
-      <div style="margin-top:1rem;font-size:0.75rem;color:var(--text-muted);text-align:center">
+      <div class="truth-table-summary">
         ${totalRows} row${totalRows > 1 ? 's' : ''} &middot; ${n} input${n > 1 ? 's' : ''}, ${outputEntries.length} output${outputEntries.length > 1 ? 's' : ''}
       </div>
     </div>`;

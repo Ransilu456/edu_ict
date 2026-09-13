@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Sinhala:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Sinhala:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
 
 :root {
 
@@ -35,9 +35,9 @@
   --icon-security: #f43f5e;
   --icon-neutral: #64748b;
 
-  --font-sans: 'Nunito', system-ui, sans-serif;
-  --font-header: 'Nunito', system-ui, sans-serif;
-  --font-sinhala: 'Noto Sans Sinhala', 'Nunito', sans-serif;
+  --font-sans: 'Poppins', system-ui, sans-serif;
+  --font-header: 'Poppins', system-ui, sans-serif;
+  --font-sinhala: 'Noto Sans Sinhala', 'Poppins', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
   --transition-fast: 0.1s ease;

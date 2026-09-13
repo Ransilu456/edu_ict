@@ -192,3 +192,50 @@
     opacity: 0;
   }
 }
+
+#logic-modal .success-modal {
+  max-width: min(940px, 94vw) !important;
+  padding: clamp(1rem, 3vw, 1.75rem) !important;
+}
+
+.truth-table-shell {
+  width: 100%;
+  color: var(--text-primary);
+}
+
+.truth-table-scroll {
+  max-height: min(52vh, 460px);
+  overflow: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg-primary) 72%, var(--bg-secondary));
+}
+
+.logic-truth-table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.logic-truth-table th,
+.logic-truth-table td {
+  padding: 0.55rem 0.7rem;
+  border-right: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
+  text-align: center;
+}
+
+.logic-truth-table th:last-child,
+.logic-truth-table td:last-child { border-right: 0; }
+.logic-truth-table tbody tr:last-child td { border-bottom: 0; }
+.logic-truth-table thead th { position: sticky; top: 0; z-index: 1; color: var(--text-primary); font: 700 0.7rem var(--font-header); letter-spacing: 0.05em; text-transform: uppercase; }
+.truth-input-heading { background: color-mix(in srgb, var(--color-cyan) 18%, var(--bg-secondary)); }
+.truth-output-heading { background: color-mix(in srgb, var(--color-amber) 18%, var(--bg-secondary)); }
+.logic-truth-table tbody tr:hover td { background: color-mix(in srgb, var(--color-cyan) 8%, transparent); }
+.truth-bit { display: inline-grid; min-width: 1.55rem; height: 1.55rem; place-items: center; border-radius: 5px; font-weight: 700; }
+.truth-bit-0 { background: color-mix(in srgb, var(--text-muted) 18%, var(--bg-secondary)); color: var(--text-secondary); }
+.truth-bit-1 { background: color-mix(in srgb, var(--color-success) 22%, var(--bg-secondary)); color: var(--text-primary); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-success) 40%, transparent); }
+.truth-table-summary { margin-top: 0.9rem; color: var(--text-muted); text-align: center; font: 0.72rem var(--font-mono); }

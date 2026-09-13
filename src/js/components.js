@@ -8,6 +8,27 @@ import networkViewHtml from '../components/network-view.html?raw';
 import globalModalsHtml from '../components/global-modals.html?raw';
 import footerHtml from '../components/app-footer.html?raw';
 
+const homeHtml = `
+<section class="view-panel home-view" data-page="home">
+  <div class="home-content">
+    <div class="home-kicker">INTERACTIVE COMPUTER SCIENCE LABS</div>
+    <h1>Learn by building<br><span>one signal at a time.</span></h1>
+    <p class="home-intro">LogicQuest turns difficult ICT concepts into hands-on experiments you can inspect, change, and run.</p>
+    <div class="home-actions">
+      <a class="home-primary-action" href="/logic/sandbox" data-route-link>Open logic sandbox</a>
+      <a class="home-secondary-action" href="/networking/osi" data-route-link>Explore networking</a>
+    </div>
+    <div class="home-subject-grid">
+      <a class="home-subject" href="/logic/sandbox" data-route-link><strong>Digital logic</strong><span>Build gates, wires, and circuits.</span></a>
+      <a class="home-subject" href="/networking/osi" data-route-link><strong>Networking</strong><span>Trace packets through the OSI model.</span></a>
+      <a class="home-subject home-subject-muted" href="/binary/bitwise" data-route-link><strong>Binary &amp; bitwise</strong><span>Compare numbers and shifts bit by bit.</span></a>
+    </div>
+  </div>
+</section>`;
+
+const booleanHtml = `<section class="view-panel boolean-view"><div class="boolean-content"><div class="home-kicker">DIGITAL LOGIC / BOOLEAN TOOL</div><h1>Turn expressions into understanding.</h1><p class="home-intro">Parse an expression, inspect every input combination, and send the resulting circuit to the sandbox.</p><form id="boolean-form" class="boolean-form"><label for="boolean-expression">Boolean expression</label><input id="boolean-expression" value="(A XOR B) AND NOT C" autocomplete="off"><button type="submit">Generate truth table</button></form><div id="boolean-output" class="boolean-output"><p>Try AND, OR, NOT, XOR, XNOR, NAND, NOR, or symbolic aliases.</p></div><button id="boolean-open-sandbox" class="boolean-sandbox-action" type="button" disabled>Open generated circuit in sandbox</button></div></section>`;
+const binaryHtml = `<section class="view-panel binary-view"><div class="boolean-content"><div class="home-kicker">BINARY / BITWISE LAB</div><h1>See every bit do its work.</h1><p class="home-intro">Compare two numbers in binary and inspect the result of common bitwise operations.</p><form id="binary-form" class="boolean-form"><div class="binary-input-grid"><label>First decimal number<input name="left" type="number" value="10" min="0"></label><label>Second number or shift count<input name="right" type="number" value="12" min="0"></label><label>Fixed width<select name="width"><option value="4">4 bits</option><option value="8" selected>8 bits</option><option value="16">16 bits</option></select></label></div><fieldset class="bit-operation-group"><legend>Operation</legend><div class="bit-operation-buttons"><button type="button" data-bit-operation="AND" class="active">AND</button><button type="button" data-bit-operation="OR">OR</button><button type="button" data-bit-operation="XOR">XOR</button><button type="button" data-bit-operation="NOT">NOT</button><button type="button" data-bit-operation="LSHIFT">LEFT SHIFT</button><button type="button" data-bit-operation="RSHIFT">RIGHT SHIFT</button></div></fieldset></form><div id="binary-output" class="boolean-output"></div></div></section>`;
+
 export function mountComponents() {
   const mount = (id, html) => {
     const target = document.getElementById(id);
@@ -16,7 +37,7 @@ export function mountComponents() {
   mount('app-header', headerHtml);
   const main = document.getElementById('app-main');
   if (main) {
-    main.innerHTML = sandboxViewHtml + networkViewHtml;
+    main.innerHTML = homeHtml + booleanHtml + binaryHtml + sandboxViewHtml + networkViewHtml;
     const sidebarSlot = document.getElementById('sandbox-sidebar-slot');
     if (sidebarSlot) sidebarSlot.outerHTML = sandboxSidebarHtml;
     const toolbarSlot = document.getElementById('sandbox-toolbar-slot');
