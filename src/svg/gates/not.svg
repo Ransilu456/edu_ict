@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" width="40" height="32" class="logic-gate-symbol not-gate">
+  <!-- Input lead -->
+  <line x1="0" y1="16" x2="8" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Triangle inverter body -->
+  <polygon points="8,5 28,16 8,27" fill="var(--gate-fill, rgba(56, 189, 248, 0.12))" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- Inversion bubble -->
+  <circle cx="31" cy="16" r="2.6" fill="var(--gate-bubble-bg, #05080c)" stroke="currentColor" stroke-width="1.6"/>
+  <!-- Output lead -->
+  <line x1="33.6" y1="16" x2="40" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

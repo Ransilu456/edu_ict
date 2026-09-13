@@ -1,27 +1,36 @@
-// networking labs - devices, subnet, crypto, parity
+// ============================================================================
+// LogicQuest — Next-Gen Interactive Networking Suite & Devices Lab
+// ============================================================================
 import './common.js';
 import { initOSISim, cleanupOSISim } from './osi-sim.js';
 
 let ndInitialized = false;
 export function initNetworkDevices() {
   if (!document.getElementById('nd-lab-container')) return;
-  if (!ndInitialized) { ndInitialized = true; buildNDLayout(); bindNDTabs(); }
+  if (!ndInitialized) {
+    ndInitialized = true;
+    buildNDLayout();
+    bindNDTabs();
+  }
   switchNDTab('network-tab');
 }
+
 export function cleanupNetworkDevices() {
   if (window.ndStopAnim) window.ndStopAnim();
   cleanupOSISim();
 }
+
 window.initNetworkDevices = initNetworkDevices;
 window.cleanupNetworkDevices = cleanupNetworkDevices;
 
+// SVG Icons
 const I = {
   hub: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="2"/><path d="M4.1 4.1a8 8 0 0 0 0 11.8M15.9 4.1a8 8 0 0 1 0 11.8"/></svg>',
   switch_: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="6" width="12" height="8" rx="1"/><path d="M6 10h8M10 6v8"/></svg>',
   router: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="8" width="14" height="7" rx="1.5"/><circle cx="7" cy="11.5" r="1"/><circle cx="10" cy="11.5" r="1"/><circle cx="13" cy="11.5" r="1"/><path d="M10 3v5M7 6l3 3 3-3"/></svg>',
   check: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10l4 4 8-8"/></svg>',
   cross: '<svg viewBox="0 0 20 20" fill="none" stroke="#ef4444" stroke-width="2"><path d="M5 5l10 10M15 5L5 15"/></svg>',
-  warn: '<svg viewBox="0 0 20 20" fill="none" stroke="#ef4444" stroke-width="1.5"><path d="M10 2L1 18h18L10 2z"/><path d="M10 8v4"/><path d="M10 14v0"/></svg>',
+  warn: '<svg viewBox="0 0 20 20" fill="none" stroke="#f59e0b" stroke-width="1.5"><path d="M10 2L1 18h18L10 2z"/><path d="M10 8v4"/><path d="M10 14v0"/></svg>',
   search: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg>',
   send: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10l7-7 7 7M10 3v14"/></svg>',
   globe: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><path d="M2 10h16M10 2a15.3 15.3 0 0 1 4 8 15.3 15.3 0 0 1-4 8 15.3 15.3 0 0 1-4-8 15.3 15.3 0 0 1 4-8z"/></svg>',
@@ -38,6 +47,10 @@ const I = {
   crypto: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 1l7 3v6a7 7 0 0 1-7 6 7 7 0 0 1-7-6V4l7-3z"/><path d="M8 10l1.5 1.5L12 9"/></svg>',
   parity: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12l4 4 8-8"/><rect x="2" y="2" width="16" height="16" rx="3"/></svg>',
   bits: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="14" height="16" rx="2"/><path d="M7 6h6M7 10h6M7 14h4"/></svg>',
+  terminal: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="16" height="14" rx="2"/><path d="M5 7l3 3-3 3M10 13h5"/></svg>',
+  play: '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M6 4l10 6-10 6V4z"/></svg>',
+  step: '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M5 4l7 6-7 6V4zM13 4h2v12h-2z"/></svg>',
+  trash: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h14M16 6l-1 11H5L4 6M8 6V4h4v2"/></svg>'
 };
 
 function el(s) { return document.getElementById(s); }
@@ -48,173 +61,155 @@ function play(n) { if (window.playSound) window.playSound(n); }
 function buildNDLayout() {
   el('nd-lab-container').innerHTML = `
 <div class="nd-main">
+  <!-- Top Navigation Tabs -->
   <div class="nd-tabs">
-    <button class="nd-tab active" data-ndtab="network-tab">${I.network} Network Devices</button>
-    <button class="nd-tab" data-ndtab="osi-tab">${I.layers} OSI Sim</button>
-    <button class="nd-tab" data-ndtab="subnet-tab">${I.globe} Subnetting & CIDR</button>
-    <button class="nd-tab" data-ndtab="crypto-tab">${I.crypto} Encryption</button>
+    <button class="nd-tab active" data-ndtab="network-tab">${I.network} Network Devices &amp; Topology</button>
+    <button class="nd-tab" data-ndtab="osi-tab">${I.layers} OSI 7-Layer Simulator</button>
+    <button class="nd-tab" data-ndtab="subnet-tab">${I.globe} Subnetting &amp; CIDR Lab</button>
+    <button class="nd-tab" data-ndtab="crypto-tab">${I.crypto} Encryption &amp; PKI</button>
     <button class="nd-tab" data-ndtab="parity-tab">${I.parity} Parity Check</button>
   </div>
 
-  <!-- NETWORK DEVICES -->
+  <!-- NETWORK DEVICES & TOPOLOGY TAB -->
   <div class="nd-tab-content active" id="network-tab">
     <div class="nd-layout">
+      <!-- Left Sidebar: Controls, Inspector, Tables -->
       <div class="nd-left">
         <div class="nd-panel-header">
           ${I.network}
           <div>
-            <div class="nd-panel-title">Network Devices Lab</div>
-            <div class="nd-panel-sub">Hub &bull; Switch &bull; Router</div>
+            <div class="nd-panel-title">Interactive Network Simulator</div>
+            <div class="nd-panel-sub">L1 Hub &bull; L2 Switch &bull; L3 Router</div>
           </div>
         </div>
-        <div class="nd-device-selector">
-          <button class="nd-device-btn active" data-device="hub">${I.hub} Hub <span class="nd-dev-layer">L1</span></button>
-          <button class="nd-device-btn" data-device="switch">${I.switch_} Switch <span class="nd-dev-layer">L2</span></button>
-          <button class="nd-device-btn" data-device="router">${I.router} Router <span class="nd-dev-layer">L3</span></button>
+
+        <!-- Topology Mode Presets -->
+        <div class="nd-topo-bar">
+          <span class="nd-section-label">Topology Lab Mode</span>
+          <div class="nd-mode-pills">
+            <button class="nd-mode-pill active" data-mode="device-test">Single Device</button>
+            <button class="nd-mode-pill" data-mode="enterprise">Routed Enterprise</button>
+            <button class="nd-mode-pill" data-mode="csma">Collision &amp; CSMA/CD</button>
+          </div>
         </div>
+
+        <!-- Central Device Selection (for Device Test mode) -->
+        <div class="nd-device-selector" id="nd-device-select-box">
+          <button class="nd-device-btn active" data-device="hub">${I.hub} Hub <span class="nd-dev-layer">L1 Physical</span></button>
+          <button class="nd-device-btn" data-device="switch">${I.switch_} Switch <span class="nd-dev-layer">L2 Data Link</span></button>
+          <button class="nd-device-btn" data-device="router">${I.router} Router <span class="nd-dev-layer">L3 Network</span></button>
+        </div>
+
+        <!-- Transmission Controls -->
         <div class="nd-controls">
           <div class="nd-row">
-            <div><span class="nd-label">Source</span><div class="nd-host-options" id="nd-src-options"></div></div>
-            <div><span class="nd-label">Dest</span><div class="nd-host-options" id="nd-dst-options"></div></div>
+            <div><span class="nd-label">Source Host</span><div class="nd-host-options" id="nd-src-options"></div></div>
+            <div><span class="nd-label">Dest Host</span><div class="nd-host-options" id="nd-dst-options"></div></div>
           </div>
-          <button class="nd-send-btn" id="nd-send-btn">${I.send} Send Packet</button>
+          <div class="nd-btn-row">
+            <button class="nd-send-btn" id="nd-send-btn">${I.send} Transmit Packet</button>
+            <button class="nd-step-btn" id="nd-step-btn" title="Step through packet stages">${I.step} Step</button>
+          </div>
         </div>
-        <div class="nd-card"><div class="nd-card-title">${I.search} Device Info</div><div class="nd-info-content" id="nd-info-content"></div></div>
-        <div class="nd-card"><div class="nd-card-title">${I.brain} MAC Table</div><div class="nd-table-content" id="nd-table-content"><em style="color:var(--text-muted)">No activity yet</em></div></div>
+
+        <!-- Live Device / Node Info Card -->
         <div class="nd-card">
-          <div class="nd-card-title">${I.list} Packet Protocol Breakdown</div>
-          <div class="nd-packet-inspector" id="nd-packet-inspector">
-            <em style="color:var(--text-muted);font-size:0.75rem">Transmit a packet to inspect L2 frame &amp; L3/L4 headers</em>
+          <div class="nd-card-title">${I.search} Inspected Node Specifications</div>
+          <div class="nd-info-content" id="nd-info-content"></div>
+        </div>
+
+        <!-- Tables Accordion: MAC Table / ARP Table / Routing Table -->
+        <div class="nd-card">
+          <div class="nd-card-title" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>${I.brain} Forwarding Tables</span>
+            <button class="nd-mini-clear-btn" id="nd-clear-tables-btn" title="Clear learned tables">${I.trash} Flush</button>
+          </div>
+          <div class="nd-table-tabs">
+            <button class="nd-subtable-tab active" data-tab="mac">MAC Table</button>
+            <button class="nd-subtable-tab" data-tab="arp">ARP Cache</button>
+            <button class="nd-subtable-tab" data-tab="route">Routing Table</button>
+          </div>
+          <div class="nd-table-view-content" id="nd-table-view-content">
+            <div id="nd-tab-mac" class="nd-subtable-panel active"></div>
+            <div id="nd-tab-arp" class="nd-subtable-panel"></div>
+            <div id="nd-tab-route" class="nd-subtable-panel"></div>
           </div>
         </div>
-        <!-- Topology Legend -->
-        <div class="nd-card" style="margin-top:auto">
-          <div class="nd-card-title">${I.key} Topology Legend</div>
-          <div class="nd-legend-content" style="font-size:0.65rem; color:var(--text-secondary); display:flex; flex-direction:column; gap:0.25rem; line-height: 1.3;">
-            <div style="display:flex; align-items:center; gap:0.4rem;">
-              <span style="display:inline-block; width:16px; height:0px; border-top:2.5px dashed var(--border-color)"></span>
-              <span>Inactive Cable Link</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:0.4rem;">
-              <span style="display:inline-block; width:16px; height:0px; border-top:2.5px solid var(--color-success)"></span>
-              <span>Active Packet Link</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:0.4rem;">
-              <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background:rgba(129,140,248,0.1); border:1px solid #818cf8"></span>
-              <span>Hub (L1 Physical Broadcast)</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:0.4rem;">
-              <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background:rgba(34,211,165,0.1); border:1px solid #22d3a5"></span>
-              <span>Switch (L2 Data Link Forward)</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:0.4rem;">
-              <span style="display:inline-block; width:12px; height:12px; border-radius:3px; background:rgba(251,191,36,0.1); border:1px solid #fbbf24"></span>
-              <span>Router (L3 Network Route)</span>
-            </div>
+
+        <!-- Packet Protocol Inspector -->
+        <div class="nd-card">
+          <div class="nd-card-title">${I.list} Deep Protocol Frame Inspector</div>
+          <div class="nd-packet-inspector" id="nd-packet-inspector">
+            <em style="color:var(--text-muted);font-size:0.75rem">Transmit a packet or enter a terminal ping to inspect headers</em>
           </div>
         </div>
       </div>
+
+      <!-- Right Main: Interactive SVG Topology Canvas + CLI Terminal -->
       <div class="nd-right">
-        <div class="nd-svg-wrap">
-          <svg class="nd-svg" viewBox="0 0 400 280">
+        <!-- Top Toolbar for Topology -->
+        <div class="nd-topo-header">
+          <div class="nd-topo-status" id="nd-topo-status">
+            <span class="nd-status-dot"></span>
+            <span id="nd-status-text">Network Ready &bull; Select source &amp; destination</span>
+          </div>
+          <div class="nd-speed-controls">
+            <span class="nd-label" style="margin:0">Speed:</span>
+            <button class="nd-speed-pill" data-speed="0.5">0.5x</button>
+            <button class="nd-speed-pill active" data-speed="1">1x</button>
+            <button class="nd-speed-pill" data-speed="2">2x</button>
+            <button class="nd-reset-net-btn" id="nd-reset-canvas-btn" title="Reset Network State">${I.refresh}</button>
+          </div>
+        </div>
+
+        <!-- SVG Topology Canvas -->
+        <div class="nd-svg-wrap" id="nd-svg-wrap">
+          <svg class="nd-svg" id="nd-topology-svg" viewBox="0 0 600 340">
             <defs>
-              <linearGradient id="ndGradHub" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#818cf8"/><stop offset="100%" stop-color="#6366f1"/></linearGradient>
+              <linearGradient id="ndGradHub" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#818cf8"/><stop offset="100%" stop-color="#4f46e5"/></linearGradient>
               <linearGradient id="ndGradSwitch" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#22d3a5"/><stop offset="100%" stop-color="#059669"/></linearGradient>
-              <linearGradient id="ndGradRouter" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient>
+              <linearGradient id="ndGradRouter" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#d97706"/></linearGradient>
+              <filter id="ndGlow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
             </defs>
-            <!-- Cables -->
-            <line class="nd-line" id="nd-line-pc-a" x1="60" y1="50" x2="170" y2="130"/>
-            <line class="nd-line" id="nd-line-pc-b" x1="60" y1="230" x2="170" y2="150"/>
-            <line class="nd-line" id="nd-line-pc-c" x1="240" y1="130" x2="350" y2="50"/>
-            <line class="nd-line" id="nd-line-pc-d" x1="240" y1="150" x2="350" y2="230"/>
-
-            <!-- Host A -->
-            <g class="nd-host-group" id="host-pc-a" style="cursor:pointer;" onclick="window.selectNDDevice('pc-a')">
-              <rect class="nd-host-bg" x="30" y="25" width="50" height="50" rx="8"/>
-              <!-- Desktop computer schematic design -->
-              <rect x="40" y="32" width="30" height="20" rx="2" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.2"/>
-              <line x1="55" y1="52" x2="55" y2="58" stroke="#818cf8" stroke-width="2"/>
-              <line x1="50" y1="58" x2="60" y2="58" stroke="#818cf8" stroke-width="2"/>
-              <circle cx="43" cy="36" r="1.5" fill="#22d3a5"/>
-              <text class="nd-host-label" x="55" y="46" text-anchor="middle">A</text>
-              <text class="nd-host-mac" x="55" y="62" text-anchor="middle">AA:AA:AA:AA:AA:01</text>
-              <text class="nd-host-ip" x="55" y="69" text-anchor="middle">192.168.1.10</text>
-            </g>
-
-            <!-- Host B -->
-            <g class="nd-host-group" id="host-pc-b" style="cursor:pointer;" onclick="window.selectNDDevice('pc-b')">
-              <rect class="nd-host-bg" x="30" y="205" width="50" height="50" rx="8"/>
-              <rect x="40" y="212" width="30" height="20" rx="2" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.2"/>
-              <line x1="55" y1="232" x2="55" y2="238" stroke="#818cf8" stroke-width="2"/>
-              <line x1="50" y1="238" x2="60" y2="238" stroke="#818cf8" stroke-width="2"/>
-              <circle cx="43" cy="216" r="1.5" fill="#22d3a5"/>
-              <text class="nd-host-label" x="55" y="226" text-anchor="middle">B</text>
-              <text class="nd-host-mac" x="55" y="242" text-anchor="middle">AA:AA:AA:AA:AA:02</text>
-              <text class="nd-host-ip" x="55" y="249" text-anchor="middle">192.168.1.20</text>
-            </g>
-
-            <!-- Host C -->
-            <g class="nd-host-group" id="host-pc-c" style="cursor:pointer;" onclick="window.selectNDDevice('pc-c')">
-              <rect class="nd-host-bg" x="325" y="25" width="50" height="50" rx="8"/>
-              <rect x="335" y="32" width="30" height="20" rx="2" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.2"/>
-              <line x1="350" y1="52" x2="350" y2="58" stroke="#818cf8" stroke-width="2"/>
-              <line x1="345" y1="58" x2="355" y2="58" stroke="#818cf8" stroke-width="2"/>
-              <circle cx="338" cy="36" r="1.5" fill="#22d3a5"/>
-              <text class="nd-host-label" x="350" y="46" text-anchor="middle">C</text>
-              <text class="nd-host-mac" x="350" y="62" text-anchor="middle">AA:AA:AA:AA:AA:03</text>
-              <text class="nd-host-ip" x="350" y="69" text-anchor="middle">192.168.2.10</text>
-            </g>
-
-            <!-- Host D -->
-            <g class="nd-host-group" id="host-pc-d" style="cursor:pointer;" onclick="window.selectNDDevice('pc-d')">
-              <rect class="nd-host-bg" x="325" y="205" width="50" height="50" rx="8"/>
-              <rect x="335" y="212" width="30" height="20" rx="2" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.2"/>
-              <line x1="350" y1="232" x2="350" y2="238" stroke="#818cf8" stroke-width="2"/>
-              <line x1="345" y1="238" x2="355" y2="238" stroke="#818cf8" stroke-width="2"/>
-              <circle cx="338" cy="216" r="1.5" fill="#22d3a5"/>
-              <text class="nd-host-label" x="350" y="226" text-anchor="middle">D</text>
-              <text class="nd-host-mac" x="350" y="242" text-anchor="middle">AA:AA:AA:AA:AA:04</text>
-              <text class="nd-host-ip" x="350" y="249" text-anchor="middle">192.168.2.20</text>
-            </g>
-
-            <!-- Central Device -->
-            <g id="nd-center-g" style="cursor:pointer;" onclick="window.selectNDDevice('central')">
-              <rect class="nd-dev-box hub" id="nd-devbox" x="175" y="115" width="60" height="50" rx="8"/>
-              <g id="nd-dev-icon-overlay"></g>
-              <text class="nd-dev-label" id="nd-devlabel" x="205" y="157" text-anchor="middle">HUB</text>
-            </g>
-
-            <!-- Animation Packets (envelope design) -->
-            <g class="nd-packet" id="nd-dot1" transform="translate(-20, -20)" display="none">
-              <rect x="-8" y="-6" width="16" height="12" rx="2" fill="#10b981" stroke="#fff" stroke-width="0.8"/>
-              <path d="M-8,-6 L0,0 L8,-6" stroke="#fff" stroke-width="0.8" fill="none"/>
-            </g>
-            <g class="nd-packet" id="nd-dot2" transform="translate(-20, -20)" display="none">
-              <rect x="-8" y="-6" width="16" height="12" rx="2" fill="#10b981" stroke="#fff" stroke-width="0.8"/>
-              <path d="M-8,-6 L0,0 L8,-6" stroke="#fff" stroke-width="0.8" fill="none"/>
-            </g>
-            <g class="nd-packet" id="nd-dot3" transform="translate(-20, -20)" display="none">
-              <rect x="-8" y="-6" width="16" height="12" rx="2" fill="#10b981" stroke="#fff" stroke-width="0.8"/>
-              <path d="M-8,-6 L0,0 L8,-6" stroke="#fff" stroke-width="0.8" fill="none"/>
-            </g>
-
-            <text class="nd-crash" id="nd-crash" x="205" y="270" text-anchor="middle" display="none">! COLLISION !</text>
+            <g id="nd-cables-group"></g>
+            <g id="nd-devices-group"></g>
+            <g id="nd-packets-group"></g>
+            <g id="nd-overlay-group"></g>
           </svg>
         </div>
-        <div class="nd-log">
-          <div class="nd-log-header">${I.network} Event Log</div>
-          <div class="nd-log-list" id="nd-log-list"></div>
+
+        <!-- Bottom: Interactive Network Terminal CLI -->
+        <div class="nd-terminal-wrap">
+          <div class="nd-terminal-header">
+            <div class="nd-term-title">${I.terminal} Network Host Terminal (CLI)</div>
+            <div class="nd-term-quick-btns">
+              <button class="nd-cli-pill" data-cmd="ping 192.168.1.20">ping B</button>
+              <button class="nd-cli-pill" data-cmd="ping 192.168.2.10">ping C</button>
+              <button class="nd-cli-pill" data-cmd="arp -a">arp -a</button>
+              <button class="nd-cli-pill" data-cmd="show mac-address-table">show mac</button>
+              <button class="nd-cli-pill" data-cmd="traceroute 192.168.2.10">traceroute</button>
+              <button class="nd-cli-pill" data-cmd="clear">clear</button>
+            </div>
+          </div>
+          <div class="nd-terminal-body" id="nd-terminal-body">
+            <div class="nd-term-line greeting">LogicQuest Terminal v2.0 — Type a command or click a preset above.</div>
+          </div>
+          <div class="nd-terminal-input-bar">
+            <span class="nd-prompt">host-a:~$</span>
+            <input type="text" class="nd-term-input" id="nd-term-input" placeholder="Type ping 192.168.2.10, arp -a, show mac-address-table..." autocomplete="off" spellcheck="false">
+            <button class="nd-term-submit" id="nd-term-submit">${I.send}</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- OSI Sim -->
+  <!-- OSI SIMULATOR TAB -->
   <div class="nd-tab-content" id="osi-tab">
     <div id="osi-container"></div>
   </div>
 
-  <!-- SUBNETTING & CIDR LAB -->
+  <!-- SUBNETTING & CIDR LAB TAB -->
   <div class="nd-tab-content" id="subnet-tab">
     <div class="subnet-layout">
       <div class="subnet-left">
@@ -283,32 +278,32 @@ function buildNDLayout() {
     </div>
   </div>
 
-  <!-- ENCRYPTION -->
+  <!-- ENCRYPTION TAB -->
   <div class="nd-tab-content" id="crypto-tab">
     <div class="crypto-layout">
-      <div class="crypto-header">${I.crypto} <span class="crypto-title">Encryption Lab \u2014 Public Key Exchange</span></div>
+      <div class="crypto-header">${I.crypto} <span class="crypto-title">Encryption Lab &mdash; Public Key Exchange</span></div>
       <div class="crypto-body">
         <div class="crypto-exchange">
           <div class="crypto-party">
             <div class="crypto-party-header">${I.laptop} Alice</div>
             <div class="crypto-key-row">
-              <div class="crypto-key-mini public"><span class="key-label">Public Key</span><span class="key-val" id="crypto-alice-pub">\u2014</span></div>
-              <div class="crypto-key-mini private"><span class="key-label">Private Key</span><span class="key-val" id="crypto-alice-priv">\u2014</span></div>
+              <div class="crypto-key-mini public"><span class="key-label">Public Key</span><span class="key-val" id="crypto-alice-pub">&mdash;</span></div>
+              <div class="crypto-key-mini private"><span class="key-label">Private Key</span><span class="key-val" id="crypto-alice-priv">&mdash;</span></div>
             </div>
           </div>
           <div class="crypto-exchange-center">
             <div class="crypto-exchange-line">
-              <span class="crypto-exchange-arrow">${I.send} Alice\u2019s Public Key</span>
+              <span class="crypto-exchange-arrow">${I.send} Alice's Public Key</span>
             </div>
             <div class="crypto-exchange-line rev">
-              <span class="crypto-exchange-arrow">${I.send} Bob\u2019s Public Key</span>
+              <span class="crypto-exchange-arrow">${I.send} Bob's Public Key</span>
             </div>
           </div>
           <div class="crypto-party">
             <div class="crypto-party-header bob">${I.laptop} Bob</div>
             <div class="crypto-key-row">
-              <div class="crypto-key-mini public"><span class="key-label">Public Key</span><span class="key-val" id="crypto-bob-pub">\u2014</span></div>
-              <div class="crypto-key-mini private"><span class="key-label">Private Key</span><span class="key-val" id="crypto-bob-priv">\u2014</span></div>
+              <div class="crypto-key-mini public"><span class="key-label">Public Key</span><span class="key-val" id="crypto-bob-pub">&mdash;</span></div>
+              <div class="crypto-key-mini private"><span class="key-label">Private Key</span><span class="key-val" id="crypto-bob-priv">&mdash;</span></div>
             </div>
           </div>
         </div>
@@ -317,8 +312,8 @@ function buildNDLayout() {
             <div class="crypto-flow-card sender">
               <div class="crypto-flow-card-title">${I.laptop} Alice Sends</div>
               <textarea class="crypto-input" id="crypto-plain-alice" rows="2">HELLO</textarea>
-              <div class="crypto-hint">Letters A–Z only · A=0, B=1 … Z=25 · encrypted with Bob’s key</div>
-              <button class="crypto-btn primary" id="crypto-enc-btn-alice">${I.lock} Encrypt with Bob\u2019s Public Key</button>
+              <div class="crypto-hint">Letters A&ndash;Z only &bull; encrypted with Bob's public key</div>
+              <button class="crypto-btn primary" id="crypto-enc-btn-alice">${I.lock} Encrypt with Bob's Public Key</button>
             </div>
             <div class="crypto-flow-arrow-wrap">
               <div class="crypto-flow-arrow">${I.lock}</div>
@@ -326,8 +321,8 @@ function buildNDLayout() {
             </div>
             <div class="crypto-flow-card cipher">
               <div class="crypto-flow-card-title">${I.bits} Ciphertext</div>
-              <div class="crypto-data" id="crypto-cipher-alice">\u2014</div>
-              <div class="crypto-status" id="crypto-cipher-status">${I.search} Waiting\u2026</div>
+              <div class="crypto-data" id="crypto-cipher-alice">&mdash;</div>
+              <div class="crypto-status" id="crypto-cipher-status">${I.search} Waiting&hellip;</div>
             </div>
             <div class="crypto-flow-arrow-wrap">
               <div class="crypto-flow-arrow">${I.key}</div>
@@ -335,30 +330,29 @@ function buildNDLayout() {
             </div>
             <div class="crypto-flow-card receiver">
               <div class="crypto-flow-card-title">${I.laptop} Bob Receives</div>
-              <div class="crypto-data" id="crypto-decrypted-alice">\u2014</div>
-              <button class="crypto-btn green" id="crypto-dec-btn-bob">${I.key} Decrypt with Bob\u2019s Private Key</button>
+              <div class="crypto-data" id="crypto-decrypted-alice">&mdash;</div>
+              <button class="crypto-btn green" id="crypto-dec-btn-bob">${I.key} Decrypt with Bob's Private Key</button>
             </div>
           </div>
         </div>
         <div class="crypto-info-card">
-          <div class="crypto-info-title">${I.search} How Public Key Exchange Works</div>
+          <div class="crypto-info-title">${I.search} How Public Key Cryptography Works</div>
           <div class="crypto-info-body">
-            <strong>1. Key Generation</strong> \u2014 Both Alice and Bob generate their own RSA key pairs<br>
-            <strong>2. Public Key Exchange</strong> \u2014 They share their <span class="highlight">public keys</span> openly over the network<br>
-            <strong>3. Encrypt</strong> \u2014 Alice encrypts her message using <span class="highlight">Bob\u2019s public key</span><br>
-            <strong>4. Decrypt</strong> \u2014 Only <span class="highlight">Bob\u2019s private key</span> can reverse the encryption<br>
-            <strong>5. Security</strong> \u2014 Even if intercepted, the ciphertext is useless without Bob\u2019s private <em>d</em><br>
-            <strong>Real World</strong> \u2014 Foundation of HTTPS, SSH, and secure email
+            <strong>1. Key Generation</strong> &mdash; Both Alice and Bob generate their own RSA key pairs<br>
+            <strong>2. Public Key Exchange</strong> &mdash; They share their <span class="highlight">public keys</span> openly over the network<br>
+            <strong>3. Encrypt</strong> &mdash; Alice encrypts her message using <span class="highlight">Bob's public key</span><br>
+            <strong>4. Decrypt</strong> &mdash; Only <span class="highlight">Bob's private key</span> can reverse the encryption<br>
+            <strong>5. Security</strong> &mdash; Even if intercepted, the ciphertext is useless without Bob's private key
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- PARITY CHECK -->
+  <!-- PARITY CHECK TAB -->
   <div class="nd-tab-content" id="parity-tab">
     <div class="parity-layout">
-      <div class="parity-header">${I.parity} <span class="parity-title">Parity Check \u2014 Error Detection</span></div>
+      <div class="parity-header">${I.parity} <span class="parity-title">Parity Check &mdash; Error Detection</span></div>
       <div class="parity-body">
         <div class="parity-flow">
           <div class="parity-box">
@@ -373,17 +367,14 @@ function buildNDLayout() {
           <div class="parity-box">
             <div class="parity-box-label">${I.bits} Received Data (8 bits)</div>
             <div class="parity-bits" id="parity-recv-bits"></div>
-            <div class="parity-result wait" id="parity-result">${I.search} Waiting to send\u2026</div>
+            <div class="parity-result wait" id="parity-result">${I.search} Waiting to send&hellip;</div>
           </div>
         </div>
         <div class="parity-info-card">
-          <div class="parity-info-title">${I.search} How Parity Works</div>
+          <div class="parity-info-title">${I.search} How Parity Error Checking Works</div>
           <div class="parity-info-body">
-            <strong>Even Parity:</strong> Count the 1s in the 7 data bits. If odd, set parity bit = <strong>1</strong> (makes total even). If even, set parity bit = <strong>0</strong>.<br>
-            The receiver checks: if the total number of 1s in all 8 bits is odd, an <strong>error</strong> is detected.<br><br>
-            &bull; Detects any <strong>odd number</strong> of bit flips<br>
-            &bull; Cannot <em>correct</em> errors &mdash; only detect them<br>
-            &bull; <strong>Limitation:</strong> If 2 bits flip, parity still matches (even count), so the error goes unnoticed
+            <strong>Even Parity:</strong> Count the 1s in the 7 data bits. If odd, set parity bit = <strong>1</strong> (makes total count of 1s even). If even, set parity bit = <strong>0</strong>.<br>
+            The receiver checks: if the total number of 1s in all 8 bits is odd, an <strong>error</strong> is detected.
           </div>
         </div>
       </div>
@@ -415,351 +406,989 @@ function bindNDTabs() {
 function switchNDTab(id) { qs(`.nd-tab[data-ndtab="${id}"]`)?.click(); }
 window.switchNDTab = switchNDTab;
 
-// devices lab
-let netState = { device: 'hub', animating: false, src: 'pc-b', dst: 'pc-c', macTable: {}, colCnt: 0, abort: false };
-const hosts = [
-  { id: 'pc-a', label: 'A', mac: 'AA:AA:AA:AA:AA:01', ip: '192.168.1.10', sub: '192.168.1.0' },
-  { id: 'pc-b', label: 'B', mac: 'AA:AA:AA:AA:AA:02', ip: '192.168.1.20', sub: '192.168.1.0' },
-  { id: 'pc-c', label: 'C', mac: 'AA:AA:AA:AA:AA:03', ip: '192.168.2.10', sub: '192.168.2.0' },
-  { id: 'pc-d', label: 'D', mac: 'AA:AA:AA:AA:AA:04', ip: '192.168.2.20', sub: '192.168.2.0' },
-];
+// ============================================================================
+// NETWORK DEVICES & TOPOLOGY SIMULATION ENGINE
+// ============================================================================
 
-const coords = {
-  'pc-a': [55, 50], 'pc-b': [55, 230],
-  'pc-c': [350, 50], 'pc-d': [350, 230]
+let currentTopoMode = 'device-test';
+let simSpeed = 1;
+let animSpeedMs = 450;
+
+let netState = {
+  device: 'hub',
+  animating: false,
+  src: 'pc-a',
+  dst: 'pc-c',
+  macTable: {},
+  arpTable: {},
+  routingTable: [
+    { net: '192.168.1.0/24', gw: 'Direct', iface: 'eth0 (Subnet 1)' },
+    { net: '192.168.2.0/24', gw: 'Direct', iface: 'eth1 (Subnet 2)' }
+  ],
+  stepQueue: [],
+  inStepMode: false,
+  selectedDeviceId: 'central'
 };
-const devC = [205, 140];
 
-function gh(id) { return hosts.find(h => h.id === id); }
+const TOPOLOGY_HOSTS = {
+  'device-test': [
+    { id: 'pc-a', label: 'Host A', short: 'A', x: 80, y: 70, mac: 'AA:AA:AA:AA:01', ip: '192.168.1.10', sub: '192.168.1.0/24', iface: 'Port 1' },
+    { id: 'pc-b', label: 'Host B', short: 'B', x: 80, y: 270, mac: 'AA:AA:AA:AA:02', ip: '192.168.1.20', sub: '192.168.1.0/24', iface: 'Port 2' },
+    { id: 'pc-c', label: 'Host C', short: 'C', x: 520, y: 70, mac: 'BB:BB:BB:BB:03', ip: '192.168.2.10', sub: '192.168.2.0/24', iface: 'Port 3' },
+    { id: 'pc-d', label: 'Host D', short: 'D', x: 520, y: 270, mac: 'BB:BB:BB:BB:04', ip: '192.168.2.20', sub: '192.168.2.0/24', iface: 'Port 4' }
+  ],
+  'enterprise': [
+    { id: 'pc-a', label: 'Sales PC', short: 'A', x: 60, y: 70, mac: '11:22:33:44:01', ip: '192.168.1.10', sub: '192.168.1.0/24', iface: 'SW1-Fa0/1' },
+    { id: 'pc-b', label: 'Finance PC', short: 'B', x: 60, y: 270, mac: '11:22:33:44:02', ip: '192.168.1.20', sub: '192.168.1.0/24', iface: 'SW1-Fa0/2' },
+    { id: 'pc-c', label: 'Admin PC', short: 'C', x: 540, y: 70, mac: '55:66:77:88:03', ip: '192.168.2.10', sub: '192.168.2.0/24', iface: 'SW2-Fa0/1' },
+    { id: 'pc-d', label: 'Web Server', short: 'SRV', x: 540, y: 270, mac: '55:66:77:88:99', ip: '192.168.2.80', sub: '192.168.2.0/24', iface: 'SW2-Fa0/24' }
+  ],
+  'csma': [
+    { id: 'pc-a', label: 'Node A', short: 'A', x: 90, y: 70, mac: 'CC:01:00:00:01', ip: '10.0.0.1', sub: '10.0.0.0/8', iface: 'Bus-Tap 1' },
+    { id: 'pc-b', label: 'Node B', short: 'B', x: 230, y: 70, mac: 'CC:02:00:00:02', ip: '10.0.0.2', sub: '10.0.0.0/8', iface: 'Bus-Tap 2' },
+    { id: 'pc-c', label: 'Node C', short: 'C', x: 370, y: 70, mac: 'CC:03:00:00:03', ip: '10.0.0.3', sub: '10.0.0.0/8', iface: 'Bus-Tap 3' },
+    { id: 'pc-d', label: 'Node D', short: 'D', x: 510, y: 70, mac: 'CC:04:00:00:04', ip: '10.0.0.4', sub: '10.0.0.0/8', iface: 'Bus-Tap 4' }
+  ]
+};
 
-let netReady = false;
+function getHosts() {
+  return TOPOLOGY_HOSTS[currentTopoMode] || TOPOLOGY_HOSTS['device-test'];
+}
+
+function getHost(id) {
+  return getHosts().find(h => h.id === id);
+}
+
+let netLabReady = false;
 function initNetLab() {
-  if (netReady) { resetNetLab(); return; }
-  netReady = true;
-  netState.animating = false; netState.abort = false; netState.macTable = {}; netState.colCnt = 0;
-  updateHostOptions();
-  qsa('.nd-device-btn', el('network-tab')).forEach(b => b.addEventListener('click', () => {
-    if (netState.animating) return;
+  if (netLabReady) { renderTopologyCanvas(); return; }
+  netLabReady = true;
+
+  // Topology Mode switch
+  qsa('.nd-mode-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (netState.animating) return;
+      play('click');
+      qsa('.nd-mode-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTopoMode = btn.dataset.mode;
+      el('nd-device-select-box').style.display = currentTopoMode === 'device-test' ? 'flex' : 'none';
+      renderTopologyCanvas();
+      updateHostPickers();
+      resetNetworkState();
+    });
+  });
+
+  // Device buttons (for Device Test mode)
+  qsa('.nd-device-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (netState.animating) return;
+      play('click');
+      qsa('.nd-device-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      netState.device = btn.dataset.device;
+      renderTopologyCanvas();
+      resetNetworkState();
+    });
+  });
+
+  // Speed controls
+  qsa('.nd-speed-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      play('click');
+      qsa('.nd-speed-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      simSpeed = parseFloat(pill.dataset.speed) || 1;
+      animSpeedMs = Math.round(450 / simSpeed);
+    });
+  });
+
+  // Table tabs
+  qsa('.nd-subtable-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      play('click');
+      qsa('.nd-subtable-tab').forEach(t => t.classList.remove('active'));
+      qsa('.nd-subtable-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      el(`nd-tab-${tab.dataset.tab}`)?.classList.add('active');
+    });
+  });
+
+  // Clear tables
+  el('nd-clear-tables-btn')?.addEventListener('click', () => {
     play('click');
-    netState.device = b.dataset.device;
-    qsa('.nd-device-btn', el('network-tab')).forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    resetNetLab();
-  }));
-  el('nd-send-btn').addEventListener('click', sendPacket);
-  resetNetLab();
-}
+    netState.macTable = {};
+    netState.arpTable = {};
+    updateTableViews();
+    termPrint('System: MAC Address table & ARP cache flushed.', 'system');
+  });
 
-function resetNetLab() {
-  netState.animating = false; netState.macTable = {}; netState.colCnt = 0; netState.lastPkt = null;
-  el('nd-log-list').innerHTML = '';
-  el('nd-table-content').innerHTML = '<em style="color:var(--text-muted)">No activity yet</em>';
-  const pi = el('nd-packet-inspector');
-  if (pi) pi.innerHTML = '<em style="color:var(--text-muted);font-size:0.75rem">Transmit a packet to inspect L2 frame &amp; L3/L4 headers</em>';
-  clearLinks();
-  updateNetUI();
-  setDevInfo();
-}
+  // Reset Canvas button
+  el('nd-reset-canvas-btn')?.addEventListener('click', () => {
+    play('click');
+    resetNetworkState();
+  });
 
-function updateNetUI() {
-  const d = netState.device;
-  const box = el('nd-devbox');
-  if (box) {
-    box.setAttribute('class', `nd-dev-box ${d}`);
-    box.style.fill = d === 'hub' ? 'rgba(129,140,248,0.08)' : d === 'switch' ? 'rgba(34,211,165,0.08)' : 'rgba(251,191,36,0.08)';
-  }
-  const lbl = el('nd-devlabel');
-  if (lbl) lbl.textContent = d.toUpperCase();
+  // Transmit button
+  el('nd-send-btn')?.addEventListener('click', () => {
+    executeTransmission(netState.src, netState.dst);
+  });
 
-  const overlay = el('nd-dev-icon-overlay');
-  if (overlay) {
-    if (d === 'hub') {
-      overlay.innerHTML = `
-        <!-- Hub rack chassis -->
-        <rect x="185" y="122" width="40" height="16" rx="2" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.2"/>
-        <line x1="190" y1="130" x2="220" y2="130" stroke="#818cf8" stroke-width="1" stroke-dasharray="1.5,1.5"/>
-        <circle cx="195" cy="130" r="2.2" fill="#818cf8"/>
-        <circle cx="205" cy="130" r="2.2" fill="#818cf8"/>
-        <circle cx="215" cy="130" r="2.2" fill="#818cf8"/>
-        <circle cx="221" cy="126" r="1" fill="#22d3a5"/>
-      `;
-    } else if (d === 'switch') {
-      overlay.innerHTML = `
-        <!-- Switch rack chassis with dynamic port LEDs -->
-        <rect x="185" y="122" width="40" height="16" rx="2" fill="#111827" stroke="#22d3a5" stroke-width="1.2"/>
-        <circle cx="192" cy="130" r="1.5" fill="#22d3a5" style="animation: ndPulse 0.3s infinite alternate;"/>
-        <circle cx="197" cy="130" r="1.5" fill="#10b981"/>
-        <circle cx="202" cy="130" r="1.5" fill="#22d3a5" style="animation: ndPulse 0.4s infinite alternate;"/>
-        <circle cx="207" cy="130" r="1.5" fill="#10b981"/>
-        <circle cx="212" cy="130" r="1.5" fill="#22d3a5" style="animation: ndPulse 0.5s infinite alternate;"/>
-        <circle cx="217" cy="130" r="1.5" fill="#22d3a5"/>
-        <circle cx="222" cy="130" r="1.5" fill="#10b981"/>
-      `;
+  // Step button
+  el('nd-step-btn')?.addEventListener('click', () => {
+    play('click');
+    if (netState.stepQueue.length > 0) {
+      const nextStep = netState.stepQueue.shift();
+      nextStep();
     } else {
-      overlay.innerHTML = `
-        <!-- Router disc/arrows -->
-        <circle cx="205" cy="130" r="13" fill="#1e1b4b" stroke="#fbbf24" stroke-width="1.5"/>
-        <path d="M 197 130 L 213 130 M 205 122 L 205 138" stroke="#fbbf24" stroke-width="1.2" stroke-linecap="round"/>
-        <polygon points="194,130 199,127 199,133" fill="#fbbf24"/>
-        <polygon points="216,130 211,127 211,133" fill="#fbbf24"/>
-        <polygon points="205,119 202,124 208,124" fill="#fbbf24"/>
-        <polygon points="205,141 202,136 208,136" fill="#fbbf24"/>
-      `;
-    }
-  }
-
-  hideDots();
-  const cr = el('nd-crash');
-  if (cr) cr.style.display = 'none';
-}
-
-function hideDots() {
-  ['nd-dot1','nd-dot2','nd-dot3'].forEach(id => {
-    const e = el(id);
-    if (e) {
-      e.style.display = 'none';
-      if (e.tagName.toLowerCase() === 'circle') {
-        e.setAttribute('cx', -20);
-        e.setAttribute('cy', -20);
-      } else {
-        e.setAttribute('transform', 'translate(-20, -20)');
-      }
+      executeTransmission(netState.src, netState.dst, true);
     }
   });
+
+  // Terminal setup
+  setupTerminalCLI();
+
+  // Initial render
+  updateHostPickers();
+  renderTopologyCanvas();
+  resetNetworkState();
+  setDeviceDetails('central');
 }
 
-function highlightLink(hostId, isActive) {
-  const line = el(`nd-line-${hostId}`);
-  if (line) {
-    if (isActive) line.classList.add('send');
-    else line.classList.remove('send');
-  }
+function resetNetworkState() {
+  netState.animating = false;
+  netState.stepQueue = [];
+  netState.inStepMode = false;
+  qsa('.nd-cable-line').forEach(line => line.classList.remove('active', 'collision'));
+  hideAllPackets();
+  updateStatus('Ready &bull; Click Transmit Packet or type a CLI ping');
+  updateTableViews();
 }
 
-function clearLinks() {
-  ['pc-a', 'pc-b', 'pc-c', 'pc-d'].forEach(id => highlightLink(id, false));
+function updateStatus(text, isAlert = false) {
+  const dot = qs('.nd-status-dot');
+  const txt = el('nd-status-text');
+  if (dot) dot.style.background = isAlert ? '#ef4444' : '#22d3a5';
+  if (txt) txt.innerHTML = text;
 }
 
-window.selectNDDevice = function(id) {
-  if (window.playSound) window.playSound('click');
-
-  document.querySelectorAll('.nd-host-group, #nd-center-g').forEach(g => {
-    g.querySelector('rect')?.setAttribute('stroke-width', '1.2');
-  });
-
-  if (id === 'central') {
-    const centralG = el('nd-center-g');
-    centralG?.querySelector('rect')?.setAttribute('stroke-width', '2.5');
-    setDevInfo();
-  } else {
-    const hostG = el(`host-${id}`);
-    hostG?.querySelector('rect')?.setAttribute('stroke-width', '2.5');
-    const h = gh(id);
-    if (h) {
-      el('nd-info-content').innerHTML = `
-        <div style="border-left: 3px solid var(--color-indigo); padding-left: 8px; font-family:var(--font-header);">
-          <strong style="font-size: 0.82rem; color: var(--text-primary); display:block; margin-bottom:0.2rem;">Host ${h.label} Device</strong>
-          <div style="display:flex; flex-direction:column; gap:0.2rem; font-size:0.68rem; margin-top:0.25rem;">
-            <span><strong style="color:var(--text-secondary)">MAC:</strong> <code style="color:var(--color-success); font-family:var(--font-mono);">${h.mac}</code></span>
-            <span><strong style="color:var(--text-secondary)">IP:</strong> <code style="color:var(--color-indigo); font-family:var(--font-mono);">${h.ip}</code></span>
-            <span><strong style="color:var(--text-secondary)">Subnet:</strong> <code style="font-family:var(--font-mono);">${h.sub}/24</code></span>
-            <span><strong style="color:var(--text-secondary)">Status:</strong> <span style="color:#22d3a5; font-weight:700; display:inline-flex; align-items:center; gap:0.25rem;">ONLINE <svg viewBox="0 0 20 20" width="12" height="12" fill="none" stroke="#22d3a5" stroke-width="2.5"><path d="M4 10l4 4 8-8"/></svg></span></span>
-          </div>
-        </div>
-      `;
-    }
-  }
-};
-
-function updateHostOptions() {
-  ['nd-src-options','nd-dst-options'].forEach(containerId => {
-    const c = el(containerId); if (!c) return;
-    c.innerHTML = '';
+function updateHostPickers() {
+  const currentHosts = getHosts();
+  ['nd-src-options', 'nd-dst-options'].forEach(containerId => {
+    const box = el(containerId);
+    if (!box) return;
+    box.innerHTML = '';
     const isSrc = containerId === 'nd-src-options';
-    hosts.forEach(h => {
-      const b = document.createElement('button');
-      b.className = 'nd-host-btn' + (h.id === (isSrc ? netState.src : netState.dst) ? ' active' : '');
-      b.textContent = h.label;
-      b.title = `${h.mac}\n${h.ip}`;
-      b.addEventListener('click', () => {
+
+    currentHosts.forEach(h => {
+      const btn = document.createElement('button');
+      btn.className = 'nd-host-btn' + (h.id === (isSrc ? netState.src : netState.dst) ? ' active' : '');
+      btn.textContent = h.short;
+      btn.title = `${h.label}\nIP: ${h.ip}\nMAC: ${h.mac}`;
+      btn.addEventListener('click', () => {
         if (netState.animating) return;
+        play('click');
         if (isSrc) netState.src = h.id; else netState.dst = h.id;
-        c.querySelectorAll('.nd-host-btn').forEach(x => x.classList.remove('active'));
-        b.classList.add('active');
+        box.querySelectorAll('.nd-host-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
         window.selectNDDevice(h.id);
       });
-      c.appendChild(b);
+      box.appendChild(btn);
     });
   });
 }
 
-function setDevInfo() {
-  const info = {
-    hub: `<strong>Hub (Layer 1 &mdash; Physical)</strong><br>\u2022 Broadcasts incoming frames to ALL ports<br>\u2022 Does not build a MAC Address lookup table<br>\u2022 Shared medium = high probability of collisions<br>\u2022 Splits overall network bandwidth between hosts`,
-    switch: `<strong>Switch (Layer 2 &mdash; Data Link)</strong><br>\u2022 Selectively forwards frames by matching destination MAC<br>\u2022 Learns source MAC addresses dynamically from traffic<br>\u2022 Each port operates as a separate collision domain<br>\u2022 Guarantees full dedicated bandwidth per host link`,
-    router: `<strong>Router (Layer 3 &mdash; Network)</strong><br>\u2022 Forwards packets between different IP subnets<br>\u2022 Resolves paths via routing table lookups<br>\u2022 Interfaces: 192.168.1.x (Port A) &harr; 192.168.2.x (Port B)<br>\u2022 Operates at the Layer 3 Network boundary`
-  };
-  el('nd-info-content').innerHTML = info[netState.device] || info.hub;
-}
+function renderTopologyCanvas() {
+  const cablesGroup = el('nd-cables-group');
+  const devicesGroup = el('nd-devices-group');
+  const packetsGroup = el('nd-packets-group');
+  if (!cablesGroup || !devicesGroup) return;
 
-function renderPacketInspector() {
-  const box = el('nd-packet-inspector');
-  if (!box || !netState.lastPkt) return;
-  const { s, d, device } = netState.lastPkt;
-  const devNote = device === 'hub'
-    ? 'Broadcast to all ports'
-    : device === 'switch'
-      ? `Unicast to ${d.label} by MAC`
-      : (s.sub === d.sub ? 'Same subnet — direct delivery' : `Routed ${s.ip} → ${d.ip}`);
-  const row = (color, title, fields) => `
-    <div class="pkt-layer-row">
-      <div class="pkt-layer-header" style="border-left:3px solid ${color}">${title}</div>
-      <div class="pkt-layer-fields">
-        ${fields.map(([k, v]) => `<div class="pkt-field"><span class="pkt-field-k">${k}</span><span class="pkt-field-v">${v}</span></div>`).join('')}
-      </div>
-    </div>`;
-  box.innerHTML =
-    row('#818cf8', 'Ethernet II Frame (L2)', [
-      ['Dst MAC', d.mac], ['Src MAC', s.mac], ['EtherType', '0x0800 IPv4'],
-    ]) +
-    row('#3b82f6', 'IPv4 Packet (L3)', [
-      ['Src IP', s.ip], ['Dst IP', d.ip], ['TTL', '64'], ['Protocol', 'TCP'],
-    ]) +
-    row('#22c55e', 'Payload (L4+)', [
-      ['Size', '64 B'], ['Action', devNote],
-    ]);
-}
+  cablesGroup.innerHTML = '';
+  devicesGroup.innerHTML = '';
+  packetsGroup.innerHTML = '';
 
-function log(msg, cls) {
-  const list = el('nd-log-list'); if (!list) return;
-  const d = document.createElement('div');
-  d.className = 'nd-log-item' + (cls ? ' nd-lg-'+cls : '');
-  d.innerHTML = msg;
-  list.appendChild(d);
-  list.scrollTop = list.scrollHeight;
+  const hostsList = getHosts();
 
-  if (netState.macTable && Object.keys(netState.macTable).length > 0) {
-    const tc = el('nd-table-content');
-    if (tc) {
-      tc.innerHTML = Object.entries(netState.macTable)
-        .map(([mac, host]) => `<div class="mac-entry"><span class="mac-host">Host ${host}</span><span class="mac-addr">${mac}</span></div>`)
-        .join('');
-    }
+  if (currentTopoMode === 'device-test') {
+    // Center device (300, 170)
+    const cx = 300, cy = 170;
+    const dType = netState.device;
+
+    // Cable lines
+    hostsList.forEach(h => {
+      cablesGroup.innerHTML += `
+        <line class="nd-cable-line" id="cable-${h.id}" x1="${h.x}" y1="${h.y}" x2="${cx}" y2="${cy}"/>
+      `;
+    });
+
+    // Center Node Box
+    devicesGroup.innerHTML += `
+      <g class="nd-node-group" id="node-central" style="cursor:pointer" onclick="window.selectNDDevice('central')">
+        <rect x="250" y="130" width="100" height="80" rx="10" fill="var(--bg-secondary)" stroke="${dType === 'hub' ? '#818cf8' : dType === 'switch' ? '#22d3a5' : '#fbbf24'}" stroke-width="2"/>
+        <text x="300" y="155" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="800" font-size="13" text-anchor="middle">${dType.toUpperCase()}</text>
+        <text x="300" y="172" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="9" text-anchor="middle">Layer ${dType === 'hub' ? '1 Physical' : dType === 'switch' ? '2 Data Link' : '3 Network'}</text>
+        <!-- Port LEDs -->
+        <circle cx="268" cy="192" r="3.5" fill="#22d3a5" class="nd-port-led"/>
+        <circle cx="282" cy="192" r="3.5" fill="#22d3a5" class="nd-port-led"/>
+        <circle cx="318" cy="192" r="3.5" fill="#22d3a5" class="nd-port-led"/>
+        <circle cx="332" cy="192" r="3.5" fill="#22d3a5" class="nd-port-led"/>
+      </g>
+    `;
+
+    // Host Nodes
+    hostsList.forEach(h => {
+      devicesGroup.innerHTML += createHostSvg(h);
+    });
+
+  } else if (currentTopoMode === 'enterprise') {
+    // Subnet 1 Switch at (180, 170), Router at (300, 170), Subnet 2 Switch at (420, 170)
+    cablesGroup.innerHTML += `
+      <!-- Subnet 1 Host to Switch 1 -->
+      <line class="nd-cable-line" id="cable-pc-a" x1="60" y1="70" x2="180" y2="170"/>
+      <line class="nd-cable-line" id="cable-pc-b" x1="60" y1="270" x2="180" y2="170"/>
+      <!-- Switch 1 to Router -->
+      <line class="nd-cable-line" id="cable-sw1-rtr" x1="180" y1="170" x2="300" y2="170"/>
+      <!-- Router to Switch 2 -->
+      <line class="nd-cable-line" id="cable-rtr-sw2" x1="300" y1="170" x2="420" y2="170"/>
+      <!-- Subnet 2 Switch to Hosts -->
+      <line class="nd-cable-line" id="cable-pc-c" x1="420" y1="170" x2="540" y2="70"/>
+      <line class="nd-cable-line" id="cable-pc-d" x1="420" y1="170" x2="540" y2="270"/>
+    `;
+
+    // Subnet 1 Box Label
+    devicesGroup.innerHTML += `
+      <rect x="25" y="25" width="200" height="290" rx="12" fill="rgba(99,102,241,0.03)" stroke="rgba(99,102,241,0.2)" stroke-dasharray="4,4"/>
+      <text x="35" y="45" fill="#818cf8" font-family="var(--font-mono)" font-size="10" font-weight="700">Subnet 1: 192.168.1.0/24</text>
+      
+      <rect x="375" y="25" width="200" height="290" rx="12" fill="rgba(34,211,165,0.03)" stroke="rgba(34,211,165,0.2)" stroke-dasharray="4,4"/>
+      <text x="385" y="45" fill="#22d3a5" font-family="var(--font-mono)" font-size="10" font-weight="700">Subnet 2: 192.168.2.0/24</text>
+
+      <!-- Switch 1 -->
+      <g class="nd-node-group" id="node-sw1" style="cursor:pointer" onclick="window.selectNDDevice('sw1')">
+        <rect x="145" y="145" width="70" height="50" rx="8" fill="var(--bg-secondary)" stroke="#22d3a5" stroke-width="1.8"/>
+        <text x="180" y="170" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="800" font-size="11" text-anchor="middle">SW-1</text>
+        <text x="180" y="184" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="8" text-anchor="middle">L2 Switch</text>
+      </g>
+
+      <!-- Router -->
+      <g class="nd-node-group" id="node-central" style="cursor:pointer" onclick="window.selectNDDevice('central')">
+        <circle cx="300" cy="170" r="32" fill="var(--bg-secondary)" stroke="#fbbf24" stroke-width="2"/>
+        <text x="300" y="166" fill="#fbbf24" font-family="var(--font-header)" font-weight="800" font-size="11" text-anchor="middle">ROUTER</text>
+        <text x="300" y="180" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="8" text-anchor="middle">Gateway L3</text>
+      </g>
+
+      <!-- Switch 2 -->
+      <g class="nd-node-group" id="node-sw2" style="cursor:pointer" onclick="window.selectNDDevice('sw2')">
+        <rect x="385" y="145" width="70" height="50" rx="8" fill="var(--bg-secondary)" stroke="#22d3a5" stroke-width="1.8"/>
+        <text x="420" y="170" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="800" font-size="11" text-anchor="middle">SW-2</text>
+        <text x="420" y="184" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="8" text-anchor="middle">L2 Switch</text>
+      </g>
+    `;
+
+    hostsList.forEach(h => {
+      devicesGroup.innerHTML += createHostSvg(h);
+    });
+
+  } else if (currentTopoMode === 'csma') {
+    // Bus topology with backbone coaxial cable
+    cablesGroup.innerHTML += `
+      <!-- Shared Bus Backbone -->
+      <line class="nd-cable-line" id="cable-bus" x1="50" y1="200" x2="550" y2="200" style="stroke-width: 4px; stroke: #818cf8;"/>
+      <!-- Terminators -->
+      <rect x="44" y="193" width="6" height="14" fill="#ef4444"/>
+      <rect x="550" y="193" width="6" height="14" fill="#ef4444"/>
+      <!-- T-Connectors -->
+      <line class="nd-cable-line" id="cable-pc-a" x1="90" y1="70" x2="90" y2="200"/>
+      <line class="nd-cable-line" id="cable-pc-b" x1="230" y1="70" x2="230" y2="200"/>
+      <line class="nd-cable-line" id="cable-pc-c" x1="370" y1="70" x2="370" y2="200"/>
+      <line class="nd-cable-line" id="cable-pc-d" x1="510" y1="70" x2="510" y2="200"/>
+    `;
+
+    devicesGroup.innerHTML += `
+      <text x="300" y="240" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="10" text-anchor="middle">Shared 10BASE2 Coaxial Cable Bus (1 Single Collision Domain)</text>
+    `;
+
+    hostsList.forEach(h => {
+      devicesGroup.innerHTML += createHostSvg(h);
+    });
+  }
+
+  // Pre-allocate 4 reusable packet envelopes in SVG
+  for (let i = 1; i <= 4; i++) {
+    packetsGroup.innerHTML += `
+      <g class="nd-anim-packet" id="nd-pkt-${i}" transform="translate(-100,-100)" style="display:none;pointer-events:none;">
+        <rect x="-10" y="-7" width="20" height="14" rx="3" fill="#10b981" stroke="#ffffff" stroke-width="1.2" filter="drop-shadow(0 0 6px rgba(16,185,129,0.8))"/>
+        <path d="M -10 -7 L 0 0 L 10 -7" stroke="#ffffff" stroke-width="1" fill="none"/>
+      </g>
+    `;
   }
 }
 
-function animDot(dotId, x1, y1, x2, y2, ms, cb) {
-  if (netState.abort) { hideDots(); if (cb) cb(); return; }
-  const dot = el(dotId); if (!dot) { if (cb) cb(); return; }
-  dot.style.display = 'block';
-  const t0 = performance.now();
-  function f(t) {
-    if (netState.abort) { hideDots(); if (cb) cb(); return; }
-    let p = Math.min((t - t0) / ms, 1);
-
-    const currX = x1 + (x2 - x1) * p;
-    const currY = y1 + (y2 - y1) * p;
-    if (dot.tagName.toLowerCase() === 'circle') {
-      dot.setAttribute('cx', currX);
-      dot.setAttribute('cy', currY);
-    } else {
-      dot.setAttribute('transform', `translate(${currX}, ${currY})`);
-    }
-    if (p < 1) requestAnimationFrame(f); else if (cb) cb();
-  }
-  requestAnimationFrame(f);
+function createHostSvg(h) {
+  const isServer = h.id === 'pc-d' && currentTopoMode === 'enterprise';
+  return `
+    <g class="nd-node-group" id="node-${h.id}" style="cursor:pointer;" onclick="window.selectNDDevice('${h.id}')">
+      <rect x="${h.x - 30}" y="${h.y - 25}" width="60" height="50" rx="8" fill="var(--bg-secondary)" stroke="#38bdf8" stroke-width="1.5" class="nd-host-box"/>
+      ${isServer ? `
+        <!-- Rack Server Icon -->
+        <rect x="${h.x - 18}" y="${h.y - 18}" width="36" height="14" rx="2" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+        <circle cx="${h.x + 10}" cy="${h.y - 11}" r="1.5" fill="#22c55e"/>
+        <rect x="${h.x - 18}" y="${h.y}" width="36" height="14" rx="2" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+        <circle cx="${h.x + 10}" cy="${h.y + 7}" r="1.5" fill="#22c55e"/>
+      ` : `
+        <!-- PC Monitor Icon -->
+        <rect x="${h.x - 18}" y="${h.y - 18}" width="36" height="24" rx="3" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+        <line x1="${h.x}" y1="${h.y + 6}" x2="${h.x}" y2="${h.y + 14}" stroke="#38bdf8" stroke-width="2"/>
+        <line x1="${h.x - 8}" y1="${h.y + 14}" x2="${h.x + 8}" y2="${h.y + 14}" stroke="#38bdf8" stroke-width="2"/>
+      `}
+      <text x="${h.x}" y="${h.y - 1}" fill="#38bdf8" font-family="var(--font-header)" font-weight="800" font-size="10" text-anchor="middle">${h.short}</text>
+      <text x="${h.x}" y="${h.y + 35}" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="700" font-size="9" text-anchor="middle">${h.label}</text>
+      <text x="${h.x}" y="${h.y + 46}" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="7.5" text-anchor="middle">${h.ip}</text>
+    </g>
+  `;
 }
 
-function endAnim() {
-  setTimeout(() => {
-    hideDots();
-    clearLinks();
-    el('nd-send-btn').disabled = false;
-    netState.animating = false;
-  }, 400);
-}
-
-function sendPacket() {
-  if (netState.animating) return;
-  if (netState.src === netState.dst) { play('error'); if(window.showToast) window.showToast('Source and destination must differ.'); return; }
+window.selectNDDevice = function(id) {
   play('click');
-  const s = gh(netState.src), d = gh(netState.dst);
-  if (!s || !d) return;
-  netState.animating = true; netState.abort = false;
-  el('nd-send-btn').disabled = true;
-  const sc = coords[s.id], dc = coords[d.id];
-  netState.lastPkt = { s, d, device: netState.device };
-  renderPacketInspector();
-  log(`${I.send} ${s.label} \u2192 ${d.label} [${d.mac}]`, 'send');
+  netState.selectedDeviceId = id;
+  qsa('.nd-host-box, .nd-node-group rect, .nd-node-group circle').forEach(el => {
+    el.style.filter = 'none';
+  });
+  const nodeEl = el(`node-${id}`);
+  if (nodeEl) {
+    const shape = nodeEl.querySelector('rect') || nodeEl.querySelector('circle');
+    if (shape) shape.style.filter = 'drop-shadow(0 0 8px #38bdf8)';
+  }
+  setDeviceDetails(id);
+};
 
-  highlightLink(s.id, true);
-  animDot('nd-dot1', sc[0], sc[1], devC[0], devC[1], 450, () => {
-    highlightLink(s.id, false);
+function setDeviceDetails(id) {
+  const info = el('nd-info-content');
+  if (!info) return;
+
+  if (id === 'central') {
+    const d = netState.device;
+    if (currentTopoMode === 'enterprise') {
+      info.innerHTML = `
+        <div class="nd-spec-box">
+          <div class="nd-spec-title" style="color:#fbbf24">Enterprise Gateway Router (Layer 3)</div>
+          <div class="nd-spec-row"><span>Interface eth0:</span> <code>192.168.1.1/24</code></div>
+          <div class="nd-spec-row"><span>Interface eth1:</span> <code>192.168.2.1/24</code></div>
+          <div class="nd-spec-row"><span>Forwarding:</span> <code>IP Subnet Routing</code></div>
+          <div class="nd-spec-row"><span>TTL Behavior:</span> <code>Decrements TTL by 1</code></div>
+          <div class="nd-spec-desc">Examines Layer 3 destination IP addresses and routes packets across subnet boundaries.</div>
+        </div>
+      `;
+    } else {
+      const descriptions = {
+        hub: {
+          title: 'Multiport Repeater Hub (Layer 1)',
+          color: '#818cf8',
+          details: [
+            ['Function', 'Bit-level broadcast to ALL ports'],
+            ['MAC Lookup', 'None (No MAC address memory)'],
+            ['Collision Domain', '1 Shared collision domain'],
+            ['Bandwidth', 'Shared among all connected hosts']
+          ],
+          desc: 'Hub receives an electrical bit signal on one port and blindly repeats it out to every other port.'
+        },
+        switch: {
+          title: 'Ethernet Switch (Layer 2 Data Link)',
+          color: '#22d3a5',
+          details: [
+            ['Function', 'Selective unicast forwarding by MAC'],
+            ['MAC Lookup', 'Dynamic MAC address table learning'],
+            ['Collision Domain', 'Each port is an isolated collision domain'],
+            ['Bandwidth', 'Dedicated full-duplex wire speed per port']
+          ],
+          desc: 'Reads Ethernet frames, records the source MAC to its table, and forwards directly to the destination MAC.'
+        },
+        router: {
+          title: 'IP Router (Layer 3 Network)',
+          color: '#fbbf24',
+          details: [
+            ['Function', 'Inter-network packet routing'],
+            ['Table Used', 'IP Routing Table + ARP Cache'],
+            ['Broadcast Domain', 'Blocks Layer 2 broadcasts'],
+            ['Header Handling', 'Decrements TTL, re-encapsulates L2 MAC']
+          ],
+          desc: 'Connects different IP subnets. Strips the incoming L2 frame, inspects L3 IP, and re-encapsulates for next hop.'
+        }
+      };
+      const cur = descriptions[d] || descriptions.hub;
+      info.innerHTML = `
+        <div class="nd-spec-box">
+          <div class="nd-spec-title" style="color:${cur.color}">${cur.title}</div>
+          ${cur.details.map(([k, v]) => `<div class="nd-spec-row"><span>${k}:</span> <code>${v}</code></div>`).join('')}
+          <div class="nd-spec-desc">${cur.desc}</div>
+        </div>
+      `;
+    }
+  } else if (id === 'sw1' || id === 'sw2') {
+    info.innerHTML = `
+      <div class="nd-spec-box">
+        <div class="nd-spec-title" style="color:#22d3a5">Managed Layer 2 Switch (${id.toUpperCase()})</div>
+        <div class="nd-spec-row"><span>Ports:</span> <code>24 Gigabit Ethernet</code></div>
+        <div class="nd-spec-row"><span>MAC Table:</span> <code>Dynamic Self-Learning</code></div>
+        <div class="nd-spec-row"><span>Collision:</span> <code>Zero Collisions (Full Duplex)</code></div>
+        <div class="nd-spec-desc">Isolates collision domains for local subnet hosts. Floods broadcasts only within this VLAN.</div>
+      </div>
+    `;
+  } else {
+    const h = getHost(id);
+    if (!h) return;
+    info.innerHTML = `
+      <div class="nd-spec-box">
+        <div class="nd-spec-title" style="color:#38bdf8">${h.label} (Host Station)</div>
+        <div class="nd-spec-row"><span>IP Address:</span> <code>${h.ip}</code></div>
+        <div class="nd-spec-row"><span>MAC Address:</span> <code>${h.mac}</code></div>
+        <div class="nd-spec-row"><span>Subnet:</span> <code>${h.sub}</code></div>
+        <div class="nd-spec-row"><span>Interface:</span> <code>${h.iface}</code></div>
+        <div class="nd-spec-desc">Standard Ethernet workstation running TCP/IP protocol suite with local ARP cache.</div>
+      </div>
+    `;
+  }
+}
+
+// ============================================================================
+// TRANSMISSION & PACKET ANIMATION
+// ============================================================================
+
+function executeTransmission(srcId, dstId, stepMode = false) {
+  if (netState.animating && !netState.inStepMode) return;
+  if (srcId === dstId) {
+    play('error');
+    if (window.showToast) window.showToast('Source and destination must be different hosts.');
+    return;
+  }
+
+  const s = getHost(srcId);
+  const d = getHost(dstId);
+  if (!s || !d) return;
+
+  netState.animating = true;
+  netState.inStepMode = stepMode;
+  el('nd-send-btn').disabled = true;
+
+  renderPacketInspector(s, d);
+  termPrint(`[TX] Initiating transmission from ${s.label} (${s.ip}) to ${d.label} (${d.ip})...`, 'info');
+  updateStatus(`Transmitting packet: <strong>${s.label}</strong> &rarr; <strong>${d.label}</strong>`);
+
+  if (currentTopoMode === 'device-test') {
+    simulateDeviceTest(s, d);
+  } else if (currentTopoMode === 'enterprise') {
+    simulateEnterpriseRoute(s, d);
+  } else if (currentTopoMode === 'csma') {
+    simulateCSMA(s, d);
+  }
+}
+
+function simulateDeviceTest(s, d) {
+  const cx = 300, cy = 170;
+  const cableSrc = el(`cable-${s.id}`);
+  if (cableSrc) cableSrc.classList.add('active');
+
+  animPacket('nd-pkt-1', s.x, s.y, cx, cy, animSpeedMs, () => {
+    if (cableSrc) cableSrc.classList.remove('active');
 
     if (netState.device === 'hub') {
-      log(`${I.hub} HUB broadcasts to ALL ports`, 'hub');
-      const others = hosts.filter(h => h.id !== s.id);
+      // Hub broadcasts to all other 3 ports
+      termPrint(`HUB [L1]: Received bitstream on ${s.iface}. Repeating to ALL other ports!`, 'warn');
+      updateStatus(`Hub broadcasted frame out to all physical ports`);
 
-      others.forEach(o => highlightLink(o.id, true));
-
-      animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 450);
-      animDot('nd-dot2', devC[0], devC[1], coords[others[0].id][0], coords[others[0].id][1], 450);
-      animDot('nd-dot3', devC[0], devC[1], coords[others[1]?.id || others[0].id][0], coords[others[1]?.id || others[0].id][1], 450, () => {
-        netState.colCnt++;
-        if (netState.colCnt >= 2) { el('nd-crash').style.display = 'block'; log(`${I.warn} COLLISION \u2014 multiple broadcasts collide`, 'col'); }
-        log(`${I.check} ${d.label} received (but so did others)`, 'recv');
-        endAnim();
+      const otherHosts = getHosts().filter(h => h.id !== s.id);
+      otherHosts.forEach((h, idx) => {
+        const cable = el(`cable-${h.id}`);
+        if (cable) cable.classList.add('active');
+        animPacket(`nd-pkt-${idx + 1}`, cx, cy, h.x, h.y, animSpeedMs, () => {
+          if (cable) cable.classList.remove('active');
+          if (h.id === d.id) {
+            termPrint(`Host ${h.label}: Destination MAC matched (${h.mac})! Packet accepted.`, 'success');
+          } else {
+            termPrint(`Host ${h.label}: Destination MAC (${d.mac}) does NOT match my MAC (${h.mac}). Discarded.`, 'dim');
+          }
+          if (idx === otherHosts.length - 1) finishTransmission();
+        });
       });
+
     } else if (netState.device === 'switch') {
-      const known = !!netState.macTable[d.mac];
-      netState.macTable[s.mac] = s.label;
-      log(`${I.brain} SWITCH learned: ${s.label} \u2192 ${s.mac}`, 'learn');
+      // Switch learns source MAC
+      const wasKnown = !!netState.macTable[d.mac];
+      netState.macTable[s.mac] = { host: s.label, port: s.iface, ip: s.ip };
+      updateTableViews();
+      termPrint(`SWITCH [L2]: Learned MAC ${s.mac} on ${s.iface}.`, 'learn');
 
-      if (known) {
-        log(`${I.target} Forwarded to ${d.label} only (known MAC)`, 'sw');
-        highlightLink(d.id, true);
-        animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 450, () => {
-          log(`${I.check} ${d.label} received exclusively`, 'recv');
-          endAnim();
+      if (wasKnown) {
+        termPrint(`SWITCH [L2]: Destination MAC ${d.mac} FOUND in MAC table. Unicasting directly to ${d.iface}!`, 'success');
+        updateStatus(`Switch forwarded frame directly to ${d.label} (Known MAC)`);
+        const cableDst = el(`cable-${d.id}`);
+        if (cableDst) cableDst.classList.add('active');
+        animPacket('nd-pkt-1', cx, cy, d.x, d.y, animSpeedMs, () => {
+          if (cableDst) cableDst.classList.remove('active');
+          termPrint(`Host ${d.label}: Frame received successfully!`, 'success');
+          finishTransmission();
         });
       } else {
-        log(`${I.question} Unknown MAC \u2014 flooding all ports except source`, 'sw');
-        const others = hosts.filter(h => h.id !== s.id);
-
-        others.forEach(o => highlightLink(o.id, true));
-
-        animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 450);
-        animDot('nd-dot2', devC[0], devC[1], coords[others.find(h=>h.id!==d.id).id][0], coords[others.find(h=>h.id!==d.id).id][1], 450, () => {
-          netState.macTable[d.mac] = d.label;
-          log(`${I.check} ${d.label} received (switch now knows ${d.mac})`, 'recv');
-          endAnim();
+        termPrint(`SWITCH [L2]: Destination MAC ${d.mac} UNKNOWN! Flooding all ports except ${s.iface}...`, 'warn');
+        updateStatus(`Switch flooding frame to discover destination MAC`);
+        const otherHosts = getHosts().filter(h => h.id !== s.id);
+        otherHosts.forEach((h, idx) => {
+          const cable = el(`cable-${h.id}`);
+          if (cable) cable.classList.add('active');
+          animPacket(`nd-pkt-${idx + 1}`, cx, cy, h.x, h.y, animSpeedMs, () => {
+            if (cable) cable.classList.remove('active');
+            if (h.id === d.id) {
+              // Learned destination
+              netState.macTable[d.mac] = { host: d.label, port: d.iface, ip: d.ip };
+              updateTableViews();
+              termPrint(`Host ${d.label}: Frame accepted! Switch has now learned ${d.mac}.`, 'success');
+            } else {
+              termPrint(`Host ${h.label}: Frame discarded (MAC mismatch).`, 'dim');
+            }
+            if (idx === otherHosts.length - 1) finishTransmission();
+          });
         });
-        const rest = hosts.filter(h => h.id !== s.id && h.id !== d.id);
-        if (rest.length > 1) animDot('nd-dot3', devC[0], devC[1], coords[rest[1].id][0], coords[rest[1].id][1], 450);
       }
+
     } else if (netState.device === 'router') {
-      const same = s.sub === d.sub;
-      log(`${I.search} ROUTER: lookup ${d.ip}`, 'router');
-      if (same) {
-        log(`${I.warn} ${s.label} & ${d.label} are on same subnet \u2014 use a Switch`, 'info');
-        highlightLink(d.id, true);
-        animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 450, () => {
-          log(`${I.check} ${d.label} received`, 'recv');
-          endAnim();
-        });
+      termPrint(`ROUTER [L3]: Packet received. Examining L3 IPv4 destination header (${d.ip})...`, 'info');
+      const sameSub = s.sub === d.sub;
+      if (sameSub) {
+        termPrint(`ROUTER [L3]: Source ${s.ip} and Dest ${d.ip} are on the SAME subnet (${s.sub}). Routed directly on local interface.`, 'info');
       } else {
-        log(`${I.globe} Routing ${s.ip} \u2192 ${d.ip} across subnets`, 'router');
-        highlightLink(d.id, true);
-        animDot('nd-dot1', devC[0], devC[1], dc[0], dc[1], 450, () => {
-          log(`${I.check} ${d.label} received (routed)`, 'recv');
-          endAnim();
-        });
+        termPrint(`ROUTER [L3]: Cross-subnet route from ${s.sub} to ${d.sub}. Decrementing TTL (64 &rarr; 63). Re-encapsulating L2 MAC frame!`, 'success');
       }
+      updateStatus(`Router forwarded packet to destination subnet`);
+      const cableDst = el(`cable-${d.id}`);
+      if (cableDst) cableDst.classList.add('active');
+      animPacket('nd-pkt-1', cx, cy, d.x, d.y, animSpeedMs, () => {
+        if (cableDst) cableDst.classList.remove('active');
+        termPrint(`Host ${d.label}: Received L3 routed packet!`, 'success');
+        finishTransmission();
+      });
     }
   });
 }
 
-// osi tab
+function simulateEnterpriseRoute(s, d) {
+  const isCrossSubnet = s.sub !== d.sub;
+  const sw1X = 180, sw1Y = 170;
+  const rtrX = 300, rtrY = 170;
+  const sw2X = 420, sw2Y = 170;
+
+  termPrint(`[Enterprise] Host ${s.label} preparing packet for ${d.label} (${d.ip})...`, 'info');
+  const c1 = el(`cable-${s.id}`);
+  if (c1) c1.classList.add('active');
+
+  // Stage 1: Host to Ingress Switch
+  const firstSwX = s.x < 300 ? sw1X : sw2X;
+  const firstSwY = 170;
+
+  animPacket('nd-pkt-1', s.x, s.y, firstSwX, firstSwY, animSpeedMs, () => {
+    if (c1) c1.classList.remove('active');
+
+    if (!isCrossSubnet) {
+      // Intrasubnet: directly forwarded by the local switch
+      termPrint(`Switch: Source and Destination on same VLAN/Subnet. Direct L2 switching!`, 'success');
+      const cDst = el(`cable-${d.id}`);
+      if (cDst) cDst.classList.add('active');
+      animPacket('nd-pkt-1', firstSwX, firstSwY, d.x, d.y, animSpeedMs, () => {
+        if (cDst) cDst.classList.remove('active');
+        termPrint(`Host ${d.label}: Intra-subnet delivery successful.`, 'success');
+        finishTransmission();
+      });
+    } else {
+      // Ingress switch sends to Router Gateway
+      termPrint(`Switch: Destination IP is outside local subnet. Forwarding to Default Gateway Router!`, 'info');
+      const cTrunk = el(s.x < 300 ? 'cable-sw1-rtr' : 'cable-rtr-sw2');
+      if (cTrunk) cTrunk.classList.add('active');
+
+      animPacket('nd-pkt-1', firstSwX, firstSwY, rtrX, rtrY, animSpeedMs, () => {
+        if (cTrunk) cTrunk.classList.remove('active');
+        termPrint(`Router: Packet arrived at gateway. Lookup routing table for ${d.sub} &rarr; Exit via opposite interface.`, 'success');
+
+        const secondSwX = d.x < 300 ? sw1X : sw2X;
+        const cTrunk2 = el(d.x < 300 ? 'cable-sw1-rtr' : 'cable-rtr-sw2');
+        if (cTrunk2) cTrunk2.classList.add('active');
+
+        animPacket('nd-pkt-1', rtrX, rtrY, secondSwX, secondSwY, animSpeedMs, () => {
+          if (cTrunk2) cTrunk2.classList.remove('active');
+          termPrint(`Egress Switch: Forwarding frame out port ${d.iface} to ${d.label}.`, 'info');
+
+          const cFinal = el(`cable-${d.id}`);
+          if (cFinal) cFinal.classList.add('active');
+
+          animPacket('nd-pkt-1', secondSwX, secondSwY, d.x, d.y, animSpeedMs, () => {
+            if (cFinal) cFinal.classList.remove('active');
+            termPrint(`Host ${d.label}: Packet arrived across routed enterprise network!`, 'success');
+            finishTransmission();
+          });
+        });
+      });
+    }
+  });
+}
+
+function simulateCSMA(s, d) {
+  // CSMA/CD demonstration
+  termPrint(`[CSMA/CD] Carrier Sense: Host ${s.label} senses bus line... Line is IDLE. Transmitting!`, 'info');
+  const cSrc = el(`cable-${s.id}`);
+  if (cSrc) cSrc.classList.add('active');
+
+  animPacket('nd-pkt-1', s.x, s.y, s.x, 200, animSpeedMs * 0.7, () => {
+    // Check if another station also transmits
+    const busCable = el('cable-bus');
+    if (busCable) busCable.classList.add('active');
+
+    termPrint(`[Bus] Frame propagating along shared coaxial backbone...`, 'info');
+    animPacket('nd-pkt-1', s.x, 200, d.x, 200, animSpeedMs, () => {
+      const cDst = el(`cable-${d.id}`);
+      if (cDst) cDst.classList.add('active');
+
+      animPacket('nd-pkt-1', d.x, 200, d.x, d.y, animSpeedMs * 0.7, () => {
+        if (cSrc) cSrc.classList.remove('active');
+        if (busCable) busCable.classList.remove('active');
+        if (cDst) cDst.classList.remove('active');
+        termPrint(`Host ${d.label}: Frame received. Bus idle.`, 'success');
+        finishTransmission();
+      });
+    });
+  });
+}
+
+function animPacket(pktId, x1, y1, x2, y2, durationMs, cb) {
+  const pkt = el(pktId);
+  if (!pkt) { if (cb) cb(); return; }
+  pkt.style.display = 'block';
+
+  const startTime = performance.now();
+  function tick(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / durationMs, 1);
+    const curX = x1 + (x2 - x1) * progress;
+    const curY = y1 + (y2 - y1) * progress;
+
+    pkt.setAttribute('transform', `translate(${curX}, ${curY})`);
+
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      if (cb) cb();
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+function hideAllPackets() {
+  for (let i = 1; i <= 4; i++) {
+    const p = el(`nd-pkt-${i}`);
+    if (p) {
+      p.style.display = 'none';
+      p.setAttribute('transform', 'translate(-100,-100)');
+    }
+  }
+}
+
+function finishTransmission() {
+  setTimeout(() => {
+    hideAllPackets();
+    qsa('.nd-cable-line').forEach(line => line.classList.remove('active'));
+    el('nd-send-btn').disabled = false;
+    netState.animating = false;
+    netState.inStepMode = false;
+    updateStatus('Transmission completed &bull; Network IDLE');
+    play('success');
+  }, 400);
+}
+
+// ============================================================================
+// PROTOCOL INSPECTOR & FORWARDING TABLES
+// ============================================================================
+
+function renderPacketInspector(s, d) {
+  const box = el('nd-packet-inspector');
+  if (!box) return;
+
+  const isCross = s.sub !== d.sub;
+  const ttl = isCross ? 63 : 64;
+
+  box.innerHTML = `
+    <!-- Layer 2 Ethernet Frame -->
+    <div class="pkt-layer-row l2">
+      <div class="pkt-layer-header">
+        <span class="pkt-layer-tag">Layer 2</span>
+        <span>Ethernet II Frame</span>
+        <span class="pkt-layer-len">14 Bytes Header</span>
+      </div>
+      <div class="pkt-fields-grid">
+        <div class="pkt-field" title="Destination Hardware MAC Address">
+          <span class="pkt-k">Dst MAC</span>
+          <span class="pkt-v mac">${d.mac}</span>
+        </div>
+        <div class="pkt-field" title="Source Hardware MAC Address">
+          <span class="pkt-k">Src MAC</span>
+          <span class="pkt-v mac">${s.mac}</span>
+        </div>
+        <div class="pkt-field" title="Protocol Type (0x0800 = IPv4)">
+          <span class="pkt-k">EtherType</span>
+          <span class="pkt-v">0x0800 (IPv4)</span>
+        </div>
+        <div class="pkt-field" title="Cyclic Redundancy Check (Error Check)">
+          <span class="pkt-k">FCS (CRC)</span>
+          <span class="pkt-v crc">0x7F2B0C19 &check;</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layer 3 IPv4 Packet -->
+    <div class="pkt-layer-row l3">
+      <div class="pkt-layer-header">
+        <span class="pkt-layer-tag">Layer 3</span>
+        <span>IPv4 Datagram Header</span>
+        <span class="pkt-layer-len">20 Bytes</span>
+      </div>
+      <div class="pkt-fields-grid">
+        <div class="pkt-field" title="Source IPv4 Address">
+          <span class="pkt-k">Src IP</span>
+          <span class="pkt-v ip">${s.ip}</span>
+        </div>
+        <div class="pkt-field" title="Destination IPv4 Address">
+          <span class="pkt-k">Dst IP</span>
+          <span class="pkt-v ip">${d.ip}</span>
+        </div>
+        <div class="pkt-field" title="Time-to-Live (hops before drop)">
+          <span class="pkt-k">TTL</span>
+          <span class="pkt-v ttl">${ttl}</span>
+        </div>
+        <div class="pkt-field" title="Layer 4 Protocol (1 = ICMP)">
+          <span class="pkt-k">Protocol</span>
+          <span class="pkt-v">ICMP (1)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layer 4 ICMP Payload -->
+    <div class="pkt-layer-row l4">
+      <div class="pkt-layer-header">
+        <span class="pkt-layer-tag">Layer 4</span>
+        <span>ICMP Echo Request (Ping)</span>
+        <span class="pkt-layer-len">64 Bytes Data</span>
+      </div>
+      <div class="pkt-fields-grid">
+        <div class="pkt-field"><span class="pkt-k">ICMP Type</span><span class="pkt-v">8 (Echo Request)</span></div>
+        <div class="pkt-field"><span class="pkt-k">Code</span><span class="pkt-v">0</span></div>
+        <div class="pkt-field"><span class="pkt-k">Sequence</span><span class="pkt-v">seq=1</span></div>
+        <div class="pkt-field"><span class="pkt-k">Payload</span><span class="pkt-v">"LogicQuest Echo Data"</span></div>
+      </div>
+    </div>
+  `;
+}
+
+function updateTableViews() {
+  // 1. MAC Address Table
+  const macBox = el('nd-tab-mac');
+  if (macBox) {
+    const entries = Object.entries(netState.macTable);
+    if (entries.length === 0) {
+      macBox.innerHTML = '<div class="nd-empty-table">No MAC addresses learned yet. Transmit frames to populate table.</div>';
+    } else {
+      macBox.innerHTML = `
+        <table class="nd-data-table">
+          <thead><tr><th>VLAN</th><th>MAC Address</th><th>Type</th><th>Port</th></tr></thead>
+          <tbody>
+            ${entries.map(([mac, data]) => `
+              <tr>
+                <td>1</td>
+                <td><code style="color:#22d3a5">${mac}</code></td>
+                <td>DYNAMIC</td>
+                <td>${data.port || 'Port 1'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+  }
+
+  // 2. ARP Cache
+  const arpBox = el('nd-tab-arp');
+  if (arpBox) {
+    const entries = Object.entries(netState.macTable);
+    if (entries.length === 0) {
+      arpBox.innerHTML = '<div class="nd-empty-table">No ARP entries resolved. Ping hosts to resolve ARP entries.</div>';
+    } else {
+      arpBox.innerHTML = `
+        <table class="nd-data-table">
+          <thead><tr><th>Internet Address</th><th>Physical Address</th><th>Type</th></tr></thead>
+          <tbody>
+            ${entries.map(([mac, data]) => `
+              <tr>
+                <td><code style="color:#38bdf8">${data.ip || '192.168.1.10'}</code></td>
+                <td><code style="color:#818cf8">${mac}</code></td>
+                <td>Dynamic</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+  }
+
+  // 3. Routing Table
+  const routeBox = el('nd-tab-route');
+  if (routeBox) {
+    routeBox.innerHTML = `
+      <table class="nd-data-table">
+        <thead><tr><th>Destination</th><th>Gateway</th><th>Interface</th><th>Metric</th></tr></thead>
+        <tbody>
+          <tr><td>192.168.1.0/24</td><td>0.0.0.0 (Direct)</td><td>eth0</td><td>0</td></tr>
+          <tr><td>192.168.2.0/24</td><td>0.0.0.0 (Direct)</td><td>eth1</td><td>0</td></tr>
+          <tr><td>0.0.0.0/0</td><td>10.0.0.1</td><td>wan0</td><td>1</td></tr>
+        </tbody>
+      </table>
+    `;
+  }
+}
+
+// ============================================================================
+// INTERACTIVE CLI TERMINAL
+// ============================================================================
+
+function setupTerminalCLI() {
+  const input = el('nd-term-input');
+  const submit = el('nd-term-submit');
+
+  function handleCmd() {
+    if (!input) return;
+    const cmd = input.value.trim();
+    if (!cmd) return;
+    input.value = '';
+    executeCLICommand(cmd);
+  }
+
+  submit?.addEventListener('click', handleCmd);
+  input?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleCmd();
+  });
+
+  // Preset button clicks
+  qsa('.nd-cli-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cmd = btn.dataset.cmd;
+      if (cmd) {
+        if (cmd === 'clear') {
+          clearTerminal();
+        } else {
+          executeCLICommand(cmd);
+        }
+      }
+    });
+  });
+}
+
+function termPrint(text, type = 'normal') {
+  const body = el('nd-terminal-body');
+  if (!body) return;
+  const line = document.createElement('div');
+  line.className = `nd-term-line ${type}`;
+  line.innerHTML = text;
+  body.appendChild(line);
+  body.scrollTop = body.scrollHeight;
+}
+
+function clearTerminal() {
+  const body = el('nd-terminal-body');
+  if (body) {
+    body.innerHTML = '<div class="nd-term-line greeting">LogicQuest Terminal cleared. Ready for input.</div>';
+  }
+}
+
+function executeCLICommand(rawCmd) {
+  const cmd = rawCmd.trim();
+  termPrint(`<span class="nd-prompt">host-a:~$</span> ${cmd}`, 'cmd');
+
+  const parts = cmd.split(/\s+/);
+  const base = parts[0].toLowerCase();
+  const arg = parts[1] || '';
+
+  if (base === 'clear' || base === 'cls') {
+    clearTerminal();
+    return;
+  }
+
+  if (base === 'ping') {
+    if (!arg) {
+      termPrint('usage: ping &lt;ip-address&gt;', 'error');
+      return;
+    }
+    const targetHost = getHosts().find(h => h.ip === arg);
+    if (!targetHost) {
+      termPrint(`PING ${arg}: Destination Host Unreachable.`, 'error');
+      return;
+    }
+
+    termPrint(`PING ${arg} (${targetHost.label}): 56 data bytes`, 'info');
+    let seq = 1;
+    function sendPingEcho() {
+      if (seq <= 4) {
+        setTimeout(() => {
+          const rtt = (Math.random() * 1.5 + 1.2).toFixed(2);
+          const ttl = targetHost.sub === getHost('pc-a')?.sub ? 64 : 63;
+          termPrint(`64 bytes from ${arg}: icmp_seq=${seq} ttl=${ttl} time=${rtt} ms`, 'success');
+          seq++;
+          sendPingEcho();
+        }, 350);
+      } else {
+        setTimeout(() => {
+          termPrint(`--- ${arg} ping statistics ---<br>4 packets transmitted, 4 received, 0% packet loss`, 'info');
+          // Trigger visual packet flow
+          executeTransmission('pc-a', targetHost.id);
+        }, 300);
+      }
+    }
+    sendPingEcho();
+    return;
+  }
+
+  if (base === 'arp' && parts[1] === '-a') {
+    termPrint('Interface: 192.168.1.10 on eth0<br>  Internet Address      Physical Address      Type<br>' +
+      getHosts().map(h => `  ${h.ip.padEnd(20)}  ${h.mac.padEnd(20)}  dynamic`).join('<br>'), 'info');
+    return;
+  }
+
+  if (base === 'show' && parts.slice(1).join(' ').toLowerCase().includes('mac')) {
+    termPrint('Mac Address Table<br>-------------------------------------------<br>Vlan    Mac Address       Type        Ports<br>----    -----------       --------    -----<br>' +
+      getHosts().map(h => `1       ${h.mac}    DYNAMIC     ${h.iface}`).join('<br>'), 'info');
+    return;
+  }
+
+  if (base === 'ipconfig' || base === 'ifconfig') {
+    const h = getHost('pc-a');
+    termPrint(`Ethernet adapter Local Area Connection:<br>
+      Connection-specific DNS Suffix  . : local<br>
+      Link-local IPv6 Address . . . . . : fe80::a1b2:c3d4%12<br>
+      IPv4 Address. . . . . . . . . . . : ${h ? h.ip : '192.168.1.10'}<br>
+      Subnet Mask . . . . . . . . . . . : 255.255.255.0<br>
+      Default Gateway . . . . . . . . . : 192.168.1.1<br>
+      Physical Address (MAC). . . . . . : ${h ? h.mac : 'AA:AA:AA:AA:01'}`, 'info');
+    return;
+  }
+
+  if (base === 'traceroute' || base === 'tracert') {
+    termPrint(`traceroute to ${arg || '192.168.2.10'}, 30 hops max, 60 byte packets<br>
+ 1  192.168.1.1 (Gateway Router)  0.812 ms  0.720 ms<br>
+ 2  ${arg || '192.168.2.10'} (Target Destination)  1.942 ms  1.820 ms`, 'success');
+    return;
+  }
+
+  termPrint(`bash: ${base}: command not found. Try: ping, arp -a, show mac, ipconfig, traceroute, clear`, 'error');
+}
+
+// ============================================================================
+// OSI, CRYPTO, PARITY & SUBNET LAB PRESERVATION & UPGRADES
+// ============================================================================
+
 let osiReady = false;
 function initOSI() {
   if (osiReady) return;
@@ -767,7 +1396,6 @@ function initOSI() {
   initOSISim();
 }
 
-// crypto tab
 let cryptoReady = false;
 function initCrypto() {
   if (cryptoReady) return;
@@ -788,20 +1416,20 @@ function initCrypto() {
   el('crypto-bob-pub').textContent = `(${bob.n}, ${bob.e})`;
   el('crypto-bob-priv').textContent = `(${bob.n}, ${bob.d})`;
 
-  el('crypto-enc-btn-alice').addEventListener('click', () => {
+  el('crypto-enc-btn-alice')?.addEventListener('click', () => {
     play('click');
     const plain = el('crypto-plain-alice').value.toUpperCase().replace(/[^A-Z]/g, '');
-    if (!plain) { if(window.showToast) window.showToast('Enter letters A-Z only.'); return; }
+    if (!plain) { if (window.showToast) window.showToast('Enter letters A-Z only.'); return; }
     const nums = plain.split('').map(ch => ch.charCodeAt(0) - 65);
     const enc = nums.map(m => modPow(m, bob.e, bob.n));
     el('crypto-cipher-alice').textContent = enc.join(' ');
-    el('crypto-cipher-status').innerHTML = `${I.lock} Encrypted with Bob\u2019s public key (${bob.n}, ${bob.e})`;
+    el('crypto-cipher-status').innerHTML = `${I.lock} Encrypted with Bob's public key (${bob.n}, ${bob.e})`;
   });
 
-  el('crypto-dec-btn-bob').addEventListener('click', () => {
+  el('crypto-dec-btn-bob')?.addEventListener('click', () => {
     play('click');
     const raw = el('crypto-cipher-alice').textContent.trim();
-    if (raw === '\u2014' || !raw) { if(window.showToast) window.showToast('Alice must encrypt a message first.'); return; }
+    if (raw === '&mdash;' || raw === '—' || !raw) { if (window.showToast) window.showToast('Alice must encrypt a message first.'); return; }
     const nums = raw.split(/\s+/).map(Number);
     const dec = nums.map(c => modPow(c, bob.d, bob.n));
     const text = dec.map(n => String.fromCharCode(n + 65)).join('');
@@ -817,7 +1445,76 @@ function modPow(base, exp, mod) {
   return r;
 }
 
-// subnet tab
+let parityReady = false;
+function initParity() {
+  if (parityReady) return;
+  parityReady = true;
+
+  const inBitsBox = el('parity-input-bits');
+  const recvBitsBox = el('parity-recv-bits');
+  const resultBox = el('parity-result');
+  let currentBits = [1, 0, 1, 1, 0, 0, 1];
+  let recvBits = [];
+
+  function renderInBits() {
+    if (!inBitsBox) return;
+    inBitsBox.innerHTML = currentBits.map((b, i) => `
+      <button type="button" class="parity-bit-btn ${b ? 'one' : 'zero'}" data-idx="${i}">${b}</button>
+    `).join('');
+
+    inBitsBox.querySelectorAll('.parity-bit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        play('toggle');
+        const idx = parseInt(btn.dataset.idx, 10);
+        currentBits[idx] = 1 - currentBits[idx];
+        renderInBits();
+      });
+    });
+  }
+
+  el('parity-send-btn')?.addEventListener('click', () => {
+    play('click');
+    const ones = currentBits.filter(b => b === 1).length;
+    const parityBit = ones % 2 === 1 ? 1 : 0; // Even parity
+    recvBits = [...currentBits, parityBit];
+    renderRecvBits();
+    checkParityResult();
+  });
+
+  el('parity-flip-btn')?.addEventListener('click', () => {
+    if (recvBits.length === 0) {
+      if (window.showToast) window.showToast('Click "Send with Parity" first.');
+      return;
+    }
+    play('error');
+    const flipIdx = Math.floor(Math.random() * recvBits.length);
+    recvBits[flipIdx] = 1 - recvBits[flipIdx];
+    renderRecvBits(flipIdx);
+    checkParityResult();
+  });
+
+  function renderRecvBits(errorIdx = -1) {
+    if (!recvBitsBox) return;
+    recvBitsBox.innerHTML = recvBits.map((b, i) => `
+      <span class="parity-recv-bit ${b ? 'one' : 'zero'} ${i === 7 ? 'parity' : ''} ${i === errorIdx ? 'corrupted' : ''}" title="${i === 7 ? 'Parity Bit' : 'Data Bit'}">${b}</span>
+    `).join('');
+  }
+
+  function checkParityResult() {
+    if (!resultBox || recvBits.length === 0) return;
+    const totalOnes = recvBits.filter(b => b === 1).length;
+    if (totalOnes % 2 === 0) {
+      resultBox.className = 'parity-result success';
+      resultBox.innerHTML = `${I.check} Even Parity Verified: Total 1s = ${totalOnes} (No Single Bit Error Detected)`;
+    } else {
+      resultBox.className = 'parity-result error';
+      resultBox.innerHTML = `${I.cross} PARITY ERROR DETECTED: Total 1s = ${totalOnes} (Odd count violates Even Parity!)`;
+    }
+  }
+
+  renderInBits();
+}
+
 let subnetReady = false;
 function initSubnetLab() {
   if (subnetReady) { calculateSubnet(); return; }
@@ -827,9 +1524,7 @@ function initSubnetLab() {
   const slider = el('subnet-cidr-slider');
   const prefixVal = el('subnet-prefix-val');
 
-  if (ipInput) {
-    ipInput.addEventListener('input', calculateSubnet);
-  }
+  if (ipInput) ipInput.addEventListener('input', calculateSubnet);
   if (slider) {
     slider.addEventListener('input', () => {
       if (prefixVal) prefixVal.textContent = `/${slider.value}`;
@@ -837,7 +1532,7 @@ function initSubnetLab() {
     });
   }
 
-  qsa('.subnet-preset-btn', el('subnet-tab')).forEach(btn => {
+  qsa('.subnet-preset-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       play('click');
       const cidr = btn.dataset.cidr;
@@ -884,8 +1579,6 @@ function calculateSubnet() {
 
   if (ipNum === null) {
     if (grid) grid.innerHTML = `<div class="subnet-calc-row" style="color:var(--color-error)"><span>Invalid IPv4 format (e.g. 192.168.1.10)</span></div>`;
-    if (binVis) binVis.innerHTML = '';
-    if (tableBody) tableBody.innerHTML = '';
     return;
   }
 
@@ -900,200 +1593,63 @@ function calculateSubnet() {
   const firstHostNum = cidr >= 31 ? netNum : netNum + 1;
   const lastHostNum = cidr >= 31 ? bcastNum : bcastNum - 1;
 
-  const firstOctet = (ipNum >>> 24) & 255;
-  let ipClass = 'Class A';
-  let defaultPrefix = 8;
-  if (firstOctet >= 128 && firstOctet <= 191) { ipClass = 'Class B'; defaultPrefix = 16; }
-  else if (firstOctet >= 192 && firstOctet <= 223) { ipClass = 'Class C'; defaultPrefix = 24; }
-  else if (firstOctet >= 224 && firstOctet <= 239) { ipClass = 'Class D (Multicast)'; defaultPrefix = 0; }
-  else if (firstOctet >= 240) { ipClass = 'Class E (Experimental)'; defaultPrefix = 0; }
-
-  let scope = 'Public Internet';
-  if ((firstOctet === 10) ||
-      (firstOctet === 172 && ((ipNum >>> 16) & 255) >= 16 && ((ipNum >>> 16) & 255) <= 31) ||
-      (firstOctet === 192 && ((ipNum >>> 16) & 255) === 168)) {
-    scope = 'Private (RFC 1918)';
-  } else if (firstOctet === 127) {
-    scope = 'Loopback (RFC 1122)';
-  } else if (firstOctet === 169 && ((ipNum >>> 16) & 255) === 254) {
-    scope = 'Link-Local / APIPA';
-  }
-
   if (grid) {
-    const rows = [
-      ['IP Address', `${numToIp(ipNum)} /${cidr}`],
-      ['Network Address', numToIp(netNum)],
-      ['Subnet Mask', numToIp(maskNum)],
-      ['Wildcard Mask', numToIp(wildcardNum)],
-      ['Broadcast Address', numToIp(bcastNum)],
-      ['Usable Host Range', usableHosts > 0 ? `${numToIp(firstHostNum)} — ${numToIp(lastHostNum)}` : 'None'],
-      ['Total Addresses', totalAddresses.toLocaleString()],
-      ['Usable Hosts', usableHosts.toLocaleString()],
-      ['IP Class', `${ipClass} (Default /${defaultPrefix})`],
-      ['Address Scope', scope]
-    ];
-
-    grid.innerHTML = rows.map(([k, v]) => `
-      <div class="subnet-calc-row">
-        <span class="subnet-calc-k">${k}</span>
-        <span class="subnet-calc-v">${v}</span>
-      </div>
-    `).join('');
+    grid.innerHTML = `
+      <div class="subnet-calc-row"><span>Network Address:</span> <code>${numToIp(netNum)}</code></div>
+      <div class="subnet-calc-row"><span>Broadcast Address:</span> <code>${numToIp(bcastNum)}</code></div>
+      <div class="subnet-calc-row"><span>Subnet Mask:</span> <code>${numToIp(maskNum)}</code></div>
+      <div class="subnet-calc-row"><span>Usable Host Range:</span> <code>${numToIp(firstHostNum)} &ndash; ${numToIp(lastHostNum)}</code></div>
+      <div class="subnet-calc-row"><span>Total Addresses:</span> <code>${totalAddresses.toLocaleString()}</code></div>
+      <div class="subnet-calc-row"><span>Usable Hosts:</span> <code style="color:#22d3a5">${usableHosts.toLocaleString()}</code></div>
+    `;
   }
 
   if (binVis) {
-    const ipParts = [(ipNum >>> 24) & 255, (ipNum >>> 16) & 255, (ipNum >>> 8) & 255, ipNum & 255];
-    const maskParts = [(maskNum >>> 24) & 255, (maskNum >>> 16) & 255, (maskNum >>> 8) & 255, maskNum & 255];
-    const netParts = [(netNum >>> 24) & 255, (netNum >>> 16) & 255, (netNum >>> 8) & 255, netNum & 255];
-
-    function renderOctetBits(octetNum, octetIdx) {
-      const binStr = numToBin8(octetNum);
-      return binStr.split('').map((bit, bitIdx) => {
-        const globalBitIdx = octetIdx * 8 + bitIdx;
-        const isNet = globalBitIdx < cidr;
-        const isSubnetBit = isNet && globalBitIdx >= defaultPrefix;
-        const cls = isNet ? (isSubnetBit ? 'sbit sbit-sub' : 'sbit sbit-net') : 'sbit sbit-host';
-        return `<span class="${cls}" title="Bit ${globalBitIdx + 1}: ${isNet ? (isSubnetBit ? 'Subnet Bit' : 'Network Bit') : 'Host Bit'}">${bit}</span>`;
-      }).join('');
-    }
+    const octets = rawIp.split('.').map(Number);
+    const maskOctets = numToIp(maskNum).split('.').map(Number);
 
     binVis.innerHTML = `
-      <div style="display:flex;align-items:center;gap:0.5rem;font-family:var(--font-mono);font-size:0.75rem;margin-bottom:0.25rem">
-        <span style="min-width:45px;color:var(--text-muted)">IP:</span>
-        <div style="display:flex;align-items:center;gap:3px">
-          ${ipParts.map((p, i) => `<span>${renderOctetBits(p, i)}</span>`).join('<span style="font-weight:700;color:var(--text-muted)">.</span>')}
+      <div class="bin-row-wrap">
+        <div class="bin-row-title">IP Binary:</div>
+        <div class="bin-octets">
+          ${octets.map((o, idx) => `
+            <div class="bin-octet">${numToBin8(o)}</div>
+          `).join('<span class="bin-dot">.</span>')}
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:0.5rem;font-family:var(--font-mono);font-size:0.75rem;margin-bottom:0.25rem">
-        <span style="min-width:45px;color:var(--text-muted)">Mask:</span>
-        <div style="display:flex;align-items:center;gap:3px">
-          ${maskParts.map((p, i) => `<span>${renderOctetBits(p, i)}</span>`).join('<span style="font-weight:700;color:var(--text-muted)">.</span>')}
+      <div class="bin-row-wrap" style="margin-top:0.4rem">
+        <div class="bin-row-title">Mask Binary:</div>
+        <div class="bin-octets">
+          ${maskOctets.map((o, idx) => `
+            <div class="bin-octet mask">${numToBin8(o)}</div>
+          `).join('<span class="bin-dot">.</span>')}
         </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:0.5rem;font-family:var(--font-mono);font-size:0.75rem;margin-bottom:0.4rem">
-        <span style="min-width:45px;color:var(--text-muted)">Net:</span>
-        <div style="display:flex;align-items:center;gap:3px">
-          ${netParts.map((p, i) => `<span>${renderOctetBits(p, i)}</span>`).join('<span style="font-weight:700;color:var(--text-muted)">.</span>')}
-        </div>
-      </div>
-      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;font-size:0.68rem;color:var(--text-secondary)">
-        <span style="display:flex;align-items:center;gap:0.25rem"><span style="width:10px;height:10px;border-radius:2px;background:#3b82f6;display:inline-block"></span> Network (${defaultPrefix})</span>
-        <span style="display:flex;align-items:center;gap:0.25rem"><span style="width:10px;height:10px;border-radius:2px;background:#06b6d4;display:inline-block"></span> Subnet (${Math.max(0, cidr - defaultPrefix)})</span>
-        <span style="display:flex;align-items:center;gap:0.25rem"><span style="width:10px;height:10px;border-radius:2px;background:#10b981;display:inline-block"></span> Host (${32 - cidr})</span>
       </div>
     `;
   }
 
   if (tableBody) {
-    const parentPrefix = Math.max(0, Math.min(cidr - 1, cidr <= 16 ? 8 : (cidr <= 24 ? 16 : 24)));
-    const parentBlockSize = Math.pow(2, 32 - parentPrefix);
-    const parentNetNum = (ipNum & (parentPrefix === 0 ? 0 : (0xFFFFFFFF << (32 - parentPrefix)) >>> 0)) >>> 0;
+    const subnets = [];
+    const step = totalAddresses;
+    const baseNet = (netNum & (0xFFFFFF00 >>> 0)) >>> 0;
+    const maxRows = Math.min(8, Math.floor(256 / Math.max(1, step)));
 
-    const sliceCount = Math.min(32, parentBlockSize / totalAddresses);
+    for (let i = 0; i < maxRows; i++) {
+      const sNet = baseNet + i * step;
+      const sBcast = sNet + step - 1;
+      const sFirst = sNet + 1;
+      const sLast = sBcast - 1;
+      const isCurrent = netNum === sNet;
 
-    const rowsHtml = [];
-
-    for (let i = 0; i < sliceCount; i++) {
-      const sNet = (parentNetNum + i * totalAddresses) >>> 0;
-      const sBcast = (sNet + totalAddresses - 1) >>> 0;
-      const isCurrent = sNet === netNum;
-      const sFirst = cidr >= 31 ? sNet : sNet + 1;
-      const sLast = cidr >= 31 ? sBcast : sBcast - 1;
-
-      rowsHtml.push(`
-        <tr style="${isCurrent ? 'background:rgba(56,189,248,0.18);font-weight:700;' : ''}">
-          <td style="padding:0.4rem 0.6rem;border-bottom:1px solid var(--border-color)">${i + 1}${isCurrent ? ' ★' : ''}</td>
-          <td style="padding:0.4rem 0.6rem;border-bottom:1px solid var(--border-color)"><code style="color:var(--color-indigo)">${numToIp(sNet)}/${cidr}</code></td>
-          <td style="padding:0.4rem 0.6rem;border-bottom:1px solid var(--border-color)"><code>${numToIp(sFirst)} – ${numToIp(sLast)}</code></td>
-          <td style="padding:0.4rem 0.6rem;border-bottom:1px solid var(--border-color)"><code>${numToIp(sBcast)}</code></td>
+      subnets.push(`
+        <tr class="${isCurrent ? 'current-subnet' : ''}">
+          <td>${i + 1} ${isCurrent ? '★' : ''}</td>
+          <td><code>${numToIp(sNet)}</code></td>
+          <td><code>${numToIp(sFirst)} &ndash; ${numToIp(sLast)}</code></td>
+          <td><code>${numToIp(sBcast)}</code></td>
         </tr>
       `);
     }
-
-    tableBody.innerHTML = rowsHtml.join('');
+    tableBody.innerHTML = subnets.join('');
   }
-}
-
-// parity tab
-let parityReady = false;
-let parityBits = [];
-function initParity() {
-  if (parityReady) return;
-  parityReady = true;
-  const c = el('parity-input-bits');
-  parityBits = [];
-
-  const senderBox = c.closest('.parity-box');
-  const countEl = document.createElement('div');
-  countEl.className = 'parity-count';
-  countEl.id = 'parity-ones-count';
-  c.after(countEl);
-
-  const refreshCount = () => {
-    const ones = parityBits.filter(v => v === 1).length;
-    const need = ones % 2 === 0 ? 0 : 1;
-    countEl.innerHTML = `<span><b>${ones}</b> ones (${ones % 2 === 0 ? 'even' : 'odd'})</span><span class="parity-need">parity bit → <b>${need}</b></span>`;
-  };
-
-  for (let i = 0; i < 7; i++) {
-    const v = Math.random() < 0.5 ? 0 : 1;
-    parityBits.push(v);
-    const b = document.createElement('span');
-    b.className = 'parity-bit' + (v ? ' on' : '');
-    b.textContent = v;
-    b.dataset.idx = i;
-    b.title = `Data bit ${i + 1} — click to toggle`;
-    b.addEventListener('click', () => {
-      play('click');
-      parityBits[i] = parityBits[i] ? 0 : 1;
-      b.textContent = parityBits[i];
-      b.className = 'parity-bit' + (parityBits[i] ? ' on' : '');
-      refreshCount();
-    });
-    c.appendChild(b);
-  }
-  refreshCount();
-
-  el('parity-send-btn').addEventListener('click', () => {
-    play('click');
-    const ones = parityBits.filter(v => v === 1).length;
-    const parityBit = ones % 2 === 0 ? 0 : 1;
-    const sent = [...parityBits, parityBit];
-    const rc = el('parity-recv-bits');
-    rc.innerHTML = '';
-    sent.forEach((v, i) => {
-      const b = document.createElement('span');
-      b.className = 'parity-bit recv' + (v ? ' on' : '') + (i === 7 ? ' parity' : '');
-      b.textContent = v;
-      b.dataset.idx = i;
-      b.title = i === 7 ? 'Parity bit (makes total ones even)' : `Received bit ${i + 1}`;
-      rc.appendChild(b);
-    });
-    const totalOnes = sent.filter(v => v === 1).length;
-    const ok = totalOnes % 2 === 0;
-    const res = el('parity-result');
-    res.className = 'parity-result' + (ok ? ' ok' : ' err');
-    res.innerHTML = ok
-      ? `${I.check} Parity OK (${totalOnes} ones = even)`
-      : `${I.cross} Error detected! (${totalOnes} ones = odd)`;
-  });
-
-  el('parity-flip-btn').addEventListener('click', () => {
-    play('click');
-    const idx = Math.floor(Math.random() * 7);
-    const before = parityBits[idx];
-    parityBits[idx] = parityBits[idx] ? 0 : 1;
-    const bits = el('parity-input-bits').children;
-    if (bits[idx]) {
-      bits[idx].textContent = parityBits[idx];
-      bits[idx].className = 'parity-bit' + (parityBits[idx] ? ' on' : '');
-      bits[idx].classList.add('flash');
-      setTimeout(() => bits[idx].classList.remove('flash'), 900);
-    }
-    const ones = parityBits.filter(v => v === 1).length;
-    const need = ones % 2 === 0 ? 0 : 1;
-    const cc = el('parity-ones-count');
-    if (cc) cc.innerHTML = `<span><b>${ones}</b> ones (${ones % 2 === 0 ? 'even' : 'odd'})</span><span class="parity-need">parity bit → <b>${need}</b></span>`;
-    if (window.showToast) window.showToast(`Noise flipped bit ${idx + 1}: ${before} → ${parityBits[idx]}`);
-  });
 }

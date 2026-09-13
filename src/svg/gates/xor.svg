@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" width="40" height="32" class="logic-gate-symbol xor-gate">
+  <!-- Input leads -->
+  <line x1="0" y1="8" x2="6" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="0" y1="24" x2="6" y2="24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- XOR back curve -->
+  <path d="M 2 4 Q 10 16 2 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- XOR body -->
+  <path d="M 6 4 Q 14 16 6 28 Q 20 27 32 16 Q 20 5 6 4 Z" fill="var(--gate-fill, rgba(56, 189, 248, 0.12))" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- Output lead -->
+  <line x1="32" y1="16" x2="40" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

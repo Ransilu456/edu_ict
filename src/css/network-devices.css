@@ -2251,3 +2251,511 @@
 .parity-box {
   min-width: 0;
 }
+
+/* ============================================================================
+   Redesigned Networking Suite & Terminal CLI Styles
+   ============================================================================ */
+
+/* Topo Mode Bar */
+.nd-topo-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0 0.85rem;
+}
+
+.nd-section-label {
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.nd-mode-pills {
+  display: flex;
+  gap: 0.3rem;
+  background: var(--bg-tertiary);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.nd-mode-pill {
+  flex: 1;
+  padding: 0.35rem 0.2rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-header);
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  text-align: center;
+}
+
+.nd-mode-pill:hover {
+  color: var(--text-primary);
+}
+
+.nd-mode-pill.active {
+  background: var(--color-indigo, #6366f1);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+}
+
+.nd-btn-row {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.nd-step-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-family: var(--font-header);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.nd-step-btn:hover {
+  background: var(--bg-primary);
+  border-color: var(--color-cyan);
+}
+
+/* Inspected Spec Box */
+.nd-spec-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+}
+
+.nd-spec-title {
+  font-family: var(--font-header);
+  font-size: 0.78rem;
+  font-weight: 800;
+  margin-bottom: 0.15rem;
+}
+
+.nd-spec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-secondary);
+}
+
+.nd-spec-row code {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  background: var(--bg-primary);
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.nd-spec-desc {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Forwarding Tables Tabs & Views */
+.nd-mini-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  font-size: 0.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s;
+}
+
+.nd-mini-clear-btn:hover {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.nd-table-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0.4rem 0 0.5rem;
+}
+
+.nd-subtable-tab {
+  flex: 1;
+  padding: 4px 6px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  font-family: var(--font-header);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background: var(--bg-primary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.nd-subtable-tab.active {
+  background: var(--color-indigo, #6366f1);
+  color: #ffffff;
+  border-color: var(--color-indigo, #6366f1);
+}
+
+.nd-subtable-panel {
+  display: none;
+}
+
+.nd-subtable-panel.active {
+  display: block;
+}
+
+.nd-empty-table {
+  padding: 0.6rem;
+  text-align: center;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.nd-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.65rem;
+}
+
+.nd-data-table th {
+  text-align: left;
+  padding: 4px 6px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 700;
+}
+
+.nd-data-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+}
+
+/* Packet Inspector Layers */
+.pkt-layer-row {
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 0.4rem;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+.pkt-layer-row.l2 { border-left: 3px solid #818cf8; }
+.pkt-layer-row.l3 { border-left: 3px solid #38bdf8; }
+.pkt-layer-row.l4 { border-left: 3px solid #22c55e; }
+
+.pkt-layer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pkt-layer-tag {
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: var(--bg-tertiary);
+}
+
+.pkt-layer-len {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.pkt-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  padding: 6px 8px;
+}
+
+.pkt-field {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pkt-k {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.pkt-v {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pkt-v.mac { color: #22d3a5; font-weight: 700; }
+.pkt-v.ip { color: #38bdf8; font-weight: 700; }
+.pkt-v.ttl { color: #fbbf24; font-weight: 700; }
+.pkt-v.crc { color: #a78bfa; }
+
+/* Right Topology Header */
+.nd-topo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.85rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.nd-topo-status {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.nd-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22d3a5;
+  box-shadow: 0 0 6px #22d3a5;
+  flex-shrink: 0;
+}
+
+.nd-speed-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.nd-speed-pill {
+  padding: 2px 7px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-header);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.nd-speed-pill.active {
+  background: var(--color-cyan, #06b6d4);
+  color: #ffffff;
+  border-color: var(--color-cyan, #06b6d4);
+}
+
+.nd-reset-net-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.12s;
+  padding: 0;
+}
+
+.nd-reset-net-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--color-cyan);
+}
+
+.nd-reset-net-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Cables & Animation SVG */
+.nd-cable-line {
+  stroke: var(--border-color);
+  stroke-width: 2px;
+  stroke-dasharray: 4, 4;
+  transition: stroke 0.2s, stroke-width 0.2s;
+}
+
+.nd-cable-line.active {
+  stroke: #22d3a5 !important;
+  stroke-width: 3px !important;
+  stroke-dasharray: none !important;
+  filter: drop-shadow(0 0 6px rgba(34, 211, 165, 0.8));
+}
+
+.nd-cable-line.collision {
+  stroke: #ef4444 !important;
+  stroke-width: 4px !important;
+  filter: drop-shadow(0 0 8px #ef4444);
+}
+
+.nd-port-led {
+  animation: ndPortBlink 0.8s infinite alternate;
+}
+
+@keyframes ndPortBlink {
+  0% { opacity: 0.3; }
+  100% { opacity: 1; filter: drop-shadow(0 0 4px #22d3a5); }
+}
+
+/* Network CLI Terminal */
+.nd-terminal-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 180px;
+  background: #090d16;
+  border-top: 1px solid var(--border-color);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+}
+
+.nd-terminal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px;
+  background: #0e1424;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nd-term-title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #94a3b8;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: var(--font-header);
+}
+
+.nd-term-title svg {
+  width: 13px;
+  height: 13px;
+  color: var(--color-cyan);
+}
+
+.nd-term-quick-btns {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.nd-cli-pill {
+  padding: 2px 7px;
+  font-size: 0.62rem;
+  font-family: var(--font-mono);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #38bdf8;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.nd-cli-pill:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+.nd-terminal-body {
+  flex: 1;
+  padding: 8px 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  color: #cbd5e1;
+  scrollbar-width: thin;
+}
+
+.nd-term-line {
+  line-height: 1.35;
+}
+
+.nd-term-line.cmd { color: #f8fafc; font-weight: 700; }
+.nd-term-line.info { color: #38bdf8; }
+.nd-term-line.success { color: #22d3a5; }
+.nd-term-line.warn { color: #fbbf24; }
+.nd-term-line.error { color: #ef4444; }
+.nd-term-line.dim { color: #64748b; }
+.nd-term-line.learn { color: #a78bfa; font-weight: 700; }
+.nd-term-line.greeting { color: #64748b; font-style: italic; }
+
+.nd-terminal-input-bar {
+  display: flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: #0b101d;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 6px;
+}
+
+.nd-prompt {
+  color: #22d3a5;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.nd-term-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  outline: none;
+}
+
+.nd-term-submit {
+  background: transparent;
+  border: none;
+  color: #38bdf8;
+  cursor: pointer;
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+}
+
+.nd-term-submit:hover {
+  color: #ffffff;
+}
+
+.nd-term-submit svg {
+  width: 14px;
+  height: 14px;
+}

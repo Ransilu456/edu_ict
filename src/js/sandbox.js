@@ -35,8 +35,30 @@ let selectionRectEl = null;
 const MAX_UNDO = 30;
 let undoStack = [];
 let _ignorePortClick = false;
-let simSpeed = 1;
 let wireStyle = localStorage.getItem('logicQuest_wireStyle') || 'curve';
+
+export const WIRE_PALETTE = [
+  { name: 'Blue', hex: '#3b82f6' },
+  { name: 'Red', hex: '#ef4444' },
+  { name: 'Green', hex: '#22c55e' },
+  { name: 'Yellow', hex: '#eab308' },
+  { name: 'Orange', hex: '#f97316' },
+  { name: 'Purple', hex: '#a855f7' },
+  { name: 'Cyan', hex: '#06b6d4' },
+  { name: 'White', hex: '#ffffff' }
+];
+let currentWireColor = localStorage.getItem('logicQuest_wireColor') || '#3b82f6';
+let wireColorIdx = 0;
+
+let simSpeed = 1;
+
+function updateWireColorUI() {
+  const dot = document.getElementById('wire-color-preview-dot');
+  if (dot) {
+    dot.style.background = currentWireColor;
+    dot.style.boxShadow = `0 0 8px ${currentWireColor}`;
+  }
+}
 
 function getWorkspaceRect() {
   return workspace?.getBoundingClientRect() || { left: 0, top: 0, width: 0, height: 0 };
@@ -603,6 +625,11 @@ function setupToolbar() {
       layoutMenu.appendChild(layoutPanel);
     }
   });
+  document.addEventListener('click', (event) => {
+    if (!layoutMenu?.open) return;
+    if (layoutMenu.contains(event.target) || layoutPanel?.contains(event.target)) return;
+    layoutMenu.removeAttribute('open');
+  });
   if (wireStyleBtn) {
     updateWireStyleBtn(wireStyleBtn);
     wireStyleBtn.addEventListener('click', () => {
@@ -623,6 +650,33 @@ function setupToolbar() {
     playSound('success');
     showToast('Circuit organized into columns');
   });
+
+  // Wire Color Toolbar Menu
+  const wireColorDetails = document.getElementById('sandbox-wire-color-details');
+  const wireColorPanel = document.getElementById('sandbox-wire-palette-panel');
+  updateWireColorUI();
+
+  if (wireColorPanel) {
+    wireColorPanel.innerHTML = WIRE_PALETTE.map(c => `
+      <button type="button" class="wire-color-swatch ${currentWireColor === c.hex ? 'active' : ''}"
+        style="background:${c.hex};"
+        title="${c.name}"
+        data-hex="${c.hex}"></button>
+    `).join('');
+
+    wireColorPanel.querySelectorAll('.wire-color-swatch').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentWireColor = btn.dataset.hex;
+        localStorage.setItem('logicQuest_wireColor', currentWireColor);
+        wireColorPanel.querySelectorAll('.wire-color-swatch').forEach(b => b.classList.toggle('active', b.dataset.hex === currentWireColor));
+        updateWireColorUI();
+        wireColorDetails?.removeAttribute('open');
+        playSound('click');
+        showToast(`Default wire color: ${WIRE_PALETTE.find(p => p.hex === currentWireColor)?.name || currentWireColor}`);
+      });
+    });
+  }
   const createICBtn = document.getElementById('sandbox-create-ic');
   if (createICBtn) {
     createICBtn.disabled = true;
@@ -694,6 +748,7 @@ function updateWireStyleBtn(btn) {
 }
 
 function organizeCircuit() {
+  if (!sandboxNodes.length) return;
   const incoming = new Map(sandboxNodes.map(node => [node.id, []]));
   sandboxWires.forEach(wire => incoming.get(wire.toNodeId)?.push(wire.fromNodeId));
   const depths = new Map();
@@ -712,12 +767,42 @@ function organizeCircuit() {
     if (!columns.has(depth)) columns.set(depth, []);
     columns.get(depth).push(node);
   });
-  [...columns.entries()].sort(([a], [b]) => a - b).forEach(([depth, nodes]) => {
-    nodes.forEach((node, index) => {
-      node.x = 70 + depth * 190;
-      node.y = 90 + index * 115;
+
+  const sortedColumns = [...columns.entries()].sort(([a], [b]) => a - b);
+  
+  // Measure heights and widths
+  let maxTotalHeight = 0;
+  const colMetrics = sortedColumns.map(([depth, nodes]) => {
+    let colWidth = 0;
+    let colHeight = 0;
+    const nodeDims = nodes.map(node => {
+      const el = document.getElementById(node.id);
+      const isIC = !!REAL_ICS[node.type];
+      const w = el?.offsetWidth || (isIC ? 390 : 130);
+      const h = el?.offsetHeight || (isIC ? 260 : 80);
+      colWidth = Math.max(colWidth, w);
+      return { node, w, h };
     });
+    colHeight = nodeDims.reduce((acc, d) => acc + d.h, 0) + Math.max(0, nodeDims.length - 1) * 36;
+    maxTotalHeight = Math.max(maxTotalHeight, colHeight);
+    return { depth, nodes: nodeDims, colWidth, colHeight };
   });
+
+  let currentX = 80;
+  colMetrics.forEach(col => {
+    // Vertically center column within overall circuit height
+    const startY = Math.max(60, 60 + (maxTotalHeight - col.colHeight) / 2);
+    let runningY = startY;
+
+    col.nodes.forEach(({ node, h }) => {
+      node.x = Math.round(currentX / 10) * 10;
+      node.y = Math.round(runningY / 10) * 10;
+      runningY += h + 36;
+    });
+
+    currentX += col.colWidth + 90; // 90px clear horizontal wire gutter
+  });
+
   sandboxNodes.forEach(node => {
     const element = document.getElementById(node.id);
     if (element) {
@@ -1842,11 +1927,14 @@ function handlePortClick(nodeId, direction, portIdx) {
     }
     sandboxWires = sandboxWires.filter(w => !(w.toNodeId === toNodeId && w.toPortIdx === toPortIdx));
 
+    const assignedColor = currentWireColor || WIRE_PALETTE[(wireColorIdx++) % WIRE_PALETTE.length].hex;
+
     sandboxWires.push({
       fromNodeId,
       fromPortIdx,
       toNodeId,
       toPortIdx,
+      color: assignedColor,
     });
 
     playSound('success');
@@ -1911,7 +1999,7 @@ function drawWiringPreview(e) {
   const prev = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   prev.setAttribute('d', d);
   prev.setAttribute('fill', 'none');
-  prev.setAttribute('stroke', '#1cb0f6');
+  prev.setAttribute('stroke', currentWireColor || '#3b82f6');
   prev.setAttribute('stroke-width', '2.5');
   prev.setAttribute('stroke-linecap', 'round');
   prev.setAttribute('stroke-dasharray', '7 5');
@@ -1938,6 +2026,13 @@ function updateSandboxWires() {
   document.querySelectorAll('.sandbox-port.connected, .real-ic-pin-row.connected, .real-ic-pin-indicator.connected').forEach(el => {
     el.classList.remove('connected');
   });
+
+  const routeLaneCounts = new Map();
+  const nextRouteLane = (key) => {
+    const lane = routeLaneCounts.get(key) || 0;
+    routeLaneCounts.set(key, lane + 1);
+    return lane;
+  };
 
   sandboxWires.forEach((wire) => {
     const fromEl = document.getElementById(wire.fromNodeId);
@@ -1988,14 +2083,111 @@ function updateSandboxWires() {
     }
     const isActive = srcVal === 1;
 
-    const dir = x2 >= x1 ? 1 : -1;
-    const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
-    const midX = x1 + (x2 - x1) * 0.5;
-    const d = wireStyle === 'straight'
-      ? `M ${x1} ${y1} L ${x2} ${y2}`
-      : wireStyle === 'orthogonal'
-        ? `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`
-        : `M ${x1} ${y1} C ${x1 + dir * dx} ${y1}, ${x2 - dir * dx} ${y2}, ${x2} ${y2}`;
+    const isSelfConnection = wire.fromNodeId === wire.toNodeId;
+    let d = '';
+
+    if (isSelfConnection && fromEl) {
+      // Connecting two pins of the SAME IC / component: route cleanly OUTSIDE the node body
+      const fromBounds = screenToWorld(fromEl.getBoundingClientRect().left, fromEl.getBoundingClientRect().top);
+      const nodeTop = fromBounds.y;
+      const nodeLeft = fromBounds.x;
+      const nodeRight = screenToWorld(fromEl.getBoundingClientRect().right, fromEl.getBoundingClientRect().top).x;
+      const nodeBottom = screenToWorld(fromEl.getBoundingClientRect().left, fromEl.getBoundingClientRect().bottom).y;
+
+      const outIsLeft = !!outPort.closest('.real-ic-col.left');
+      const inIsLeft = !!inPort.closest('.real-ic-col.left');
+
+      if (outIsLeft && inIsLeft) {
+        // Both pins on the left side: route outside to the left
+        const lane = nextRouteLane(`${wire.fromNodeId}:left`);
+        const outX = nodeLeft - 28 - lane * 14;
+        if (wireStyle === 'orthogonal') {
+          d = `M ${x1} ${y1} L ${outX} ${y1} L ${outX} ${y2} L ${x2} ${y2}`;
+        } else {
+          d = `M ${x1} ${y1} C ${outX} ${y1}, ${outX} ${y2}, ${x2} ${y2}`;
+        }
+      } else if (!outIsLeft && !inIsLeft) {
+        // Both pins on the right side: route outside to the right
+        const lane = nextRouteLane(`${wire.fromNodeId}:right`);
+        const outX = nodeRight + 28 + lane * 14;
+        if (wireStyle === 'orthogonal') {
+          d = `M ${x1} ${y1} L ${outX} ${y1} L ${outX} ${y2} L ${x2} ${y2}`;
+        } else {
+          d = `M ${x1} ${y1} C ${outX} ${y1}, ${outX} ${y2}, ${x2} ${y2}`;
+        }
+      } else {
+        // One pin on left, one pin on right: route around the top or bottom of the IC
+        const distToTop = (y1 - nodeTop) + (y2 - nodeTop);
+        const distToBottom = (nodeBottom - y1) + (nodeBottom - y2);
+        const goTop = distToTop <= distToBottom;
+        const lane = nextRouteLane(`${wire.fromNodeId}:cross:${goTop ? 'top' : 'bottom'}`);
+
+        const leftX = nodeLeft - 28;
+        const rightX = nodeRight + 28;
+        const bypassY = goTop
+          ? (nodeTop - 30 - lane * 18)
+          : (nodeBottom + 30 + lane * 18);
+
+        if (wireStyle === 'orthogonal') {
+          d = outIsLeft
+            ? `M ${x1} ${y1} L ${leftX} ${y1} L ${leftX} ${bypassY} L ${rightX} ${bypassY} L ${rightX} ${y2} L ${x2} ${y2}`
+            : `M ${x1} ${y1} L ${rightX} ${y1} L ${rightX} ${bypassY} L ${leftX} ${bypassY} L ${leftX} ${y2} L ${x2} ${y2}`;
+        } else {
+          const midX = (x1 + x2) * 0.5;
+          d = outIsLeft
+            ? `M ${x1} ${y1} C ${leftX} ${y1}, ${leftX} ${bypassY}, ${midX} ${bypassY} S ${rightX} ${y2}, ${x2} ${y2}`
+            : `M ${x1} ${y1} C ${rightX} ${y1}, ${rightX} ${bypassY}, ${midX} ${bypassY} S ${leftX} ${y2}, ${x2} ${y2}`;
+        }
+      }
+    } else {
+      const fromIsIC = fromEl.classList.contains('real-ic-node');
+      const toIsIC = toEl.classList.contains('real-ic-node');
+
+      if (fromIsIC || toIsIC) {
+        const icEl = fromIsIC ? fromEl : toEl;
+        const icPort = fromIsIC ? outPort : inPort;
+        const icBounds = icEl.getBoundingClientRect();
+        const icBoundsWorld = screenToWorld(icBounds.left, icBounds.top);
+        const icLeft = icBoundsWorld.x;
+        const icRight = screenToWorld(icBounds.right, icBounds.top).x;
+        const onLeft = !!icPort.closest('.real-ic-col.left');
+        const side = onLeft ? 'left' : 'right';
+        const lane = nextRouteLane(`${icEl.id}:${side}:external`);
+        const channelX = onLeft
+          ? icLeft - 28 - lane * 14
+          : icRight + 28 + lane * 14;
+        const channelStartX = fromIsIC ? x1 : x2;
+        const channelStartY = fromIsIC ? y1 : y2;
+        const channelEndX = fromIsIC ? x2 : x1;
+        const channelEndY = fromIsIC ? y2 : y1;
+
+        if (wireStyle === 'orthogonal') {
+          d = fromIsIC
+            ? `M ${x1} ${y1} L ${channelX} ${y1} L ${channelX} ${y2} L ${x2} ${y2}`
+            : `M ${x1} ${y1} L ${channelX} ${y1} L ${channelX} ${y2} L ${x2} ${y2}`;
+        } else if (wireStyle === 'straight') {
+          d = `M ${x1} ${y1} L ${x2} ${y2}`;
+        } else {
+          d = fromIsIC
+            ? `M ${x1} ${y1} C ${channelX} ${y1}, ${channelX} ${y2}, ${x2} ${y2}`
+            : `M ${x1} ${y1} C ${channelX} ${y1}, ${channelX} ${y2}, ${x2} ${y2}`;
+        }
+      } else {
+      const dir = x2 >= x1 ? 1 : -1;
+      const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
+      const midX = x1 + (x2 - x1) * 0.5;
+      d = wireStyle === 'straight'
+        ? `M ${x1} ${y1} L ${x2} ${y2}`
+        : wireStyle === 'orthogonal'
+          ? `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`
+          : `M ${x1} ${y1} C ${x1 + dir * dx} ${y1}, ${x2 - dir * dx} ${y2}, ${x2} ${y2}`;
+          }
+    }
+
+    const wireColor = wire.color || '#3b82f6';
+    const strokeColor = isActive ? wireColor : (wireColor === '#ffffff' ? '#64748b' : wireColor);
+    const strokeOpacity = isActive ? '1' : '0.45';
+    const strokeWidth = isActive ? '3.2' : '2.4';
 
     const casing = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     casing.setAttribute('d', d);
@@ -2005,17 +2197,20 @@ function updateSandboxWires() {
     casing.setAttribute('stroke-linecap', 'round');
     casing.setAttribute('class', 'sb-wire-casing');
     casing.style.pointerEvents = 'none';
+
     const visPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     visPath.setAttribute('d', d);
     visPath.setAttribute('fill', 'none');
-    visPath.setAttribute('stroke', isActive ? '#00ff66' : '#64748b');
-    visPath.setAttribute('stroke-width', isActive ? '3.2' : '2.5');
+    visPath.setAttribute('stroke', strokeColor);
+    visPath.setAttribute('stroke-width', strokeWidth);
+    visPath.setAttribute('opacity', strokeOpacity);
     visPath.setAttribute('stroke-linecap', 'round');
     visPath.setAttribute('class', 'sb-wire-core ' + (isActive ? 'high' : 'low'));
     if (isActive) {
-      visPath.style.filter = 'drop-shadow(0 0 5px rgba(0, 255, 102, 0.75))';
+      visPath.style.filter = `drop-shadow(0 0 5px ${wireColor})`;
     }
     visPath.style.pointerEvents = 'none';
+
     const hitTarget = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     hitTarget.setAttribute('d', d);
     hitTarget.setAttribute('fill', 'none');
@@ -2024,28 +2219,52 @@ function updateSandboxWires() {
     hitTarget.setAttribute('class', 'sb-wire-hit');
     hitTarget.style.cursor = 'pointer';
     hitTarget.style.pointerEvents = 'stroke';
-    hitTarget.addEventListener('mouseenter', () => {
+
+    hitTarget.addEventListener('mouseenter', (e) => {
       visPath.setAttribute('class', 'sb-wire-core hover');
       visPath.setAttribute('stroke', '#ff4b4b');
       visPath.setAttribute('stroke-width', '4');
+      visPath.setAttribute('opacity', '1');
       visPath.style.filter = 'drop-shadow(0 0 6px #ff4b4b)';
+      outPort.classList.add('wire-hovered');
+      inPort.classList.add('wire-hovered');
+      outPort.style.color = wireColor;
+      inPort.style.color = wireColor;
+      showWireTooltip(e, wire, outPort, inPort);
     });
+
     hitTarget.addEventListener('mouseleave', () => {
       visPath.setAttribute('class', 'sb-wire-core ' + (isActive ? 'high' : 'low'));
-      visPath.setAttribute('stroke', isActive ? '#00ff66' : '#64748b');
-      visPath.setAttribute('stroke-width', isActive ? '3.2' : '2.5');
-      visPath.style.filter = isActive ? 'drop-shadow(0 0 5px rgba(0, 255, 102, 0.75))' : 'none';
+      visPath.setAttribute('stroke', strokeColor);
+      visPath.setAttribute('stroke-width', strokeWidth);
+      visPath.setAttribute('opacity', strokeOpacity);
+      visPath.style.filter = isActive ? `drop-shadow(0 0 5px ${wireColor})` : 'none';
+      outPort.classList.remove('wire-hovered');
+      inPort.classList.remove('wire-hovered');
+      outPort.style.color = '';
+      inPort.style.color = '';
+      hideWireTooltip();
     });
+
+    hitTarget.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      showWireContextMenu(e, wire);
+    });
+
     hitTarget.addEventListener('click', (e) => {
       e.stopPropagation();
       sandboxWires = sandboxWires.filter(w => w !== wire);
       playSound('click');
+      hideWireTooltip();
+      closeWireContextMenu();
       evaluateSandbox();
     });
 
     wiresSvg.appendChild(casing);
     wiresSvg.appendChild(visPath);
     wiresSvg.appendChild(hitTarget);
+
     if (isActive) {
       const flow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       flow.setAttribute('d', d);
@@ -2081,6 +2300,106 @@ function updateSandboxWires() {
     });
   });
 }
+
+function showWireTooltip(e, wire, outPort, inPort) {
+  let tip = document.getElementById('sb-wire-badge');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 'sb-wire-badge';
+    tip.className = 'sb-wire-badge';
+    document.body.appendChild(tip);
+  }
+  const fromNode = sandboxNodes.find(n => n.id === wire.fromNodeId);
+  const toNode = sandboxNodes.find(n => n.id === wire.toNodeId);
+  const fromLabel = fromNode ? (fromNode.label || fromNode.type) : 'Out';
+  const toLabel = toNode ? (toNode.label || toNode.type) : 'In';
+
+  const outPin = outPort?.dataset?.pinNum || outPort?.dataset?.portIdx;
+  const inPin = inPort?.dataset?.pinNum || inPort?.dataset?.portIdx;
+
+  const fromDesc = REAL_ICS[fromNode?.type] ? `Pin ${outPin}` : `${fromLabel}[${outPin}]`;
+  const toDesc = REAL_ICS[toNode?.type] ? `Pin ${inPin}` : `${toLabel}[${inPin}]`;
+
+  tip.innerHTML = `<strong>${fromDesc}</strong> ➔ <strong>${toDesc}</strong> <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${wire.color || '#3b82f6'};margin-left:6px;box-shadow:0 0 5px ${wire.color || '#3b82f6'};vertical-align:middle;"></span>`;
+  tip.style.left = `${e.clientX}px`;
+  tip.style.top = `${e.clientY - 10}px`;
+  tip.style.display = 'block';
+}
+
+function hideWireTooltip() {
+  const tip = document.getElementById('sb-wire-badge');
+  if (tip) tip.style.display = 'none';
+}
+
+function showWireContextMenu(e, wire) {
+  let menu = document.getElementById('sb-wire-context-menu');
+  if (!menu) {
+    menu = document.createElement('div');
+    menu.id = 'sb-wire-context-menu';
+    menu.className = 'sb-wire-context-menu';
+    document.body.appendChild(menu);
+  }
+  const fromNode = sandboxNodes.find(n => n.id === wire.fromNodeId);
+  const toNode = sandboxNodes.find(n => n.id === wire.toNodeId);
+  const fromName = fromNode ? (fromNode.label || fromNode.type) : 'Out';
+  const toName = toNode ? (toNode.label || toNode.type) : 'In';
+  const wireColor = wire.color || '#3b82f6';
+
+  menu.innerHTML = `
+    <div class="wire-ctx-header">
+      Wire: ${fromName} ➔ ${toName}
+    </div>
+    <div class="wire-ctx-label">Wire Color</div>
+    <div class="wire-ctx-palette">
+      ${WIRE_PALETTE.map(c => `
+        <button type="button" class="wire-color-swatch ${wireColor === c.hex ? 'active' : ''}"
+          style="background:${c.hex};"
+          title="${c.name}"
+          data-hex="${c.hex}"></button>
+      `).join('')}
+    </div>
+    <div class="wire-ctx-divider"></div>
+    <button type="button" class="wire-ctx-del-btn" id="wire-ctx-delete">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 6h18M19 6l-1 14H6L5 6M10 6V4h4v2"/>
+      </svg>
+      Delete Wire
+    </button>
+  `;
+
+  menu.style.display = 'block';
+  menu.style.left = `${Math.min(window.innerWidth - 210, Math.max(10, e.clientX - 20))}px`;
+  menu.style.top = `${Math.min(window.innerHeight - 180, Math.max(10, e.clientY - 20))}px`;
+
+  menu.querySelectorAll('.wire-color-swatch').forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      wire.color = btn.dataset.hex;
+      currentWireColor = wire.color;
+      localStorage.setItem('logicQuest_wireColor', currentWireColor);
+      updateWireColorUI();
+      updateSandboxWires();
+      closeWireContextMenu();
+    });
+  });
+
+  menu.querySelector('#wire-ctx-delete')?.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    sandboxWires = sandboxWires.filter(w => w !== wire);
+    playSound('click');
+    closeWireContextMenu();
+    hideWireTooltip();
+    evaluateSandbox();
+  });
+}
+
+function closeWireContextMenu() {
+  const menu = document.getElementById('sb-wire-context-menu');
+  if (menu) menu.style.display = 'none';
+}
+window.addEventListener('click', (e) => {
+  if (!e.target.closest('#sb-wire-context-menu')) closeWireContextMenu();
+});
 
 window.updateSensorValue = function (nodeId, value) {
   const node = sandboxNodes.find(n => n.id === nodeId);
