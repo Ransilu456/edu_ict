@@ -10,5 +10,8 @@
   },
   "devDependencies": {
     "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "lucide-react": "^1.45.0"
   }
 }

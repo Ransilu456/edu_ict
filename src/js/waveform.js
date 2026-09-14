@@ -1,6 +1,4 @@
-// Digital Logic Oscilloscope & Waveform Scope Analyzer
-// Authentic electronic lab timing diagram matching Falstad / Logisim scope
-
+// Osilascope
 let waveformHistory = [];
 const MAX_WAVEFORM_POINTS = 80;
 let waveformCanvas = null;

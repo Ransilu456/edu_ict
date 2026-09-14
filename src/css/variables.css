@@ -1,32 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Sinhala:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
 
 :root {
-
   --bg-primary: #f0f7ff;
   --bg-secondary: #ffffff;
   --bg-tertiary: #e0f2fe;
   --border-color: #cbd5e1;
   --bg-mobile: #e0f2fe;
-
   --text-primary: #1e293b;
   --text-secondary: #475569;
   --text-muted: #64748b;
-
   --color-indigo: #1cb0f6;
   --color-indigo-glow: rgba(28, 176, 246, 0.15);
   --color-cyan: #1cb0f6;
   --color-cyan-glow: rgba(28, 176, 246, 0.15);
-
   --color-high: #58cc02;
   --color-high-glow: rgba(88, 204, 2, 0.2);
   --color-low: #cbd5e1;
   --color-low-glow: transparent;
   --color-label: #334155;
-
   --color-success: #58cc02;
   --color-error: #ff4b4b;
   --color-amber: #ff9600;
-
   --icon-default: #0ea5e9;
   --icon-input: #10b981;
   --icon-logic: #6366f1;
@@ -34,15 +28,24 @@
   --icon-network: #06b6d4;
   --icon-security: #f43f5e;
   --icon-neutral: #64748b;
-
   --font-sans: 'Poppins', system-ui, sans-serif;
   --font-header: 'Poppins', system-ui, sans-serif;
   --font-sinhala: 'Noto Sans Sinhala', 'Poppins', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-
   --transition-fast: 0.1s ease;
   --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --content-max: 1180px;
 }
 
 :root.dark,
@@ -52,26 +55,21 @@
   --bg-tertiary: #273549;
   --border-color: #334155;
   --bg-mobile: #1c2541;
-
   --text-primary: #f8fafc;
   --text-secondary: #cbd5e1;
   --text-muted: #94a3b8;
-
   --color-indigo: #38bdf8;
   --color-indigo-glow: rgba(56, 189, 248, 0.25);
   --color-cyan: #38bdf8;
   --color-cyan-glow: rgba(56, 189, 248, 0.25);
-
   --color-high: #4ade80;
   --color-high-glow: rgba(74, 222, 128, 0.35);
   --color-low: #475569;
   --color-low-glow: transparent;
   --color-label: #e2e8f0;
-
   --color-success: #4ade80;
   --color-error: #f87171;
   --color-amber: #fbbf24;
-
   --icon-default: #38bdf8;
   --icon-input: #34d399;
   --icon-logic: #a78bfa;
@@ -79,7 +77,6 @@
   --icon-network: #22d3ee;
   --icon-security: #fb7185;
   --icon-neutral: #94a3b8;
-
 }
 
 * {
@@ -89,6 +86,8 @@
   scrollbar-width: thin;
   scrollbar-color: var(--border-color) transparent;
 }
+
+html { scroll-behavior: smooth; }
 
 body {
   background-color: var(--bg-primary);
@@ -102,9 +101,7 @@ body {
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
-svg {
-  color: var(--icon-default);
-}
+svg { color: var(--icon-default); }
 
 button > svg,
 nav svg,
@@ -119,9 +116,7 @@ nav svg,
 .nd-card-title svg,
 .osi-btn svg,
 .osi-host-header svg,
-.osi-inspector-header svg {
-  color: var(--icon-default);
-}
+.osi-inspector-header svg { color: var(--icon-default); }
 
 .nav-tab:nth-child(1) svg,
 .mobile-nav-btn:nth-child(1) svg,
@@ -132,40 +127,30 @@ nav svg,
 .sidebar-item[data-type="nand"] svg,
 .sidebar-item[data-type="nor"] svg,
 .sidebar-item[data-type="xor"] svg,
-.sidebar-item[data-type="xnor"] svg {
-  color: var(--icon-logic);
-}
+.sidebar-item[data-type="xnor"] svg { color: var(--icon-logic); }
 
 .nav-tab:nth-child(2) svg,
 .mobile-nav-btn:nth-child(2) svg,
 .sidebar-section-title[data-category="ICs"] svg,
 .nd-tab:nth-child(1) svg,
-.nd-device-btn svg {
-  color: var(--icon-network);
-}
+.nd-device-btn svg { color: var(--icon-network); }
 
 .nav-tab:nth-child(3) svg,
 .mobile-nav-btn:nth-child(3) svg,
 .sidebar-section-title[data-category="Inputs"] svg,
 .sidebar-item[data-type="input"] svg,
-.sidebar-item[data-type="clock"] svg {
-  color: var(--icon-input);
-}
+.sidebar-item[data-type="clock"] svg { color: var(--icon-input); }
 
 .nav-tab:nth-child(4) svg,
 .mobile-nav-btn:nth-child(4) svg,
 .sidebar-section-title[data-category="Outputs"] svg,
 .sidebar-item[data-type="output"] svg,
-.sidebar-section-title[data-category="Templates"] svg {
-  color: var(--icon-output);
-}
+.sidebar-section-title[data-category="Templates"] svg { color: var(--icon-output); }
 
 .nd-tab:nth-child(2) svg,
 .osi-btn#osi-crypto-btn svg,
 .crypto-header svg,
-.crypto-party-header svg {
-  color: var(--icon-security);
-}
+.crypto-party-header svg { color: var(--icon-security); }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-header);
@@ -177,10 +162,7 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-::selection {
-  background: rgba(28, 176, 246, 0.28);
-}
+::selection { background: rgba(28, 176, 246, 0.28); }
 
 button:focus-visible,
 input:focus-visible,
@@ -190,6 +172,21 @@ textarea:focus-visible,
   outline: 2px solid var(--color-indigo);
   outline-offset: 2px;
 }
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  background: var(--color-indigo);
+  color: #fff;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-sm);
+  z-index: 999;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.skip-link:focus { left: var(--space-4); top: var(--space-4); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

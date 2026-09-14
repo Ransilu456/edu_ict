@@ -1,18 +1,28 @@
 // Common utilities: theme, sound, toast, alert, confirm
 import './modal-manager.js';
 
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let audioCtx;
 let soundEnabled = localStorage.getItem("soundEnabled") !== "false";
+
+function getAudioContext() {
+  if (audioCtx) return audioCtx;
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return null;
+  audioCtx = new AudioContext();
+  return audioCtx;
+}
 
 function playSound(type) {
   if (!soundEnabled) return;
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const context = getAudioContext();
+  if (!context) return;
+  if (context.state === 'suspended') context.resume();
 
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   osc.connect(gain);
-  gain.connect(audioCtx.destination);
-  const now = audioCtx.currentTime;
+  gain.connect(context.destination);
+  const now = context.currentTime;
 
   if (type === 'click') {
     osc.type = 'sine';
@@ -206,14 +216,17 @@ function showToast(msg) {
   }
   
   // Format checkmark if present as crisp SVG
-  const cleanMsg = msg.replace(/\s*✓\s*/g, '');
-  const isSuccess = msg.includes('✓') || msg.toLowerCase().includes('saved') || msg.toLowerCase().includes('success') || msg.toLowerCase().includes('placed');
+  const message = String(msg ?? '');
+  const cleanMsg = message.replace(/\s*✓\s*/g, '');
+  const lowerMessage = message.toLowerCase();
+  const isSuccess = message.includes('✓') || lowerMessage.includes('saved') || lowerMessage.includes('success') || lowerMessage.includes('placed');
   
   const iconSvg = isSuccess 
     ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>`
     : `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
 
-  toast.innerHTML = `${iconSvg}<span>${cleanMsg}</span>`;
+  toast.innerHTML = `${iconSvg}<span></span>`;
+  toast.querySelector('span').textContent = cleanMsg;
   toast.style.opacity = '1';
   toast.style.transform = 'translateX(-50%) translateY(0)';
   clearTimeout(toast._t);
