@@ -61,19 +61,15 @@ function play(n) { if (window.playSound) window.playSound(n); }
 function buildNDLayout() {
   el('nd-lab-container').innerHTML = `
 <div class="nd-main">
-  <!-- Top Navigation Tabs -->
   <div class="nd-tabs">
     <button class="nd-tab active" data-ndtab="network-tab">${I.network} Network Devices &amp; Topology</button>
     <button class="nd-tab" data-ndtab="osi-tab">${I.layers} OSI 7-Layer Simulator</button>
     <button class="nd-tab" data-ndtab="subnet-tab">${I.globe} Subnetting &amp; CIDR Lab</button>
-    <button class="nd-tab" data-ndtab="crypto-tab">${I.crypto} Encryption &amp; PKI</button>
     <button class="nd-tab" data-ndtab="parity-tab">${I.parity} Parity Check</button>
   </div>
 
-  <!-- NETWORK DEVICES & TOPOLOGY TAB -->
   <div class="nd-tab-content active" id="network-tab">
     <div class="nd-layout">
-      <!-- Left Sidebar: Controls, Inspector, Tables -->
       <div class="nd-left">
         <div class="nd-panel-header">
           ${I.network}
@@ -83,7 +79,6 @@ function buildNDLayout() {
           </div>
         </div>
 
-        <!-- Topology Mode Presets -->
         <div class="nd-topo-bar">
           <span class="nd-section-label">Topology Lab Mode</span>
           <div class="nd-mode-pills">
@@ -93,14 +88,12 @@ function buildNDLayout() {
           </div>
         </div>
 
-        <!-- Central Device Selection (for Device Test mode) -->
         <div class="nd-device-selector" id="nd-device-select-box">
           <button class="nd-device-btn active" data-device="hub">${I.hub} Hub <span class="nd-dev-layer">L1 Physical</span></button>
           <button class="nd-device-btn" data-device="switch">${I.switch_} Switch <span class="nd-dev-layer">L2 Data Link</span></button>
           <button class="nd-device-btn" data-device="router">${I.router} Router <span class="nd-dev-layer">L3 Network</span></button>
         </div>
 
-        <!-- Transmission Controls -->
         <div class="nd-controls">
           <div class="nd-row">
             <div><span class="nd-label">Source Host</span><div class="nd-host-options" id="nd-src-options"></div></div>
@@ -112,31 +105,11 @@ function buildNDLayout() {
           </div>
         </div>
 
-        <!-- Live Device / Node Info Card -->
         <div class="nd-card">
           <div class="nd-card-title">${I.search} Inspected Node Specifications</div>
           <div class="nd-info-content" id="nd-info-content"></div>
         </div>
 
-        <!-- Tables Accordion: MAC Table / ARP Table / Routing Table -->
-        <div class="nd-card">
-          <div class="nd-card-title" style="display:flex;justify-content:space-between;align-items:center;">
-            <span>${I.brain} Forwarding Tables</span>
-            <button class="nd-mini-clear-btn" id="nd-clear-tables-btn" title="Clear learned tables">${I.trash} Flush</button>
-          </div>
-          <div class="nd-table-tabs">
-            <button class="nd-subtable-tab active" data-tab="mac">MAC Table</button>
-            <button class="nd-subtable-tab" data-tab="arp">ARP Cache</button>
-            <button class="nd-subtable-tab" data-tab="route">Routing Table</button>
-          </div>
-          <div class="nd-table-view-content" id="nd-table-view-content">
-            <div id="nd-tab-mac" class="nd-subtable-panel active"></div>
-            <div id="nd-tab-arp" class="nd-subtable-panel"></div>
-            <div id="nd-tab-route" class="nd-subtable-panel"></div>
-          </div>
-        </div>
-
-        <!-- Packet Protocol Inspector -->
         <div class="nd-card">
           <div class="nd-card-title">${I.list} Deep Protocol Frame Inspector</div>
           <div class="nd-packet-inspector" id="nd-packet-inspector">
@@ -145,7 +118,6 @@ function buildNDLayout() {
         </div>
       </div>
 
-      <!-- Right Main: Interactive SVG Topology Canvas + CLI Terminal -->
       <div class="nd-right">
         <!-- Top Toolbar for Topology -->
         <div class="nd-topo-header">
@@ -162,7 +134,6 @@ function buildNDLayout() {
           </div>
         </div>
 
-        <!-- SVG Topology Canvas -->
         <div class="nd-svg-wrap" id="nd-svg-wrap">
           <svg class="nd-svg" id="nd-topology-svg" viewBox="0 0 600 340">
             <defs>
@@ -178,7 +149,6 @@ function buildNDLayout() {
           </svg>
         </div>
 
-        <!-- Bottom: Interactive Network Terminal CLI -->
         <div class="nd-terminal-wrap">
           <div class="nd-terminal-header">
             <div class="nd-term-title">${I.terminal} Network Host Terminal (CLI)</div>
@@ -204,12 +174,12 @@ function buildNDLayout() {
     </div>
   </div>
 
-  <!-- OSI SIMULATOR TAB -->
+  <!-- OSI TAB -->
   <div class="nd-tab-content" id="osi-tab">
     <div id="osi-container"></div>
   </div>
 
-  <!-- SUBNETTING & CIDR LAB TAB -->
+  <!-- SUBNETTING TAB -->
   <div class="nd-tab-content" id="subnet-tab">
     <div class="subnet-layout">
       <div class="subnet-left">
@@ -278,77 +248,6 @@ function buildNDLayout() {
     </div>
   </div>
 
-  <!-- ENCRYPTION TAB -->
-  <div class="nd-tab-content" id="crypto-tab">
-    <div class="crypto-layout">
-      <div class="crypto-header">${I.crypto} <span class="crypto-title">Encryption Lab &mdash; Public Key Exchange</span></div>
-      <div class="crypto-body">
-        <div class="crypto-exchange">
-          <div class="crypto-party">
-            <div class="crypto-party-header">${I.laptop} Alice</div>
-            <div class="crypto-key-row">
-              <div class="crypto-key-mini public"><span class="key-label">Public Key</span><span class="key-val" id="crypto-alice-pub">&mdash;</span></div>
-              <div class="crypto-key-mini private"><span class="key-label">Private Key</span><span class="key-val" id="crypto-alice-priv">&mdash;</span></div>
-            </div>
-          </div>
-          <div class="crypto-exchange-center">
-            <div class="crypto-exchange-line">
-              <span class="crypto-exchange-arrow">${I.send} Alice's Public Key</span>
-            </div>
-            <div class="crypto-exchange-line rev">
-              <span class="crypto-exchange-arrow">${I.send} Bob's Public Key</span>
-            </div>
-          </div>
-          <div class="crypto-party">
-            <div class="crypto-party-header bob">${I.laptop} Bob</div>
-            <div class="crypto-key-row">
-              <div class="crypto-key-mini public"><span class="key-label">Public Key</span><span class="key-val" id="crypto-bob-pub">&mdash;</span></div>
-              <div class="crypto-key-mini private"><span class="key-label">Private Key</span><span class="key-val" id="crypto-bob-priv">&mdash;</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="crypto-flow-row">
-          <div class="crypto-flow-step">
-            <div class="crypto-flow-card sender">
-              <div class="crypto-flow-card-title">${I.laptop} Alice Sends</div>
-              <textarea class="crypto-input" id="crypto-plain-alice" rows="2">HELLO</textarea>
-              <div class="crypto-hint">Letters A&ndash;Z only &bull; encrypted with Bob's public key</div>
-              <button class="crypto-btn primary" id="crypto-enc-btn-alice">${I.lock} Encrypt with Bob's Public Key</button>
-            </div>
-            <div class="crypto-flow-arrow-wrap">
-              <div class="crypto-flow-arrow">${I.lock}</div>
-              <div class="crypto-flow-arrow-label">Encrypt</div>
-            </div>
-            <div class="crypto-flow-card cipher">
-              <div class="crypto-flow-card-title">${I.bits} Ciphertext</div>
-              <div class="crypto-data" id="crypto-cipher-alice">&mdash;</div>
-              <div class="crypto-status" id="crypto-cipher-status">${I.search} Waiting&hellip;</div>
-            </div>
-            <div class="crypto-flow-arrow-wrap">
-              <div class="crypto-flow-arrow">${I.key}</div>
-              <div class="crypto-flow-arrow-label">Decrypt</div>
-            </div>
-            <div class="crypto-flow-card receiver">
-              <div class="crypto-flow-card-title">${I.laptop} Bob Receives</div>
-              <div class="crypto-data" id="crypto-decrypted-alice">&mdash;</div>
-              <button class="crypto-btn green" id="crypto-dec-btn-bob">${I.key} Decrypt with Bob's Private Key</button>
-            </div>
-          </div>
-        </div>
-        <div class="crypto-info-card">
-          <div class="crypto-info-title">${I.search} How Public Key Cryptography Works</div>
-          <div class="crypto-info-body">
-            <strong>1. Key Generation</strong> &mdash; Both Alice and Bob generate their own RSA key pairs<br>
-            <strong>2. Public Key Exchange</strong> &mdash; They share their <span class="highlight">public keys</span> openly over the network<br>
-            <strong>3. Encrypt</strong> &mdash; Alice encrypts her message using <span class="highlight">Bob's public key</span><br>
-            <strong>4. Decrypt</strong> &mdash; Only <span class="highlight">Bob's private key</span> can reverse the encryption<br>
-            <strong>5. Security</strong> &mdash; Even if intercepted, the ciphertext is useless without Bob's private key
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- PARITY CHECK TAB -->
   <div class="nd-tab-content" id="parity-tab">
     <div class="parity-layout">
@@ -393,23 +292,17 @@ function bindNDTabs() {
     if (t.dataset.ndtab === 'network-tab') initNetLab();
     else if (t.dataset.ndtab === 'osi-tab') initOSI();
     else if (t.dataset.ndtab === 'subnet-tab') initSubnetLab();
-    else if (t.dataset.ndtab === 'crypto-tab') initCrypto();
-    else if (t.dataset.ndtab === 'parity-tab') initParity();
   }));
   initNetLab();
   initOSI();
   initSubnetLab();
-  initCrypto();
   initParity();
 }
 
 function switchNDTab(id) { qs(`.nd-tab[data-ndtab="${id}"]`)?.click(); }
 window.switchNDTab = switchNDTab;
 
-// ============================================================================
-// NETWORK DEVICES & TOPOLOGY SIMULATION ENGINE
-// ============================================================================
-
+// Network Devices
 let currentTopoMode = 'device-test';
 let simSpeed = 1;
 let animSpeedMs = 450;
@@ -479,7 +372,7 @@ function initNetLab() {
     });
   });
 
-  // Device buttons (for Device Test mode)
+  // Device buttons 
   qsa('.nd-device-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       if (netState.animating) return;
@@ -611,7 +504,6 @@ function renderTopologyCanvas() {
   const hostsList = getHosts();
 
   if (currentTopoMode === 'device-test') {
-    // Center device (300, 170)
     const cx = 300, cy = 170;
     const dType = netState.device;
 
@@ -642,7 +534,6 @@ function renderTopologyCanvas() {
     });
 
   } else if (currentTopoMode === 'enterprise') {
-    // Subnet 1 Switch at (180, 170), Router at (300, 170), Subnet 2 Switch at (420, 170)
     cablesGroup.innerHTML += `
       <!-- Subnet 1 Host to Switch 1 -->
       <line class="nd-cable-line" id="cable-pc-a" x1="60" y1="70" x2="180" y2="170"/>
@@ -656,7 +547,6 @@ function renderTopologyCanvas() {
       <line class="nd-cable-line" id="cable-pc-d" x1="420" y1="170" x2="540" y2="270"/>
     `;
 
-    // Subnet 1 Box Label
     devicesGroup.innerHTML += `
       <rect x="25" y="25" width="200" height="290" rx="12" fill="rgba(99,102,241,0.03)" stroke="rgba(99,102,241,0.2)" stroke-dasharray="4,4"/>
       <text x="35" y="45" fill="#818cf8" font-family="var(--font-mono)" font-size="10" font-weight="700">Subnet 1: 192.168.1.0/24</text>
@@ -691,7 +581,6 @@ function renderTopologyCanvas() {
     });
 
   } else if (currentTopoMode === 'csma') {
-    // Bus topology with backbone coaxial cable
     cablesGroup.innerHTML += `
       <!-- Shared Bus Backbone -->
       <line class="nd-cable-line" id="cable-bus" x1="50" y1="200" x2="550" y2="200" style="stroke-width: 4px; stroke: #818cf8;"/>
@@ -714,7 +603,6 @@ function renderTopologyCanvas() {
     });
   }
 
-  // Pre-allocate 4 reusable packet envelopes in SVG
   for (let i = 1; i <= 4; i++) {
     packetsGroup.innerHTML += `
       <g class="nd-anim-packet" id="nd-pkt-${i}" transform="translate(-100,-100)" style="display:none;pointer-events:none;">
@@ -851,10 +739,7 @@ function setDeviceDetails(id) {
   }
 }
 
-// ============================================================================
-// TRANSMISSION & PACKET ANIMATION
-// ============================================================================
-
+// Transmission
 function executeTransmission(srcId, dstId, stepMode = false) {
   if (netState.animating && !netState.inStepMode) return;
   if (srcId === dstId) {
@@ -981,7 +866,6 @@ function simulateEnterpriseRoute(s, d) {
   const c1 = el(`cable-${s.id}`);
   if (c1) c1.classList.add('active');
 
-  // Stage 1: Host to Ingress Switch
   const firstSwX = s.x < 300 ? sw1X : sw2X;
   const firstSwY = 170;
 
@@ -989,7 +873,6 @@ function simulateEnterpriseRoute(s, d) {
     if (c1) c1.classList.remove('active');
 
     if (!isCrossSubnet) {
-      // Intrasubnet: directly forwarded by the local switch
       termPrint(`Switch: Source and Destination on same VLAN/Subnet. Direct L2 switching!`, 'success');
       const cDst = el(`cable-${d.id}`);
       if (cDst) cDst.classList.add('active');
@@ -1031,13 +914,11 @@ function simulateEnterpriseRoute(s, d) {
 }
 
 function simulateCSMA(s, d) {
-  // CSMA/CD demonstration
   termPrint(`[CSMA/CD] Carrier Sense: Host ${s.label} senses bus line... Line is IDLE. Transmitting!`, 'info');
   const cSrc = el(`cable-${s.id}`);
   if (cSrc) cSrc.classList.add('active');
 
   animPacket('nd-pkt-1', s.x, s.y, s.x, 200, animSpeedMs * 0.7, () => {
-    // Check if another station also transmits
     const busCable = el('cable-bus');
     if (busCable) busCable.classList.add('active');
 
@@ -1101,10 +982,6 @@ function finishTransmission() {
     play('success');
   }, 400);
 }
-
-// ============================================================================
-// PROTOCOL INSPECTOR & FORWARDING TABLES
-// ============================================================================
 
 function renderPacketInspector(s, d) {
   const box = el('nd-packet-inspector');
@@ -1186,7 +1063,7 @@ function renderPacketInspector(s, d) {
 }
 
 function updateTableViews() {
-  // 1. MAC Address Table
+  // MAC Address Table
   const macBox = el('nd-tab-mac');
   if (macBox) {
     const entries = Object.entries(netState.macTable);
@@ -1211,7 +1088,7 @@ function updateTableViews() {
     }
   }
 
-  // 2. ARP Cache
+  // ARP Cache
   const arpBox = el('nd-tab-arp');
   if (arpBox) {
     const entries = Object.entries(netState.macTable);
@@ -1235,7 +1112,7 @@ function updateTableViews() {
     }
   }
 
-  // 3. Routing Table
+  // Routing Table
   const routeBox = el('nd-tab-route');
   if (routeBox) {
     routeBox.innerHTML = `
@@ -1251,10 +1128,7 @@ function updateTableViews() {
   }
 }
 
-// ============================================================================
-// INTERACTIVE CLI TERMINAL
-// ============================================================================
-
+// CLI
 function setupTerminalCLI() {
   const input = el('nd-term-input');
   const submit = el('nd-term-submit');
@@ -1385,64 +1259,11 @@ function executeCLICommand(rawCmd) {
   termPrint(`bash: ${base}: command not found. Try: ping, arp -a, show mac, ipconfig, traceroute, clear`, 'error');
 }
 
-// ============================================================================
-// OSI, CRYPTO, PARITY & SUBNET LAB PRESERVATION & UPGRADES
-// ============================================================================
-
 let osiReady = false;
 function initOSI() {
   if (osiReady) return;
   osiReady = true;
   initOSISim();
-}
-
-let cryptoReady = false;
-function initCrypto() {
-  if (cryptoReady) return;
-  cryptoReady = true;
-
-  function genRSA() {
-    const p = 61, q = 53, n = p * q, phi = (p - 1) * (q - 1);
-    let e = 3; while (e < phi && gcd(e, phi) !== 1) e += 2;
-    let d = modInv(e, phi);
-    return { p, q, n, phi, e, d };
-  }
-
-  const alice = genRSA();
-  const bob = genRSA();
-
-  el('crypto-alice-pub').textContent = `(${alice.n}, ${alice.e})`;
-  el('crypto-alice-priv').textContent = `(${alice.n}, ${alice.d})`;
-  el('crypto-bob-pub').textContent = `(${bob.n}, ${bob.e})`;
-  el('crypto-bob-priv').textContent = `(${bob.n}, ${bob.d})`;
-
-  el('crypto-enc-btn-alice')?.addEventListener('click', () => {
-    play('click');
-    const plain = el('crypto-plain-alice').value.toUpperCase().replace(/[^A-Z]/g, '');
-    if (!plain) { if (window.showToast) window.showToast('Enter letters A-Z only.'); return; }
-    const nums = plain.split('').map(ch => ch.charCodeAt(0) - 65);
-    const enc = nums.map(m => modPow(m, bob.e, bob.n));
-    el('crypto-cipher-alice').textContent = enc.join(' ');
-    el('crypto-cipher-status').innerHTML = `${I.lock} Encrypted with Bob's public key (${bob.n}, ${bob.e})`;
-  });
-
-  el('crypto-dec-btn-bob')?.addEventListener('click', () => {
-    play('click');
-    const raw = el('crypto-cipher-alice').textContent.trim();
-    if (raw === '&mdash;' || raw === '—' || !raw) { if (window.showToast) window.showToast('Alice must encrypt a message first.'); return; }
-    const nums = raw.split(/\s+/).map(Number);
-    const dec = nums.map(c => modPow(c, bob.d, bob.n));
-    const text = dec.map(n => String.fromCharCode(n + 65)).join('');
-    el('crypto-decrypted-alice').innerHTML = `<strong style="color:var(--color-success);font-size:1.1rem">${text}</strong>`;
-  });
-}
-
-function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
-function modInv(a, m) { for (let x = 1; x < m; x++) { if ((a * x) % m === 1) return x; } return 1; }
-function modPow(base, exp, mod) {
-  let r = 1;
-  for (let i = 0; i < exp; i++) r = (r * base) % mod;
-  return r;
 }
 
 let parityReady = false;

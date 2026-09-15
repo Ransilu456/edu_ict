@@ -188,6 +188,7 @@ const COMPONENT_DEFS = {
   'ic-7402':     { inputs: 15, outputs: 15, label: '7402 Quad NOR', category: 'ICs' },
   'ic-7486':     { inputs: 15, outputs: 15, label: '7486 Quad XOR', category: 'ICs' },
 };
+
 window.initSandboxCanvas = function () {
   workspace = document.getElementById('sandbox-workspace-canvas');
   wiresSvg = document.getElementById('sandbox-wires-svg');
@@ -993,7 +994,7 @@ function renderRealICNodeDOM(node, el) {
     selectNode(node.id, e.shiftKey || e.ctrlKey || e.metaKey);
   });
 
-  (panContainer || workspace).appendChild(el);
+   (panContainer || workspace).appendChild(el);
 }
 
 // node dom

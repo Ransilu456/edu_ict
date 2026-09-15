@@ -114,10 +114,6 @@ window.cleanupOSISim = cleanupOSISim;
 function buildOSILayout() {
   el('osi-container').innerHTML = `
 <div class="osi-topbar" id="osi-topbar">
-  <div class="osi-brand">
-    <span class="osi-brand-icon">${I.layers}</span>
-    <span class="osi-brand-text"><b>OSI Journey</b><small>7 layers · live encapsulation</small></span>
-  </div>
   <div class="osi-control-strip">
     <div class="osi-ctrl-group" data-group="Message">
       <span class="osi-group-tag">Simulation</span>
@@ -141,32 +137,9 @@ function buildOSILayout() {
       <button class="osi-btn" id="osi-compare-btn">${I.layers} Compare</button>
       <button class="osi-btn" id="osi-crypto-btn">${I.shield} RSA</button>
     </div>
-    <div class="osi-settings-btn-wrap">
-      <button class="osi-btn" id="osi-settings-btn" title="Show network addressing options">${I.gear} Network Settings</button>
-      <span class="osi-settings-summary" id="osi-settings-summary">Switch · Same subnet</span>
-    </div>
   </div>
 </div>
-<div class="osi-ctrl-group osi-settings-panel" id="osi-settings-panel" data-group="Network">
-  <span class="osi-group-tag">Network</span>
-  <label>Src IP <input type="text" id="osi-srcip" value="192.168.1.10" size="12"></label>
-  <label>Dst IP <input type="text" id="osi-dstip" value="192.168.1.20" size="12"></label>
-  <label>Device <select id="osi-device"><option value="switch">Switch</option><option value="router">Router</option></select></label>
-  <label>Subnets <select id="osi-subnet"><option value="same">Same</option><option value="diff">Different</option></select></label>
-</div>
-<div class="osi-step-rail" id="osi-step-rail"></div>
-<div class="osi-progress-row">
-  <div class="osi-step-indicator">
-    <span class="osi-step-kicker">Current step</span>
-    <span class="osi-step-text" id="osi-step-text" aria-live="polite">Ready to transmit</span>
-    <div class="osi-step-bar"><div class="osi-step-fill" id="osi-step-fill" style="width:0%"></div></div>
-    <span class="osi-step-text" id="osi-step-num">0 / ${STEP_NAMES.length}</span>
-  </div>
-  <div class="osi-status-card" aria-live="polite"><span class="osi-status-dot"></span><span>Ready</span></div>
-</div>
-<div class="osi-legend" id="osi-legend">
-  ${LAYERS.map(l => `<span class="osi-legend-chip" style="--c:${l.color}"><i></i>${l.id}. ${l.short}</span>`).join('')}
-</div>
+
 <div class="osi-main">
   <div class="osi-alice" id="osi-alice">
     <div class="osi-host-header">${I.laptop} Alice <small>Sender</small></div>
@@ -174,7 +147,7 @@ function buildOSILayout() {
   </div>
   <div class="osi-center">
     <div class="osi-stage-head"><span class="osi-stage-dot"></span><strong>Packet journey</strong><span class="osi-stage-hint">Alice → network → Bob</span></div>
-    <div class="osi-ready-card"><span class="osi-ready-icon">${I.send}</span><div><strong>Ready to transmit</strong><small>Press Run to follow HELLO through HTTP → TCP.</small></div></div>
+    <div class="osi-ready-card"><span class="osi-ready-icon">${I.send}</span><div><strong>Ready to transmit</strong><small>Press Auto to start.</small></div></div>
     <div class="osi-packet-vis" id="osi-packet-vis">
       <div class="osi-packet-wrap" id="osi-packet-wrap"></div>
     </div>
@@ -272,37 +245,11 @@ function buildOSILayout() {
   </div>
 </div>`;
 
-  const aliceStack = el('osi-alice-stack');  const bobStack = el('osi-bob-stack');
+  const aliceStack = el('osi-alice-stack'); const bobStack = el('osi-bob-stack');
   LAYERS.forEach(l => {
     aliceStack.appendChild(createLayerBlock(l, 'alice'));
     bobStack.appendChild(createLayerBlock(l, 'bob'));
   });
-  buildStepRail();
-}
-
-function buildStepRail() {
-  const rail = el('osi-step-rail');
-  if (!rail || rail.dataset.built) return;
-  rail.dataset.built = '1';
-  STEP_NAMES.forEach((name, i) => {
-    const d = document.createElement('div');
-    d.className = 'osi-rail-dot ' + (i < 7 ? 'phase-enc' : i < 10 ? 'phase-net' : 'phase-dec');
-    d.id = `osi-rail-${i}`;
-    d.title = `${i + 1}. ${name}`;
-    d.innerHTML = `<span>${i + 1}</span>`;
-    rail.appendChild(d);
-  });
-}
-
-function updateStepRail() {
-  for (let i = 0; i < STEP_NAMES.length; i++) {
-    const d = el(`osi-rail-${i}`);
-    if (!d) continue;
-    d.classList.toggle('done', i < state.step);
-    d.classList.toggle('current', i === state.step);
-  }
-  const cur = el(`osi-rail-${state.step}`);
-  if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest', inline: 'nearest' });
 }
 
 function createLayerBlock(l, side) {
@@ -415,17 +362,6 @@ function bindOSIControls() {
     });
   }
 
-  // Network Settings drawer
-  const settingsBtn = el('osi-settings-btn');
-  const settingsPanel = el('osi-settings-panel');
-  if (settingsBtn && settingsPanel) {
-    settingsBtn.addEventListener('click', () => {
-      play('click');
-      const open = settingsPanel.classList.toggle('open');
-      settingsBtn.classList.toggle('active', open);
-    });
-  }
-
   // Error simulation toggle
   const errorBtn = el('osi-error-btn');
   if (errorBtn) {
@@ -443,16 +379,12 @@ function bindOSIControls() {
       } else if (state.errorType === 'ttl') {
         el('osi-device').value = 'router';
         el('osi-subnet').value = 'diff';
-        if (settingsPanel && !settingsPanel.classList.contains('open')) {
-          settingsPanel.classList.add('open');
-          if (settingsBtn) settingsBtn.classList.add('active');
-        }
       }
       resetOSI();
     });
   }
 
-  ['msg','srcip','dstip','protocol','transport','device','subnet'].forEach(id => {
+  ['msg', 'srcip', 'dstip', 'protocol', 'transport', 'device', 'subnet'].forEach(id => {
     const inp = el('osi-' + id);
     if (inp) inp.addEventListener('change', () => {
       if (state.step < 0) {
@@ -466,12 +398,8 @@ function bindOSIControls() {
 
 function readInputs() {
   state.msg = el('osi-msg').value.trim() || 'HELLO';
-  state.srcIP = el('osi-srcip').value.trim() || '192.168.1.10';
-  state.dstIP = el('osi-dstip').value.trim() || '192.168.1.20';
   state.protocol = el('osi-protocol').value;
   state.transport = el('osi-transport').value;
-  state.device = el('osi-device').value;
-  state.sameSubnet = el('osi-subnet').value === 'same';
   state.sessionId = Math.floor(Math.random() * 90000) + 10000;
 }
 
@@ -480,12 +408,6 @@ function updateSettingsSummary() {
   if (s) s.textContent = `${state.device === 'switch' ? 'Switch' : 'Router'} · ${state.sameSubnet ? 'Same subnet' : 'Different subnet'}`;
 }
 
-function updateOSIStatus(label, tone = 'ready') {
-  const status = qs('.osi-status-card');
-  if (!status) return;
-  status.dataset.tone = tone;
-  status.innerHTML = `<span class="osi-status-dot"></span><span>${label}</span>`;
-}
 
 function resetOSI() {
   osiAbort = true;
@@ -498,11 +420,6 @@ function resetOSI() {
   autoBtn.innerHTML = `${I.play} Auto`;
   el('osi-step-btn').disabled = false;
   el('osi-step-btn').innerHTML = `${I.arrowR} Next Step`;
-  el('osi-step-text').textContent = 'Ready';
-  updateOSIStatus('Ready to transmit', 'ready');
-  el('osi-step-fill').style.width = '0%';
-  el('osi-step-num').textContent = `0 / ${STEP_NAMES.length}`;
-  updateStepRail();
   el('osi-bits-display').innerHTML = '';
   el('osi-hex-display').innerHTML = '';
   el('osi-error-overlay').classList.remove('show');
@@ -515,7 +432,7 @@ function resetOSI() {
   pkt = {};
 
   LAYERS.forEach(l => {
-    ['alice','bob'].forEach(side => {
+    ['alice', 'bob'].forEach(side => {
       const b = el(`osi-${side}-l${l.id}`);
       if (b) { b.className = 'osi-layer-block inactive'; b.title = `${l.name}\n${l.desc}\n\n${l.analogy}`; }
       const d = el(`osi-${side}-l${l.id}-data`);
@@ -561,9 +478,7 @@ function triggerError(message) {
   if (autoBtn) { autoBtn.classList.remove('active'); autoBtn.innerHTML = `${I.play} Auto`; }
   const stepBtn = el('osi-step-btn');
   if (stepBtn) { stepBtn.disabled = true; stepBtn.textContent = 'Reset to retry'; }
-  const stepText = el('osi-step-text');
   if (stepText) stepText.textContent = `${STEP_NAMES[state.step]} — ERROR`;
-  updateOSIStatus('Transmission error', 'error');
 }
 
 // steps
@@ -572,11 +487,6 @@ function stepOSI() {
   play('click');
   state.step++;
   osiAbort = false;
-  updateOSIStatus('Processing packet', 'processing');
-  el('osi-step-text').textContent = `(${state.step + 1}/${STEP_NAMES.length}) ${STEP_NAMES[state.step]}`;
-  el('osi-step-fill').style.width = `${((state.step + 1) / STEP_NAMES.length) * 100}%`;
-  el('osi-step-num').textContent = `${state.step + 1} / ${STEP_NAMES.length}`;
-  updateStepRail();
 
   if (state.step < 7) {
     encapsulateStep(state.step);
@@ -597,7 +507,6 @@ function stepOSI() {
   if (state.showDetails) updateInspector();
 
   if (state.step >= STEP_NAMES.length - 1 && !el('osi-step-btn').disabled === false) {
-    // no-op guard (see below for the real completion handling)
   }
 
   if (state.step >= STEP_NAMES.length - 1) {
@@ -744,8 +653,6 @@ function decapsulateStep(step) {
 }
 
 function completeDelivery() {
-  el('osi-step-text').textContent = 'Message Delivered!';
-  updateOSIStatus('Message delivered', 'success');
   const bob7 = el('osi-bob-l7');
   const bob7d = el('osi-bob-l7-data');
   if (bob7) bob7.className = 'osi-layer-block done active';
@@ -789,7 +696,7 @@ function animateCable(side, cb) {
 }
 
 function hideCablePulses() {
-  ['osi-cable-track1','osi-cable-track2'].forEach(id => {
+  ['osi-cable-track1', 'osi-cable-track2'].forEach(id => {
     const t = el(id);
     if (t) t.innerHTML = '';
   });
@@ -848,50 +755,68 @@ function updateInspector() {
   if (!body) return;
   const sections = [];
 
-  sections.push({ title: `${I.doc} Application`, bg: '#ef4444', fields: [
-    ['Data', `&quot;${esc(state.msg)}&quot;`], ['Protocol', esc(state.protocol)], ['Transport', esc(state.transport)],
-  ]});
+  sections.push({
+    title: `${I.doc} Application`, bg: '#ef4444', fields: [
+      ['Data', `&quot;${esc(state.msg)}&quot;`], ['Protocol', esc(state.protocol)], ['Transport', esc(state.transport)],
+    ]
+  });
 
   if (state.protocol === 'HTTPS') {
-    sections.push({ title: `${I.lock} Presentation (TLS)`, bg: '#f97316', fields: [
-      ['Encryption', 'AES-256'], ['Encoding', 'Base64'], ['Status', pkt.presInfo || 'Pending\u2026'],
-    ]});
+    sections.push({
+      title: `${I.lock} Presentation (TLS)`, bg: '#f97316', fields: [
+        ['Encryption', 'AES-256'], ['Encoding', 'Base64'], ['Status', pkt.presInfo || 'Pending\u2026'],
+      ]
+    });
   } else {
-    sections.push({ title: `${I.wrench} Presentation`, bg: '#f97316', fields: [
-      ['Encoding', 'UTF-8'], ['Status', pkt.presInfo || 'Pending\u2026'],
-    ]});
+    sections.push({
+      title: `${I.wrench} Presentation`, bg: '#f97316', fields: [
+        ['Encoding', 'UTF-8'], ['Status', pkt.presInfo || 'Pending\u2026'],
+      ]
+    });
   }
 
-  sections.push({ title: `${I.link} Session`, bg: '#eab308', fields: [
-    ['Session ID', pkt.sessionId || '\u2014'],
-    ['Status', state.step >= 2 || state.step >= 14 ? `${I.check} Established` : 'Pending\u2026'],
-  ]});
+  sections.push({
+    title: `${I.link} Session`, bg: '#eab308', fields: [
+      ['Session ID', pkt.sessionId || '\u2014'],
+      ['Status', state.step >= 2 || state.step >= 14 ? `${I.check} Established` : 'Pending\u2026'],
+    ]
+  });
 
-  sections.push({ title: `${I.box} ${state.transport}`, bg: '#22c55e', fields: [
-    ['Source Port', pkt.srcPort || '\u2014'], ['Dest Port', pkt.dstPort || '\u2014'],
-    ['Sequence #', pkt.seqNum || '\u2014'], ['Checksum', pkt.checksum || '\u2014'],
-  ]});
+  sections.push({
+    title: `${I.box} ${state.transport}`, bg: '#22c55e', fields: [
+      ['Source Port', pkt.srcPort || '\u2014'], ['Dest Port', pkt.dstPort || '\u2014'],
+      ['Sequence #', pkt.seqNum || '\u2014'], ['Checksum', pkt.checksum || '\u2014'],
+    ]
+  });
 
-  sections.push({ title: `${I.globe} Network`, bg: '#3b82f6', fields: [
-    ['Source IP', state.srcIP], ['Dest IP', state.dstIP],
-    ['TTL', pkt.ttl || state.ttl], ['Protocol', state.transport],
-  ]});
+  sections.push({
+    title: `${I.globe} Network`, bg: '#3b82f6', fields: [
+      ['Source IP', state.srcIP], ['Dest IP', state.dstIP],
+      ['TTL', pkt.ttl || state.ttl], ['Protocol', state.transport],
+    ]
+  });
 
-  sections.push({ title: `${I.plug} Data Link`, bg: '#818cf8', fields: [
-    ['Source MAC', state.srcMAC], ['Dest MAC', pkt.dstMAC || state.dstMAC],
-    ['FCS', pkt.fcs || '\u2014'],
-  ]});
+  sections.push({
+    title: `${I.plug} Data Link`, bg: '#818cf8', fields: [
+      ['Source MAC', state.srcMAC], ['Dest MAC', pkt.dstMAC || state.dstMAC],
+      ['FCS', pkt.fcs || '\u2014'],
+    ]
+  });
 
   if (state.showBinary) {
-    sections.push({ title: `${I.bolt} Physical (Binary)`, bg: '#c084fc', fields: [
-      ['Bits', (pkt.bits || strToBin(state.msg)).slice(0, 80) + '\u2026'],
-    ]});
+    sections.push({
+      title: `${I.bolt} Physical (Binary)`, bg: '#c084fc', fields: [
+        ['Bits', (pkt.bits || strToBin(state.msg)).slice(0, 80) + '\u2026'],
+      ]
+    });
   }
 
   if (state.errorMode) {
-    sections.unshift({ title: `${I.warn} Simulation`, bg: '#ef4444', fields: [
-      ['Error scenario', ERROR_LABELS[String(state.errorType)].replace('Error: ', '')],
-    ]});
+    sections.unshift({
+      title: `${I.warn} Simulation`, bg: '#ef4444', fields: [
+        ['Error scenario', ERROR_LABELS[String(state.errorType)].replace('Error: ', '')],
+      ]
+    });
   }
 
   body.innerHTML = sections.map(s => `
@@ -927,7 +852,7 @@ function updatePktVis() {
   }
 
   if (step < 0) {
-    wrap.innerHTML = `<div class="osi-packet-placeholder">${I.bolt} Press <strong>Next Step</strong> or <strong>Auto</strong> to start encapsulating &quot;${esc(state.msg)}&quot;</div>`;
+    wrap.innerHTML = `<div class="osi-packet-placeholder"> Press Next Step or Auto to start</div>`;
   } else if (step >= 0 && step <= 6) {
 
     const encLayers = [];
@@ -970,7 +895,7 @@ function generateRSA() {
   const steps = [
     { label: 'Step 1: Choose two prime numbers', math: `p = ${p}, q = ${q}` },
     { label: 'Step 2: Calculate n = p x q', math: `n = ${p} x ${q} = ${n}`, result: n.toString() },
-    { label: 'Step 3: Calculate phi(n) = (p-1)(q-1)', math: `phi = (${p-1}) x (${q-1}) = ${phi}`, result: phi.toString() },
+    { label: 'Step 3: Calculate phi(n) = (p-1)(q-1)', math: `phi = (${p - 1}) x (${q - 1}) = ${phi}`, result: phi.toString() },
     { label: 'Step 4: Choose e (coprime with phi)', math: `GCD(${e}, ${phi}) = ${gcd(e, phi)} -> e = ${e}`, result: e.toString() },
     { label: 'Step 5: Calculate d (modular inverse of e mod phi)', math: `d = ${e}^-1 mod ${phi} = ${d}`, result: d.toString() },
     { label: 'Step 6: Public Key (n, e)', math: `Public: (${n}, ${e})`, result: `(${n}, ${e})` },

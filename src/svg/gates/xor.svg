@@ -1,11 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" width="40" height="32" class="logic-gate-symbol xor-gate">
-  <!-- Input leads -->
-  <line x1="0" y1="8" x2="6" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-  <line x1="0" y1="24" x2="6" y2="24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-  <!-- XOR back curve -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -20 40 140" width="200" height="96" class="logic-gate-symbol xor-gate">
+
+  <defs>
+    <style>
+      .pinA { stroke: #38bdf8; } /* Cyan - Input A */
+      .pinB { stroke: #a855f7; } /* Purple - Input B */
+      .pinY { stroke: #22c55e; } /* Green - Output Y */
+      .gate { stroke: #64748b; fill: rgba(56, 189, 248, 0.12); } /* Gray gate body */
+    </style>
+  </defs>
+
+  
+  <!--Gate-->
   <path d="M 2 4 Q 10 16 2 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-  <!-- XOR body -->
   <path d="M 6 4 Q 14 16 6 28 Q 20 27 32 16 Q 20 5 6 4 Z" fill="var(--gate-fill, rgba(56, 189, 248, 0.12))" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-  <!-- Output lead -->
-  <line x1="32" y1="16" x2="40" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Top Line-->
+  <line x1="-80" y1="8" x2="6" y2="8" class="pinA" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="-20" y1="-3" x2="-20" y2="8" class="pinA" stroke-width="1.8"/>
+  <line x1="-20" y1="-3" x2="105" y2="-3" class="pinA" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="105" y1="-3" x2="105" y2="15" class="pinA" stroke-width="1.8"/>
+
+  <!-- Bottom Line-->
+  <line x1="0" y1="24" x2="6" y2="24" class="pinB" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="0" y1="25" x2="0" y2="40" class="pinB" stroke-width="1.8"/>
+  <line x1="0" y1="40" x2="120" y2="40" class="pinB" stroke-width="1.8" stroke-linecap="round"/>
+ 
+  <!--Output -->
+  <line x1="32" y1="16" x2="48" y2="16" class="pinY" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="48" y1="16" x2="48" y2="65" class="pinY" stroke-width="1.8"/>
+  <line x1="120" y1="16" x2="120" y2="65" class="pinY" stroke-width="1.8"/>
+  <line x1="-80" y1="65" x2="120" y2="65" class="pinY" stroke-width="1.8" stroke-linecap="round"/>
 </svg>

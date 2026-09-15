@@ -359,11 +359,6 @@
 
 .osi-pkt-layer:first-child {
   border-top: 1px solid var(--border-color);
-  border-radius: 4px 4px 0 0;
-}
-
-.osi-pkt-layer:last-child {
-  border-radius: 0 0 4px 4px;
 }
 
 .osi-pkt-layer .osi-pkt-detail {
@@ -1007,7 +1002,6 @@
 }
 
  .osi-pkt-layer {
-  border-radius: 8px !important;
   border-width: 2px !important;
   font-family: 'JetBrains Mono', monospace !important;
   font-weight: 700 !important;
@@ -1016,11 +1010,6 @@
 
  .osi-pkt-layer:first-child {
   border-top-width: 2px !important;
-  border-radius: 8px 8px 0 0 !important;
-}
-
- .osi-pkt-layer:last-child {
-  border-radius: 0 0 8px 8px !important;
 }
 
  .osi-pkt-layer.active {
@@ -1718,7 +1707,6 @@
   transform: translateY(-50%);
   width: 15px;
   height: 15px;
-  border-radius: 50%;
   background: currentColor;
   color: #fff;
   font-size: 0.44rem;
@@ -2048,7 +2036,6 @@
 
 .osi-pkt-layer {
   border-left-width: 4px !important;
-  border-radius: 10px !important;
   box-shadow: 0 3px 8px rgba(15, 42, 67, 0.1) !important;
 }
 

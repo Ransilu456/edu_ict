@@ -34,7 +34,6 @@
   display: flex;
   gap: 0;
   flex-shrink: 0;
-  background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
   overflow-x: auto;
   padding: 0 1rem;
@@ -1579,7 +1578,6 @@
   background: #1e293b !important;
   color: #ffffff !important;
   border-color: #1e293b !important;
-  box-shadow: 0 6px 14px rgba(30, 41, 59, 0.28) !important;
 }
 
 .nd-layout {
@@ -1937,7 +1935,6 @@
   position: relative;
 }
 
-/* Responsive lab layout: keep controls usable while preserving the visual lab canvas. */
 .nd-tabs {
   overscroll-behavior-inline: contain;
 }
