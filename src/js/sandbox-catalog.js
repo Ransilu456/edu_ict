@@ -1,4 +1,3 @@
-// Sandbox component catalog
 export const COMPONENT_DEFS = {
   'input':       { inputs: 0, outputs: 1, label: 'Toggle Switch',    category: 'Inputs' },
   'clock':       { inputs: 0, outputs: 1, label: 'Clock Signal',     category: 'Inputs' },

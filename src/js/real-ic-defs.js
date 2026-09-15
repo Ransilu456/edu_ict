@@ -1,4 +1,3 @@
-// real 74xx DIP-14 IC definitions
 export const REAL_ICS = {
   'ic-7408': {
     type: 'ic-7408',

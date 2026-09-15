@@ -1,4 +1,4 @@
-// Common utilities: theme, sound, toast, alert, confirm
+// theme, sound, toast, alert, confirm
 import './modal-manager.js';
 
 let audioCtx;

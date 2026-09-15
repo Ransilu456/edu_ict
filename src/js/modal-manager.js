@@ -1,9 +1,3 @@
-// Universal Modal Controller for LogicQuest
-// Ensures every modal, popup, and overlay can be closed via:
-// 1. Close [data-close-modal] buttons or [id*="close"]
-// 2. Backdrop / overlay clicks
-// 3. Escape key globally
-
 const registeredModals = new Set([
   'logic-modal',
   'save-modal',
@@ -80,7 +74,6 @@ export function initUniversalModalManager() {
   if (window.__modalManagerInit) return;
   window.__modalManagerInit = true;
 
-  // 1. Global Escape Key Listener
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       if (closeActiveModal()) {
@@ -90,9 +83,7 @@ export function initUniversalModalManager() {
     }
   });
 
-  // 2. Global Delegated Click for Modal Closes & Backdrops
   document.addEventListener('click', (e) => {
-    // Close button clicked
     const closeBtn = e.target.closest('[data-close-modal], .modal-close-btn, .waveform-close-btn, .osi-insp-close');
     if (closeBtn) {
       const targetId = closeBtn.dataset.closeModal;
@@ -105,7 +96,6 @@ export function initUniversalModalManager() {
       return;
     }
 
-    // Backdrop clicked directly (overlay itself, not modal dialog box)
     if (
       e.target.classList.contains('success-modal-overlay') ||
       e.target.classList.contains('osi-crypto-modal') ||
@@ -116,7 +106,6 @@ export function initUniversalModalManager() {
   });
 }
 
-// Expose globally
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.closeActiveModal = closeActiveModal;

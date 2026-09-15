@@ -89,7 +89,6 @@ export function sampleWaveform(nodes = []) {
 
   const channels = [];
 
-  // Priority 1: Clocks
   nodes.filter(n => n.type === 'clock').forEach(n => {
     if (channels.length < 8) {
       channels.push({
@@ -101,7 +100,6 @@ export function sampleWaveform(nodes = []) {
     }
   });
 
-  // Priority 2: Inputs (Switches)
   nodes.filter(n => n.type === 'input').forEach(n => {
     if (channels.length < 8) {
       channels.push({
@@ -113,7 +111,6 @@ export function sampleWaveform(nodes = []) {
     }
   });
 
-  // Priority 3: Outputs (LEDs, Probes)
   nodes.filter(n => n.type === 'output' || n.type === 'rgb-led').forEach(n => {
     if (channels.length < 8) {
       channels.push({
@@ -125,7 +122,6 @@ export function sampleWaveform(nodes = []) {
     }
   });
 
-  // Priority 4: Compound / ICs / Gates
   nodes.filter(n => ['d-flop', 'half-adder', 'full-adder', 'and', 'or', 'not', 'nand', 'nor', 'xor'].includes(n.type)).forEach(n => {
     if (channels.length < 8) {
       channels.push({
@@ -163,7 +159,6 @@ export function drawWaveform() {
   const w = waveformCanvas.width / waveformDpr;
   const h = waveformCanvas.height / waveformDpr;
 
-  // Deep engineering oscilloscope black
   ctx.fillStyle = '#05080c';
   ctx.fillRect(0, 0, w, h);
 
@@ -171,11 +166,9 @@ export function drawWaveform() {
   const legendWidth = 90;
   const plotWidth = Math.max(80, w - labelWidth - legendWidth);
 
-  // 1. Oscilloscope Grid Lines (Dark Green phosphor grid)
   ctx.lineWidth = 1;
   ctx.strokeStyle = 'rgba(0, 255, 100, 0.08)';
 
-  // Vertical time division ticks
   const divisions = 16;
   for (let div = 0; div <= divisions; div++) {
     const gx = labelWidth + (plotWidth * div / divisions);
@@ -184,7 +177,6 @@ export function drawWaveform() {
     ctx.lineTo(gx, h - 6);
     ctx.stroke();
 
-    // Small subdivision tick marks
     ctx.strokeStyle = 'rgba(0, 255, 100, 0.04)';
     for (let sub = 1; sub < 4; sub++) {
       const subX = gx + (plotWidth / divisions) * (sub / 4);
@@ -213,14 +205,12 @@ export function drawWaveform() {
 
   const rowHeight = Math.floor((h - 16) / numChannels);
 
-  // Draw each channel trace
   channels.forEach((ch, chIdx) => {
     const topY = 10 + chIdx * rowHeight;
     const bottomY = topY + rowHeight - 6;
     const highY = topY + 4;
     const lowY = bottomY - 2;
 
-    // Horizontal baseline & division
     ctx.strokeStyle = 'rgba(0, 255, 100, 0.12)';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -228,20 +218,17 @@ export function drawWaveform() {
     ctx.lineTo(labelWidth + plotWidth, lowY);
     ctx.stroke();
 
-    // Sub-grid high line
     ctx.strokeStyle = 'rgba(0, 255, 100, 0.04)';
     ctx.beginPath();
     ctx.moveTo(labelWidth, highY);
     ctx.lineTo(labelWidth + plotWidth, highY);
     ctx.stroke();
 
-    // Left Channel Label + Indicator Badge
     ctx.fillStyle = '#94a3b8';
     ctx.font = '700 11px "JetBrains Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText(ch.name.slice(0, 8), 10, topY + rowHeight / 2 + 3);
 
-    // Live logic value pill [ 1 / 0 ]
     const isHigh = ch.val === 1;
     ctx.fillStyle = isHigh ? 'rgba(0, 255, 102, 0.2)' : 'rgba(100, 116, 139, 0.2)';
     ctx.fillRect(labelWidth - 32, topY + rowHeight / 2 - 8, 24, 16);
@@ -253,7 +240,6 @@ export function drawWaveform() {
     ctx.textAlign = 'center';
     ctx.fillText(isHigh ? 'H' : 'L', labelWidth - 20, topY + rowHeight / 2 + 4);
 
-    // Waveform Trace: Bright Neon Phosphor Green with glow
     const pts = waveformHistory.length;
     const step = plotWidth / (MAX_WAVEFORM_POINTS - 1);
 
@@ -280,21 +266,18 @@ export function drawWaveform() {
       }
     }
 
-    // Outer phosphor glow
     ctx.strokeStyle = '#00ff66';
     ctx.lineWidth = 2.2;
     ctx.shadowColor = '#00ff66';
     ctx.shadowBlur = 8;
     ctx.stroke();
 
-    // Inner bright core
     ctx.lineWidth = 1.2;
     ctx.strokeStyle = '#e6fff2';
     ctx.stroke();
     ctx.restore();
   });
 
-  // Right Side: Voltage / Logic Level Legend (like in screenshot)
   const legendX = labelWidth + plotWidth + 12;
   ctx.fillStyle = '#64748b';
   ctx.font = '700 9px "JetBrains Mono", monospace';

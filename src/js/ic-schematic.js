@@ -1,4 +1,3 @@
-// IC Schematic SVG generator with modular SVG gate symbols and precise pin alignment
 import andSvg from '../svg/gates/and.svg?raw';
 import orSvg from '../svg/gates/or.svg?raw';
 import notSvg from '../svg/gates/not.svg?raw';
@@ -6,7 +5,6 @@ import nandSvg from '../svg/gates/nand.svg?raw';
 import norSvg from '../svg/gates/nor.svg?raw';
 import xorSvg from '../svg/gates/xor.svg?raw';
 import xnorSvg from '../svg/gates/xnor.svg?raw';
-import bufferSvg from '../svg/gates/buffer.svg?raw';
 
 function extractSvgInner(svgRaw) {
   const match = svgRaw.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i);
@@ -21,7 +19,6 @@ const GATE_TEMPLATES = {
   'nor': extractSvgInner(norSvg),
   'xor': extractSvgInner(xorSvg),
   'xnor': extractSvgInner(xnorSvg),
-  'buffer': extractSvgInner(bufferSvg)
 };
 
 export function generateICSchematicSVG(node, icDef) {
@@ -159,44 +156,32 @@ export function generateICSchematicSVG(node, icDef) {
     gatesHtml = `
       <!-- Pin 1 -> Pin 2 -->
       <g class="ic-gate-unit" data-gate="1">
-        <path d="M ${leftPinX} ${pinY[1]} L 125 ${pinY[1]}" fill="none" stroke="${color(1)}" stroke-width="1.8" style="${glow(1)}"/>
-        ${renderGate('not', 25, 39, false, 2)}
-        <path d="M 165 55 L 180 55 L 180 ${pinY[2]} L ${leftPinX} ${pinY[2]}" fill="none" stroke="${color(2)}" stroke-width="1.8" style="${glow(2)}"/>
+        ${renderGate('not', 22, 45, false, 2)}
       </g>
 
       <!-- Pin 3 -> Pin 4 -->
       <g class="ic-gate-unit" data-gate="2">
-        <path d="M ${leftPinX} ${pinY[3]} L 125 ${pinY[3]}" fill="none" stroke="${color(3)}" stroke-width="1.8" style="${glow(3)}"/>
-        ${renderGate('not', 25, 91, false, 4)}
-        <path d="M 165 107 L 180 107 L 180 ${pinY[4]} L ${leftPinX} ${pinY[4]}" fill="none" stroke="${color(4)}" stroke-width="1.8" style="${glow(4)}"/>
+        ${renderGate('not', 22, 97, false, 4)}
       </g>
 
       <!-- Pin 5 -> Pin 6 -->
       <g class="ic-gate-unit" data-gate="3">
-        <path d="M ${leftPinX} ${pinY[5]} L 125 ${pinY[5]}" fill="none" stroke="${color(5)}" stroke-width="1.8" style="${glow(5)}"/>
-        ${renderGate('not', 25, 143, false, 6)}
-        <path d="M 165 159 L 180 159 L 180 ${pinY[6]} L ${leftPinX} ${pinY[6]}" fill="none" stroke="${color(6)}" stroke-width="1.8" style="${glow(6)}"/>
+        ${renderGate('not', 22, 150, false, 6)}
       </g>
 
       <!-- Pin 13 -> Pin 12 -->
       <g class="ic-gate-unit" data-gate="6">
-        <path d="M ${rightPinX} ${pinY[13]} L 265 ${pinY[13]}" fill="none" stroke="${color(13)}" stroke-width="1.8" style="${glow(13)}"/>
-        ${renderGate('not', 325, 65, true, 12)}
-        <path d="M 225 81 L 210 81 L 210 ${pinY[12]} L ${rightPinX} ${pinY[12]}" fill="none" stroke="${color(12)}" stroke-width="1.8" style="${glow(12)}"/>
+        ${renderGate('not', 328, 72, true, 12)}
       </g>
 
       <!-- Pin 11 -> Pin 10 -->
       <g class="ic-gate-unit" data-gate="5">
-        <path d="M ${rightPinX} ${pinY[11]} L 265 ${pinY[11]}" fill="none" stroke="${color(11)}" stroke-width="1.8" style="${glow(11)}"/>
-        ${renderGate('not', 325, 117, true, 10)}
-        <path d="M 225 133 L 210 133 L 210 ${pinY[10]} L ${rightPinX} ${pinY[10]}" fill="none" stroke="${color(10)}" stroke-width="1.8" style="${glow(10)}"/>
+        ${renderGate('not', 328, 124, true, 10)}
       </g>
 
       <!-- Pin 9 -> Pin 8 -->
       <g class="ic-gate-unit" data-gate="4">
-        <path d="M ${rightPinX} ${pinY[9]} L 265 ${pinY[9]}" fill="none" stroke="${color(9)}" stroke-width="1.8" style="${glow(9)}"/>
-        ${renderGate('not', 325, 169, true, 8)}
-        <path d="M 225 185 L 210 185 L 210 ${pinY[8]} L ${rightPinX} ${pinY[8]}" fill="none" stroke="${color(8)}" stroke-width="1.8" style="${glow(8)}"/>
+        ${renderGate('not', 328, 176, true, 8)}
       </g>
   `;
   }

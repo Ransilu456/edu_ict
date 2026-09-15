@@ -1,4 +1,3 @@
-// OSI 7-layer packet simulator
 import './common.js';
 
 let osiReady = false;

@@ -1,4 +1,3 @@
-// Boolean expressions use a recursive-descent parser so one AST powers every tool.
 function tokenize(expr) {
   const tokens = [];
   const source = String(expr || '');

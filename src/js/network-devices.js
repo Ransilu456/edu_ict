@@ -1,6 +1,3 @@
-// ============================================================================
-// LogicQuest — Next-Gen Interactive Networking Suite & Devices Lab
-// ============================================================================
 import './common.js';
 import { initOSISim, cleanupOSISim } from './osi-sim.js';
 

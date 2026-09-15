@@ -793,96 +793,6 @@ function organizeCircuit() {
   });
 }
 
-function organizeCircuitLegacy() {
-  if (!sandboxNodes.length) return;
-  const incoming = new Map(sandboxNodes.map(node => [node.id, []]));
-  sandboxWires.forEach(wire => incoming.get(wire.toNodeId)?.push(wire.fromNodeId));
-  const depths = new Map();
-  const depthOf = (nodeId, visiting = new Set()) => {
-    if (depths.has(nodeId)) return depths.get(nodeId);
-    if (visiting.has(nodeId)) return 0;
-    visiting.add(nodeId);
-    const depth = Math.max(0, ...(incoming.get(nodeId) || []).map(parent => depthOf(parent, new Set(visiting)) + 1));
-    depths.set(nodeId, depth);
-    return depth;
-  };
-  sandboxNodes.forEach(node => depthOf(node.id));
-  const columns = new Map();
-  sandboxNodes.forEach(node => {
-    const depth = depths.get(node.id) || 0;
-    if (!columns.has(depth)) columns.set(depth, []);
-    columns.get(depth).push(node);
-  });
-
-  const sortedColumns = [...columns.entries()].sort(([a], [b]) => a - b);
-  
-  // Measure heights and widths
-  let maxTotalHeight = 0;
-  const colMetrics = sortedColumns.map(([depth, nodes]) => {
-    let colWidth = 0;
-    let colHeight = 0;
-    const nodeDims = nodes.map(node => {
-      const el = document.getElementById(node.id);
-      const isIC = !!REAL_ICS[node.type];
-      const w = el?.offsetWidth || (isIC ? 390 : 130);
-      const h = el?.offsetHeight || (isIC ? 260 : 80);
-      colWidth = Math.max(colWidth, w);
-      return { node, w, h };
-    });
-    colHeight = nodeDims.reduce((acc, d) => acc + d.h, 0) + Math.max(0, nodeDims.length - 1) * 36;
-    maxTotalHeight = Math.max(maxTotalHeight, colHeight);
-    return { depth, nodes: nodeDims, colWidth, colHeight };
-  });
-
-  let currentX = 80;
-  colMetrics.forEach(col => {
-    // Vertically center column within overall circuit height
-    const startY = Math.max(60, 60 + (maxTotalHeight - col.colHeight) / 2);
-    let runningY = startY;
-
-    col.nodes.forEach(({ node, h }) => {
-      node.x = Math.round(currentX / 10) * 10;
-      node.y = Math.round(runningY / 10) * 10;
-      runningY += h + 36;
-    });
-
-    currentX += col.colWidth + 90; // 90px clear horizontal wire gutter
-  });
-
-  sandboxNodes.forEach(node => {
-    const element = document.getElementById(node.id);
-    if (element) {
-      element.style.left = `${node.x}px`;
-      element.style.top = `${node.y}px`;
-    }
-  });
-
-  // Fit the organized graph into the current canvas, leaving the toolbar clear.
-  const rect = getWorkspaceRect();
-  const bounds = sandboxNodes.reduce((result, node) => {
-    const element = document.getElementById(node.id);
-    const width = element?.offsetWidth || (REAL_ICS[node.type] ? 390 : 130);
-    const height = element?.offsetHeight || (REAL_ICS[node.type] ? 260 : 80);
-    result.left = Math.min(result.left, node.x);
-    result.top = Math.min(result.top, node.y);
-    result.right = Math.max(result.right, node.x + width);
-    result.bottom = Math.max(result.bottom, node.y + height);
-    return result;
-  }, { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity });
-
-  if (rect.width && rect.height && Number.isFinite(bounds.left)) {
-    const contentWidth = Math.max(1, bounds.right - bounds.left);
-    const contentHeight = Math.max(1, bounds.bottom - bounds.top);
-    const availableWidth = Math.max(240, rect.width - 72);
-    const availableHeight = Math.max(220, rect.height - 126);
-    zoom = Math.min(1, availableWidth / contentWidth, availableHeight / contentHeight);
-    panX = (rect.width - contentWidth * zoom) / 2 - bounds.left * zoom;
-    panY = 82 - bounds.top * zoom;
-    applyViewportTransform();
-  }
-  updateSandboxWires();
-}
-
 function reRenderAllNodes() {
   const ids = sandboxNodes.map(n => n.id);
   ids.forEach(id => {
@@ -1066,7 +976,6 @@ function renderRealICNodeDOM(node, el) {
    (panContainer || workspace).appendChild(el);
 }
 
-// node dom
 function renderNodeDOM(node) {
   const existing = document.getElementById(node.id);
   if (existing) existing.remove();
