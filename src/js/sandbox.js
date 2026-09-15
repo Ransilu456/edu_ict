@@ -1,6 +1,7 @@
 import { REAL_ICS } from './real-ic-defs.js';
 import { initWaveform, sampleWaveform } from './waveform.js';
 import { generateICSchematicSVG } from './ic-schematic.js';
+import { snapWorld, getNodePlacementPoint, findFreePlacement, organizeCircuit as organizeSandboxCircuit } from './sandbox-layout.js';
 
 // canvas state
 let sandboxNodes = [];
@@ -23,7 +24,6 @@ let panX = 0, panY = 0;
 let zoom = 1;
 const MIN_ZOOM = 0.45;
 const MAX_ZOOM = 2.2;
-const GRID_SIZE = 10;
 let isPanning = false;
 let didPan = false;
 let panStart = { x: 0, y: 0 };
@@ -95,42 +95,6 @@ function applyViewportTransform() {
   }
 }
 
-function snapWorld(value) {
-  return Math.round(value / GRID_SIZE) * GRID_SIZE;
-}
-
-function getNodePlacementPoint(type, worldX, worldY) {
-  const centeredTypes = new Set(['ic-7408', 'ic-7432', 'ic-7404', 'ic-7400', 'ic-7402', 'ic-7486']);
-  const halfWidth = centeredTypes.has(type) ? 132 : 60;
-  const halfHeight = centeredTypes.has(type) ? 70 : 40;
-  return { x: snapWorld(worldX - halfWidth), y: snapWorld(worldY - halfHeight) };
-}
-
-function findFreePlacement(type, worldX, worldY) {
-  const base = getNodePlacementPoint(type, worldX, worldY);
-  const candidates = [
-    { x: 0, y: 0 }, { x: 140, y: 0 }, { x: -140, y: 0 },
-    { x: 0, y: 110 }, { x: 0, y: -110 }, { x: 140, y: 110 }, { x: -140, y: 110 },
-  ];
-  const overlaps = (x, y) => sandboxNodes.some(node => Math.abs(node.x - x) < 110 && Math.abs(node.y - y) < 80);
-  const rect = getWorkspaceRect();
-  const topLeft = screenToWorld(rect.left, rect.top);
-  const bottomRight = screenToWorld(rect.right, rect.bottom);
-  const visible = {
-    left: Math.min(topLeft.x, bottomRight.x),
-    top: Math.min(topLeft.y, bottomRight.y),
-    right: Math.max(topLeft.x, bottomRight.x),
-    bottom: Math.max(topLeft.y, bottomRight.y),
-  };
-  for (const offset of candidates) {
-    const x = snapWorld(base.x + offset.x);
-    const y = snapWorld(base.y + offset.y);
-    if (!overlaps(x, y) && x >= visible.left - 20 && y >= visible.top - 20 && x <= visible.right - 90 && y <= visible.bottom - 70) {
-      return { x, y };
-    }
-  }
-  return base;
-}
 
 function pushUndo() {
   const snapshot = JSON.stringify(serializeLayout());
@@ -350,6 +314,14 @@ function setupSidebarSearch() {
 function setupSidebarItem(item) {
   const type = item.dataset.type;
   const label = item.querySelector('span')?.innerText || type;
+  const shortLabels = {
+    input: 'SW', clock: 'CLK', and: 'AND', or: 'OR', not: 'NOT', nand: 'NAND', nor: 'NOR', xor: 'XOR', xnor: 'XNOR',
+    output: 'LED', 'half-adder': 'HA', 'full-adder': 'FA', 'd-flop': 'D', 'seven-seg': '7S', 'text-label': 'T',
+    'ic-7408': '7408', 'ic-7432': '7432', 'ic-7404': '7404', 'ic-7400': '7400', 'ic-7402': '7402', 'ic-7486': '7486'
+  };
+  item.dataset.tooltip = label;
+  item.dataset.short = shortLabels[type] || label.slice(0, 3).toUpperCase();
+  item.title = `${label} — click to place or drag to canvas`;
   item.setAttribute('draggable', 'true');
   item.addEventListener('dragstart', (e) => {
     e.dataTransfer.effectAllowed = 'copy';
@@ -362,7 +334,9 @@ function setupSidebarItem(item) {
     const column = (slot % 3) - 1;
     const row = Math.floor(slot / 3) % 3 - 1;
     const center = getViewportCenterWorld();
-    const placement = findFreePlacement(type, center.x + column * 150, center.y + row * 110);
+    const placement = findFreePlacement(type, center.x + column * 150, center.y + row * 110, {
+      nodes: sandboxNodes, screenToWorld, workspaceRect: getWorkspaceRect()
+    });
     placeNode(type, label, placement.x, placement.y);
     showToast(`${label} placed ✓`);
   });
@@ -452,16 +426,71 @@ function setupDragAndDrop() {
   const sidebar = document.getElementById('sandboxSidebar');
   if (!sidebar) return;
 
+  const sidebarToggle = sidebar.querySelector('#sidebar-collapse-btn');
+  const sandboxView = sidebar.closest('.sandbox-view');
+  const bindCompactTooltip = element => {
+    let tooltip;
+    const removeTooltip = () => {
+      tooltip?.remove();
+      tooltip = null;
+    };
+    const showTooltip = () => {
+      if (!sandboxView?.classList.contains('sidebar-collapsed') || !element.dataset.tooltip) return;
+      removeTooltip();
+      const rect = element.getBoundingClientRect();
+      tooltip = document.createElement('div');
+      tooltip.className = 'sidebar-compact-tooltip';
+      tooltip.textContent = element.dataset.tooltip;
+      tooltip.style.left = `${rect.right + 10}px`;
+      tooltip.style.top = `${Math.max(8, Math.min(window.innerHeight - 42, rect.top + rect.height / 2))}px`;
+      document.body.appendChild(tooltip);
+    };
+    element.addEventListener('pointerenter', showTooltip);
+    element.addEventListener('pointerleave', removeTooltip);
+    element.addEventListener('focus', showTooltip);
+    element.addEventListener('blur', removeTooltip);
+  };
+  sidebarToggle?.addEventListener('click', () => {
+    const collapsed = sandboxView?.classList.toggle('sidebar-collapsed') || false;
+    sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
+    sidebarToggle.setAttribute('aria-label', collapsed ? 'Expand component library' : 'Collapse component library');
+    sidebarToggle.title = collapsed ? 'Expand component library' : 'Collapse component library';
+    if (window.playSound) window.playSound('click');
+  });
+
   sidebar.querySelectorAll('.sidebar-section-title').forEach(title => {
     title.style.cursor = 'pointer';
-    title.title = 'Collapse / expand section';
-    title.addEventListener('click', () => {
+    title.setAttribute('role', 'button');
+    title.setAttribute('tabindex', '0');
+    title.setAttribute('aria-expanded', 'true');
+    const category = title.dataset.category || 'Components';
+    title.dataset.tooltip = `${category} components`;
+    title.title = `${category} components — collapse / expand`;
+    bindCompactTooltip(title);
+    const toggleSection = () => {
+      if (sandboxView?.classList.contains('sidebar-collapsed')) return;
       title.parentElement?.classList.toggle('collapsed');
+      title.setAttribute('aria-expanded', String(!title.parentElement?.classList.contains('collapsed')));
+    };
+    title.addEventListener('click', toggleSection);
+    title.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleSection();
+      }
     });
   });
-  sidebar.querySelectorAll('.sidebar-item').forEach(item => setupSidebarItem(item));
+  sidebar.querySelectorAll('.sidebar-item').forEach(item => {
+    setupSidebarItem(item);
+    bindCompactTooltip(item);
+  });
   sidebar.querySelectorAll('.template-card').forEach(card => {
     card.setAttribute('draggable', 'true');
+    const templateLabel = card.querySelector('.template-card-name')?.innerText || card.dataset.templateName || 'Template';
+    card.dataset.tooltip = templateLabel;
+    card.dataset.short = 'TPL';
+    card.title = `${templateLabel} — click to load or drag to canvas`;
+    bindCompactTooltip(card);
     card.addEventListener('dragstart', (e) => {
       e.dataTransfer.effectAllowed = 'copy';
       e.dataTransfer.setData('type', 'template');
@@ -749,6 +778,22 @@ function updateWireStyleBtn(btn) {
 }
 
 function organizeCircuit() {
+  organizeSandboxCircuit({
+    nodes: sandboxNodes,
+    wires: sandboxWires,
+    getElement: id => document.getElementById(id),
+    workspaceRect: getWorkspaceRect(),
+    setViewport: next => {
+      zoom = next.zoom;
+      panX = next.panX;
+      panY = next.panY;
+    },
+    applyViewportTransform,
+    updateWires: updateSandboxWires,
+  });
+}
+
+function organizeCircuitLegacy() {
   if (!sandboxNodes.length) return;
   const incoming = new Map(sandboxNodes.map(node => [node.id, []]));
   sandboxWires.forEach(wire => incoming.get(wire.toNodeId)?.push(wire.fromNodeId));
@@ -811,6 +856,30 @@ function organizeCircuit() {
       element.style.top = `${node.y}px`;
     }
   });
+
+  // Fit the organized graph into the current canvas, leaving the toolbar clear.
+  const rect = getWorkspaceRect();
+  const bounds = sandboxNodes.reduce((result, node) => {
+    const element = document.getElementById(node.id);
+    const width = element?.offsetWidth || (REAL_ICS[node.type] ? 390 : 130);
+    const height = element?.offsetHeight || (REAL_ICS[node.type] ? 260 : 80);
+    result.left = Math.min(result.left, node.x);
+    result.top = Math.min(result.top, node.y);
+    result.right = Math.max(result.right, node.x + width);
+    result.bottom = Math.max(result.bottom, node.y + height);
+    return result;
+  }, { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity });
+
+  if (rect.width && rect.height && Number.isFinite(bounds.left)) {
+    const contentWidth = Math.max(1, bounds.right - bounds.left);
+    const contentHeight = Math.max(1, bounds.bottom - bounds.top);
+    const availableWidth = Math.max(240, rect.width - 72);
+    const availableHeight = Math.max(220, rect.height - 126);
+    zoom = Math.min(1, availableWidth / contentWidth, availableHeight / contentHeight);
+    panX = (rect.width - contentWidth * zoom) / 2 - bounds.left * zoom;
+    panY = 82 - bounds.top * zoom;
+    applyViewportTransform();
+  }
   updateSandboxWires();
 }
 

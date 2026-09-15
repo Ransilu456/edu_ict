@@ -25,9 +25,10 @@ function getAllPanels() {
 function setupViewNavigation() {
   const tabs = document.querySelectorAll('[data-route]');
   let networkReady = false;
+  const workspaceMode = window.location.pathname.endsWith('/app.html');
 
   const routes = {
-    '/': { panel: 'home-view' },
+    '/': { panel: 'sandbox-view' },
     '/logic': { panel: 'sandbox-view' },
     '/logic/sandbox': { panel: 'sandbox-view' },
     '/logic/boolean': { panel: 'boolean-view' },
@@ -45,6 +46,18 @@ function setupViewNavigation() {
     return routes[path] ? path : '/';
   }
 
+  function routeFromLocation() {
+    return workspaceMode
+      ? new URLSearchParams(window.location.search).get('route') || '/logic/sandbox'
+      : window.location.pathname;
+  }
+
+  function routeUrl(path) {
+    return workspaceMode
+      ? `/app.html?route=${encodeURIComponent(path)}`
+      : path;
+  }
+
   function renderRoute(pathname, { replace = false } = {}) {
     const path = normalizePath(pathname);
     const route = routes[path];
@@ -54,8 +67,10 @@ function setupViewNavigation() {
     document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.classList.toggle('active', tab.dataset.route === path || (path === '/logic' && tab.dataset.route === '/logic/sandbox'));
     });
-    document.getElementById('app-footer')?.classList.toggle('is-hidden', path !== '/');
-    if (replace && window.location.pathname !== path) history.replaceState({}, '', path);
+    document.getElementById('app-footer')?.classList.add('is-hidden');
+    if (replace && window.location.href !== new URL(routeUrl(path), window.location.origin).href) {
+      history.replaceState({}, '', routeUrl(path));
+    }
 
     if (route.panel === 'sandbox-view') {
       window.initSandboxCanvas?.();
@@ -73,34 +88,38 @@ function setupViewNavigation() {
   }
 
   tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
+    tab.addEventListener('click', event => {
       if (window.playSound) window.playSound('click');
       const route = normalizePath(tab.dataset.route || '/');
       if (tab.matches('a')) event.preventDefault();
-      if (window.location.pathname !== route) history.pushState({}, '', route);
+      if (window.location.href !== new URL(routeUrl(route), window.location.origin).href) {
+        history.pushState({}, '', routeUrl(route));
+      }
       renderRoute(route);
     });
   });
-  window.addEventListener('popstate', () => renderRoute(window.location.pathname));
+  window.addEventListener('popstate', () => renderRoute(routeFromLocation()));
   document.querySelectorAll('[data-route-link]').forEach(link => {
     link.addEventListener('click', event => {
       event.preventDefault();
       const route = normalizePath(link.getAttribute('href') || '/');
-      history.pushState({}, '', route);
+      history.pushState({}, '', routeUrl(route));
       renderRoute(route);
     });
   });
   window.navigateToView = target => {
     const route = Object.entries(routes).find(([, value]) => value.panel === target)?.[0] || '/';
-    history.pushState({}, '', route);
+    history.pushState({}, '', routeUrl(route));
     renderRoute(route);
   };
   window.navigateToRoute = route => {
     const nextRoute = normalizePath(route);
-    if (window.location.pathname !== nextRoute) history.pushState({}, '', nextRoute);
+    if (window.location.href !== new URL(routeUrl(nextRoute), window.location.origin).href) {
+      history.pushState({}, '', routeUrl(nextRoute));
+    }
     renderRoute(nextRoute);
   };
-  renderRoute(window.location.pathname, { replace: true });
+  renderRoute(routeFromLocation(), { replace: true });
 }
 
 function cleanupCurrentView() {

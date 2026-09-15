@@ -10,6 +10,1113 @@
   background: var(--bg-primary);
 }
 
+/* Network studio refresh: the simulator stays data-driven, while every tab
+   shares one visual hierarchy and a more deliberate lab-canvas treatment. */
+.network-devices-view {
+  --nd-ink: #102a25;
+  --nd-muted: #6c817a;
+  --nd-teal: #168b77;
+  --nd-teal-soft: rgba(22, 139, 119, .12);
+  --nd-orange: #ef7955;
+  --nd-surface: #f8fbf8;
+  --nd-panel: #ffffff;
+  background: #edf4ef;
+  color: var(--nd-ink);
+}
+
+.network-devices-view .nd-lab-container {
+  background: linear-gradient(135deg, #eff7f1 0%, #e8f1ed 100%);
+}
+
+.network-devices-view .nd-main {
+  gap: 0;
+}
+
+.network-devices-view .nd-tabs {
+  align-items: center;
+  gap: 6px;
+  padding: 12px 22px;
+  border: 0;
+  background: rgba(255, 255, 255, .86);
+  box-shadow: 0 1px 0 rgba(16, 42, 37, .08);
+}
+
+.network-devices-view .nd-tab {
+  min-height: 38px;
+  padding: 9px 14px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: var(--nd-muted);
+  font-size: .73rem;
+  font-weight: 700;
+  transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
+}
+
+.network-devices-view .nd-tab:hover {
+  color: var(--nd-ink);
+  background: #f0f6f2;
+  transform: translateY(-1px);
+}
+
+.network-devices-view .nd-tab.active {
+  color: var(--nd-ink);
+  border-color: #b9d8c8;
+  background: #e6f5ea;
+  box-shadow: inset 0 -2px 0 var(--nd-teal), 0 4px 12px rgba(22, 139, 119, .08);
+}
+
+.network-devices-view .nd-tab-content {
+  padding: 18px 20px 20px;
+}
+
+.network-devices-view .nd-layout {
+  gap: 18px;
+  overflow: auto;
+}
+
+.network-devices-view .nd-left,
+.network-devices-view .nd-right {
+  overflow: visible;
+}
+
+.network-devices-view .nd-left {
+  width: 330px;
+  min-width: 290px;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.network-devices-view .nd-right {
+  gap: 12px;
+  overflow: visible;
+}
+
+.network-devices-view .nd-panel-header,
+.network-devices-view .nd-card,
+.network-devices-view .nd-terminal-wrap,
+.network-devices-view .nd-topo-header,
+.network-devices-view .subnet-card,
+.network-devices-view .parity-box,
+.network-devices-view .parity-info-card {
+  border: 1px solid #d3e2d8;
+  border-radius: 9px;
+  background: var(--nd-panel);
+  box-shadow: 0 6px 18px rgba(31, 73, 56, .055);
+}
+
+.network-devices-view .nd-panel-header {
+  padding: 18px;
+  border-bottom: 1px solid #d3e2d8;
+  background: #fbfdfb;
+}
+
+.network-devices-view .nd-panel-header svg,
+.network-devices-view .nd-card-title svg,
+.network-devices-view .subnet-card-title svg,
+.network-devices-view .parity-header svg,
+.network-devices-view .parity-info-title svg {
+  color: var(--nd-teal);
+}
+
+.network-devices-view .nd-panel-title {
+  color: var(--nd-ink);
+  font-size: .95rem;
+  letter-spacing: -.02em;
+}
+
+.network-devices-view .nd-panel-sub,
+.network-devices-view .nd-label,
+.network-devices-view .nd-sidebar-section-title {
+  color: var(--nd-muted);
+}
+
+.network-devices-view .nd-topo-bar,
+.network-devices-view .nd-device-selector,
+.network-devices-view .nd-controls {
+  padding: 14px 16px;
+  border: 1px solid #d3e2d8;
+  border-radius: 9px;
+  background: var(--nd-panel);
+  box-shadow: 0 6px 18px rgba(31, 73, 56, .045);
+}
+
+.network-devices-view .nd-topo-bar {
+  display: grid;
+  gap: 10px;
+}
+
+.network-devices-view .nd-section-label,
+.network-devices-view .nd-card-title,
+.network-devices-view .subnet-card-title,
+.network-devices-view .parity-box-label,
+.network-devices-view .parity-info-title {
+  color: var(--nd-ink);
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.network-devices-view .nd-mode-pills {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.network-devices-view .nd-mode-pill,
+.network-devices-view .nd-speed-pill,
+.network-devices-view .nd-cli-pill,
+.network-devices-view .subnet-preset-btn {
+  border: 1px solid #d3e2d8;
+  border-radius: 5px;
+  background: #f7faf7;
+  color: var(--nd-muted);
+  font: 700 .62rem var(--font-header);
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.network-devices-view .nd-mode-pill {
+  min-height: 35px;
+  padding: 5px 7px;
+}
+
+.network-devices-view .nd-mode-pill:hover,
+.network-devices-view .nd-speed-pill:hover,
+.network-devices-view .nd-cli-pill:hover,
+.network-devices-view .subnet-preset-btn:hover {
+  color: var(--nd-teal);
+  border-color: #8fc7b3;
+  background: #eff9f1;
+}
+
+.network-devices-view .nd-mode-pill.active,
+.network-devices-view .nd-speed-pill.active,
+.network-devices-view .subnet-preset-btn.active {
+  color: #fff;
+  border-color: var(--nd-teal);
+  background: var(--nd-teal);
+  box-shadow: 0 3px 8px rgba(22, 139, 119, .2);
+}
+
+.network-devices-view .nd-device-selector {
+  gap: 7px;
+}
+
+.network-devices-view .nd-device-btn {
+  min-height: 75px;
+  border-radius: 7px;
+  background: #f7faf7;
+}
+
+.network-devices-view .nd-device-btn.active {
+  background: #e9f6ec;
+  box-shadow: inset 0 -2px 0 var(--nd-teal), 0 4px 10px rgba(22, 139, 119, .08);
+}
+
+.network-devices-view .nd-host-btn.active {
+  border-color: var(--nd-teal);
+  background: var(--nd-teal-soft);
+  color: var(--nd-teal);
+}
+
+.network-devices-view .nd-send-btn,
+.network-devices-view .parity-action-btn.primary,
+.network-devices-view .osi-btn.primary {
+  border-radius: 6px;
+  background: var(--nd-ink);
+  box-shadow: 0 5px 12px rgba(16, 42, 37, .14);
+}
+
+.network-devices-view .nd-card {
+  padding: 14px 16px;
+}
+
+.network-devices-view .nd-card-title {
+  margin-bottom: 10px;
+}
+
+.network-devices-view .nd-spec-box {
+  padding: 12px;
+  border: 1px solid #d8e8dc;
+  border-radius: 6px;
+  background: #f6faf6;
+}
+
+.network-devices-view .nd-topo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 54px;
+  padding: 10px 14px;
+}
+
+.network-devices-view .nd-topo-status {
+  color: var(--nd-ink);
+  font: 700 .68rem var(--font-mono);
+}
+
+.network-devices-view .nd-speed-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.network-devices-view .nd-speed-pill {
+  min-width: 37px;
+  padding: 6px 7px;
+}
+
+.network-devices-view .nd-reset-net-btn {
+  width: 30px;
+  height: 30px;
+  margin-left: 5px;
+  border: 1px solid #d3e2d8;
+  border-radius: 5px;
+  background: #f7faf7;
+  color: var(--nd-teal);
+  cursor: pointer;
+}
+
+.network-devices-view .nd-svg-wrap {
+  min-height: 390px;
+  border: 1px solid #c9ded0;
+  border-radius: 9px;
+  background-color: #f6fbf6;
+  background-image: linear-gradient(rgba(93, 145, 111, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(93, 145, 111, .08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .8);
+}
+
+.network-devices-view .nd-terminal-wrap {
+  overflow: hidden;
+  background: #18352d;
+  border-color: #285648;
+  color: #d8f5dd;
+}
+
+.network-devices-view .nd-terminal-header {
+  min-height: 44px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #326554;
+  background: #20463b;
+}
+
+.network-devices-view .nd-term-title,
+.network-devices-view .nd-prompt {
+  color: #c9f36b;
+}
+
+.network-devices-view .nd-cli-pill {
+  padding: 5px 8px;
+  border-color: #3b6e5d;
+  background: #1a3c33;
+  color: #b5d8c0;
+}
+
+.network-devices-view .nd-terminal-body {
+  min-height: 98px;
+  background: #122a24;
+}
+
+.network-devices-view .nd-term-input-bar {
+  border-top-color: #326554;
+  background: #16332b;
+}
+
+.network-devices-view .nd-term-input {
+  color: #effff0;
+}
+
+.network-devices-view .nd-term-submit {
+  border-radius: 4px;
+  background: var(--nd-orange);
+}
+
+.network-devices-view .subnet-layout,
+.network-devices-view .parity-layout {
+  gap: 18px;
+  padding: 0;
+  background: transparent;
+}
+
+.network-devices-view .subnet-left,
+.network-devices-view .subnet-right {
+  gap: 14px;
+}
+
+.network-devices-view .subnet-card {
+  padding: 18px;
+}
+
+.network-devices-view .subnet-text-input {
+  min-height: 40px;
+  border-radius: 6px;
+  border-color: #cbded1;
+  background: #fbfdfb;
+  color: var(--nd-ink);
+}
+
+.network-devices-view .subnet-text-input:focus {
+  border-color: var(--nd-teal);
+  box-shadow: 0 0 0 3px var(--nd-teal-soft);
+}
+
+.network-devices-view .subnet-prefix-val {
+  color: var(--nd-teal);
+}
+
+.network-devices-view .subnet-calc-row,
+.network-devices-view .subnet-table-wrap,
+.network-devices-view .subnet-binary-vis {
+  border-color: #d3e2d8;
+  background: #f7fbf7;
+}
+
+.network-devices-view .subnet-calc-row {
+  border-radius: 5px;
+}
+
+.network-devices-view .subnet-calc-v,
+.network-devices-view .subnet-table td code {
+  color: var(--nd-teal);
+}
+
+.network-devices-view .subnet-table th {
+  background: #eaf5ec;
+  color: var(--nd-ink);
+}
+
+.network-devices-view .subnet-table tr:hover td {
+  background: #f0f8f1;
+}
+
+.network-devices-view .parity-layout {
+  overflow-y: auto;
+}
+
+.network-devices-view .parity-header {
+  border: 0;
+  border-bottom: 1px solid #d3e2d8;
+  border-radius: 0;
+  background: transparent;
+  color: var(--nd-ink);
+}
+
+.network-devices-view .parity-body {
+  gap: 18px;
+}
+
+.network-devices-view .parity-box,
+.network-devices-view .parity-info-card {
+  padding: 20px;
+}
+
+.network-devices-view .parity-bit {
+  border-color: #c7ddd0;
+  border-radius: 5px;
+  background: #f5faf5;
+  color: var(--nd-ink);
+}
+
+.network-devices-view .parity-bit.on,
+.network-devices-view .parity-bit.recv.on {
+  border-color: var(--nd-teal);
+  background: #dff2e5;
+  color: var(--nd-teal);
+}
+
+.network-devices-view .parity-action-btn {
+  border-radius: 6px;
+}
+
+.network-devices-view .parity-action-btn.danger {
+  background: #fff3ee;
+  color: #c45e43;
+  border-color: #f1c4b5;
+}
+
+.network-devices-view .parity-info-card {
+  background: #f4faf3;
+}
+
+@media (max-width: 900px) {
+  .network-devices-view .nd-tab-content { padding: 12px; }
+  .network-devices-view .nd-layout { flex-direction: column; }
+  .network-devices-view .nd-left { width: 100%; min-width: 0; }
+  .network-devices-view .nd-svg-wrap { min-height: 340px; }
+  .network-devices-view .subnet-layout { flex-direction: column; }
+}
+
+/* Complete networking suite layer: topology, OSI, CIDR, and parity share one
+   responsive lab shell and theme contract. */
+.network-devices-view .nd-tab-content {
+  min-height: 0;
+  overflow: auto;
+  padding: clamp(10px, 1.5vw, 20px);
+  background: var(--bg-primary);
+}
+
+.network-devices-view .nd-layout,
+.network-devices-view .subnet-layout,
+.network-devices-view .parity-layout {
+  width: min(1480px, 100%);
+  margin: 0 auto;
+}
+
+.network-devices-view .nd-layout {
+  min-height: 100%;
+  grid-template-columns: minmax(270px, 330px) minmax(0, 1fr);
+  align-items: start;
+}
+
+.network-devices-view .nd-left {
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - 130px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.network-devices-view .nd-right {
+  min-height: 0;
+}
+
+.network-devices-view #osi-container {
+  width: min(1480px, 100%);
+  min-height: 620px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .07);
+}
+
+.network-devices-view .osi-topbar {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+}
+
+.network-devices-view .osi-control-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.network-devices-view .osi-ctrl-group {
+  min-height: 34px;
+  padding: 4px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+}
+
+.network-devices-view .osi-group-tag {
+  color: var(--color-cyan);
+  font: 700 .58rem var(--font-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.network-devices-view .osi-btn,
+.network-devices-view .osi-ctrl-group input,
+.network-devices-view .osi-ctrl-group select {
+  min-height: 28px;
+  border-color: var(--border-color);
+  border-radius: 5px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.network-devices-view .osi-btn.primary {
+  border-color: var(--color-cyan);
+  background: var(--color-cyan);
+  color: #08202a;
+}
+
+.network-devices-view .osi-main {
+  min-height: 0;
+  padding: 14px;
+  gap: 14px;
+  background: var(--bg-primary);
+}
+
+.network-devices-view .osi-alice,
+.network-devices-view .osi-bob,
+.network-devices-view .osi-center {
+  min-width: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+}
+
+.network-devices-view .osi-alice,
+.network-devices-view .osi-bob {
+  width: clamp(180px, 20%, 250px);
+}
+
+.network-devices-view .osi-host-header {
+  border-radius: 7px 7px 0 0;
+  background: var(--color-cyan);
+  color: #08202a;
+}
+
+.network-devices-view .osi-host-header.bob {
+  background: var(--color-success);
+}
+
+.network-devices-view .osi-center {
+  overflow: hidden;
+  background: var(--bg-tertiary);
+}
+
+.network-devices-view .subnet-layout {
+  min-height: 100%;
+  align-items: stretch;
+}
+
+.network-devices-view .subnet-left,
+.network-devices-view .subnet-right {
+  min-width: 0;
+}
+
+.network-devices-view .parity-layout {
+  min-height: 100%;
+  padding: 0;
+}
+
+.network-devices-view .parity-body {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+@media (max-width: 1100px) {
+  .network-devices-view .nd-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .network-devices-view .nd-left {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .network-devices-view .osi-main {
+    overflow: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .network-devices-view .nd-tabs {
+    padding: 8px;
+  }
+
+  .network-devices-view .osi-main {
+    flex-direction: column;
+  }
+
+  .network-devices-view .osi-alice,
+  .network-devices-view .osi-bob {
+    width: 100%;
+    min-height: 160px;
+  }
+
+  .network-devices-view .osi-center {
+    min-height: 420px;
+    order: -1;
+  }
+}
+
+/* Screenshot fixes: restore readable subnet rows and OSI idle-state contrast. */
+.network-devices-view .bin-row-wrap {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.network-devices-view .bin-row-title {
+  color: var(--text-secondary);
+  font: 700 .68rem var(--font-mono);
+  white-space: nowrap;
+}
+
+.network-devices-view .bin-octets {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  width: 100%;
+}
+
+.network-devices-view .bin-octet {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 8px 4px;
+  border: 1px solid color-mix(in srgb, var(--color-cyan) 35%, var(--border-color));
+  border-radius: 4px;
+  background: var(--color-cyan-glow);
+  color: var(--text-primary);
+  font: 700 clamp(.58rem, 1.2vw, .76rem) var(--font-mono);
+  text-align: center;
+  letter-spacing: .03em;
+}
+
+.network-devices-view .bin-octet.mask {
+  border-color: color-mix(in srgb, var(--color-indigo) 35%, var(--border-color));
+  background: var(--color-indigo-glow);
+}
+
+.network-devices-view .bin-dot {
+  color: var(--text-muted);
+  font: 700 .8rem var(--font-mono);
+}
+
+.network-devices-view .nd-panel-sub,
+.network-devices-view .nd-panel-header .nd-panel-sub {
+  color: var(--text-muted) !important;
+}
+
+.network-devices-view .nd-panel-header {
+  background: var(--bg-tertiary) !important;
+}
+
+.network-devices-view .osi-layer-block.inactive {
+  opacity: .72;
+}
+
+.network-devices-view .osi-layer-block.inactive .osi-layer-name,
+.network-devices-view .osi-layer-block.inactive .osi-layer-data {
+  color: var(--text-secondary);
+}
+
+.network-devices-view .osi-ready-card,
+.network-devices-view .osi-packet-vis,
+.network-devices-view .osi-cable-area {
+  border-color: var(--border-color);
+  background: var(--bg-secondary);
+}
+
+@media (max-width: 620px) {
+  .network-devices-view .bin-row-wrap {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .network-devices-view .bin-octets {
+    gap: 3px;
+  }
+
+  .network-devices-view .bin-octet {
+    padding-inline: 1px;
+    font-size: .55rem;
+  }
+}
+
+/* Final screenshot corrections for the two most visual networking labs. */
+.network-devices-view .parity-layout {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0;
+  background: var(--bg-primary);
+}
+
+.network-devices-view .parity-header {
+  flex: 0 0 auto;
+  min-height: 54px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+}
+
+.network-devices-view .parity-body {
+  width: min(1120px, 100%);
+  flex: 1;
+  justify-content: center;
+  gap: 22px;
+  padding: 0 8px 24px;
+  margin: 0 auto;
+}
+
+.network-devices-view .parity-flow {
+  width: 100%;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.network-devices-view .parity-box {
+  min-height: 220px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 12px !important;
+  background: var(--bg-secondary) !important;
+}
+
+.network-devices-view .parity-box-label {
+  margin-bottom: 18px;
+  font-size: .78rem;
+}
+
+.network-devices-view .parity-bits {
+  margin-bottom: 22px;
+}
+
+.network-devices-view .parity-bit {
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
+}
+
+.network-devices-view .parity-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.network-devices-view .parity-action-btn {
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 6px;
+}
+
+.network-devices-view .parity-arrow {
+  align-self: center;
+  color: var(--text-muted);
+}
+
+.network-devices-view .parity-info-card {
+  width: 100%;
+  padding: 20px 22px;
+  border-radius: 12px !important;
+  background: var(--bg-secondary) !important;
+}
+
+.network-devices-view .nd-layout {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.network-devices-view .nd-left {
+  height: 100%;
+  max-height: none;
+  overflow-y: auto;
+}
+
+.network-devices-view .nd-right {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.network-devices-view .nd-svg-wrap {
+  flex: 1 1 auto;
+  min-height: 300px;
+  height: min(58vh, 590px);
+  overflow: hidden;
+}
+
+.network-devices-view .nd-svg {
+  max-height: 100%;
+}
+
+.network-devices-view .nd-terminal-wrap {
+  flex: 0 0 auto;
+  max-height: 170px;
+}
+
+@media (max-width: 900px) {
+  .network-devices-view .nd-layout {
+    height: auto;
+    overflow: auto;
+  }
+
+  .network-devices-view .nd-right,
+  .network-devices-view .nd-left {
+    height: auto;
+  }
+
+  .network-devices-view .nd-svg-wrap {
+    height: min(62vh, 520px);
+  }
+}
+
+@media (max-width: 680px) {
+  .network-devices-view .parity-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .network-devices-view .parity-box {
+    min-height: 190px;
+  }
+
+  .network-devices-view .parity-arrow {
+    transform: rotate(90deg);
+  }
+}
+
+/* Keep the parity heading readable in the light theme. */
+.network-devices-view .parity-header {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.network-devices-view .parity-header .parity-title {
+  color: var(--text-primary) !important;
+}
+
+.network-devices-view .parity-header svg {
+  color: var(--color-success) !important;
+}
+
+@media (max-width: 560px) {
+  .network-devices-view .nd-tabs { padding: 8px; }
+  .network-devices-view .nd-tab { padding: 8px 10px; font-size: .66rem; }
+  .network-devices-view .nd-mode-pills { grid-template-columns: 1fr; }
+  .network-devices-view .nd-topo-header { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .network-devices-view .nd-speed-controls { width: 100%; justify-content: flex-end; }
+  .network-devices-view .nd-svg-wrap { min-height: 260px; }
+  .network-devices-view .parity-flow { flex-direction: column; }
+  .network-devices-view .parity-arrow { transform: rotate(90deg); }
+}
+
+/* Final cascade layer. The file contains older device-lab rules below the
+   original refresh block, so these tokens and layout constraints intentionally
+   live at the end where they win in both theme modes. */
+.network-devices-view {
+  --nd-ink: var(--text-primary);
+  --nd-muted: var(--text-muted);
+  --nd-teal: var(--color-cyan);
+  --nd-teal-soft: var(--color-cyan-glow);
+  --nd-orange: var(--color-amber);
+  --nd-panel: var(--bg-secondary);
+  --nd-canvas: var(--bg-primary);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.network-devices-view .nd-lab-container,
+.network-devices-view .nd-tab-content,
+.network-devices-view .nd-layout,
+.network-devices-view .subnet-layout,
+.network-devices-view .parity-layout {
+  background: var(--bg-primary);
+}
+
+.network-devices-view .nd-tabs {
+  flex: 0 0 auto;
+  min-height: 62px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 1px 0 var(--border-color);
+}
+
+.network-devices-view .nd-tab {
+  color: var(--text-muted);
+}
+
+.network-devices-view .nd-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.network-devices-view .nd-tab.active {
+  color: var(--text-primary);
+  border-color: var(--border-color);
+  background: var(--color-cyan-glow);
+  box-shadow: inset 0 -2px 0 var(--color-cyan);
+}
+
+.network-devices-view .nd-tab-content {
+  min-height: 0;
+  padding: clamp(10px, 1.5vw, 18px);
+}
+
+.network-devices-view .nd-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 330px) minmax(0, 1fr);
+  gap: 18px;
+  overflow: auto;
+}
+
+.network-devices-view .nd-left,
+.network-devices-view .nd-right {
+  min-height: 0;
+  overflow: visible;
+}
+
+.network-devices-view .nd-left {
+  width: auto;
+  min-width: 0;
+}
+
+.network-devices-view .nd-right {
+  min-width: 0;
+}
+
+.network-devices-view .nd-panel-header,
+.network-devices-view .nd-card,
+.network-devices-view .nd-terminal-wrap,
+.network-devices-view .nd-topo-header,
+.network-devices-view .subnet-card,
+.network-devices-view .parity-box,
+.network-devices-view .parity-info-card,
+.network-devices-view .nd-topo-bar,
+.network-devices-view .nd-device-selector,
+.network-devices-view .nd-controls {
+  border-color: var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, .06);
+}
+
+.network-devices-view .nd-panel-header {
+  border-bottom-color: var(--border-color);
+  background: var(--bg-tertiary);
+}
+
+.network-devices-view .nd-panel-title,
+.network-devices-view .nd-section-label,
+.network-devices-view .nd-card-title,
+.network-devices-view .subnet-card-title,
+.network-devices-view .parity-box-label,
+.network-devices-view .parity-info-title,
+.network-devices-view .nd-topo-status {
+  color: var(--text-primary);
+}
+
+.network-devices-view .nd-panel-sub,
+.network-devices-view .nd-label,
+.network-devices-view .nd-sidebar-section-title,
+.network-devices-view .nd-card,
+.network-devices-view .parity-info-body {
+  color: var(--text-secondary);
+}
+
+.network-devices-view .nd-mode-pill,
+.network-devices-view .nd-speed-pill,
+.network-devices-view .nd-cli-pill,
+.network-devices-view .subnet-preset-btn,
+.network-devices-view .nd-reset-net-btn,
+.network-devices-view .nd-device-btn,
+.network-devices-view .nd-host-btn,
+.network-devices-view .parity-bit {
+  border-color: var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+}
+
+.network-devices-view .nd-mode-pill:hover,
+.network-devices-view .nd-speed-pill:hover,
+.network-devices-view .nd-cli-pill:hover,
+.network-devices-view .subnet-preset-btn:hover,
+.network-devices-view .nd-reset-net-btn:hover,
+.network-devices-view .nd-device-btn:hover,
+.network-devices-view .nd-host-btn:hover,
+.network-devices-view .parity-bit:hover {
+  border-color: var(--color-cyan);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.network-devices-view .nd-mode-pill.active,
+.network-devices-view .nd-speed-pill.active,
+.network-devices-view .subnet-preset-btn.active,
+.network-devices-view .nd-device-btn.active,
+.network-devices-view .nd-host-btn.active,
+.network-devices-view .parity-bit.on,
+.network-devices-view .parity-bit.recv.on {
+  border-color: var(--color-cyan);
+  background: var(--color-cyan-glow);
+  color: var(--color-cyan);
+  box-shadow: inset 0 -2px 0 var(--color-cyan);
+}
+
+.network-devices-view .nd-send-btn,
+.network-devices-view .parity-action-btn.primary,
+.network-devices-view .osi-btn.primary {
+  background: var(--color-cyan);
+  color: #06202a;
+  box-shadow: 0 4px 12px var(--color-cyan-glow);
+}
+
+.network-devices-view .nd-svg-wrap {
+  min-height: clamp(300px, 45vh, 540px);
+  border-color: var(--border-color);
+  background-color: var(--nd-canvas);
+  background-image: linear-gradient(var(--border-color) 1px, transparent 1px), linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.network-devices-view .nd-spec-box,
+.network-devices-view .subnet-calc-row,
+.network-devices-view .subnet-table-wrap,
+.network-devices-view .subnet-binary-vis {
+  border-color: var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.network-devices-view .subnet-text-input {
+  border-color: var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.network-devices-view .subnet-text-input:focus {
+  border-color: var(--color-cyan);
+  box-shadow: 0 0 0 3px var(--color-cyan-glow);
+}
+
+.network-devices-view .subnet-table th {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.network-devices-view .subnet-table td,
+.network-devices-view .subnet-table th {
+  border-color: var(--border-color);
+}
+
+.network-devices-view .subnet-table tr:hover td {
+  background: var(--color-cyan-glow);
+}
+
+.network-devices-view .nd-terminal-wrap {
+  border-color: var(--border-color);
+  background: #10231f;
+}
+
+.network-devices-view .parity-info-card {
+  background: var(--bg-tertiary);
+}
+
+@media (max-width: 900px) {
+  .network-devices-view .nd-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .network-devices-view .nd-left {
+    width: 100%;
+  }
+}
+
 .nd-lab-container {
   width: 100%;
   height: 100%;
@@ -2033,6 +3140,83 @@
   padding: 0.25rem 0.5rem;
 }
 
+/* Keep these last so the studio treatment wins over legacy responsive rules. */
+.network-devices-view .nd-tabs {
+  gap: 6px;
+  padding: 12px 22px;
+  border: 0;
+  background: rgba(255, 255, 255, .86);
+}
+
+.network-devices-view .nd-tab {
+  min-height: 38px;
+  padding: 9px 14px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: #6c817a;
+  font-size: .73rem;
+}
+
+.network-devices-view .nd-tab.active {
+  color: #102a25;
+  border-color: #b9d8c8;
+  background: #e6f5ea;
+  box-shadow: inset 0 -2px 0 #168b77, 0 4px 12px rgba(22, 139, 119, .08);
+}
+
+.network-devices-view .nd-tab-content { padding: 18px 20px 20px; }
+.network-devices-view .nd-layout { gap: 18px; overflow: auto; }
+.network-devices-view .nd-left { width: 330px; min-width: 290px; gap: 12px; padding: 0; border: 0; background: transparent; }
+.network-devices-view .nd-right { gap: 12px; overflow: visible; }
+.network-devices-view .nd-panel-header,
+.network-devices-view .nd-card,
+.network-devices-view .nd-terminal-wrap,
+.network-devices-view .nd-topo-header,
+.network-devices-view .subnet-card,
+.network-devices-view .parity-box,
+.network-devices-view .parity-info-card {
+  border: 1px solid #d3e2d8;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(31, 73, 56, .055);
+}
+.network-devices-view .nd-panel-header { padding: 18px; background: #fbfdfb; }
+.network-devices-view .nd-panel-title { color: #102a25; font-size: .95rem; }
+.network-devices-view .nd-topo-header { min-height: 54px; padding: 10px 14px; }
+.network-devices-view .nd-svg-wrap {
+  min-height: 390px;
+  border: 1px solid #c9ded0;
+  border-radius: 9px;
+  background-color: #f6fbf6;
+  background-image: linear-gradient(rgba(93, 145, 111, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(93, 145, 111, .08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.network-devices-view .nd-terminal-wrap { overflow: hidden; background: #18352d; border-color: #285648; color: #d8f5dd; }
+.network-devices-view .nd-terminal-header { background: #20463b; border-bottom-color: #326554; }
+.network-devices-view .nd-terminal-body { background: #122a24; }
+.network-devices-view .nd-term-input-bar { background: #16332b; border-top-color: #326554; }
+.network-devices-view .nd-term-title,
+.network-devices-view .nd-prompt { color: #c9f36b; }
+.network-devices-view .nd-cli-pill { border-color: #3b6e5d; background: #1a3c33; color: #b5d8c0; }
+.network-devices-view .subnet-card,
+.network-devices-view .parity-box,
+.network-devices-view .parity-info-card { padding: 18px; }
+.network-devices-view .subnet-text-input { min-height: 40px; border-radius: 6px; border-color: #cbded1; background: #fbfdfb; }
+.network-devices-view .subnet-table th { background: #eaf5ec; color: #102a25; }
+.network-devices-view .parity-header { background: transparent; border-radius: 0; }
+
+@media (max-width: 900px) {
+  .network-devices-view .nd-tab-content { padding: 12px; }
+  .network-devices-view .nd-layout { flex-direction: column; }
+  .network-devices-view .nd-left { width: 100%; min-width: 0; }
+}
+
+@media (max-width: 560px) {
+  .network-devices-view .nd-tabs { padding: 8px; }
+  .network-devices-view .nd-tab { padding: 8px 10px; font-size: .66rem; }
+  .network-devices-view .nd-svg-wrap { min-height: 260px; }
+}
+
 .crypto-input {
   font-size: 0.9rem;
   letter-spacing: 0.15em;
@@ -2755,4 +3939,159 @@
 .nd-term-submit svg {
   width: 14px;
   height: 14px;
+}
+
+/* Keep this last: older lab rules above contain fixed light-theme colors. */
+.network-devices-view {
+  --nd-ink: var(--text-primary);
+  --nd-muted: var(--text-muted);
+  --nd-teal: var(--color-cyan);
+  --nd-teal-soft: var(--color-cyan-glow);
+  --nd-panel: var(--bg-secondary);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.network-devices-view .nd-lab-container,
+.network-devices-view .nd-tab-content,
+.network-devices-view .nd-layout,
+.network-devices-view .subnet-layout,
+.network-devices-view .parity-layout {
+  background: var(--bg-primary);
+}
+
+.network-devices-view .nd-tabs {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.network-devices-view .nd-tab {
+  color: var(--text-muted);
+}
+
+.network-devices-view .nd-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.network-devices-view .nd-tab.active {
+  color: var(--text-primary);
+  border-color: var(--border-color);
+  background: var(--color-cyan-glow);
+  box-shadow: inset 0 -2px 0 var(--color-cyan);
+}
+
+.network-devices-view .nd-panel-header,
+.network-devices-view .nd-card,
+.network-devices-view .nd-topo-header,
+.network-devices-view .nd-topo-bar,
+.network-devices-view .nd-device-selector,
+.network-devices-view .nd-controls,
+.network-devices-view .subnet-card,
+.network-devices-view .parity-box,
+.network-devices-view .parity-info-card {
+  border-color: var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.network-devices-view .nd-panel-header {
+  background: var(--bg-tertiary);
+}
+
+.network-devices-view .nd-panel-title,
+.network-devices-view .nd-section-label,
+.network-devices-view .nd-card-title,
+.network-devices-view .subnet-card-title,
+.network-devices-view .parity-box-label,
+.network-devices-view .parity-info-title,
+.network-devices-view .nd-topo-status {
+  color: var(--text-primary) !important;
+}
+
+.network-devices-view .nd-panel-sub,
+.network-devices-view .nd-label,
+.network-devices-view .nd-sidebar-section-title,
+.network-devices-view .parity-info-body {
+  color: var(--text-secondary) !important;
+}
+
+.network-devices-view .nd-mode-pill,
+.network-devices-view .nd-speed-pill,
+.network-devices-view .nd-cli-pill,
+.network-devices-view .subnet-preset-btn,
+.network-devices-view .nd-reset-net-btn,
+.network-devices-view .nd-device-btn,
+.network-devices-view .nd-host-btn,
+.network-devices-view .parity-bit {
+  border-color: var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+}
+
+.network-devices-view .nd-mode-pill.active,
+.network-devices-view .nd-speed-pill.active,
+.network-devices-view .subnet-preset-btn.active,
+.network-devices-view .nd-device-btn.active,
+.network-devices-view .nd-host-btn.active,
+.network-devices-view .parity-bit.on,
+.network-devices-view .parity-bit.recv.on {
+  border-color: var(--color-cyan);
+  background: var(--color-cyan-glow);
+  color: var(--color-cyan);
+  box-shadow: inset 0 -2px 0 var(--color-cyan);
+}
+
+.network-devices-view .nd-send-btn,
+.network-devices-view .parity-action-btn.primary,
+.network-devices-view .osi-btn.primary {
+  background: var(--color-cyan);
+  color: #06202a;
+}
+
+.network-devices-view .nd-svg-wrap {
+  min-height: clamp(300px, 45vh, 540px);
+  border-color: var(--border-color);
+  background-color: var(--bg-primary);
+  background-image: linear-gradient(var(--border-color) 1px, transparent 1px), linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+}
+
+.network-devices-view .nd-spec-box,
+.network-devices-view .subnet-calc-row,
+.network-devices-view .subnet-table-wrap,
+.network-devices-view .subnet-binary-vis {
+  border-color: var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.network-devices-view .subnet-text-input {
+  border-color: var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.network-devices-view .subnet-table th {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.network-devices-view .subnet-table td,
+.network-devices-view .subnet-table th {
+  border-color: var(--border-color);
+}
+
+.network-devices-view .parity-info-card {
+  background: var(--bg-tertiary);
+}
+
+@media (max-width: 900px) {
+  .network-devices-view .nd-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .network-devices-view .nd-left {
+    width: 100%;
+  }
 }
