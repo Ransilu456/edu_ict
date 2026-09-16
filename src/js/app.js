@@ -41,6 +41,14 @@ function setupViewNavigation() {
     '/networking/signal-encoding': { panel: 'network-devices-view', subtab: 'parity-tab' },
   };
 
+  const requestedRoute = workspaceMode
+    ? new URLSearchParams(window.location.search).get('route')
+    : null;
+  if (workspaceMode && requestedRoute && !routes[requestedRoute]) {
+    window.location.replace(`/404.html?path=${encodeURIComponent(requestedRoute)}`);
+    return;
+  }
+
   function normalizePath(pathname) {
     const path = pathname.replace(/\/$/, '') || '/';
     return routes[path] ? path : '/';

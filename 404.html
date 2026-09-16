@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LogicQuest | Page Not Found</title>
+  <meta name="description" content="The LogicQuest page you requested could not be found.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f6f8f4;
+      --ink: #10211c;
+      --muted: #66736e;
+      --line: #d9e1da;
+      --mint: #dff2e5;
+      --lime: #c9f36b;
+      --dark: #163b31;
+      --orange: #ff7854;
+      --mono: 'DM Mono', monospace;
+      --display: 'Manrope', sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--display);
+    }
+
+    main {
+      width: min(760px, 100%);
+      padding: clamp(28px, 6vw, 64px);
+      border: 1px solid var(--line);
+      background: #fff;
+      box-shadow: 7px 7px 0 var(--mint);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--ink);
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -.06em;
+    }
+
+    .brand-mark { display: inline-flex; align-items: end; gap: 3px; width: 25px; height: 24px; }
+    .brand-mark i { display: block; width: 6px; background: var(--dark); transform: skew(-18deg); }
+    .brand-mark i:nth-child(1) { height: 13px; }
+    .brand-mark i:nth-child(2) { height: 20px; background: #62c594; }
+    .brand-mark i:nth-child(3) { height: 17px; background: var(--orange); }
+    .brand span span { color: #3a9b70; }
+
+    .eyebrow {
+      margin: clamp(52px, 10vw, 96px) 0 12px;
+      color: #4d7f69;
+      font: 700 12px var(--mono);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    h1 { max-width: 620px; margin: 0; font-size: clamp(2.5rem, 8vw, 5.8rem); line-height: .92; letter-spacing: -.07em; }
+    p { max-width: 500px; margin: 24px 0 30px; color: var(--muted); font-size: 1rem; line-height: 1.65; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    a { padding: 12px 16px; border: 1px solid var(--ink); color: var(--ink); font-weight: 800; text-decoration: none; }
+    a.primary { background: var(--dark); color: #fff; }
+    a:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--lime); }
+
+    details { margin-top: 32px; border-top: 1px solid var(--line); padding-top: 18px; }
+    summary { cursor: pointer; color: var(--muted); font: 700 .75rem var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+    ul { display: grid; gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; }
+    li a { display: block; border-color: var(--line); padding: 10px 12px; font: 600 .75rem var(--mono); }
+    @media (max-width: 520px) { body { padding: 16px; } main { padding: 24px; } .actions { display: grid; } a { text-align: center; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand" aria-label="LogicQuest">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>logic<span>quest</span></span>
+    </div>
+    <div class="eyebrow">404 / Route not found</div>
+    <h1>That page wandered off.</h1>
+    <p>The address does not point to a LogicQuest page. Return to the workspace or open one of the hidden networking routes used during development.</p>
+    <div class="actions">
+      <a class="primary" href="/app.html?route=/logic/sandbox">Open Logic Sandbox</a>
+      <a href="/">Back to home</a>
+    </div>
+    <details>
+      <summary>Development network routes</summary>
+      <ul>
+        <li><a href="/app.html?route=/networking/topology">Network topology</a></li>
+        <li><a href="/app.html?route=/networking/osi">OSI simulator</a></li>
+        <li><a href="/app.html?route=/networking/subnetting">Subnetting and CIDR</a></li>
+        <li><a href="/app.html?route=/networking/signal-encoding">Parity and signal encoding</a></li>
+      </ul>
+    </details>
+  </main>
+</body>
+</html>
