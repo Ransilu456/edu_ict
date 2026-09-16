@@ -1,4 +1,4 @@
-import './common.js';
+﻿import './common.js';
 
 let osiReady = false;
 let osiAbort = false;
@@ -40,7 +40,7 @@ const I = {
 };
 
 const LAYERS = [
-  { id: 7, name: 'Application', short: 'App', pdu: 'Data', tcpIp: 'Application', icon: I.doc, color: '#ef4444', desc: 'User-facing protocols — HTTP, FTP, SMTP, DNS. Provides network services directly to software applications.', analogy: 'Like writing a letter — you decide what to say and who to send it to.' },
+  { id: 7, name: 'Application', short: 'App', pdu: 'Data', tcpIp: 'Application', icon: I.doc, color: '#ef4444', desc: 'User-facing protocols â€” HTTP, FTP, SMTP, DNS. Provides network services directly to software applications.', analogy: 'Like writing a letter â€” you decide what to say and who to send it to.' },
   { id: 6, name: 'Presentation', short: 'Pres', pdu: 'Data', tcpIp: 'Application', icon: I.wrench, color: '#f97316', desc: 'Data formatting, syntax translation, encryption (TLS/SSL), and compression. Prepares data for transmission.', analogy: 'Like translating your letter into a standard postal format, and sealing it in an envelope.' },
   { id: 5, name: 'Session', short: 'Sess', pdu: 'Data', tcpIp: 'Application', icon: I.link, color: '#eab308', desc: 'Establishes, maintains, and synchronizes dialog sessions between applications (checkpoints, full/half duplex).', analogy: 'Like picking up the telephone, ensuring the connection is open, and saying hello.' },
   { id: 4, name: 'Transport', short: 'Trans', pdu: 'Segment / Datagram', tcpIp: 'Transport', icon: I.box, color: '#22c55e', desc: 'End-to-end delivery, port multiplexing, segmentation, flow control, and error recovery. TCP (reliable) / UDP (fast).', analogy: 'Like numbering individual boxes so the receiver can reassemble them in order and verify none are lost.' },
@@ -145,7 +145,7 @@ function buildOSILayout() {
     <div class="osi-stack" id="osi-alice-stack"></div>
   </div>
   <div class="osi-center">
-    <div class="osi-stage-head"><span class="osi-stage-dot"></span><strong>Packet journey</strong><span class="osi-stage-hint">Alice → network → Bob</span></div>
+    <div class="osi-stage-head"><span class="osi-stage-dot"></span><strong>Packet journey</strong><span class="osi-stage-hint">Alice â†’ network â†’ Bob</span></div>
     <div class="osi-ready-card"><span class="osi-ready-icon">${I.send}</span><div><strong>Ready to transmit</strong><small>Press Auto to start.</small></div></div>
     <div class="osi-packet-vis" id="osi-packet-vis">
       <div class="osi-packet-wrap" id="osi-packet-wrap"></div>
@@ -157,7 +157,7 @@ function buildOSILayout() {
           <div class="osi-switch-icon switch" id="osi-switch-icon">${I.switch_}</div>
           <div class="osi-switch-label" id="osi-switch-label">Switch</div>
         </div>
-        <div class="osi-switch-status" id="osi-switch-status">Waiting…</div>
+        <div class="osi-switch-status" id="osi-switch-status">Waitingâ€¦</div>
       </div>
       <div class="osi-cable-row"><span class="osi-cable-tag">Bob link</span><div class="osi-cable" id="osi-cable-right"><div class="osi-cable-track" id="osi-cable-track2"></div></div></div>
       <div class="osi-binary-row" id="osi-bits-display"></div>
@@ -175,15 +175,15 @@ function buildOSILayout() {
     <span>${I.list} Packet Inspector</span>
     <button class="osi-insp-close" id="osi-insp-close">&times;</button>
   </div>
-  <div class="osi-insp-body" id="osi-insp-body"></div>
+  <div class="osi-insp-body" id="osi-insp-body">Coming Soon..</div>
 </div>
 <div class="osi-crypto-modal" id="osi-compare-modal">
   <div class="osi-crypto-box" style="max-width:700px;width:94%">
     <div class="osi-crypto-title">${I.layers} OSI 7-Layer vs TCP/IP 4-Layer Architecture</div>
-    <div style="max-height:360px;overflow-y:auto;margin:0.8rem 0;border:1px solid var(--border-color);border-radius:8px">
+    <div style="max-height:360px;overflow-y:auto;margin:0.8rem 0;border:1px solid var(--line);border-radius:8px">
       <table style="width:100%;border-collapse:collapse;font-size:0.75rem;text-align:left">
         <thead>
-          <tr style="background:var(--bg-tertiary);border-bottom:1px solid var(--border-color)">
+          <tr style="background:var(--mint);border-bottom:1px solid var(--line)">
             <th style="padding:0.5rem 0.6rem">OSI Layer</th>
             <th style="padding:0.5rem 0.6rem">PDU</th>
             <th style="padding:0.5rem 0.6rem">TCP/IP Layer</th>
@@ -191,38 +191,38 @@ function buildOSILayout() {
           </tr>
         </thead>
         <tbody>
-          <tr style="border-bottom:1px solid var(--border-color)">
+          <tr style="border-bottom:1px solid var(--line)">
             <td style="padding:0.45rem 0.6rem"><strong style="color:#ef4444">7. Application</strong></td>
             <td style="padding:0.45rem 0.6rem">Data</td>
-            <td style="padding:0.45rem 0.6rem" rowspan="3"><strong style="color:#f97316">Application Layer</strong><br><small style="color:var(--text-muted)">User processes & representation</small></td>
+            <td style="padding:0.45rem 0.6rem" rowspan="3"><strong style="color:#f97316">Application Layer</strong><br><small style="color:var(--muted)">User processes & representation</small></td>
             <td style="padding:0.45rem 0.6rem">HTTP, HTTPS, DNS, FTP, SMTP, DHCP</td>
           </tr>
-          <tr style="border-bottom:1px solid var(--border-color)">
+          <tr style="border-bottom:1px solid var(--line)">
             <td style="padding:0.45rem 0.6rem"><strong style="color:#f97316">6. Presentation</strong></td>
             <td style="padding:0.45rem 0.6rem">Data</td>
             <td style="padding:0.45rem 0.6rem">TLS/SSL, JPEG, ASCII, MPEG</td>
           </tr>
-          <tr style="border-bottom:1px solid var(--border-color)">
+          <tr style="border-bottom:1px solid var(--line)">
             <td style="padding:0.45rem 0.6rem"><strong style="color:#eab308">5. Session</strong></td>
             <td style="padding:0.45rem 0.6rem">Data</td>
             <td style="padding:0.45rem 0.6rem">NetBIOS, RPC, Sockets, PPTP</td>
           </tr>
-          <tr style="border-bottom:1px solid var(--border-color)">
+          <tr style="border-bottom:1px solid var(--line)">
             <td style="padding:0.45rem 0.6rem"><strong style="color:#22c55e">4. Transport</strong></td>
             <td style="padding:0.45rem 0.6rem">Segment (TCP) / Datagram (UDP)</td>
-            <td style="padding:0.45rem 0.6rem"><strong style="color:#22c55e">Transport Layer</strong><br><small style="color:var(--text-muted)">Host-to-Host reliability</small></td>
+            <td style="padding:0.45rem 0.6rem"><strong style="color:#22c55e">Transport Layer</strong><br><small style="color:var(--muted)">Host-to-Host reliability</small></td>
             <td style="padding:0.45rem 0.6rem">TCP, UDP, Port Numbers (e.g. 80, 443)</td>
           </tr>
-          <tr style="border-bottom:1px solid var(--border-color)">
+          <tr style="border-bottom:1px solid var(--line)">
             <td style="padding:0.45rem 0.6rem"><strong style="color:#3b82f6">3. Network</strong></td>
             <td style="padding:0.45rem 0.6rem">Packet</td>
-            <td style="padding:0.45rem 0.6rem"><strong style="color:#3b82f6">Internet Layer</strong><br><small style="color:var(--text-muted)">Logical addressing & routing</small></td>
+            <td style="padding:0.45rem 0.6rem"><strong style="color:#3b82f6">Internet Layer</strong><br><small style="color:var(--muted)">Logical addressing & routing</small></td>
             <td style="padding:0.45rem 0.6rem">IPv4, IPv6, ICMP, ARP, <strong>Router</strong></td>
           </tr>
-          <tr style="border-bottom:1px solid var(--border-color)">
+          <tr style="border-bottom:1px solid var(--line)">
             <td style="padding:0.45rem 0.6rem"><strong style="color:#818cf8">2. Data Link</strong></td>
             <td style="padding:0.45rem 0.6rem">Frame</td>
-            <td style="padding:0.45rem 0.6rem" rowspan="2"><strong style="color:#818cf8">Network Access / Link</strong><br><small style="color:var(--text-muted)">Physical hardware delivery</small></td>
+            <td style="padding:0.45rem 0.6rem" rowspan="2"><strong style="color:#818cf8">Network Access / Link</strong><br><small style="color:var(--muted)">Physical hardware delivery</small></td>
             <td style="padding:0.45rem 0.6rem">Ethernet (802.3), Wi-Fi (802.11), <strong>Switch</strong>, MAC</td>
           </tr>
           <tr>
@@ -261,7 +261,7 @@ function createLayerBlock(l, side) {
   div.innerHTML = `<div class="osi-layer-top">
       <span class="osi-layer-badge" style="background:${l.color}">${l.id}</span>
       <span class="osi-layer-icon" style="color:${l.color}">${l.icon}</span>
-      <span class="osi-layer-text"><span class="osi-layer-name">${l.name}</span><span class="osi-layer-sub">${l.tcpIp} · ${l.pdu}</span></span>
+      <span class="osi-layer-text"><span class="osi-layer-name">${l.name}</span><span class="osi-layer-sub">${l.tcpIp} Â· ${l.pdu}</span></span>
     </div>
     <div class="osi-layer-data" id="osi-${side}-l${l.id}-data"></div>`;
   div.title = `${l.name} Layer\nPDU: ${l.pdu}\n${l.desc}\n\n${l.analogy}`;
@@ -276,13 +276,13 @@ function showLayerInfo(l) {
       <p style="margin-bottom:0.5rem"><strong style="color:${l.color};font-size:1.1rem">Layer ${l.id}: ${l.name} Layer</strong></p>
       <p style="margin-bottom:0.3rem"><strong>PDU (Protocol Data Unit):</strong> <span style="color:#22d3a5;font-weight:700">${l.pdu}</span></p>
       <p style="margin-bottom:0.3rem"><strong>TCP/IP Model Equivalent:</strong> <span style="color:#38bdf8;font-weight:700">${l.tcpIp} Layer</span></p>
-      <p style="margin-bottom:0.6rem;color:var(--text-secondary);font-size:0.85rem">${l.desc}</p>
+      <p style="margin-bottom:0.6rem;color:var(--muted);font-size:0.85rem">${l.desc}</p>
       <div style="background:rgba(255,255,255,0.05);padding:8px 12px;border-radius:6px;border-left:3px solid ${l.color}">
-        <small style="color:var(--text-muted)">Real-World Analogy:</small><br>
+        <small style="color:var(--muted)">Real-World Analogy:</small><br>
         <em>${l.analogy}</em>
       </div>
     </div>`,
-    `Layer ${l.id} — ${l.name}`
+    `Layer ${l.id} â€” ${l.name}`
   );
 }
 
@@ -326,7 +326,7 @@ function bindOSIControls() {
     state.showDetails = !state.showDetails;
     el('osi-inspector').classList.toggle('open', state.showDetails);
     el('osi-insp-btn').classList.toggle('active', state.showDetails);
-    if (state.showDetails) updateInspector();
+   // if (state.showDetails) updateInspector();
   });
   el('osi-insp-close').addEventListener('click', () => {
     state.showDetails = false;
@@ -389,7 +389,7 @@ function bindOSIControls() {
       if (state.step < 0) {
         readInputs();
         updateSettingsSummary();
-        if (state.showDetails) updateInspector();
+      //  if (state.showDetails) updateInspector();
       }
     });
   });
@@ -404,7 +404,7 @@ function readInputs() {
 
 function updateSettingsSummary() {
   const s = el('osi-settings-summary');
-  if (s) s.textContent = `${state.device === 'switch' ? 'Switch' : 'Router'} · ${state.sameSubnet ? 'Same subnet' : 'Different subnet'}`;
+  if (s) s.textContent = `${state.device === 'switch' ? 'Switch' : 'Router'} Â· ${state.sameSubnet ? 'Same subnet' : 'Different subnet'}`;
 }
 
 
@@ -418,13 +418,13 @@ function resetOSI() {
   autoBtn.classList.remove('active');
   autoBtn.innerHTML = `${I.play} Auto`;
   el('osi-step-btn').disabled = false;
-  el('osi-step-btn').innerHTML = `${I.arrowR} Next Step`;
+  el('osi-step-btn').innerHTML = `Next Step ${I.arrowR}`;
   el('osi-bits-display').innerHTML = '';
   el('osi-hex-display').innerHTML = '';
   el('osi-error-overlay').classList.remove('show');
   el('osi-error-overlay').innerHTML = '';
   el('osi-switch-status').textContent = 'Waiting\u2026';
-  el('osi-insp-body').innerHTML = '';
+  el('osi-insp-body').innerHTML = 'Coming Soon';
   hideCablePulses();
   readInputs();
   updateSettingsSummary();
@@ -447,7 +447,7 @@ function resetOSI() {
   devIcon.innerHTML = state.device === 'switch' ? I.switch_ : I.router;
   el('osi-switch-label').textContent = state.device === 'switch' ? 'Switch' : 'Router';
 
-  if (state.showDetails) updateInspector();
+ // if (state.showDetails) updateInspector();
   setSendPort();
 
   if (state.protocol === 'HTTPS') {
@@ -477,7 +477,7 @@ function triggerError(message) {
   if (autoBtn) { autoBtn.classList.remove('active'); autoBtn.innerHTML = `${I.play} Auto`; }
   const stepBtn = el('osi-step-btn');
   if (stepBtn) { stepBtn.disabled = true; stepBtn.textContent = 'Reset to retry'; }
-  if (stepText) stepText.textContent = `${STEP_NAMES[state.step]} — ERROR`;
+  if (stepText) stepText.textContent = `${STEP_NAMES[state.step]} â€” ERROR`;
 }
 
 // steps
@@ -503,7 +503,7 @@ function stepOSI() {
   }
 
   updatePktVis();
-  if (state.showDetails) updateInspector();
+  //if (state.showDetails) updateInspector();
 
   if (state.step >= STEP_NAMES.length - 1 && !el('osi-step-btn').disabled === false) {
   }
@@ -627,7 +627,7 @@ function decapsulateStep(step) {
       if (state.errorType === 'checksum') {
         const original = parseInt(pkt.checksum, 16) || 0;
         const corrupted = (original ^ 0xFF).toString(16).toUpperCase().padStart(4, '0');
-        dat.innerHTML = `<span style="color:#ef4444">${proto} checksum MISMATCH — expected ${pkt.checksum}, recomputed ${corrupted}</span>`;
+        dat.innerHTML = `<span style="color:#ef4444">${proto} checksum MISMATCH â€” expected ${pkt.checksum}, recomputed ${corrupted}</span>`;
         blk.className = 'osi-layer-block error';
         triggerError('Checksum verification failed at the Transport layer. The segment was corrupted in transit, so it is discarded and never reaches the Session layer.');
         break;
@@ -636,7 +636,7 @@ function decapsulateStep(step) {
       break;
     }
     case 5:
-      dat.innerHTML = `Session ${pkt.sessionId} verified <span style="color:var(--color-success)">${I.check}</span>`;
+      dat.innerHTML = `Session ${pkt.sessionId} verified <span style="color:var(--teal)">${I.check}</span>`;
       break;
     case 6:
       if (state.protocol === 'HTTPS') {
@@ -646,7 +646,7 @@ function decapsulateStep(step) {
       }
       break;
     case 7:
-      dat.innerHTML = `<span style="color:var(--color-success);font-weight:800;font-size:0.85rem">${I.doc} &quot;${esc(state.msg)}&quot;</span>`;
+      dat.innerHTML = `<span style="color:var(--teal);font-weight:800;font-size:0.85rem">${I.doc} &quot;${esc(state.msg)}&quot;</span>`;
       break;
   }
 }
@@ -655,7 +655,7 @@ function completeDelivery() {
   const bob7 = el('osi-bob-l7');
   const bob7d = el('osi-bob-l7-data');
   if (bob7) bob7.className = 'osi-layer-block done active';
-  if (bob7d) bob7d.innerHTML = `<span style="color:var(--color-success);font-weight:800;font-size:0.85rem">${I.doc} &quot;${esc(state.msg)}&quot;</span>`;
+  if (bob7d) bob7d.innerHTML = `<span style="color:var(--teal);font-weight:800;font-size:0.85rem">${I.doc} &quot;${esc(state.msg)}&quot;</span>`;
   LAYERS.forEach(l => {
     const al = el(`osi-alice-l${l.id}`);
     if (al) al.className = 'osi-layer-block done';
@@ -685,12 +685,12 @@ function animateCable(side, cb) {
   const bitsEl = el('osi-bits-display');
   if (bitsEl && state.showBinary) {
     const bin = strToBin(state.msg);
-    bitsEl.innerHTML = `<span style="font-size:0.65rem;color:var(--text-muted);width:100%;text-align:center">${bin.slice(0, 60)}${bin.length > 60 ? '\u2026' : ''}</span>`;
+    bitsEl.innerHTML = `<span style="font-size:0.65rem;color:var(--muted);width:100%;text-align:center">${bin.slice(0, 60)}${bin.length > 60 ? '\u2026' : ''}</span>`;
   }
   const hexEl = el('osi-hex-display');
   if (hexEl && state.showHex) {
     const hex = strToHex(state.msg);
-    hexEl.innerHTML = `<span style="font-size:0.65rem;color:var(--text-muted);width:100%;text-align:center">${hex}</span>`;
+    hexEl.innerHTML = `<span style="font-size:0.65rem;color:var(--muted);width:100%;text-align:center">${hex}</span>`;
   }
 }
 
@@ -712,7 +712,7 @@ function animateSwitch() {
     status.innerHTML = `${I.search} Looking up MAC\u2026`;
     setTimeout(() => {
       if (state.errorType === 'mac') {
-        status.innerHTML = `${I.cross} Destination MAC ${state.dstMAC} not found — ARP failed, frame dropped`;
+        status.innerHTML = `${I.cross} Destination MAC ${state.dstMAC} not found â€” ARP failed, frame dropped`;
         triggerError('The switch has no entry for the destination MAC address and no ARP reply arrived in time. The frame is dropped at the switch and never reaches Bob.');
         return;
       }
@@ -736,7 +736,7 @@ function animateSwitch() {
         pkt.ttl = (pkt.ttl || 64) - 1;
         if (state.errorType === 'ttl') {
           pkt.ttl = 0;
-          status.innerHTML = `${I.cross} TTL reached 0 — packet expired, router discards it (ICMP Time Exceeded)`;
+          status.innerHTML = `${I.cross} TTL reached 0 â€” packet expired, router discards it (ICMP Time Exceeded)`;
           triggerError('The Time To Live counter reached zero. Routers discard packets whose TTL expires so they cannot loop forever across the network.');
           return;
         }
@@ -748,7 +748,7 @@ function animateSwitch() {
     }
   }
 }
-
+/*
 function updateInspector() {
   const body = el('osi-insp-body');
   if (!body) return;
@@ -825,7 +825,7 @@ function updateInspector() {
         ${s.fields.map(f => `<div class="field"><span class="label">${f[0]}</span><span class="value">${f[1]}</span></div>`).join('')}
       </div>
     </div>`).join('');
-}
+}*/
 
 // packet view
 function updatePktVis() {
@@ -918,14 +918,14 @@ function updateBitHexDisplay() {
   if (bitsEl) {
     if (state.showBinary) {
       bitsEl.innerHTML = msg.split('').map((b) =>
-        `<span class="osi-bin-byte" style="${b === '1' ? 'color:var(--color-success)' : 'color:var(--text-muted)'}">${b}</span>`
+        `<span class="osi-bin-byte" style="${b === '1' ? 'color:var(--teal)' : 'color:var(--muted)'}">${b}</span>`
       ).join('');
     } else { bitsEl.innerHTML = ''; }
   }
   if (hexEl) {
     if (state.showHex) {
       const hex = strToHex(state.msg);
-      hexEl.innerHTML = hex.split('').map(h => `<span style="color:var(--color-indigo)">${h}</span>`).join('');
+      hexEl.innerHTML = hex.split('').map(h => `<span style="color:var(--teal)">${h}</span>`).join('');
     } else { hexEl.innerHTML = ''; }
   }
 }

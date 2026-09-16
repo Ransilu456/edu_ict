@@ -82,8 +82,8 @@
 	justify-content: center;
 }
 
-.sandbox-view.sidebar-collapsed .sidebar-heading > div,
-.sandbox-view.sidebar-collapsed .sandbox-sidebar > p,
+.sandbox-view.sidebar-collapsed .sidebar-heading>div,
+.sandbox-view.sidebar-collapsed .sandbox-sidebar>p,
 .sandbox-view.sidebar-collapsed .sidebar-search,
 .sandbox-view.sidebar-collapsed .sidebar-filter-tabs {
 	display: none;
@@ -99,7 +99,7 @@
 
 .sandbox-view.sidebar-collapsed .sidebar-section .sidebar-item,
 .sandbox-view.sidebar-collapsed .sidebar-section .template-grid,
-.sandbox-view.sidebar-collapsed .sidebar-section > div:not(.sidebar-section-title) {
+.sandbox-view.sidebar-collapsed .sidebar-section>div:not(.sidebar-section-title) {
 	display: flex;
 }
 
@@ -124,7 +124,7 @@
 .sandbox-view.sidebar-collapsed .sidebar-section .sidebar-item span,
 .sandbox-view.sidebar-collapsed .template-card-info,
 .sandbox-view.sidebar-collapsed .template-load-icon,
-.sandbox-view.sidebar-collapsed .sidebar-section > div[style] {
+.sandbox-view.sidebar-collapsed .sidebar-section>div[style] {
 	display: none;
 }
 
@@ -315,7 +315,7 @@
 	background: color-mix(in srgb, var(--border-color) 80%, transparent);
 }
 
-.sandbox-sidebar > h3 {
+.sandbox-sidebar>h3 {
 	margin: 0;
 	padding-bottom: 0.55rem;
 	border-bottom: 1px solid var(--border-color);
@@ -323,7 +323,7 @@
 	font: 800 1.05rem var(--font-header);
 }
 
-.sandbox-sidebar > p {
+.sandbox-sidebar>p {
 	margin: 0;
 	color: var(--text-muted);
 	font-size: 0.72rem;
@@ -616,11 +616,17 @@
 }
 
 @keyframes backdropFadeIn {
-	from { opacity: 0; }
-	to   { opacity: 1; }
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
 }
 
 @media (max-width: 760px) {
+
 	/* Make the sandbox view a positioning context */
 	.sandbox-view {
 		position: relative;
@@ -645,7 +651,7 @@
 		box-shadow: 14px 0 32px rgba(5, 8, 15, 0.28);
 		transform: translateX(0);
 		transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-		            box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+			box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 		padding-inline: 0.8rem;
 		max-height: 100%;
 		overflow-x: hidden;
@@ -706,8 +712,7 @@
 		color: var(--color-cyan);
 	}
 
-	/* Hide all sidebar content except the toggle when collapsed */
-	.sandbox-view.sidebar-collapsed .sidebar-heading > div,
+	.sandbox-view.sidebar-collapsed .sidebar-heading>div,
 	.sandbox-view.sidebar-collapsed .sidebar-kicker,
 	.sandbox-view.sidebar-collapsed .sidebar-search,
 	.sandbox-view.sidebar-collapsed .sidebar-filter-tabs,

@@ -2,12 +2,14 @@
   --ink: #10211c;
   --muted: #66736e;
   --paper: #f6f8f4;
+  --panel: #ffffff;
   --line: #d9e1da;
   --lime: #c9f36b;
   --mint: #dff2e5;
   --blue: #b9ddff;
   --orange: #ff7854;
   --dark: #163b31;
+  --teal: #168b77;
   --mono: 'DM Mono', monospace;
   --display: 'Manrope', sans-serif;
 }
@@ -1054,4 +1056,10 @@ h2 em {
   .signal {
     animation: none;
   }
+}
+
+:root.dark,
+[data-theme="dark"] {
+  --panel: #132b23;
+  --teal: #5ee0b2;
 }

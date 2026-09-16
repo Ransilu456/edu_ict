@@ -1,4 +1,4 @@
-import './common.js';
+﻿import './common.js';
 import { initOSISim, cleanupOSISim } from './osi-sim.js';
 
 let ndInitialized = false;
@@ -57,41 +57,63 @@ function play(n) { if (window.playSound) window.playSound(n); }
 
 function buildNDLayout() {
   el('nd-lab-container').innerHTML = `
-<div class="nd-main">
-  <div class="nd-tabs">
+<div class="nd-main nd-lab-shell">
+  <header class="nd-lab-hero">
+    <div class="nd-hero-copy">
+      <p class="eyebrow nd-eyebrow"><span class="eyebrow-dot"></span>NETWORKING STUDIO / LIVE LAB</p>
+      <h1>See the network <em>think.</em></h1>
+      <p class="nd-hero-lede">Trace frames, compare layers, and test how devices make decisions as data crosses the wire.</p>
+    </div>
+    <div class="nd-hero-readout" aria-label="Network lab status">
+      <span class="nd-hero-label">LAB STATUS</span>
+      <strong><span class="nd-status-dot"></span>READY TO TRANSMIT</strong>
+      <div class="nd-hero-metrics">
+        <span><b>04</b> HOSTS</span>
+        <span><b>03</b> LABS</span>
+        <span><b>07</b> OSI LAYERS</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="nd-tabs" aria-label="Networking labs">
     <button class="nd-tab active" data-ndtab="network-tab">${I.network} Network Devices &amp; Topology</button>
     <button class="nd-tab" data-ndtab="osi-tab">${I.layers} OSI 7-Layer Simulator</button>
     <button class="nd-tab" data-ndtab="subnet-tab">${I.globe} Subnetting &amp; CIDR Lab</button>
     <button class="nd-tab" data-ndtab="parity-tab">${I.parity} Parity Check</button>
-  </div>
+  </nav>
 
   <div class="nd-tab-content active" id="network-tab">
-    <div class="nd-layout">
-      <div class="nd-left">
+    <div class="nd-workspace">
+      <aside class="nd-control-panel" aria-label="Network lab controls">
         <div class="nd-panel-header">
-          ${I.network}
+          <span class="nd-panel-icon">${I.network}</span>
           <div>
+            <span class="nd-panel-kicker">TOPOLOGY / 01</span>
             <div class="nd-panel-title">Interactive Network Simulator</div>
             <div class="nd-panel-sub">L1 Hub &bull; L2 Switch &bull; L3 Router</div>
           </div>
         </div>
 
-        <div class="nd-topo-bar">
-          <span class="nd-section-label">Topology Lab Mode</span>
+        <section class="nd-control-section">
+          <span class="nd-section-label">Lab mode</span>
           <div class="nd-mode-pills">
             <button class="nd-mode-pill active" data-mode="device-test">Single Device</button>
             <button class="nd-mode-pill" data-mode="enterprise">Routed Enterprise</button>
             <button class="nd-mode-pill" data-mode="csma">Collision &amp; CSMA/CD</button>
           </div>
-        </div>
+        </section>
 
-        <div class="nd-device-selector" id="nd-device-select-box">
+        <section class="nd-control-section">
+          <span class="nd-section-label">Devices</span>
+          <div class="nd-device-selector" id="nd-device-select-box">
           <button class="nd-device-btn active" data-device="hub">${I.hub} Hub <span class="nd-dev-layer">L1 Physical</span></button>
           <button class="nd-device-btn" data-device="switch">${I.switch_} Switch <span class="nd-dev-layer">L2 Data Link</span></button>
           <button class="nd-device-btn" data-device="router">${I.router} Router <span class="nd-dev-layer">L3 Network</span></button>
-        </div>
+          </div>
+        </section>
 
-        <div class="nd-controls">
+        <section class="nd-control-section nd-packet-controls">
+          <span class="nd-section-label">Packet</span>
           <div class="nd-row">
             <div><span class="nd-label">Source Host</span><div class="nd-host-options" id="nd-src-options"></div></div>
             <div><span class="nd-label">Dest Host</span><div class="nd-host-options" id="nd-dst-options"></div></div>
@@ -100,30 +122,21 @@ function buildNDLayout() {
             <button class="nd-send-btn" id="nd-send-btn">${I.send} Transmit Packet</button>
             <button class="nd-step-btn" id="nd-step-btn" title="Step through packet stages">${I.step} Step</button>
           </div>
-        </div>
+        </section>
+      </aside>
 
-        <div class="nd-card">
-          <div class="nd-card-title">${I.search} Inspected Node Specifications</div>
-          <div class="nd-info-content" id="nd-info-content"></div>
-        </div>
-
-        <div class="nd-card">
-          <div class="nd-card-title">${I.list} Deep Protocol Frame Inspector</div>
-          <div class="nd-packet-inspector" id="nd-packet-inspector">
-            <em style="color:var(--text-muted);font-size:0.75rem">Transmit a packet or enter a terminal ping to inspect headers</em>
-          </div>
-        </div>
-      </div>
-
-      <div class="nd-right">
-        <!-- Top Toolbar for Topology -->
-        <div class="nd-topo-header">
+      <section class="nd-canvas-column" aria-label="Topology workspace">
+        <div class="nd-topo-header nd-canvas-toolbar">
           <div class="nd-topo-status" id="nd-topo-status">
             <span class="nd-status-dot"></span>
             <span id="nd-status-text">Network Ready &bull; Select source &amp; destination</span>
           </div>
-          <div class="nd-speed-controls">
-            <span class="nd-label" style="margin:0">Speed:</span>
+          <div class="nd-canvas-tools">
+            <button class="nd-tool-btn" id="nd-zoom-out" title="Zoom out">&minus;</button>
+            <button class="nd-tool-btn" id="nd-zoom-in" title="Zoom in">+</button>
+            <button class="nd-tool-btn nd-fit-btn" id="nd-fit-canvas" title="Fit topology">Fit</button>
+            <span class="nd-tool-divider"></span>
+            <span class="nd-label" style="margin:0">Speed</span>
             <button class="nd-speed-pill" data-speed="0.5">0.5x</button>
             <button class="nd-speed-pill active" data-speed="1">1x</button>
             <button class="nd-speed-pill" data-speed="2">2x</button>
@@ -145,7 +158,10 @@ function buildNDLayout() {
             <g id="nd-overlay-group"></g>
           </svg>
         </div>
+      </section>
+    </div>
 
+    <div class="nd-bottom-workspace">
         <div class="nd-terminal-wrap">
           <div class="nd-terminal-header">
             <div class="nd-term-title">${I.terminal} Network Host Terminal (CLI)</div>
@@ -159,7 +175,7 @@ function buildNDLayout() {
             </div>
           </div>
           <div class="nd-terminal-body" id="nd-terminal-body">
-            <div class="nd-term-line greeting">LogicQuest Terminal v2.0 — Type a command or click a preset above.</div>
+            <div class="nd-term-line greeting">LogicQuest Terminal v2.0 â€” Type a command or click a preset above.</div>
           </div>
           <div class="nd-terminal-input-bar">
             <span class="nd-prompt">host-a:~$</span>
@@ -167,7 +183,12 @@ function buildNDLayout() {
             <button class="nd-term-submit" id="nd-term-submit">${I.send}</button>
           </div>
         </div>
-      </div>
+        <section class="nd-card nd-packet-panel">
+          <div class="nd-card-title">${I.list} Packet Inspector</div>
+          <div class="nd-packet-inspector" id="nd-packet-inspector">
+            <em style="color:var(--muted);font-size:0.75rem">Transmit a packet or enter a terminal ping to inspect headers.</em>
+          </div>
+        </section>
     </div>
   </div>
 
@@ -181,8 +202,9 @@ function buildNDLayout() {
     <div class="subnet-layout">
       <div class="subnet-left">
         <div class="nd-panel-header">
-          ${I.globe}
+          <span class="nd-panel-icon">${I.globe}</span>
           <div>
+            <span class="nd-panel-kicker">ADDRESSING / 02</span>
             <div class="nd-panel-title">IPv4 Subnet &amp; CIDR Lab</div>
             <div class="nd-panel-sub">Classless Addressing &bull; VLSM &bull; Binary Octets</div>
           </div>
@@ -225,9 +247,9 @@ function buildNDLayout() {
         <div class="subnet-card" style="flex:1;overflow:hidden;display:flex;flex-direction:column">
           <div class="subnet-card-title" style="display:flex;justify-content:space-between;align-items:center">
             <span>${I.layers} Subnet Partition Slices</span>
-            <span style="font-size:0.7rem;color:var(--text-muted)">Addresses in this block</span>
+            <span style="font-size:0.7rem;color:var(--muted)">Addresses in this block</span>
           </div>
-          <div class="subnet-table-wrap" style="flex:1;overflow-y:auto;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-primary)">
+          <div class="subnet-table-wrap" style="flex:1;overflow-y:auto;border:1px solid var(--line);border-radius:6px;background:var(--paper)">
             <table class="subnet-table">
               <thead>
                 <tr>
@@ -313,6 +335,7 @@ window.switchNDTab = switchNDTab;
 let currentTopoMode = 'device-test';
 let simSpeed = 1;
 let animSpeedMs = 450;
+let topologyView = { x: 0, y: 0, width: 600, height: 340 };
 
 let netState = {
   device: 'hub',
@@ -357,6 +380,26 @@ function getHosts() {
 
 function getHost(id) {
   return getHosts().find(h => h.id === id);
+}
+
+function applyTopologyView() {
+  const svg = el('nd-topology-svg');
+  if (svg) svg.setAttribute('viewBox', `${topologyView.x} ${topologyView.y} ${topologyView.width} ${topologyView.height}`);
+}
+
+function resetTopologyView() {
+  topologyView = { x: 0, y: 0, width: 600, height: 340 };
+  applyTopologyView();
+}
+
+function zoomTopology(scale) {
+  const nextWidth = Math.max(300, Math.min(900, topologyView.width * scale));
+  const nextHeight = Math.max(170, Math.min(510, topologyView.height * scale));
+  topologyView.x = Math.max(0, Math.min(600 - nextWidth, topologyView.x - (nextWidth - topologyView.width) / 2));
+  topologyView.y = Math.max(0, Math.min(340 - nextHeight, topologyView.y - (nextHeight - topologyView.height) / 2));
+  topologyView.width = nextWidth;
+  topologyView.height = nextHeight;
+  applyTopologyView();
 }
 
 let netLabReady = false;
@@ -426,8 +469,13 @@ function initNetLab() {
   // Reset Canvas button
   el('nd-reset-canvas-btn')?.addEventListener('click', () => {
     play('click');
+    resetTopologyView();
     resetNetworkState();
   });
+
+  el('nd-zoom-in')?.addEventListener('click', () => { play('click'); zoomTopology(.82); });
+  el('nd-zoom-out')?.addEventListener('click', () => { play('click'); zoomTopology(1.22); });
+  el('nd-fit-canvas')?.addEventListener('click', () => { play('click'); resetTopologyView(); });
 
   // Transmit button
   el('nd-send-btn')?.addEventListener('click', () => {
@@ -450,9 +498,9 @@ function initNetLab() {
 
   // Initial render
   updateHostPickers();
+  resetTopologyView();
   renderTopologyCanvas();
   resetNetworkState();
-  setDeviceDetails('central');
 }
 
 function resetNetworkState() {
@@ -524,9 +572,9 @@ function renderTopologyCanvas() {
     // Center Node Box
     devicesGroup.innerHTML += `
       <g class="nd-node-group" id="node-central" style="cursor:pointer" onclick="window.selectNDDevice('central')">
-        <rect x="250" y="130" width="100" height="80" rx="10" fill="var(--bg-secondary)" stroke="${dType === 'hub' ? '#818cf8' : dType === 'switch' ? '#22d3a5' : '#fbbf24'}" stroke-width="2"/>
-        <text x="300" y="155" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="800" font-size="13" text-anchor="middle">${dType.toUpperCase()}</text>
-        <text x="300" y="172" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="9" text-anchor="middle">Layer ${dType === 'hub' ? '1 Physical' : dType === 'switch' ? '2 Data Link' : '3 Network'}</text>
+        <rect x="250" y="130" width="100" height="80" rx="10" fill="var(--panel)" stroke="${dType === 'hub' ? '#818cf8' : dType === 'switch' ? '#22d3a5' : '#fbbf24'}" stroke-width="2"/>
+        <text x="300" y="155" fill="var(--ink)" font-family="var(--display)" font-weight="800" font-size="13" text-anchor="middle">${dType.toUpperCase()}</text>
+        <text x="300" y="172" fill="var(--muted)" font-family="var(--mono)" font-size="9" text-anchor="middle">Layer ${dType === 'hub' ? '1 Physical' : dType === 'switch' ? '2 Data Link' : '3 Network'}</text>
         <!-- Port LEDs -->
         <circle cx="268" cy="192" r="3.5" fill="#22d3a5" class="nd-port-led"/>
         <circle cx="282" cy="192" r="3.5" fill="#22d3a5" class="nd-port-led"/>
@@ -556,30 +604,30 @@ function renderTopologyCanvas() {
 
     devicesGroup.innerHTML += `
       <rect x="25" y="25" width="200" height="290" rx="12" fill="rgba(99,102,241,0.03)" stroke="rgba(99,102,241,0.2)" stroke-dasharray="4,4"/>
-      <text x="35" y="45" fill="#818cf8" font-family="var(--font-mono)" font-size="10" font-weight="700">Subnet 1: 192.168.1.0/24</text>
+      <text x="35" y="45" fill="#818cf8" font-family="var(--mono)" font-size="10" font-weight="700">Subnet 1: 192.168.1.0/24</text>
       
       <rect x="375" y="25" width="200" height="290" rx="12" fill="rgba(34,211,165,0.03)" stroke="rgba(34,211,165,0.2)" stroke-dasharray="4,4"/>
-      <text x="385" y="45" fill="#22d3a5" font-family="var(--font-mono)" font-size="10" font-weight="700">Subnet 2: 192.168.2.0/24</text>
+      <text x="385" y="45" fill="#22d3a5" font-family="var(--mono)" font-size="10" font-weight="700">Subnet 2: 192.168.2.0/24</text>
 
       <!-- Switch 1 -->
       <g class="nd-node-group" id="node-sw1" style="cursor:pointer" onclick="window.selectNDDevice('sw1')">
-        <rect x="145" y="145" width="70" height="50" rx="8" fill="var(--bg-secondary)" stroke="#22d3a5" stroke-width="1.8"/>
-        <text x="180" y="170" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="800" font-size="11" text-anchor="middle">SW-1</text>
-        <text x="180" y="184" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="8" text-anchor="middle">L2 Switch</text>
+        <rect x="145" y="145" width="70" height="50" rx="8" fill="var(--panel)" stroke="#22d3a5" stroke-width="1.8"/>
+        <text x="180" y="170" fill="var(--ink)" font-family="var(--display)" font-weight="800" font-size="11" text-anchor="middle">SW-1</text>
+        <text x="180" y="184" fill="var(--muted)" font-family="var(--mono)" font-size="8" text-anchor="middle">L2 Switch</text>
       </g>
 
       <!-- Router -->
       <g class="nd-node-group" id="node-central" style="cursor:pointer" onclick="window.selectNDDevice('central')">
-        <circle cx="300" cy="170" r="32" fill="var(--bg-secondary)" stroke="#fbbf24" stroke-width="2"/>
-        <text x="300" y="166" fill="#fbbf24" font-family="var(--font-header)" font-weight="800" font-size="11" text-anchor="middle">ROUTER</text>
-        <text x="300" y="180" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="8" text-anchor="middle">Gateway L3</text>
+        <circle cx="300" cy="170" r="32" fill="var(--panel)" stroke="#fbbf24" stroke-width="2"/>
+        <text x="300" y="166" fill="#fbbf24" font-family="var(--display)" font-weight="800" font-size="11" text-anchor="middle">ROUTER</text>
+        <text x="300" y="180" fill="var(--muted)" font-family="var(--mono)" font-size="8" text-anchor="middle">Gateway L3</text>
       </g>
 
       <!-- Switch 2 -->
       <g class="nd-node-group" id="node-sw2" style="cursor:pointer" onclick="window.selectNDDevice('sw2')">
-        <rect x="385" y="145" width="70" height="50" rx="8" fill="var(--bg-secondary)" stroke="#22d3a5" stroke-width="1.8"/>
-        <text x="420" y="170" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="800" font-size="11" text-anchor="middle">SW-2</text>
-        <text x="420" y="184" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="8" text-anchor="middle">L2 Switch</text>
+        <rect x="385" y="145" width="70" height="50" rx="8" fill="var(--panel)" stroke="#22d3a5" stroke-width="1.8"/>
+        <text x="420" y="170" fill="var(--ink)" font-family="var(--display)" font-weight="800" font-size="11" text-anchor="middle">SW-2</text>
+        <text x="420" y="184" fill="var(--muted)" font-family="var(--mono)" font-size="8" text-anchor="middle">L2 Switch</text>
       </g>
     `;
 
@@ -602,7 +650,7 @@ function renderTopologyCanvas() {
     `;
 
     devicesGroup.innerHTML += `
-      <text x="300" y="240" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="10" text-anchor="middle">Shared 10BASE2 Coaxial Cable Bus (1 Single Collision Domain)</text>
+      <text x="300" y="240" fill="var(--muted)" font-family="var(--mono)" font-size="10" text-anchor="middle">Shared 10BASE2 Coaxial Cable Bus (1 Single Collision Domain)</text>
     `;
 
     hostsList.forEach(h => {
@@ -624,7 +672,7 @@ function createHostSvg(h) {
   const isServer = h.id === 'pc-d' && currentTopoMode === 'enterprise';
   return `
     <g class="nd-node-group" id="node-${h.id}" style="cursor:pointer;" onclick="window.selectNDDevice('${h.id}')">
-      <rect x="${h.x - 30}" y="${h.y - 25}" width="60" height="50" rx="8" fill="var(--bg-secondary)" stroke="#38bdf8" stroke-width="1.5" class="nd-host-box"/>
+      <rect x="${h.x - 30}" y="${h.y - 25}" width="60" height="50" rx="8" fill="var(--panel)" stroke="#38bdf8" stroke-width="1.5" class="nd-host-box"/>
       ${isServer ? `
         <!-- Rack Server Icon -->
         <rect x="${h.x - 18}" y="${h.y - 18}" width="36" height="14" rx="2" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
@@ -637,9 +685,9 @@ function createHostSvg(h) {
         <line x1="${h.x}" y1="${h.y + 6}" x2="${h.x}" y2="${h.y + 14}" stroke="#38bdf8" stroke-width="2"/>
         <line x1="${h.x - 8}" y1="${h.y + 14}" x2="${h.x + 8}" y2="${h.y + 14}" stroke="#38bdf8" stroke-width="2"/>
       `}
-      <text x="${h.x}" y="${h.y - 1}" fill="#38bdf8" font-family="var(--font-header)" font-weight="800" font-size="10" text-anchor="middle">${h.short}</text>
-      <text x="${h.x}" y="${h.y + 35}" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="700" font-size="9" text-anchor="middle">${h.label}</text>
-      <text x="${h.x}" y="${h.y + 46}" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="7.5" text-anchor="middle">${h.ip}</text>
+      <text x="${h.x}" y="${h.y - 1}" fill="#38bdf8" font-family="var(--display)" font-weight="800" font-size="10" text-anchor="middle">${h.short}</text>
+      <text x="${h.x}" y="${h.y + 35}" fill="var(--ink)" font-family="var(--display)" font-weight="700" font-size="9" text-anchor="middle">${h.label}</text>
+      <text x="${h.x}" y="${h.y + 46}" fill="var(--muted)" font-family="var(--mono)" font-size="7.5" text-anchor="middle">${h.ip}</text>
     </g>
   `;
 }
@@ -655,96 +703,8 @@ window.selectNDDevice = function(id) {
     const shape = nodeEl.querySelector('rect') || nodeEl.querySelector('circle');
     if (shape) shape.style.filter = 'drop-shadow(0 0 8px #38bdf8)';
   }
-  setDeviceDetails(id);
 };
 
-function setDeviceDetails(id) {
-  const info = el('nd-info-content');
-  if (!info) return;
-
-  if (id === 'central') {
-    const d = netState.device;
-    if (currentTopoMode === 'enterprise') {
-      info.innerHTML = `
-        <div class="nd-spec-box">
-          <div class="nd-spec-title" style="color:#fbbf24">Enterprise Gateway Router (Layer 3)</div>
-          <div class="nd-spec-row"><span>Interface eth0:</span> <code>192.168.1.1/24</code></div>
-          <div class="nd-spec-row"><span>Interface eth1:</span> <code>192.168.2.1/24</code></div>
-          <div class="nd-spec-row"><span>Forwarding:</span> <code>IP Subnet Routing</code></div>
-          <div class="nd-spec-row"><span>TTL Behavior:</span> <code>Decrements TTL by 1</code></div>
-          <div class="nd-spec-desc">Examines Layer 3 destination IP addresses and routes packets across subnet boundaries.</div>
-        </div>
-      `;
-    } else {
-      const descriptions = {
-        hub: {
-          title: 'Multiport Repeater Hub (Layer 1)',
-          color: '#818cf8',
-          details: [
-            ['Function', 'Bit-level broadcast to ALL ports'],
-            ['MAC Lookup', 'None (No MAC address memory)'],
-            ['Collision Domain', '1 Shared collision domain'],
-            ['Bandwidth', 'Shared among all connected hosts']
-          ],
-          desc: 'Hub receives an electrical bit signal on one port and blindly repeats it out to every other port.'
-        },
-        switch: {
-          title: 'Ethernet Switch (Layer 2 Data Link)',
-          color: '#22d3a5',
-          details: [
-            ['Function', 'Selective unicast forwarding by MAC'],
-            ['MAC Lookup', 'Dynamic MAC address table learning'],
-            ['Collision Domain', 'Each port is an isolated collision domain'],
-            ['Bandwidth', 'Dedicated full-duplex wire speed per port']
-          ],
-          desc: 'Reads Ethernet frames, records the source MAC to its table, and forwards directly to the destination MAC.'
-        },
-        router: {
-          title: 'IP Router (Layer 3 Network)',
-          color: '#fbbf24',
-          details: [
-            ['Function', 'Inter-network packet routing'],
-            ['Table Used', 'IP Routing Table + ARP Cache'],
-            ['Broadcast Domain', 'Blocks Layer 2 broadcasts'],
-            ['Header Handling', 'Decrements TTL, re-encapsulates L2 MAC']
-          ],
-          desc: 'Connects different IP subnets. Strips the incoming L2 frame, inspects L3 IP, and re-encapsulates for next hop.'
-        }
-      };
-      const cur = descriptions[d] || descriptions.hub;
-      info.innerHTML = `
-        <div class="nd-spec-box">
-          <div class="nd-spec-title" style="color:${cur.color}">${cur.title}</div>
-          ${cur.details.map(([k, v]) => `<div class="nd-spec-row"><span>${k}:</span> <code>${v}</code></div>`).join('')}
-          <div class="nd-spec-desc">${cur.desc}</div>
-        </div>
-      `;
-    }
-  } else if (id === 'sw1' || id === 'sw2') {
-    info.innerHTML = `
-      <div class="nd-spec-box">
-        <div class="nd-spec-title" style="color:#22d3a5">Managed Layer 2 Switch (${id.toUpperCase()})</div>
-        <div class="nd-spec-row"><span>Ports:</span> <code>24 Gigabit Ethernet</code></div>
-        <div class="nd-spec-row"><span>MAC Table:</span> <code>Dynamic Self-Learning</code></div>
-        <div class="nd-spec-row"><span>Collision:</span> <code>Zero Collisions (Full Duplex)</code></div>
-        <div class="nd-spec-desc">Isolates collision domains for local subnet hosts. Floods broadcasts only within this VLAN.</div>
-      </div>
-    `;
-  } else {
-    const h = getHost(id);
-    if (!h) return;
-    info.innerHTML = `
-      <div class="nd-spec-box">
-        <div class="nd-spec-title" style="color:#38bdf8">${h.label} (Host Station)</div>
-        <div class="nd-spec-row"><span>IP Address:</span> <code>${h.ip}</code></div>
-        <div class="nd-spec-row"><span>MAC Address:</span> <code>${h.mac}</code></div>
-        <div class="nd-spec-row"><span>Subnet:</span> <code>${h.sub}</code></div>
-        <div class="nd-spec-row"><span>Interface:</span> <code>${h.iface}</code></div>
-        <div class="nd-spec-desc">Standard Ethernet workstation running TCP/IP protocol suite with local ARP cache.</div>
-      </div>
-    `;
-  }
-}
 
 // Transmission
 function executeTransmission(srcId, dstId, stepMode = false) {
@@ -899,6 +859,7 @@ function simulateEnterpriseRoute(s, d) {
         termPrint(`Router: Packet arrived at gateway. Lookup routing table for ${d.sub} &rarr; Exit via opposite interface.`, 'success');
 
         const secondSwX = d.x < 300 ? sw1X : sw2X;
+        const secondSwY = d.x < 300 ? sw1Y : sw2Y;
         const cTrunk2 = el(d.x < 300 ? 'cable-sw1-rtr' : 'cable-rtr-sw2');
         if (cTrunk2) cTrunk2.classList.add('active');
 
@@ -1406,7 +1367,7 @@ function calculateSubnet() {
   const tableBody = el('subnet-table-body');
 
   if (ipNum === null) {
-    if (grid) grid.innerHTML = `<div class="subnet-calc-row" style="color:var(--color-error)"><span>Invalid IPv4 format (e.g. 192.168.1.10)</span></div>`;
+    if (grid) grid.innerHTML = `<div class="subnet-calc-row" style="color:var(--orange)"><span>Invalid IPv4 format (e.g. 192.168.1.10)</span></div>`;
     return;
   }
 
@@ -1471,7 +1432,7 @@ function calculateSubnet() {
 
       subnets.push(`
         <tr class="${isCurrent ? 'current-subnet' : ''}">
-          <td>${i + 1} ${isCurrent ? '★' : ''}</td>
+          <td>${i + 1} ${isCurrent ? 'â˜…' : ''}</td>
           <td><code>${numToIp(sNet)}</code></td>
           <td><code>${numToIp(sFirst)} &ndash; ${numToIp(sLast)}</code></td>
           <td><code>${numToIp(sBcast)}</code></td>
