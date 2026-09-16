@@ -1,6 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Sinhala:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
 
 :root {
+  --ink: #10211c;
+  --muted: #66736e;
+  --paper: #f6f8f4;
+  --line: #d9e1da;
+  --lime: #c9f36b;
+  --mint: #dff2e5;
+  --blue: #b9ddff;
+  --orange: #ff7854;
+  --dark: #163b31;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Poppins', sans-serif;
   --bg-primary: #f0f7ff;
   --bg-secondary: #ffffff;
   --bg-tertiary: #e0f2fe;
@@ -50,6 +61,15 @@
 
 :root.dark,
 [data-theme="dark"] {
+  --ink: #f0f7f3;
+  --muted: #9ab0a7;
+  --paper: #0b1713;
+  --line: #285244;
+  --lime: #c9f36b;
+  --mint: rgba(201, 243, 107, 0.12);
+  --blue: #38bdf8;
+  --orange: #ff7854;
+  --dark: #c9f36b;
   --bg-primary: #0b132b;
   --bg-secondary: #1c2541;
   --bg-tertiary: #273549;

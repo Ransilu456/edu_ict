@@ -55,15 +55,17 @@
 	transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
+.sidebar-collapse-btn svg {
+	display: block;
+	width: 16px;
+	height: 16px;
+	flex: 0 0 16px;
+}
+
 .sidebar-collapse-btn:hover {
 	background: var(--bg-tertiary);
 	color: var(--text-primary);
 	transform: translateX(-2px);
-}
-
-.sidebar-collapse-btn svg {
-	width: 15px;
-	height: 15px;
 }
 
 .sandbox-view.sidebar-collapsed .sandbox-sidebar {
@@ -591,39 +593,35 @@
 	display: none !important;
 }
 
-@media (max-width: 760px) {
-	.sandbox-sidebar {
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		left: 0;
-		z-index: 40;
-		width: min(286px, calc(100vw - 54px));
-		flex-basis: auto;
-		box-shadow: 12px 0 28px rgba(15, 42, 67, .16);
-		transform: translateX(0);
-		transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-		padding-inline: 0.75rem;
-	}
+/* ============================================================
+   Mobile & Tablet Sidebar Drawer (≤ 760px)
+   – Sidebar slides in as full-width overlay drawer
+   – Collapsed = hidden behind left edge (only toggle handle peeks)
+   – Expanded  = slides fully open with dimmed backdrop
+   ============================================================ */
 
-	.sandbox-view.sidebar-collapsed .sandbox-sidebar {
-		width: min(286px, calc(100vw - 54px));
-		flex-basis: auto;
-		transform: translateX(calc(-100% + 46px));
-		box-shadow: none;
-	}
+/* Backdrop overlay – injected as a sibling by JS or via ::before on .sandbox-view */
+.sandbox-sidebar-backdrop {
+	display: none;
+	border: 0;
+	padding: 0;
+	cursor: pointer;
+	position: absolute;
+	inset: 0;
+	z-index: 39;
+	background: rgba(5, 8, 15, 0.55);
+	backdrop-filter: blur(2px);
+	-webkit-backdrop-filter: blur(2px);
+	animation: backdropFadeIn 0.22s ease;
+}
 
-	.sandbox-view.sidebar-collapsed .sidebar-heading {
-		width: 42px;
-		margin-left: auto;
-	}
-
-	.sandbox-view.sidebar-collapsed .sidebar-collapse-btn {
-		background: var(--bg-secondary);
-	}
+@keyframes backdropFadeIn {
+	from { opacity: 0; }
+	to   { opacity: 1; }
 }
 
 @media (max-width: 760px) {
+	/* Make the sandbox view a positioning context */
 	.sandbox-view {
 		position: relative;
 		min-width: 0;
@@ -635,10 +633,89 @@
 		min-width: 0;
 	}
 
-	.sandbox-view.sidebar-collapsed .sandbox-sidebar {
+	/* ---------- Sidebar drawer base (OPEN state) ---------- */
+	.sandbox-sidebar {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 40;
+		width: min(290px, calc(100vw - 48px));
+		flex-basis: auto;
+		box-shadow: 14px 0 32px rgba(5, 8, 15, 0.28);
+		transform: translateX(0);
+		transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+		            box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+		padding-inline: 0.8rem;
 		max-height: 100%;
 		overflow-x: hidden;
 		overflow-y: auto;
+		border-right: 1px solid var(--border-color);
+	}
+
+	/* Show backdrop when sidebar is OPEN on mobile */
+	.sandbox-sidebar-backdrop {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	/* ---------- COLLAPSED state ---------- */
+	.sandbox-view.sidebar-collapsed .sandbox-sidebar {
+		width: min(290px, calc(100vw - 48px));
+		flex-basis: auto;
+		/* Slide almost fully off-screen — leave 44px 'handle' visible */
+		transform: translateX(calc(-100% + 44px));
+		box-shadow: none;
+		max-height: 100%;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+	/* Hide the backdrop when sidebar is COLLAPSED */
+	.sandbox-view.sidebar-collapsed .sandbox-sidebar-backdrop {
+		display: none;
+	}
+
+	/* The heading collapses to just the toggle button */
+	.sandbox-view.sidebar-collapsed .sidebar-heading {
+		width: 38px;
+		margin-left: auto;
+		padding-bottom: 0.4rem;
+		border-bottom: none;
+	}
+
+	.sandbox-view.sidebar-collapsed .sidebar-collapse-btn {
+		position: absolute;
+		top: 12px;
+		left: calc(100% - 44px);
+		z-index: 2;
+		background: var(--bg-secondary);
+		border-color: var(--border-color);
+		width: 34px;
+		height: 34px;
+		border-radius: 0 8px 8px 0;
+		box-shadow: 4px 4px 14px rgba(8, 24, 42, 0.2);
+		color: var(--text-primary);
+	}
+
+	.sandbox-view.sidebar-collapsed .sidebar-collapse-btn svg {
+		display: block;
+		width: 17px;
+		height: 17px;
+		color: var(--color-cyan);
+	}
+
+	/* Hide all sidebar content except the toggle when collapsed */
+	.sandbox-view.sidebar-collapsed .sidebar-heading > div,
+	.sandbox-view.sidebar-collapsed .sidebar-kicker,
+	.sandbox-view.sidebar-collapsed .sidebar-search,
+	.sandbox-view.sidebar-collapsed .sidebar-filter-tabs,
+	.sandbox-view.sidebar-collapsed .sidebar-section,
+	.sandbox-view.sidebar-collapsed .sidebar-section-title {
+		visibility: hidden;
+		opacity: 0;
+		transition: opacity 0.15s ease;
 	}
 }
 
@@ -646,5 +723,10 @@
 	.sandbox-empty-hint {
 		width: min(300px, calc(100% - 32px));
 		padding: 1.15rem 1rem;
+	}
+
+	/* On very small screens, sidebar takes the full screen when open */
+	.sandbox-sidebar {
+		width: min(320px, calc(100vw - 40px)) !important;
 	}
 }

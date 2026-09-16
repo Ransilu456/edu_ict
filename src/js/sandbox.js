@@ -1,4 +1,4 @@
-import { REAL_ICS } from './real-ic-defs.js';
+﻿import { REAL_ICS } from './real-ic-defs.js';
 import { initWaveform, sampleWaveform } from './waveform.js';
 import { generateICSchematicSVG } from './ic-schematic.js';
 import { snapWorld, getNodePlacementPoint, findFreePlacement, organizeCircuit as organizeSandboxCircuit } from './sandbox-layout.js';
@@ -86,6 +86,9 @@ function getViewportCenterWorld() {
 }
 
 function applyViewportTransform() {
+  window.__sandboxPanX = panX;
+  window.__sandboxPanY = panY;
+  window.__sandboxZoom = zoom;
   if (panContainer) {
     panContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
   }
@@ -238,8 +241,9 @@ function loadPendingCircuit() {
   if (!pendingCircuit) return;
   try {
     importLayout(JSON.parse(pendingCircuit));
+    organizeCircuit();
     sessionStorage.removeItem('logicQuest_pendingCircuit');
-    showToast('Generated circuit loaded');
+    showToast('Generated circuit loaded and organized');
   } catch {
     sessionStorage.removeItem('logicQuest_pendingCircuit');
     showAlert('The generated circuit could not be loaded.', 'Circuit Import');
@@ -428,6 +432,12 @@ function setupDragAndDrop() {
 
   const sidebarToggle = sidebar.querySelector('#sidebar-collapse-btn');
   const sandboxView = sidebar.closest('.sandbox-view');
+  const sidebarBackdrop = document.getElementById('sandbox-sidebar-backdrop');
+  const closeMobileSidebar = () => {
+    if (!sandboxView || window.innerWidth > 760) return;
+    sandboxView.classList.add('sidebar-collapsed');
+    sidebarToggle?.setAttribute('aria-expanded', 'false');
+  };
   const bindCompactTooltip = element => {
     let tooltip;
     const removeTooltip = () => {
@@ -457,6 +467,7 @@ function setupDragAndDrop() {
     sidebarToggle.title = collapsed ? 'Expand component library' : 'Collapse component library';
     if (window.playSound) window.playSound('click');
   });
+  sidebarBackdrop?.addEventListener('click', closeMobileSidebar);
 
   sidebar.querySelectorAll('.sidebar-section-title').forEach(title => {
     title.style.cursor = 'pointer';

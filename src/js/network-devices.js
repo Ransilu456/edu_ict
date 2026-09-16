@@ -248,11 +248,20 @@ function buildNDLayout() {
   <!-- PARITY CHECK TAB -->
   <div class="nd-tab-content" id="parity-tab">
     <div class="parity-layout">
-      <div class="parity-header">${I.parity} <span class="parity-title">Parity Check &mdash; Error Detection</span></div>
+      <div class="parity-header">
+        ${I.parity}
+        <div class="parity-heading-copy">
+          <span class="parity-kicker">SIGNAL ENCODING / ERROR DETECTION</span>
+          <span class="parity-title">Parity check</span>
+          <span class="parity-subtitle">Send seven data bits, add one checking bit, and verify the message.</span>
+        </div>
+        <span class="parity-protocol">EVEN PARITY</span>
+      </div>
       <div class="parity-body">
         <div class="parity-flow">
           <div class="parity-box">
             <div class="parity-box-label">${I.laptop} Original Data (7 bits)</div>
+            <p class="parity-box-help">Click any bit to change the message before sending.</p>
             <div class="parity-bits" id="parity-input-bits"></div>
             <div class="parity-actions">
               <button class="parity-action-btn primary" id="parity-send-btn">${I.send} Send with Parity</button>
@@ -262,6 +271,7 @@ function buildNDLayout() {
           <div class="parity-arrow">${I.send}</div>
           <div class="parity-box">
             <div class="parity-box-label">${I.bits} Received Data (8 bits)</div>
+            <p class="parity-box-help">The final highlighted tile is the parity bit.</p>
             <div class="parity-bits" id="parity-recv-bits"></div>
             <div class="parity-result wait" id="parity-result">${I.search} Waiting to send&hellip;</div>
           </div>

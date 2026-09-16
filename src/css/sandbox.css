@@ -294,6 +294,18 @@
     max-height: min(230px, calc(100% - 1.3rem));
     padding: 0.55rem 0.65rem 0.7rem;
   }
+
+  .waveform-header {
+    gap: 0.35rem;
+  }
+
+  .waveform-header > span {
+    font-size: 0.68rem;
+  }
+
+  .waveform-clear-btn {
+    padding-inline: 0.45rem;
+  }
 }
 
 /* Desktop toolbars should hug their controls; only smaller viewports span the canvas. */
@@ -348,7 +360,9 @@
 .sandbox-node-header {
   font-family: var(--font-header);
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
   color: var(--text-secondary);
   margin-bottom: 0.4rem;
   pointer-events: none;
@@ -2105,16 +2119,19 @@
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid var(--border-color, #334155);
   border-radius: 6px;
-  padding: 3px 8px;
+  max-width: min(360px, calc(100vw - 24px));
+  padding: 6px 10px;
   font-family: var(--font-mono, monospace);
-  font-size: 0.68rem;
+  font-size: 0.74rem;
+  line-height: 1.35;
   font-weight: 700;
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   z-index: 50;
   transform: translate(-50%, -100%);
   margin-top: -8px;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .sandbox-port.wire-hovered {
@@ -2296,6 +2313,10 @@
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    touch-action: pan-x;
   }
 
   .sandbox-toolbar .sandbox-btn,
@@ -2330,6 +2351,10 @@
 
   .sandbox-toolbar .sandbox-tool-menu {
     flex: 0 0 34px;
+  }
+
+  .sandbox-toolbar::-webkit-scrollbar {
+    height: 4px;
   }
 }
 
