@@ -24,6 +24,13 @@ function getAllPanels() {
 
 function setupViewNavigation() {
   const tabs = document.querySelectorAll('[data-route]');
+  const header = document.getElementById('app-header');
+  const menuToggle = document.getElementById('header-menu-toggle');
+  menuToggle?.addEventListener('click', () => {
+    const expanded = header?.classList.toggle('menu-open') ?? true;
+    menuToggle.setAttribute('aria-expanded', String(expanded));
+    if (window.playSound) window.playSound('click');
+  });
   let networkReady = false;
   const workspaceMode = window.location.pathname.endsWith('/app.html');
 

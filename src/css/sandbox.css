@@ -963,7 +963,7 @@
 }
 
 .real-ic-chip-name {
-  font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+  font-family: var(--mono), 'Courier New', Courier, monospace;
   font-weight: 800;
   font-size: 0.85rem;
   letter-spacing: 0.12em;
@@ -1019,7 +1019,7 @@
 }
 
 .real-ic-pin-num {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--mono), monospace;
   font-size: 0.62rem;
   font-weight: 600;
   color: #64748b;
@@ -1028,7 +1028,7 @@
 }
 
 .real-ic-pin-name {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--mono), monospace;
   font-size: 0.68rem;
   font-weight: 700;
   color: #94a3b8;
@@ -1569,7 +1569,7 @@
 }
 
 .real-ic-mfg {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--mono), monospace;
   font-size: 0.58rem;
   font-weight: 600;
   letter-spacing: 0.28em;
@@ -1578,7 +1578,7 @@
 }
 
 .real-ic-part {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--mono), monospace;
   font-weight: 800;
   font-size: 0.92rem;
   letter-spacing: 0.06em;
@@ -1587,7 +1587,7 @@
 }
 
 .real-ic-subtitle {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--mono), monospace;
   font-size: 0.6rem;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -1596,7 +1596,7 @@
 }
 
 .real-ic-date {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--mono), monospace;
   font-size: 0.56rem;
   letter-spacing: 0.14em;
   color: #5b6376;
@@ -1663,7 +1663,7 @@
 }
 
 .sandbox-node.real-ic-node .real-ic-pin-num {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--mono), monospace;
   font-size: 0.6rem;
   font-weight: 600;
   color: #6d7688;
@@ -1672,7 +1672,7 @@
 }
 
 .sandbox-node.real-ic-node .real-ic-pin-name {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--mono), monospace;
   font-size: 0.66rem;
   font-weight: 700;
   color: #a7b0c2;

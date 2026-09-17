@@ -224,7 +224,7 @@ export function drawWaveform() {
 
   if (waveformHistory.length < 2) {
     ctx.fillStyle = '#22c55e';
-    ctx.font = '700 12px "JetBrains Mono", monospace';
+    ctx.font = '700 12px "DM Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('RUNNING OSCILLOSCOPE — PROBING SIGNALS...', w / 2, h / 2);
     return;
@@ -257,7 +257,7 @@ export function drawWaveform() {
     ctx.stroke();
 
     ctx.fillStyle = '#94a3b8';
-    ctx.font = '700 11px "JetBrains Mono", monospace';
+    ctx.font = '700 11px "DM Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText(ch.name.slice(0, 8), 10, topY + rowHeight / 2 + 3);
 
@@ -268,7 +268,7 @@ export function drawWaveform() {
     ctx.strokeRect(labelWidth - 32, topY + rowHeight / 2 - 8, 24, 16);
 
     ctx.fillStyle = isHigh ? '#00ff66' : '#94a3b8';
-    ctx.font = '800 10px "JetBrains Mono", monospace';
+    ctx.font = '800 10px "DM Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText(isHigh ? 'H' : 'L', labelWidth - 20, topY + rowHeight / 2 + 4);
 
@@ -312,7 +312,7 @@ export function drawWaveform() {
 
   const legendX = labelWidth + plotWidth + 12;
   ctx.fillStyle = '#64748b';
-  ctx.font = '700 9px "JetBrains Mono", monospace';
+  ctx.font = '700 9px "DM Mono", monospace';
   ctx.textAlign = 'left';
   ctx.fillText('LOGIC LEVEL', legendX, 22);
 

@@ -98,9 +98,12 @@
 }
 
 .sandbox-view.sidebar-collapsed .sidebar-section .sidebar-item,
-.sandbox-view.sidebar-collapsed .sidebar-section .template-grid,
 .sandbox-view.sidebar-collapsed .sidebar-section>div:not(.sidebar-section-title) {
 	display: flex;
+}
+
+.sandbox-view.sidebar-collapsed .sidebar-section .template-grid {
+	display: none;
 }
 
 .sandbox-view.sidebar-collapsed .sidebar-section .sidebar-item {
@@ -113,12 +116,15 @@
 	border-radius: 6px;
 	background: transparent;
 	font-size: 0;
+	z-index: 10;
 }
 
 .sandbox-view.sidebar-collapsed .sidebar-section .sidebar-item:hover,
 .sandbox-view.sidebar-collapsed .sidebar-section .sidebar-item:focus-visible {
 	border-color: var(--border-color);
 	background: var(--bg-tertiary);
+	width: 40px;
+	height: 35px;
 }
 
 .sandbox-view.sidebar-collapsed .sidebar-section .sidebar-item span,
@@ -152,6 +158,7 @@
 	width: 100%;
 	grid-template-columns: 1fr;
 	gap: 2px;
+	display: none;
 }
 
 .sandbox-view.sidebar-collapsed .template-card {
@@ -249,7 +256,6 @@
 	transform: translateY(-50%) translateX(0);
 }
 
-/* Native title tooltips remain available without clipping the scroll rail. */
 .sandbox-view.sidebar-collapsed .sidebar-section-title::before,
 .sandbox-view.sidebar-collapsed .sidebar-section .sidebar-item::before,
 .sandbox-view.sidebar-collapsed .template-card::before {
@@ -587,20 +593,11 @@
 	outline-offset: 2px;
 }
 
-/* Templates stay available in the expanded library, never in the compact rail. */
 .sandbox-view.sidebar-collapsed .template-grid,
 .sandbox-view.sidebar-collapsed .template-card {
 	display: none !important;
 }
 
-/* ============================================================
-   Mobile & Tablet Sidebar Drawer (≤ 760px)
-   – Sidebar slides in as full-width overlay drawer
-   – Collapsed = hidden behind left edge (only toggle handle peeks)
-   – Expanded  = slides fully open with dimmed backdrop
-   ============================================================ */
-
-/* Backdrop overlay – injected as a sibling by JS or via ::before on .sandbox-view */
 .sandbox-sidebar-backdrop {
 	display: none;
 	border: 0;
@@ -624,10 +621,8 @@
 		opacity: 1;
 	}
 }
-
 @media (max-width: 760px) {
 
-	/* Make the sandbox view a positioning context */
 	.sandbox-view {
 		position: relative;
 		min-width: 0;
@@ -639,7 +634,7 @@
 		min-width: 0;
 	}
 
-	/* ---------- Sidebar drawer base (OPEN state) ---------- */
+	/*  Open  */
 	.sandbox-sidebar {
 		position: absolute;
 		top: 0;
@@ -654,74 +649,21 @@
 			box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 		padding-inline: 0.8rem;
 		max-height: 100%;
-		overflow-x: hidden;
+		overflow-x: auto;
 		overflow-y: auto;
 		border-right: 1px solid var(--border-color);
 	}
 
-	/* Show backdrop when sidebar is OPEN on mobile */
 	.sandbox-sidebar-backdrop {
 		display: block;
 		width: 100%;
 		height: 100%;
 	}
 
-	/* ---------- COLLAPSED state ---------- */
-	.sandbox-view.sidebar-collapsed .sandbox-sidebar {
-		width: min(290px, calc(100vw - 48px));
-		flex-basis: auto;
-		/* Slide almost fully off-screen — leave 44px 'handle' visible */
-		transform: translateX(calc(-100% + 44px));
-		box-shadow: none;
-		max-height: 100%;
-		overflow-x: hidden;
-		overflow-y: auto;
-	}
-
-	/* Hide the backdrop when sidebar is COLLAPSED */
 	.sandbox-view.sidebar-collapsed .sandbox-sidebar-backdrop {
 		display: none;
 	}
-
-	/* The heading collapses to just the toggle button */
-	.sandbox-view.sidebar-collapsed .sidebar-heading {
-		width: 38px;
-		margin-left: auto;
-		padding-bottom: 0.4rem;
-		border-bottom: none;
-	}
-
-	.sandbox-view.sidebar-collapsed .sidebar-collapse-btn {
-		position: absolute;
-		top: 12px;
-		left: calc(100% - 44px);
-		z-index: 2;
-		background: var(--bg-secondary);
-		border-color: var(--border-color);
-		width: 34px;
-		height: 34px;
-		border-radius: 0 8px 8px 0;
-		box-shadow: 4px 4px 14px rgba(8, 24, 42, 0.2);
-		color: var(--text-primary);
-	}
-
-	.sandbox-view.sidebar-collapsed .sidebar-collapse-btn svg {
-		display: block;
-		width: 17px;
-		height: 17px;
-		color: var(--color-cyan);
-	}
-
-	.sandbox-view.sidebar-collapsed .sidebar-heading>div,
-	.sandbox-view.sidebar-collapsed .sidebar-kicker,
-	.sandbox-view.sidebar-collapsed .sidebar-search,
-	.sandbox-view.sidebar-collapsed .sidebar-filter-tabs,
-	.sandbox-view.sidebar-collapsed .sidebar-section,
-	.sandbox-view.sidebar-collapsed .sidebar-section-title {
-		visibility: hidden;
-		opacity: 0;
-		transition: opacity 0.15s ease;
-	}
+	
 }
 
 @media (max-width: 480px) {
@@ -730,8 +672,64 @@
 		padding: 1.15rem 1rem;
 	}
 
-	/* On very small screens, sidebar takes the full screen when open */
 	.sandbox-sidebar {
 		width: min(320px, calc(100vw - 40px)) !important;
 	}
+}
+
+/* Landing-theme component library */
+.sandbox-sidebar {
+	background: var(--panel, #fff);
+	border-right-color: var(--line, #d9e1da);
+	padding: 18px 14px;
+	gap: 14px;
+}
+
+.sidebar-eyebrow {
+	display: block;
+	color: var(--teal, #4da779);
+	font: 700 .6rem var(--mono, 'DM Mono', monospace);
+	letter-spacing: .12em;
+}
+
+.sidebar-heading h3 {
+	font: 800 1.05rem var(--display, 'Manrope', sans-serif);
+	letter-spacing: -.04em;
+}
+
+.sidebar-item,
+.template-card {
+	min-height: 44px;
+	border-color: var(--line, #d9e1da);
+	border-radius: 5px;
+	background: var(--paper, #f6f8f4);
+	font-family: var(--display, 'Manrope', sans-serif);
+	transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease;
+}
+
+.sidebar-item:hover,
+.template-card:hover {
+	border-color: var(--teal, #4da779);
+	background: var(--mint, #dff2e5);
+	transform: translateY(-2px);
+	box-shadow: 3px 3px 0 var(--line, #d9e1da);
+}
+
+.sidebar-item svg { color: var(--teal, #4da779); }
+.sidebar-search { border-radius: 5px; background: var(--paper, #f6f8f4); }
+.sidebar-filter-tabs { gap: 6px; }
+.sidebar-tab { min-height: 32px; padding: 5px 9px; border-radius: 999px; font-family: var(--mono, 'DM Mono', monospace); font-size: .62rem; }
+.sidebar-tab.active { border-color: var(--dark, #163b31); background: var(--dark, #163b31); color: #fff; box-shadow: 2px 2px 0 var(--lime, #c9f36b); }
+.template-card:nth-child(odd) { background: color-mix(in srgb, var(--mint, #dff2e5) 58%, var(--panel, #fff)); }
+.template-card:nth-child(even) { background: color-mix(in srgb, var(--blue, #b9ddff) 42%, var(--panel, #fff)); }
+
+@media (max-width: 768px) {
+	.sandbox-sidebar {
+		transform: translateX(-105%);
+		transition: transform .28s cubic-bezier(.4, 0, .2, 1);
+	}
+	.sandbox-view.sidebar-open .sandbox-sidebar { transform: translateX(0); }
+	.sandbox-view.sidebar-collapsed .sandbox-sidebar { width: min(320px, calc(100vw - 40px)); padding-inline: 14px; }
+	.sandbox-view.sidebar-open .sandbox-sidebar-backdrop { display: block; }
+	.sandbox-view.sidebar-open .sandbox-sidebar { box-shadow: 14px 0 32px rgba(16, 33, 28, .2); }
 }

@@ -1,4 +1,4 @@
-﻿import './common.js';
+import './common.js';
 
 let osiReady = false;
 let osiAbort = false;
@@ -40,7 +40,7 @@ const I = {
 };
 
 const LAYERS = [
-  { id: 7, name: 'Application', short: 'App', pdu: 'Data', tcpIp: 'Application', icon: I.doc, color: '#ef4444', desc: 'User-facing protocols â€” HTTP, FTP, SMTP, DNS. Provides network services directly to software applications.', analogy: 'Like writing a letter â€” you decide what to say and who to send it to.' },
+  { id: 7, name: 'Application', short: 'App', pdu: 'Data', tcpIp: 'Application', icon: I.doc, color: '#ef4444', desc: 'User-facing protocols &mdash; HTTP, FTP, SMTP, DNS. Provides network services directly to software applications.', analogy: 'Like writing a letter &mdash; you decide what to say and who to send it to.' },
   { id: 6, name: 'Presentation', short: 'Pres', pdu: 'Data', tcpIp: 'Application', icon: I.wrench, color: '#f97316', desc: 'Data formatting, syntax translation, encryption (TLS/SSL), and compression. Prepares data for transmission.', analogy: 'Like translating your letter into a standard postal format, and sealing it in an envelope.' },
   { id: 5, name: 'Session', short: 'Sess', pdu: 'Data', tcpIp: 'Application', icon: I.link, color: '#eab308', desc: 'Establishes, maintains, and synchronizes dialog sessions between applications (checkpoints, full/half duplex).', analogy: 'Like picking up the telephone, ensuring the connection is open, and saying hello.' },
   { id: 4, name: 'Transport', short: 'Trans', pdu: 'Segment / Datagram', tcpIp: 'Transport', icon: I.box, color: '#22c55e', desc: 'End-to-end delivery, port multiplexing, segmentation, flow control, and error recovery. TCP (reliable) / UDP (fast).', analogy: 'Like numbering individual boxes so the receiver can reassemble them in order and verify none are lost.' },
@@ -282,7 +282,7 @@ function showLayerInfo(l) {
         <em>${l.analogy}</em>
       </div>
     </div>`,
-    `Layer ${l.id} â€” ${l.name}`
+    `Layer ${l.id} &mdash; ${l.name}`
   );
 }
 
@@ -477,7 +477,7 @@ function triggerError(message) {
   if (autoBtn) { autoBtn.classList.remove('active'); autoBtn.innerHTML = `${I.play} Auto`; }
   const stepBtn = el('osi-step-btn');
   if (stepBtn) { stepBtn.disabled = true; stepBtn.textContent = 'Reset to retry'; }
-  if (stepText) stepText.textContent = `${STEP_NAMES[state.step]} â€” ERROR`;
+  if (stepText) stepText.textContent = `${STEP_NAMES[state.step]} &mdash; ERROR`;
 }
 
 // steps
@@ -627,7 +627,7 @@ function decapsulateStep(step) {
       if (state.errorType === 'checksum') {
         const original = parseInt(pkt.checksum, 16) || 0;
         const corrupted = (original ^ 0xFF).toString(16).toUpperCase().padStart(4, '0');
-        dat.innerHTML = `<span style="color:#ef4444">${proto} checksum MISMATCH â€” expected ${pkt.checksum}, recomputed ${corrupted}</span>`;
+        dat.innerHTML = `<span style="color:#ef4444">${proto} checksum MISMATCH &mdash; expected ${pkt.checksum}, recomputed ${corrupted}</span>`;
         blk.className = 'osi-layer-block error';
         triggerError('Checksum verification failed at the Transport layer. The segment was corrupted in transit, so it is discarded and never reaches the Session layer.');
         break;
@@ -712,7 +712,7 @@ function animateSwitch() {
     status.innerHTML = `${I.search} Looking up MAC\u2026`;
     setTimeout(() => {
       if (state.errorType === 'mac') {
-        status.innerHTML = `${I.cross} Destination MAC ${state.dstMAC} not found â€” ARP failed, frame dropped`;
+        status.innerHTML = `${I.cross} Destination MAC ${state.dstMAC} not found &mdash; ARP failed, frame dropped`;
         triggerError('The switch has no entry for the destination MAC address and no ARP reply arrived in time. The frame is dropped at the switch and never reaches Bob.');
         return;
       }
@@ -736,7 +736,7 @@ function animateSwitch() {
         pkt.ttl = (pkt.ttl || 64) - 1;
         if (state.errorType === 'ttl') {
           pkt.ttl = 0;
-          status.innerHTML = `${I.cross} TTL reached 0 â€” packet expired, router discards it (ICMP Time Exceeded)`;
+          status.innerHTML = `${I.cross} TTL reached 0 &mdash; packet expired, router discards it (ICMP Time Exceeded)`;
           triggerError('The Time To Live counter reached zero. Routers discard packets whose TTL expires so they cannot loop forever across the network.');
           return;
         }

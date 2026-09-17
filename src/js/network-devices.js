@@ -1,4 +1,4 @@
-﻿import './common.js';
+import './common.js';
 import { initOSISim, cleanupOSISim } from './osi-sim.js';
 
 let ndInitialized = false;
@@ -175,7 +175,7 @@ function buildNDLayout() {
             </div>
           </div>
           <div class="nd-terminal-body" id="nd-terminal-body">
-            <div class="nd-term-line greeting">LogicQuest Terminal v2.0 â€” Type a command or click a preset above.</div>
+            <div class="nd-term-line greeting">LogicQuest Terminal v2.0 &mdash; Type a command or click a preset above.</div>
           </div>
           <div class="nd-terminal-input-bar">
             <span class="nd-prompt">host-a:~$</span>

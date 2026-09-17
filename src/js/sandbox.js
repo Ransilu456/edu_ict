@@ -1,4 +1,4 @@
-﻿import { REAL_ICS } from './real-ic-defs.js';
+import { REAL_ICS } from './real-ic-defs.js';
 import { initWaveform, sampleWaveform } from './waveform.js';
 import { generateICSchematicSVG } from './ic-schematic.js';
 import { snapWorld, getNodePlacementPoint, findFreePlacement, organizeCircuit as organizeSandboxCircuit } from './sandbox-layout.js';
@@ -121,39 +121,39 @@ function performUndo() {
 }
 // component catalog
 const COMPONENT_DEFS = {
-  'input':       { inputs: 0, outputs: 1, label: 'Toggle Switch',    category: 'Inputs' },
-  'clock':       { inputs: 0, outputs: 1, label: 'Clock Signal',     category: 'Inputs' },
-  'buffer':      { inputs: 1, outputs: 1, label: 'Buffer Gate',      category: 'Logic Gates' },
-  'not':         { inputs: 1, outputs: 1, label: 'NOT Gate',         category: 'Logic Gates' },
-  'and':         { inputs: 2, outputs: 1, label: 'AND Gate',         category: 'Logic Gates' },
-  'or':          { inputs: 2, outputs: 1, label: 'OR Gate',          category: 'Logic Gates' },
-  'nand':        { inputs: 2, outputs: 1, label: 'NAND Gate',        category: 'Logic Gates' },
-  'nor':         { inputs: 2, outputs: 1, label: 'NOR Gate',         category: 'Logic Gates' },
-  'xor':         { inputs: 2, outputs: 1, label: 'XOR Gate',         category: 'Logic Gates' },
-  'xnor':        { inputs: 2, outputs: 1, label: 'XNOR Gate',        category: 'Logic Gates' },
-  'output':      { inputs: 1, outputs: 0, label: 'LED Light',        category: 'Outputs' },
-  'rgb-led':     { inputs: 3, outputs: 0, label: 'RGB LED',          category: 'Outputs' },
-  'buzzer':      { inputs: 1, outputs: 0, label: 'Buzzer',           category: 'Outputs' },
-  'led-bar':     { inputs: 4, outputs: 0, label: 'LED Bar (4-bit)',  category: 'Outputs' },
-  'd-flop':      { inputs: 2, outputs: 1, label: 'D Flip-Flop',     category: 'Sequential' },
-  'sr-latch':    { inputs: 2, outputs: 2, label: 'SR Latch',        category: 'Sequential' },
-  'jk-flop':     { inputs: 3, outputs: 2, label: 'JK Flip-Flop',   category: 'Sequential' },
-  't-flop':      { inputs: 2, outputs: 1, label: 'T Flip-Flop',    category: 'Sequential' },
-  'half-adder':  { inputs: 2, outputs: 2, label: 'Half Adder',      category: 'Arithmetic' },
-  'full-adder':  { inputs: 3, outputs: 2, label: 'Full Adder',      category: 'Arithmetic' },
-  'mux-2-1':     { inputs: 3, outputs: 1, label: '2:1 Multiplexer', category: 'Combinational' },
-  'demux-1-2':   { inputs: 2, outputs: 2, label: '1:2 DeMultiplexer', category: 'Combinational' },
-  'decoder-2-4': { inputs: 2, outputs: 4, label: '2:4 Decoder',    category: 'Combinational' },
+  'input': { inputs: 0, outputs: 1, label: 'Toggle Switch', category: 'Inputs' },
+  'clock': { inputs: 0, outputs: 1, label: 'Clock Signal', category: 'Inputs' },
+  'buffer': { inputs: 1, outputs: 1, label: 'Buffer Gate', category: 'Logic Gates' },
+  'not': { inputs: 1, outputs: 1, label: 'NOT Gate', category: 'Logic Gates' },
+  'and': { inputs: 2, outputs: 1, label: 'AND Gate', category: 'Logic Gates' },
+  'or': { inputs: 2, outputs: 1, label: 'OR Gate', category: 'Logic Gates' },
+  'nand': { inputs: 2, outputs: 1, label: 'NAND Gate', category: 'Logic Gates' },
+  'nor': { inputs: 2, outputs: 1, label: 'NOR Gate', category: 'Logic Gates' },
+  'xor': { inputs: 2, outputs: 1, label: 'XOR Gate', category: 'Logic Gates' },
+  'xnor': { inputs: 2, outputs: 1, label: 'XNOR Gate', category: 'Logic Gates' },
+  'output': { inputs: 1, outputs: 0, label: 'LED Light', category: 'Outputs' },
+  'rgb-led': { inputs: 3, outputs: 0, label: 'RGB LED', category: 'Outputs' },
+  'buzzer': { inputs: 1, outputs: 0, label: 'Buzzer', category: 'Outputs' },
+  'led-bar': { inputs: 4, outputs: 0, label: 'LED Bar (4-bit)', category: 'Outputs' },
+  'd-flop': { inputs: 2, outputs: 1, label: 'D Flip-Flop', category: 'Sequential' },
+  'sr-latch': { inputs: 2, outputs: 2, label: 'SR Latch', category: 'Sequential' },
+  'jk-flop': { inputs: 3, outputs: 2, label: 'JK Flip-Flop', category: 'Sequential' },
+  't-flop': { inputs: 2, outputs: 1, label: 'T Flip-Flop', category: 'Sequential' },
+  'half-adder': { inputs: 2, outputs: 2, label: 'Half Adder', category: 'Arithmetic' },
+  'full-adder': { inputs: 3, outputs: 2, label: 'Full Adder', category: 'Arithmetic' },
+  'mux-2-1': { inputs: 3, outputs: 1, label: '2:1 Multiplexer', category: 'Combinational' },
+  'demux-1-2': { inputs: 2, outputs: 2, label: '1:2 DeMultiplexer', category: 'Combinational' },
+  'decoder-2-4': { inputs: 2, outputs: 4, label: '2:4 Decoder', category: 'Combinational' },
   'encoder-4-2': { inputs: 4, outputs: 2, label: '4:2 Priority Encoder', category: 'Combinational' },
-  'comparator':  { inputs: 4, outputs: 3, label: '2-bit Comparator', category: 'Combinational' },
-  'seven-seg':   { inputs: 4, outputs: 0, label: '7-Seg Display',   category: 'Outputs' },
-  'text-label':  { inputs: 0, outputs: 0, label: 'Text Label',      category: 'Utility' },
-  'ic-7408':     { inputs: 15, outputs: 15, label: '7408 Quad AND', category: 'ICs' },
-  'ic-7432':     { inputs: 15, outputs: 15, label: '7432 Quad OR',  category: 'ICs' },
-  'ic-7404':     { inputs: 15, outputs: 15, label: '7404 Hex NOT',  category: 'ICs' },
-  'ic-7400':     { inputs: 15, outputs: 15, label: '7400 Quad NAND', category: 'ICs' },
-  'ic-7402':     { inputs: 15, outputs: 15, label: '7402 Quad NOR', category: 'ICs' },
-  'ic-7486':     { inputs: 15, outputs: 15, label: '7486 Quad XOR', category: 'ICs' },
+  'comparator': { inputs: 4, outputs: 3, label: '2-bit Comparator', category: 'Combinational' },
+  'seven-seg': { inputs: 4, outputs: 0, label: '7-Seg Display', category: 'Outputs' },
+  'text-label': { inputs: 0, outputs: 0, label: 'Text Label', category: 'Utility' },
+  'ic-7408': { inputs: 15, outputs: 15, label: '7408 Quad AND', category: 'ICs' },
+  'ic-7432': { inputs: 15, outputs: 15, label: '7432 Quad OR', category: 'ICs' },
+  'ic-7404': { inputs: 15, outputs: 15, label: '7404 Hex NOT', category: 'ICs' },
+  'ic-7400': { inputs: 15, outputs: 15, label: '7400 Quad NAND', category: 'ICs' },
+  'ic-7402': { inputs: 15, outputs: 15, label: '7402 Quad NOR', category: 'ICs' },
+  'ic-7486': { inputs: 15, outputs: 15, label: '7486 Quad XOR', category: 'ICs' },
 };
 
 window.initSandboxCanvas = function () {
@@ -189,6 +189,7 @@ window.initSandboxCanvas = function () {
   startSimulationLoop();
   initWaveform();
   updateSandboxWires();
+
   workspace.addEventListener('click', (e) => {
     if (didPan) { didPan = false; return; }
     if (e.ctrlKey || e.metaKey) return;
@@ -343,6 +344,7 @@ function setupSidebarItem(item) {
     });
     placeNode(type, label, placement.x, placement.y);
     showToast(`${label} placed ✓`);
+    if (window.innerWidth <= 768) window.closeMobileSidebar?.();
   });
   let touchDragGhost = null;
   let touchDragActive = false;
@@ -422,6 +424,7 @@ function setupSidebarItem(item) {
       const placement = getNodePlacementPoint(type, point.x, point.y);
       placeNode(type, label, placement.x, placement.y);
       showToast(`${label} placed ✓`);
+      if (window.innerWidth <= 768) window.closeMobileSidebar?.();
     }
   });
 }
@@ -434,10 +437,48 @@ function setupDragAndDrop() {
   const sandboxView = sidebar.closest('.sandbox-view');
   const sidebarBackdrop = document.getElementById('sandbox-sidebar-backdrop');
   const closeMobileSidebar = () => {
-    if (!sandboxView || window.innerWidth > 760) return;
+    if (!sandboxView) return;
     sandboxView.classList.add('sidebar-collapsed');
+    sandboxView.classList.remove('sidebar-open');
     sidebarToggle?.setAttribute('aria-expanded', 'false');
+    toolbarToggle?.classList.remove('active');
   };
+  window.closeMobileSidebar = closeMobileSidebar;
+
+  const toolbarToggle = document.getElementById('sandbox-components-toggle');
+  const toggleSidebar = () => {
+    if (!sandboxView) return;
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      const open = sandboxView.classList.toggle('sidebar-open');
+      sandboxView.classList.add('sidebar-collapsed');
+      sidebarToggle?.setAttribute('aria-expanded', String(open));
+      toolbarToggle?.classList.toggle('active', open);
+      if (window.playSound) window.playSound('click');
+      return;
+    }
+    const collapsed = sandboxView.classList.toggle('sidebar-collapsed');
+    sidebarToggle?.setAttribute('aria-expanded', String(!collapsed));
+    sidebarToggle?.setAttribute('aria-label', collapsed ? 'Expand component library' : 'Collapse component library');
+    if (sidebarToggle) sidebarToggle.title = collapsed ? 'Expand component library' : 'Collapse component library';
+    toolbarToggle?.classList.toggle('active', !collapsed);
+    if (window.playSound) window.playSound('click');
+  };
+
+  sidebarToggle?.addEventListener('click', toggleSidebar);
+  toolbarToggle?.addEventListener('click', toggleSidebar);
+  sidebarBackdrop?.addEventListener('click', closeMobileSidebar);
+
+  // Default to collapsed on mobile to reveal the canvas and toolbar
+  if (window.innerWidth <= 768 && sandboxView) {
+    sandboxView.classList.add('sidebar-collapsed');
+    sandboxView.classList.remove('sidebar-open');
+    sidebarToggle?.setAttribute('aria-expanded', 'false');
+    toolbarToggle?.classList.remove('active');
+  } else if (toolbarToggle && sandboxView) {
+    toolbarToggle.classList.toggle('active', !sandboxView.classList.contains('sidebar-collapsed'));
+  }
+
   const bindCompactTooltip = element => {
     let tooltip;
     const removeTooltip = () => {
@@ -460,14 +501,6 @@ function setupDragAndDrop() {
     element.addEventListener('focus', showTooltip);
     element.addEventListener('blur', removeTooltip);
   };
-  sidebarToggle?.addEventListener('click', () => {
-    const collapsed = sandboxView?.classList.toggle('sidebar-collapsed') || false;
-    sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
-    sidebarToggle.setAttribute('aria-label', collapsed ? 'Expand component library' : 'Collapse component library');
-    sidebarToggle.title = collapsed ? 'Expand component library' : 'Collapse component library';
-    if (window.playSound) window.playSound('click');
-  });
-  sidebarBackdrop?.addEventListener('click', closeMobileSidebar);
 
   sidebar.querySelectorAll('.sidebar-section-title').forEach(title => {
     title.style.cursor = 'pointer';
@@ -532,6 +565,7 @@ function setupDragAndDrop() {
       const label = e.dataTransfer.getData('label');
       const placement = getNodePlacementPoint(type, dropPoint.x, dropPoint.y);
       placeNode(type, label, placement.x, placement.y);
+      if (window.innerWidth <= 768) window.closeMobileSidebar?.();
     }
   });
 }
@@ -753,20 +787,6 @@ function setupToolbar() {
     showTruthTable();
   });
 
-  const speedBtn = document.getElementById('sandbox-speed-btn');
-  if (speedBtn) {
-    const speeds = [1, 2, 4, 0.5];
-    let speedIdx = 0;
-    speedBtn.addEventListener('click', () => {
-      speedIdx = (speedIdx + 1) % speeds.length;
-      simSpeed = speeds[speedIdx];
-      const lbl = speedBtn.querySelector('span');
-      if (lbl) lbl.textContent = simSpeed + 'x';
-      playSound('click');
-      if (isSimRunning) startSimulationLoop();
-    });
-  }
-
   [saveModal, loadModal].forEach(modal => {
     if (!modal) return;
     modal.addEventListener('click', (e) => {
@@ -984,7 +1004,7 @@ function renderRealICNodeDOM(node, el) {
     selectNode(node.id, e.shiftKey || e.ctrlKey || e.metaKey);
   });
 
-   (panContainer || workspace).appendChild(el);
+  (panContainer || workspace).appendChild(el);
 }
 
 function renderNodeDOM(node) {
@@ -1025,7 +1045,7 @@ function renderNodeDOM(node) {
   header.className = 'sandbox-node-header';
   header.innerText = node.label;
 
-  const pureGateTypes = ['not','and','or','nand','nor','xor','xnor'];
+  const pureGateTypes = ['not', 'and', 'or', 'nand', 'nor', 'xor', 'xnor'];
   const gateStyle = window.__gateStyle || localStorage.getItem('sandboxGateStyle') || 'box';
   if (gateStyle === 'realistic' && pureGateTypes.includes(node.type)) {
     header.style.display = 'none';
@@ -1326,9 +1346,9 @@ function renderNodeBody(node, body) {
 
     case 'sr-latch': {
       const set = a ? 1 : 0, rst = b ? 1 : 0;
-      if (set && !rst)       { node.outputState = 1; node.outputState2 = 0; }
-      else if (!set && rst)  { node.outputState = 0; node.outputState2 = 1; }
-      else if (set && rst)   { node.outputState = 0; node.outputState2 = 0; }
+      if (set && !rst) { node.outputState = 1; node.outputState2 = 0; }
+      else if (!set && rst) { node.outputState = 0; node.outputState2 = 1; }
+      else if (set && rst) { node.outputState = 0; node.outputState2 = 0; }
 
       break;
     }
@@ -1336,9 +1356,9 @@ function renderNodeBody(node, body) {
     case 'jk-flop': {
       const j = a ? 1 : 0, k = b ? 1 : 0, clk = c ? 1 : 0;
       if (clk && !node.prevClockState) {
-        if (j && !k)      { node.outputState = 1; }
+        if (j && !k) { node.outputState = 1; }
         else if (!j && k) { node.outputState = 0; }
-        else if (j && k)  { node.outputState = node.outputState ? 0 : 1; }
+        else if (j && k) { node.outputState = node.outputState ? 0 : 1; }
         node.outputState2 = node.outputState ? 0 : 1;
       }
       node.prevClockState = clk;
@@ -1362,15 +1382,15 @@ function renderNodeBody(node, body) {
 
     case 'demux-1-2': {
       const inp = a ? 1 : 0, sel = b ? 1 : 0;
-      node.outputState  = (!sel && inp) ? 1 : 0;
-      node.outputState2 = (sel && inp)  ? 1 : 0;
+      node.outputState = (!sel && inp) ? 1 : 0;
+      node.outputState2 = (sel && inp) ? 1 : 0;
       break;
     }
 
     case 'decoder-2-4': {
       const inA = a ? 1 : 0, inB = b ? 1 : 0;
       const val = (inA << 1) | inB;
-      node.outputState  = val === 0 ? 1 : 0;
+      node.outputState = val === 0 ? 1 : 0;
       node.outputState2 = val === 1 ? 1 : 0;
       node.outputState3 = val === 2 ? 1 : 0;
       node.outputState4 = val === 3 ? 1 : 0;
@@ -1378,21 +1398,21 @@ function renderNodeBody(node, body) {
     }
 
     case 'encoder-4-2': {
-      const d0 = (node.inputValues[0]||0) ? 1 : 0;
-      const d1 = (node.inputValues[1]||0) ? 1 : 0;
-      const d2 = (node.inputValues[2]||0) ? 1 : 0;
-      const d3 = (node.inputValues[3]||0) ? 1 : 0;
+      const d0 = (node.inputValues[0] || 0) ? 1 : 0;
+      const d1 = (node.inputValues[1] || 0) ? 1 : 0;
+      const d2 = (node.inputValues[2] || 0) ? 1 : 0;
+      const d3 = (node.inputValues[3] || 0) ? 1 : 0;
       let encOut = 0;
       if (d1) encOut = 1; if (d2) encOut = 2; if (d3) encOut = 3;
-      node.outputState  = (encOut >> 1) & 1;
+      node.outputState = (encOut >> 1) & 1;
       node.outputState2 = encOut & 1;
       break;
     }
 
     case 'comparator': {
-      const A = ((node.inputValues[0]||0) << 1) | (node.inputValues[1]||0);
-      const B = ((node.inputValues[2]||0) << 1) | (node.inputValues[3]||0);
-      node.outputState  = A > B ? 1 : 0;
+      const A = ((node.inputValues[0] || 0) << 1) | (node.inputValues[1] || 0);
+      const B = ((node.inputValues[2] || 0) << 1) | (node.inputValues[3] || 0);
+      node.outputState = A > B ? 1 : 0;
       node.outputState2 = A === B ? 1 : 0;
       node.outputState3 = A < B ? 1 : 0;
       break;
@@ -2163,15 +2183,15 @@ function updateSandboxWires() {
             : `M ${x1} ${y1} C ${channelX} ${y1}, ${channelX} ${y2}, ${x2} ${y2}`;
         }
       } else {
-      const dir = x2 >= x1 ? 1 : -1;
-      const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
-      const midX = x1 + (x2 - x1) * 0.5;
-      d = wireStyle === 'straight'
-        ? `M ${x1} ${y1} L ${x2} ${y2}`
-        : wireStyle === 'orthogonal'
-          ? `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`
-          : `M ${x1} ${y1} C ${x1 + dir * dx} ${y1}, ${x2 - dir * dx} ${y2}, ${x2} ${y2}`;
-          }
+        const dir = x2 >= x1 ? 1 : -1;
+        const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
+        const midX = x1 + (x2 - x1) * 0.5;
+        d = wireStyle === 'straight'
+          ? `M ${x1} ${y1} L ${x2} ${y2}`
+          : wireStyle === 'orthogonal'
+            ? `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`
+            : `M ${x1} ${y1} C ${x1 + dir * dx} ${y1}, ${x2 - dir * dx} ${y2}, ${x2} ${y2}`;
+      }
     }
 
     const wireColor = wire.color || '#3b82f6';
@@ -2282,8 +2302,8 @@ function updateSandboxWires() {
         val = (node.outputStates && node.outputStates[portIdx] !== undefined) ? node.outputStates[portIdx] : 0;
       } else {
         val = portIdx === 0 ? (node.outputState || 0) :
-              portIdx === 1 ? (node.outputState2 || 0) :
-              portIdx === 2 ? (node.outputState3 || 0) :
+          portIdx === 1 ? (node.outputState2 || 0) :
+            portIdx === 2 ? (node.outputState3 || 0) :
               portIdx === 3 ? (node.outputState4 || 0) : 0;
       }
       p.classList.toggle('active-port', val === 1);
@@ -2495,8 +2515,8 @@ function computeNodeOutput(node) {
   const iv = node.inputValues;
   const a = iv[0], b = iv[1], c = iv[2];
 
-  const allHigh  = () => iv.every(v => !!v);
-  const anyHigh  = () => iv.some(v => !!v);
+  const allHigh = () => iv.every(v => !!v);
+  const anyHigh = () => iv.some(v => !!v);
   const xorParity = () => (iv.filter(v => !!v).length % 2 === 1) ? 1 : 0;
 
   switch (node.type) {
@@ -2574,7 +2594,7 @@ function computeNodeOutput(node) {
   }
 }
 
-const MULTI_INPUT_GATE_TYPES = new Set(['and','or','nand','nor','xor','xnor']);
+const MULTI_INPUT_GATE_TYPES = new Set(['and', 'or', 'nand', 'nor', 'xor', 'xnor']);
 const MAX_GATE_INPUTS = 32;
 const MIN_GATE_INPUTS = 2;
 
@@ -2850,7 +2870,7 @@ window.getSandboxInputNodes = getInputNodes;
 window.getSandboxOutputNodes = getOutputNodes;
 
 function getDigitalGates() {
-  return sandboxNodes.filter(n => ['not','and','or','nand','nor','xor','xnor','d-flop','half-adder','full-adder','seven-seg'].includes(n.type));
+  return sandboxNodes.filter(n => ['not', 'and', 'or', 'nand', 'nor', 'xor', 'xnor', 'd-flop', 'half-adder', 'full-adder', 'seven-seg'].includes(n.type));
 }
 
 function isDigitalCircuit() {
@@ -3023,7 +3043,7 @@ function startSimulationLoop() {
   simInterval = setInterval(() => {
     if (isSimRunning) {
       evaluateSandbox();
-      try { sampleWaveform(sandboxNodes); } catch (err) {}
+      try { sampleWaveform(sandboxNodes); } catch (err) { }
     }
   }, Math.max(16, baseInterval));
 
@@ -3248,12 +3268,12 @@ const halfAdderSvg = `
   <text x="320" y="55" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="700">Sum (S)</text>
   <text x="320" y="165" fill="var(--text-primary)" font-family="var(--font-header)" font-weight="700">Carry (C)</text>
 
-  <path d="M 45 55 L 180 45" fill="none" stroke="var(--text-secondary)" stroke-width="2" />
+  <path d="M 45 45 L 180 45" fill="none" stroke="var(--text-secondary)" stroke-width="2" />
   <path d="M 45 165 L 120 165 L 120 65 L 180 65" fill="none" stroke="var(--text-secondary)" stroke-width="2" />
-  <path d="M 90 55 L 90 145 L 180 145" fill="none" stroke="var(--text-secondary)" stroke-width="2" />
+  <path d="M 90 45 L 90 145 L 180 145" fill="none" stroke="var(--text-secondary)" stroke-width="2" />
   <path d="M 45 165 L 180 165" fill="none" stroke="var(--text-secondary)" stroke-width="2" />
 
-  <circle cx="90" cy="55" r="3" fill="var(--text-primary)"/>
+  <circle cx="90" cy="45" r="3" fill="var(--text-primary)"/>
   <circle cx="120" cy="165" r="3" fill="var(--text-primary)"/>
 
   <path d="M 260 55 L 310 55" fill="none" stroke="var(--text-secondary)" stroke-width="2" />

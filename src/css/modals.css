@@ -198,6 +198,38 @@
   padding: clamp(1rem, 3vw, 1.75rem) !important;
 }
 
+.success-modal-overlay {
+  background: rgba(16, 33, 28, .45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.success-modal {
+  border-color: var(--line, #d9e1da);
+  border-radius: 8px;
+  background: var(--panel, #fff);
+  box-shadow: 8px 8px 0 var(--mint, #dff2e5), 0 20px 40px rgba(16, 33, 28, .12);
+}
+
+.custom-alert-box { max-width: 420px; padding: 2rem; text-align: center; position: relative; }
+.custom-alert-icon { width: 60px; height: 60px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 50%; background: var(--mint); color: var(--teal, #4da779); }
+.custom-alert-title, .success-modal-title { font-family: var(--display, 'Manrope', sans-serif); font-weight: 800; letter-spacing: -.04em; }
+.custom-alert-msg { color: var(--muted, #66736e); font: .82rem/1.6 var(--mono, 'DM Mono', monospace); }
+.custom-alert-buttons, .modal-actions { display: flex; gap: .7rem; justify-content: flex-end; }
+.custom-alert-buttons { justify-content: center; }
+.custom-alert-buttons .btn-primary, .modal-actions .btn-primary { min-width: 100px; }
+#custom-alert-cancel-btn { display: none; }
+.modal-close-btn { position: absolute; top: 14px; right: 14px; border: 0; background: transparent; color: var(--muted); font-size: 1.4rem; cursor: pointer; line-height: 1; padding: 6px; }
+.modal-heading-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: .65rem; border-bottom: 1px solid var(--line); }
+.modal-heading-row .modal-close-btn { position: static; }
+.logic-modal-card { max-width: 680px; width: 94%; padding: 1.75rem; position: relative; }
+.logic-modal-card #logic-modal-content { margin: 1rem 0; width: 100%; display: flex; justify-content: center; align-items: flex-start; flex-direction: column; }
+.save-modal-card, .load-modal-card { width: min(460px, 92vw); padding: 1.75rem; text-align: left; position: relative; }
+#save-circuit-name { width: 100%; padding: .7rem .8rem; margin-bottom: 1.25rem; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: .9rem var(--display); outline: none; }
+#saved-circuits-list { max-height: 280px; overflow-y: auto; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); padding: .25rem; }
+.modal-actions .btn-primary, .modal-actions .btn-secondary, .custom-alert-buttons .btn-primary, .custom-alert-buttons .btn-secondary { min-height: 42px; padding: .6rem 1.25rem; border-radius: 5px; }
+.modal-actions .btn-primary, .custom-alert-buttons .btn-primary { background: var(--dark, #163b31); color: #fff; box-shadow: 3px 3px 0 var(--lime, #c9f36b); }
+
 .truth-table-shell {
   width: 100%;
   color: var(--text-primary);

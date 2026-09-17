@@ -304,101 +304,307 @@ header#app-header .btn-icon {
   }
 }
 
-/* Match the public landing header: quiet, flat, and typographic. */
+/* Workspace header: matches the quiet, flat, and typographic aesthetic of landing.html */
 header#app-header {
-  min-height: 76px;
-  padding: 18px max(24px, calc((100vw - 1180px) / 2));
-  background: var(--bg-primary);
-  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 64px;
+  padding: 12px max(24px, calc((100vw - 1200px) / 2));
+  background: var(--panel, #ffffff);
+  border-bottom: 1px solid var(--line, #d9e1da);
+  box-shadow: 0 1px 3px rgba(16, 33, 28, 0.04);
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-header#app-header > div:first-child {
-  min-width: 150px;
+:root.dark header#app-header,
+[data-theme="dark"] header#app-header {
+  background: #10211c;
+  border-bottom-color: #255245;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
-header#app-header .logo {
+.header-brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 0 0 auto;
+}
+
+header#app-header .brand {
+  display: inline-flex;
+  align-items: center;
   gap: 9px;
-  font-size: 1.18rem;
+  font-family: var(--display, 'Manrope', sans-serif);
+  font-size: 1.15rem;
   font-weight: 800;
-  letter-spacing: -.06em;
+  letter-spacing: -0.06em;
+  color: var(--ink, #10211c);
+  text-decoration: none;
 }
 
-header#app-header .logo-mark i {
-  background: #163b31;
+:root.dark header#app-header .brand,
+[data-theme="dark"] header#app-header .brand {
+  color: #f0f7f3;
 }
 
-header#app-header .logo-mark i:nth-child(2) {
-  background: #62c594;
-}
-
-header#app-header .logo-mark i:nth-child(3) {
-  background: #ff7854;
-}
-
-header#app-header .logo-wordmark span {
+header#app-header .brand > span:last-child span {
   color: #3a9b70;
 }
 
+header#app-header .brand-mark {
+  display: inline-flex;
+  align-items: end;
+  gap: 3px;
+  width: 22px;
+  height: 22px;
+}
+
+header#app-header .brand-mark span {
+  display: block;
+  width: 5.5px;
+  border-radius: 3px 3px 1px 1px;
+  background: var(--dark, #163b31);
+  transform: skew(-18deg);
+}
+
+:root.dark header#app-header .brand-mark span,
+[data-theme="dark"] header#app-header .brand-mark span {
+  background: #c9f36b;
+}
+
+header#app-header .brand-mark span:nth-child(1) { height: 12px; }
+header#app-header .brand-mark span:nth-child(2) { height: 19px; background: #62c594; }
+header#app-header .brand-mark span:nth-child(3) { height: 15px; background: var(--orange, #ff7854); }
+
+.header-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border: 1px solid var(--line, #d9e1da);
+  border-radius: 5px;
+  background: var(--paper, #f6f8f4);
+  color: var(--muted, #66736e);
+  font-family: var(--mono, 'DM Mono', monospace);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.18s ease;
+}
+
+:root.dark .header-home-link,
+[data-theme="dark"] .header-home-link {
+  background: #163b31;
+  border-color: #255245;
+  color: #9ab0a7;
+}
+
+.header-home-link:hover {
+  color: var(--ink, #10211c);
+  border-color: #3a9b70;
+  transform: translateY(-1px);
+}
+
+:root.dark .header-home-link:hover,
+[data-theme="dark"] .header-home-link:hover {
+  color: #c9f36b;
+  border-color: #62c594;
+}
+
+.header-home-link .home-arrow {
+  color: #3a9b70;
+  font-weight: 700;
+}
+
+/* Primary Lab Navigation */
 header#app-header .desktop-nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 28px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 3px 4px;
+  border: 1px solid var(--line, #d9e1da);
+  border-radius: 7px;
+  background: var(--paper, #f6f8f4);
   box-shadow: none;
+}
+
+:root.dark header#app-header .desktop-nav,
+[data-theme="dark"] header#app-header .desktop-nav {
+  background: #142922;
+  border-color: #255245;
 }
 
 header#app-header .nav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   min-height: 32px;
-  padding: 6px 0;
-  border: 0;
-  border-radius: 0;
+  padding: 6px 14px;
+  border: 1px solid transparent;
+  border-radius: 5px;
   background: transparent;
-  color: var(--text-muted);
-  font-size: .73rem;
+  color: var(--muted, #66736e);
+  font-family: var(--display, 'Manrope', sans-serif);
+  font-size: 0.76rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
   box-shadow: none;
+  transition: all 0.16s ease;
+}
+
+:root.dark header#app-header .nav-tab,
+[data-theme="dark"] header#app-header .nav-tab {
+  color: #9ab0a7;
 }
 
 header#app-header .nav-tab:hover {
-  color: var(--text-primary);
-  background: transparent;
-  transform: none;
+  color: var(--ink, #10211c);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+:root.dark header#app-header .nav-tab:hover,
+[data-theme="dark"] header#app-header .nav-tab:hover {
+  color: #f0f7f3;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 header#app-header .nav-tab.active {
-  color: var(--text-primary);
-  border: 0;
-  background: transparent;
-  box-shadow: inset 0 -2px 0 var(--color-cyan);
-  transform: none;
+  color: var(--ink, #10211c);
+  background: var(--panel, #ffffff);
+  border-color: var(--line, #d9e1da);
+  box-shadow: 2px 2px 0 rgba(16, 33, 28, 0.07);
 }
+
+:root.dark header#app-header .nav-tab.active,
+[data-theme="dark"] header#app-header .nav-tab.active {
+  color: #10211c;
+  background: var(--lime, #c9f36b);
+  border-color: var(--lime, #c9f36b);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.25);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.header-menu-toggle { display: none !important; }
 
 header#app-header .btn-icon {
   width: 34px;
   height: 34px;
-  border: 1px solid var(--border-color);
-  border-radius: 50%;
-  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--line, #d9e1da);
+  border-radius: 5px;
+  background: var(--paper, #f6f8f4);
+  color: var(--ink, #10211c);
+  cursor: pointer;
   box-shadow: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+:root.dark header#app-header .btn-icon,
+[data-theme="dark"] header#app-header .btn-icon {
+  background: #163b31;
+  border-color: #255245;
+  color: #f0f7f3;
 }
 
 header#app-header .btn-icon:hover {
-  background: var(--bg-secondary);
+  transform: translateY(-2px);
+  box-shadow: 2px 2px 0 var(--ink, #10211c);
+  background: var(--panel, #ffffff);
 }
 
-@media (max-width: 760px) {
+:root.dark header#app-header .btn-icon:hover,
+[data-theme="dark"] header#app-header .btn-icon:hover {
+  box-shadow: 2px 2px 0 #c9f36b;
+  background: #1e4d40;
+}
+
+header#app-header .btn-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Responsive Header Layout */
+@media (max-width: 780px) {
   header#app-header {
-    padding: 14px 18px;
+    flex-wrap: wrap;
+    padding: 10px 14px 8px;
+    gap: 8px 12px;
+    min-height: auto;
+  }
+
+  .header-brand-wrap {
+    flex: 1 1 auto;
+    justify-content: flex-start;
+  }
+
+  .header-actions {
+    flex: 0 0 auto;
   }
 
   header#app-header .desktop-nav {
+    order: 3;
+    flex-basis: 100%;
     justify-content: flex-start;
-    gap: 20px;
     overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 3px;
+    gap: 4px;
+  }
+
+  .header-menu-toggle { display: inline-flex !important; }
+  header#app-header:not(.menu-open) .desktop-nav {
+    max-height: 0;
+    min-height: 0;
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-width: 0;
+    overflow: hidden !important;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  header#app-header .desktop-nav {
+    max-height: 48px;
+    transition: max-height .2s ease, opacity .2s ease, padding .2s ease;
+  }
+
+  header#app-header .desktop-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  header#app-header .nav-tab {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 440px) {
+  .header-home-link {
+    display: none;
   }
 }
 
