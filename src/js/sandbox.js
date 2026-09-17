@@ -451,7 +451,7 @@ function setupDragAndDrop() {
     const isMobile = window.innerWidth <= 768;
     if (isMobile) {
       const open = sandboxView.classList.toggle('sidebar-open');
-      sandboxView.classList.add('sidebar-collapsed');
+      sandboxView.classList.toggle('sidebar-collapsed', !open);
       sidebarToggle?.setAttribute('aria-expanded', String(open));
       toolbarToggle?.classList.toggle('active', open);
       if (window.playSound) window.playSound('click');
