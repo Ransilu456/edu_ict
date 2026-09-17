@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 116" role="img" aria-label="LogicQuest microcontroller">
+  <rect x="24" y="8" width="172" height="100" rx="8" fill="#173b32" stroke="#0c211c" stroke-width="3"/>
+  <path d="M36 22h148M36 94h148" stroke="#28594b"/>
+  <text x="110" y="52" text-anchor="middle" fill="#c9f36b" font-family="monospace" font-size="14" font-weight="700">LQ-MCU</text>
+  <text x="110" y="72" text-anchor="middle" fill="#a9c5b9" font-family="monospace" font-size="9">3V3  GPIO  USB</text>
+  <g stroke="#d9a84a" stroke-width="3"><path d="M24 24H8M24 42H8M24 60H8M24 78H8M24 96H8"/><path d="M196 24h16M196 42h16M196 60h16M196 78h16M196 96h16"/></g>
+</svg>

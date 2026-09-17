@@ -1,10 +1,10 @@
-import andSvg from '../svg/gates/and.svg?raw';
-import orSvg from '../svg/gates/or.svg?raw';
-import notSvg from '../svg/gates/not.svg?raw';
-import nandSvg from '../svg/gates/nand.svg?raw';
-import norSvg from '../svg/gates/nor.svg?raw';
-import xorSvg from '../svg/gates/xor.svg?raw';
-import xnorSvg from '../svg/gates/xnor.svg?raw';
+import andSvg from '/svg/gates/and.svg?raw';
+import orSvg from '/svg/gates/or.svg?raw';
+import notSvg from '/svg/gates/not.svg?raw';
+import nandSvg from '/svg/gates/nand.svg?raw';
+import norSvg from '/svg/gates/nor.svg?raw';
+import xorSvg from '/svg/gates/xor.svg?raw';
+import xnorSvg from '/svg/gates/xnor.svg?raw';
 
 function extractSvgInner(svgRaw) {
   const match = svgRaw.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i);

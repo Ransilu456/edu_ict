@@ -1,0 +1,47 @@
+<section class="view-panel breadboard-view">
+  <div class="breadboard-shell" id="breadboard-lab">
+    <header class="breadboard-heading">
+      <div>
+        <p class="breadboard-kicker"><span></span>HARDWARE LAB / PROTOTYPING</p>
+        <h1>Build it on the board.</h1>
+        <p>Place a controller, drop in components, and route real pin-to-pin connections.</p>
+      </div>
+      <div class="breadboard-status" aria-live="polite"><span class="status-dot"></span><strong id="breadboard-status">READY</strong><span id="breadboard-count">0 connections</span></div>
+    </header>
+
+    <div class="breadboard-layout">
+      <section class="breadboard-stage-panel" aria-label="Interactive breadboard">
+        <div class="stage-toolbar">
+          <div><span class="stage-label">PROTOBOARD / 01</span><span class="stage-hint">Drag a wire onto any hole, then move its handles</span></div>
+          <button class="breadboard-clear" id="breadboard-clear" type="button">Reset board</button>
+        </div>
+        <div class="breadboard-stage" id="breadboard-stage">
+          <div class="power-rail rail-positive"><span>+</span><div class="rail-holes" data-rail="positive"></div></div>
+          <div class="power-rail rail-ground"><span>-</span><div class="rail-holes" data-rail="ground"></div></div>
+          <div class="breadboard-surface">
+            <div class="board-label-top">A</div><div class="board-label-bottom">B</div>
+            <div class="terminal-strip" id="breadboard-holes" aria-label="Breadboard tie points"></div>
+            <div class="board-channel"><span>IC CHANNEL</span></div>
+            <svg class="breadboard-wires" id="breadboard-wires" aria-hidden="true"></svg>
+            <div class="board-components" id="board-components"></div>
+          </div>
+          <div class="board-legend"><span><i class="legend-dot dot-power"></i>3V3 / VCC</span><span><i class="legend-dot dot-ground"></i>GND</span><span><i class="legend-dot dot-signal"></i>SIGNAL</span></div>
+        </div>
+      </section>
+
+      <aside class="breadboard-palette" aria-label="Breadboard parts">
+        <div class="palette-heading"><div><span class="stage-label">PARTS DRAWER</span><h2>Drop components</h2></div><span class="palette-count">LIVE</span></div>
+        <div class="palette-section"><span class="palette-label">CONTROLLERS</span>
+          <button class="part-card" data-part="microcontroller" draggable="true" type="button"><span class="part-icon chip-icon">MCU</span><span><strong>LogicQuest MCU</strong><small>GPIO / 3V3 / GND</small></span><b>+</b></button>
+        </div>
+        <div class="palette-section"><span class="palette-label">OUTPUTS</span>
+          <button class="part-card" data-part="led" draggable="true" type="button"><span class="part-icon led-icon led-red"></span><span><strong>Single LED</strong><small>Anode / cathode</small></span><b>+</b></button>
+          <button class="part-card" data-part="rgb" draggable="true" type="button"><span class="part-icon rgb-icon"><i></i><i></i><i></i></span><span><strong>RGB LED</strong><small>R / G / B / common</small></span><b>+</b></button>
+        </div>
+        <div class="palette-section wire-section"><span class="palette-label">JUMPER WIRES</span><div class="wire-palette" id="wire-palette"></div><p class="palette-note">Drag the colored wire itself onto a tie point. Each end can be snapped to a pin or hole.</p></div>
+        <div class="code-panel"><div class="code-panel-heading"><span class="palette-label">MICROCONTROLLER SKETCH</span><span id="code-state">IDLE</span></div><textarea id="board-code" spellcheck="false">pinMode(LED_BUILTIN, OUTPUT);&#10;digitalWrite(LED_BUILTIN, HIGH);</textarea><button class="run-sketch" id="run-sketch" type="button"><span>Run sketch</span><span>CTRL + ENTER</span></button></div>
+      </aside>
+    </div>
+    <div class="breadboard-inspector" id="breadboard-inspector"><span class="inspector-kicker">PIN INSPECTOR</span><strong>Select a pin or component</strong><span>Power rails, signal pins, and component values appear here.</span></div>
+  </div>
+</section>

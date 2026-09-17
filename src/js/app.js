@@ -1,8 +1,9 @@
 import './common.js';
-import './sandbox.js';
-import { initBooleanTool } from './boolean-tool.js';
-import { initBinaryTool } from './binary-tool.js';
-import { initNetworkDevices } from './network-devices.js';
+import './sandbox/sandbox.js';
+import { initBooleanTool } from './bool/boolean-tool.js';
+import { initBinaryTool } from './bool/binary-tool.js';
+import { initNetworkDevices } from './network/network-devices.js';
+import { initBreadboard, cleanupBreadboard } from './breadboard/breadboard.js';
 import { mountComponents } from './components.js';
 
 mountComponents();
@@ -46,6 +47,7 @@ function setupViewNavigation() {
     '/networking/osi': { panel: 'network-devices-view', subtab: 'osi-tab' },
     '/networking/subnetting': { panel: 'network-devices-view', subtab: 'subnet-tab' },
     '/networking/signal-encoding': { panel: 'network-devices-view', subtab: 'parity-tab' },
+    '/hardware/breadboard': { panel: 'breadboard-view' },
   };
 
   const requestedRoute = workspaceMode
@@ -99,6 +101,8 @@ function setupViewNavigation() {
         networkReady = true;
       }
       if (route.subtab) window.switchNDTab?.(route.subtab);
+    } else if (route.panel === 'breadboard-view') {
+      initBreadboard();
     }
   }
 
@@ -141,4 +145,5 @@ function cleanupCurrentView() {
   if (window.cleanupCommon) window.cleanupCommon();
   if (window.cleanupSandbox) window.cleanupSandbox();
   if (window.cleanupNetworkDevices) window.cleanupNetworkDevices();
+  cleanupBreadboard();
 }

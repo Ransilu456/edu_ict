@@ -1,4 +1,4 @@
-import './common.js';
+import '../common.js';
 import { initOSISim, cleanupOSISim } from './osi-sim.js';
 
 let ndInitialized = false;

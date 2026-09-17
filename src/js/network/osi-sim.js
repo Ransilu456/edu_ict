@@ -1,4 +1,4 @@
-import './common.js';
+import '../common.js';
 
 let osiReady = false;
 let osiAbort = false;
