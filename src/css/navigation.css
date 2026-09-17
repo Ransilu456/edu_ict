@@ -269,6 +269,13 @@ header#app-header .nav-tab {
   transform: none;
 }
 
+header#app-header .nav-tab > svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  color: #3a9b70;
+}
+
 header#app-header .nav-tab.active {
   border-color: var(--color-cyan);
   background: var(--color-cyan-glow);

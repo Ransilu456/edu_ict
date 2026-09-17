@@ -715,7 +715,7 @@
 	box-shadow: 3px 3px 0 var(--line, #d9e1da);
 }
 
-.sidebar-item svg { color: var(--teal, #4da779); }
+.sidebar-item svg { color: var(--teal, #4da779); stroke: currentColor; }
 .sidebar-search { border-radius: 5px; background: var(--paper, #f6f8f4); }
 .sidebar-filter-tabs { gap: 6px; }
 .sidebar-tab { min-height: 32px; padding: 5px 9px; border-radius: 999px; font-family: var(--mono, 'DM Mono', monospace); font-size: .62rem; }

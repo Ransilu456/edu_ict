@@ -308,6 +308,86 @@
   }
 }
 
+/* Landing-theme toolbar */
+.sandbox-toolbar {
+  background: color-mix(in srgb, var(--panel, #fff) 96%, transparent);
+  border-color: var(--line, #d9e1da);
+  border-radius: 6px;
+  box-shadow: 4px 4px 0 color-mix(in srgb, var(--line, #d9e1da) 70%, transparent), 0 10px 24px rgba(16, 33, 28, .08);
+  font-family: var(--display, 'Manrope', sans-serif);
+}
+
+.sandbox-toolbar-divider { background: var(--line, #d9e1da); }
+
+.sandbox-toolbar .sandbox-btn,
+.sandbox-toolbar .sandbox-tool-menu > summary {
+  min-height: 38px;
+  border-color: transparent;
+  border-radius: 5px;
+  color: var(--muted, #66736e);
+  font-family: var(--display, 'Manrope', sans-serif);
+  font-weight: 800;
+  letter-spacing: -.01em;
+  transition: transform .16s ease, box-shadow .16s ease, background .16s ease, color .16s ease, border-color .16s ease;
+}
+
+.sandbox-toolbar .sandbox-btn:hover,
+.sandbox-toolbar .sandbox-tool-menu > summary:hover,
+.sandbox-toolbar .sandbox-tool-menu[open] > summary {
+  border-color: var(--line, #d9e1da);
+  background: var(--mint, #dff2e5);
+  color: var(--ink, #10211c);
+  transform: translateY(-1px);
+}
+
+.sandbox-toolbar .sandbox-btn:active,
+.sandbox-toolbar .sandbox-tool-menu > summary:active { transform: translateY(1px); box-shadow: none; }
+.sandbox-toolbar .sandbox-btn svg,
+.sandbox-toolbar .sandbox-tool-menu > summary svg { color: var(--teal, #168b77); }
+
+.sandbox-toolbar .sandbox-btn.btn-components.active,
+.sandbox-toolbar .sandbox-btn.btn-play {
+  border-color: var(--dark, #163b31);
+  background: var(--dark, #163b31);
+  color: #fff;
+  box-shadow: 3px 3px 0 var(--lime, #c9f36b);
+}
+
+.sandbox-toolbar .sandbox-btn.btn-components.active svg,
+.sandbox-toolbar .sandbox-btn.btn-play svg { color: var(--lime, #c9f36b); }
+.sandbox-toolbar .sandbox-btn.btn-play:hover { background: var(--ink, #10211c); color: var(--lime, #c9f36b); }
+.sandbox-toolbar .sandbox-btn.btn-play.running { background: var(--lime, #c9f36b); color: var(--ink, #10211c); border-color: var(--ink, #10211c); }
+.sandbox-toolbar .sandbox-btn.btn-play.running svg { color: currentColor; }
+.sandbox-toolbar .sandbox-btn.active:not(.btn-components) { border-color: var(--teal, #168b77); background: var(--mint, #dff2e5); color: var(--ink, #10211c); }
+
+.sandbox-toolbar .sandbox-menu-panel {
+  border-color: var(--line, #d9e1da);
+  border-radius: 6px;
+  background: var(--panel, #fff);
+  box-shadow: 4px 4px 0 var(--line, #d9e1da), 0 16px 30px rgba(16, 33, 28, .12);
+}
+
+.sandbox-toolbar .sandbox-menu-btn {
+  min-height: 40px;
+  border-radius: 5px;
+  color: var(--muted, #66736e);
+  font-family: var(--mono, 'DM Mono', monospace);
+}
+.sandbox-toolbar .sandbox-menu-btn:hover { background: var(--mint, #dff2e5); color: var(--ink, #10211c); }
+
+@media (max-width: 640px) {
+  .sandbox-toolbar .sandbox-btn,
+  .sandbox-toolbar .sandbox-tool-menu > summary {
+    flex-basis: 44px;
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 10px;
+  }
+  .sandbox-toolbar .sandbox-btn.btn-play { flex-basis: 44px; width: 44px; }
+  .sandbox-toolbar .sandbox-tool-menu { flex-basis: 44px; }
+}
+
 /* Desktop toolbars should hug their controls; only smaller viewports span the canvas. */
 @media (min-width: 981px) {
   .sandbox-toolbar {
