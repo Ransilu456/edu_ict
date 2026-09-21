@@ -3,7 +3,8 @@ import './sandbox/sandbox.js';
 import { initBooleanTool } from './bool/boolean-tool.js';
 import { initBinaryTool } from './bool/binary-tool.js';
 import { initNetworkDevices } from './network/network-devices.js';
-import { initBreadboard, cleanupBreadboard } from './breadboard/breadboard.js';
+import { initPacketLab, cleanupPacketLab } from './network/packet-lab.js';
+import { initICTester } from './sandbox/ic-tester.js';
 import { mountComponents } from './components.js';
 
 mountComponents();
@@ -40,14 +41,21 @@ function setupViewNavigation() {
     '/logic': { panel: 'sandbox-view' },
     '/logic/sandbox': { panel: 'sandbox-view' },
     '/logic/boolean': { panel: 'boolean-view' },
+    '/logic/ic-tester': { panel: 'ic-tester-view' },
+    '/ic-tester': { panel: 'ic-tester-view' },
+    '/ic-test': { panel: 'ic-tester-view' },
+    '/ic': { panel: 'ic-tester-view' },
     '/binary': { panel: 'binary-view' },
     '/binary/bitwise': { panel: 'binary-view' },
-    '/networking': { panel: 'network-devices-view', subtab: 'network-tab' },
-    '/networking/topology': { panel: 'network-devices-view', subtab: 'network-tab' },
+    '/networking': { panel: 'network-devices-view', subtab: 'osi-tab' },
+    '/networking/topology': { panel: 'network-devices-view', subtab: 'osi-tab' },
     '/networking/osi': { panel: 'network-devices-view', subtab: 'osi-tab' },
+    '/networking/academy': { panel: 'network-devices-view', subtab: 'url-tab' },
+    '/networking/journey': { panel: 'network-devices-view', subtab: 'url-tab' },
     '/networking/subnetting': { panel: 'network-devices-view', subtab: 'subnet-tab' },
     '/networking/signal-encoding': { panel: 'network-devices-view', subtab: 'parity-tab' },
     '/hardware/breadboard': { panel: 'breadboard-view' },
+    '/networking/packet-lab': { panel: 'packet-lab-view' },
   };
 
   const requestedRoute = workspaceMode
@@ -101,8 +109,10 @@ function setupViewNavigation() {
         networkReady = true;
       }
       if (route.subtab) window.switchNDTab?.(route.subtab);
-    } else if (route.panel === 'breadboard-view') {
-      initBreadboard();
+    } else if (route.panel === 'ic-tester-view') {
+      initICTester();
+    } else if (route.panel === 'packet-lab-view') {
+      initPacketLab();
     }
   }
 
@@ -145,5 +155,5 @@ function cleanupCurrentView() {
   if (window.cleanupCommon) window.cleanupCommon();
   if (window.cleanupSandbox) window.cleanupSandbox();
   if (window.cleanupNetworkDevices) window.cleanupNetworkDevices();
-  cleanupBreadboard();
+  cleanupPacketLab();
 }

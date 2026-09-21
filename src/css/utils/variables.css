@@ -30,7 +30,7 @@
   --color-success: #58cc02;
   --color-error: #ff4b4b;
   --color-amber: #ff9600;
-  --icon-default: #0ea5e9;
+  --icon-default: #4ade80;
   --icon-input: #10b981;
   --icon-logic: #6366f1;
   --icon-output: #f59e0b;
@@ -55,46 +55,55 @@
   --radius-sm: 6px;
   --radius-md: 10px;
   --content-max: 1180px;
+  --panel: #ffffff;
+  --panel-raised: #f6f8f4;
 }
 
 :root.dark,
 [data-theme="dark"] {
-  --ink: #f0f7f3;
-  --muted: #9ab0a7;
-  --paper: #0b1713;
-  --line: #285244;
-  --lime: #c9f36b;
-  --mint: rgba(201, 243, 107, 0.12);
+  --ink: #f1f5f9;
+  --muted: #809289;
+  --paper: #0a0f0d;
+  --line: #1d2c23;
+  --lime: #bef264;
+  --mint: rgba(190, 242, 100, 0.12);
   --blue: #38bdf8;
-  --orange: #ff7854;
-  --dark: #c9f36b;
-  --bg-primary: #0b132b;
-  --bg-secondary: #1c2541;
-  --bg-tertiary: #273549;
-  --border-color: #334155;
-  --bg-mobile: #1c2541;
-  --text-primary: #f8fafc;
+  --orange: #fb923c;
+  --dark: #bef264;
+  /* ── Core backgrounds: charcoal dark grey with subtle dark green undertone ── */
+  --bg-primary: #0a0f0d;
+  --bg-secondary: #0f1713;
+  --bg-tertiary: #16241c;
+  --border-color: #1e3025;
+  --bg-mobile: #0f1713;
+  /* ── Text ── */
+  --text-primary: #f1f5f9;
   --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --color-indigo: #38bdf8;
-  --color-indigo-glow: rgba(56, 189, 248, 0.25);
-  --color-cyan: #38bdf8;
-  --color-cyan-glow: rgba(56, 189, 248, 0.25);
-  --color-high: #4ade80;
-  --color-high-glow: rgba(74, 222, 128, 0.35);
-  --color-low: #475569;
+  --text-muted: #73887d;
+  /* ── Accent colours (Vivid lime green brand accent) ── */
+  --color-indigo: #22c55e;
+  --color-indigo-glow: rgba(34, 197, 94, 0.25);
+  --color-cyan: #4ade80;
+  --color-cyan-glow: rgba(74, 222, 128, 0.20);
+  --color-high: #bef264;
+  --color-high-glow: rgba(190, 242, 100, 0.35);
+  --color-low: #233429;
   --color-low-glow: transparent;
   --color-label: #e2e8f0;
-  --color-success: #4ade80;
+  --color-success: #bef264;
   --color-error: #f87171;
   --color-amber: #fbbf24;
-  --icon-default: #38bdf8;
-  --icon-input: #34d399;
-  --icon-logic: #a78bfa;
+  /* ── Icon tints ── */
+  --icon-default: #4ade80;
+  --icon-input: #4ade80;
+  --icon-logic: #86efac;
   --icon-output: #fbbf24;
-  --icon-network: #22d3ee;
+  --icon-network: #38bdf8;
   --icon-security: #fb7185;
-  --icon-neutral: #94a3b8;
+  --icon-neutral: #73887d;
+  /* ── Panel / surface ── */
+  --panel: #0f1713;
+  --panel-raised: #16241c;
 }
 
 * {

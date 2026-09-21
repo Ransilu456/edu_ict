@@ -37,17 +37,41 @@
 	font: 1rem var(--font-mono);
 }
 
-.boolean-form button,
-.boolean-sandbox-action {
+.boolean-form button {
 	width: fit-content;
-	padding: 0.75rem 1rem;
-	border: 2px solid var(--border-color);
+	padding: 0.75rem 1.25rem;
+	border: none;
 	border-radius: 8px;
-	background: var(--color-cyan);
-    font-family: var(--font-header);
-	color: #08202a;
+	background: var(--lime, #bef264);
+	font-family: var(--font-header);
+	color: #0b140e;
 	font-weight: 800;
 	cursor: pointer;
+	box-shadow: 0 0 12px rgba(190, 242, 100, 0.25);
+	transition: all var(--transition-fast);
+}
+
+.boolean-form button:hover:not(:disabled) {
+	background: #d9f99d;
+	box-shadow: 0 0 16px rgba(190, 242, 100, 0.4);
+}
+
+.boolean-sandbox-action {
+	width: fit-content;
+	padding: 0.75rem 1.25rem;
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	background: var(--bg-tertiary);
+	font-family: var(--font-header);
+	color: var(--text-primary);
+	font-weight: 800;
+	cursor: pointer;
+	transition: all var(--transition-fast);
+}
+
+.boolean-sandbox-action:hover:not(:disabled) {
+	border-color: var(--lime, #bef264);
+	color: var(--lime, #bef264);
 }
 
 .boolean-form button:disabled,
@@ -193,11 +217,18 @@
 	cursor: pointer;
 }
 
-.bit-operation-buttons button:hover,
-.bit-operation-buttons button.active {
-	border-color: var(--color-cyan);
-	background: color-mix(in srgb, var(--color-cyan) 13%, var(--bg-secondary));
+.bit-operation-buttons button:hover {
+	border-color: var(--border-color);
+	background: var(--bg-tertiary);
 	color: var(--text-primary);
+}
+
+.bit-operation-buttons button.active {
+	border-color: var(--lime, #bef264);
+	background: var(--lime, #bef264);
+	color: #0b140e;
+	font-weight: 800;
+	box-shadow: 0 0 12px rgba(190, 242, 100, 0.35);
 }
 
 .btn-primary,

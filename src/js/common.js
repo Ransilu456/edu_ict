@@ -78,7 +78,7 @@ function updateAudioIcon(btn) {
     : `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
 }
 
-let currentTheme = localStorage.getItem("logicQuest_theme") || "light";
+let currentTheme = localStorage.getItem("logicQuest_theme") || "dark";
 
 function applyTheme(theme) {
   currentTheme = theme;
@@ -197,43 +197,81 @@ function showConfirm(message, callback, title) {
 }
 window.showConfirm = showConfirm;
 
-function showToast(msg) {
+export function showToast(msg, type = 'auto') {
   let toast = document.getElementById('sb-toast');
   if (!toast) {
     toast = document.createElement('div');
     toast.id = 'sb-toast';
-    toast.style.cssText = `
-      position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%);
-      background:#0f172a; color:#fff;
-      padding:0.6rem 1.4rem; border-radius:999px; font-size:0.85rem;
-      font-family:var(--font-header); font-weight:700;
-      box-shadow:0 12px 32px rgba(2,6,23,0.4);
-      border: 1px solid rgba(255,255,255,0.15);
-      display:flex; align-items:center; gap:0.5rem;
-      z-index:999; pointer-events:none; opacity:0;
-      transition:opacity 0.2s ease, transform 0.2s ease; max-width:90vw; text-align:center;`;
+    toast.className = 'app-toast';
     document.body.appendChild(toast);
   }
-  
-  // Format checkmark if present as crisp SVG
+
   const message = String(msg ?? '');
   const cleanMsg = message.replace(/\s*✓\s*/g, '');
   const lowerMessage = message.toLowerCase();
-  const isSuccess = message.includes('✓') || lowerMessage.includes('saved') || lowerMessage.includes('success') || lowerMessage.includes('placed');
   
-  const iconSvg = isSuccess 
-    ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>`
-    : `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+  let resolvedType = type;
+  if (resolvedType === 'auto') {
+    if (message.includes('✓') || lowerMessage.includes('saved') || lowerMessage.includes('success') || lowerMessage.includes('placed') || lowerMessage.includes('pass') || lowerMessage.includes('complete')) {
+      resolvedType = 'success';
+    } else if (lowerMessage.includes('error') || lowerMessage.includes('fail') || lowerMessage.includes('blown') || lowerMessage.includes('invalid')) {
+      resolvedType = 'error';
+    } else if (lowerMessage.includes('warning') || lowerMessage.includes('limit') || lowerMessage.includes('maximum')) {
+      resolvedType = 'warning';
+    } else {
+      resolvedType = 'info';
+    }
+  }
 
-  toast.innerHTML = `${iconSvg}<span></span>`;
-  toast.querySelector('span').textContent = cleanMsg;
-  toast.style.opacity = '1';
-  toast.style.transform = 'translateX(-50%) translateY(0)';
+  let iconSvg = '';
+  let accentColor = 'var(--lime, #bef264)';
+  if (resolvedType === 'success') {
+    accentColor = 'var(--lime, #bef264)';
+    iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--lime, #bef264); flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>`;
+  } else if (resolvedType === 'error') {
+    accentColor = 'var(--color-error, #f87171)';
+    iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-error, #f87171); flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+  } else if (resolvedType === 'warning') {
+    accentColor = 'var(--color-amber, #fbbf24)';
+    iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-amber, #fbbf24); flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+  } else {
+    accentColor = 'var(--blue, #38bdf8)';
+    iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue, #38bdf8); flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+  }
+
+  toast.innerHTML = `${iconSvg}<span style="color:var(--text-primary, #f1f5f9)">${cleanMsg}</span>`;
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    background: var(--bg-secondary, #0f1713);
+    color: var(--text-primary, #f1f5f9);
+    padding: 0.65rem 1.35rem;
+    border-radius: 5px;
+    font-size: 0.82rem;
+    font-family: var(--font-header, sans-serif);
+    font-weight: 700;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 16px ${resolvedType === 'success' ? 'rgba(190, 242, 100, 0.2)' : 'rgba(0,0,0,0.3)'};
+    border: 1px solid ${resolvedType === 'success' ? 'rgba(190, 242, 100, 0.35)' : 'var(--border-color, #1e3025)'};
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    max-width: 90vw;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  `;
+
   clearTimeout(toast._t);
   toast._t = setTimeout(() => {
     toast.style.opacity = '0';
-    toast.style.transform = 'translateX(-50%) translateY(10px)';
-  }, 2200);
+    toast.style.transform = 'translateX(-50%) translateY(12px)';
+  }, 2400);
 }
 window.showToast = showToast;
 

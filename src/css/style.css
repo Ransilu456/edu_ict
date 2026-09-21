@@ -2,12 +2,15 @@
 @import './app/navigation.css';
 @import './sandbox/sandbox.css';
 @import './sandbox/sandbox-sidebar.css';
+@import './sandbox/ic-tester.css';
 @import './network/network-suite.css';
+@import './network/packet-lab.css';
 @import './utils/modals.css';
 @import './utils/utilities.css';
 @import './app/app-footer.css';
 @import './bool/bollean_and_binary.css';
 @import './breadboard/breadboard.css';
+@import './network/osi-learning.css';
 
 button {
 	font-family: var(--font-header) !important;

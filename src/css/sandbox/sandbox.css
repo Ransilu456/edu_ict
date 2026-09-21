@@ -16,24 +16,26 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
-  max-width: 320px;
-  padding: 1.5rem 1.75rem;
+  gap: 0.5rem;
+  max-width: 360px;
+  padding: 1.8rem 2rem;
   text-align: center;
   pointer-events: none;
-  background: color-mix(in srgb, var(--bg-secondary) 82%, transparent);
-  border: 2px dashed var(--border-color);
-  border-radius: 20px;
+  background: var(--bg-secondary);
+  border: 1px dashed var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
 }
 
 .empty-hint-icon {
-  color: var(--color-indigo);
+  color: var(--color-cyan, #4ade80);
+  margin-bottom: 0.2rem;
 }
 
 .empty-hint-title {
   font-family: var(--font-header);
-  font-weight: 900;
-  font-size: 1.05rem;
+  font-weight: 800;
+  font-size: 1.15rem;
   color: var(--text-primary);
 }
 
@@ -175,8 +177,27 @@
   height: 14px;
 }
 
+.sandbox-btn.btn-components,
 .sandbox-btn.btn-play {
-  color: var(--color-success);
+  background: var(--lime, #bef264);
+  color: #0b140e;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  box-shadow: 0 0 10px rgba(190, 242, 100, 0.25);
+}
+
+.sandbox-btn.btn-components svg,
+.sandbox-btn.btn-play svg {
+  color: #0b140e;
+  stroke: #0b140e;
+}
+
+.sandbox-btn.btn-components:hover,
+.sandbox-btn.btn-play:hover {
+  background: #d9f99d;
+  color: #0b140e;
+  box-shadow: 0 0 14px rgba(190, 242, 100, 0.4);
 }
 
 .sandbox-btn.active {
@@ -186,8 +207,14 @@
 }
 
 .sandbox-btn.btn-play.running {
-  background: var(--text-primary);
-  color: var(--bg-primary);
+  background: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+}
+
+.sandbox-btn.btn-play.running svg {
+  color: #ffffff;
+  stroke: #ffffff;
 }
 
 .sandbox-waveform-panel {
@@ -343,7 +370,7 @@
 .sandbox-toolbar .sandbox-btn:active,
 .sandbox-toolbar .sandbox-tool-menu > summary:active { transform: translateY(1px); box-shadow: none; }
 .sandbox-toolbar .sandbox-btn svg,
-.sandbox-toolbar .sandbox-tool-menu > summary svg { color: var(--teal, #168b77); }
+.sandbox-toolbar .sandbox-tool-menu > summary svg { color: var(--color-cyan, #168b77); }
 
 .sandbox-toolbar .sandbox-btn.btn-components.active,
 .sandbox-toolbar .sandbox-btn.btn-play {
@@ -358,7 +385,7 @@
 .sandbox-toolbar .sandbox-btn.btn-play:hover { background: var(--ink, #10211c); color: var(--lime, #c9f36b); }
 .sandbox-toolbar .sandbox-btn.btn-play.running { background: var(--lime, #c9f36b); color: var(--ink, #10211c); border-color: var(--ink, #10211c); }
 .sandbox-toolbar .sandbox-btn.btn-play.running svg { color: currentColor; }
-.sandbox-toolbar .sandbox-btn.active:not(.btn-components) { border-color: var(--teal, #168b77); background: var(--mint, #dff2e5); color: var(--ink, #10211c); }
+.sandbox-toolbar .sandbox-btn.active:not(.btn-components) { border-color: var(--color-cyan, #168b77); background: var(--mint, #dff2e5); color: var(--ink, #10211c); }
 
 .sandbox-toolbar .sandbox-menu-panel {
   border-color: var(--line, #d9e1da);

@@ -9,6 +9,7 @@ export default defineConfig({
         landing: resolve(__dirname, 'index.html'),
         workspace: resolve(__dirname, 'app.html'),
         standaloneLanding: resolve(__dirname, 'landing.html'),
+        icTester: resolve(__dirname, 'ic-tester.html'),
       },
     },
   },

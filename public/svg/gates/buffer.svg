@@ -1,8 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" width="40" height="32" class="logic-gate-symbol buffer-gate">
+  <defs>
+    <style>
+      .buffer-lead { stroke: currentColor; filter: drop-shadow(0 0 2px currentColor); }
+      .buffer-body { stroke: currentColor; fill: var(--gate-fill, rgba(56, 189, 248, 0.12)); filter: drop-shadow(0 0 3px currentColor); }
+    </style>
+  </defs>
   <!-- Input lead -->
-  <line x1="0" y1="16" x2="8" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="0" y1="16" x2="8" y2="16" class="buffer-lead" stroke-width="1.8" stroke-linecap="round"/>
   <!-- Triangle buffer body -->
-  <polygon points="8,5 30,16 8,27" fill="var(--gate-fill, rgba(56, 189, 248, 0.12))" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+  <polygon points="8,5 30,16 8,27" class="buffer-body" stroke-width="1.8" stroke-linejoin="round"/>
   <!-- Output lead -->
-  <line x1="30" y1="16" x2="40" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="30" y1="16" x2="40" y2="16" class="buffer-lead" stroke-width="1.8" stroke-linecap="round"/>
 </svg>
