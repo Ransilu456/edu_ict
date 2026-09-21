@@ -2,8 +2,7 @@ import './common.js';
 import './sandbox/sandbox.js';
 import { initBooleanTool } from './bool/boolean-tool.js';
 import { initBinaryTool } from './bool/binary-tool.js';
-import { initNetworkDevices } from './network/network-devices.js';
-import { initPacketLab, cleanupPacketLab } from './network/packet-lab.js';
+import { initNetworkSuite as initNetworkDevices } from './network/network-suite.js';
 import { initICTester } from './sandbox/ic-tester.js';
 import { mountComponents } from './components.js';
 
@@ -55,7 +54,6 @@ function setupViewNavigation() {
     '/networking/subnetting': { panel: 'network-devices-view', subtab: 'subnet-tab' },
     '/networking/signal-encoding': { panel: 'network-devices-view', subtab: 'parity-tab' },
     '/hardware/breadboard': { panel: 'breadboard-view' },
-    '/networking/packet-lab': { panel: 'packet-lab-view' },
   };
 
   const requestedRoute = workspaceMode
@@ -108,11 +106,9 @@ function setupViewNavigation() {
         initNetworkDevices();
         networkReady = true;
       }
-      if (route.subtab) window.switchNDTab?.(route.subtab);
+      window.switchNDTab?.(route.subtab || 'osi-tab');
     } else if (route.panel === 'ic-tester-view') {
       initICTester();
-    } else if (route.panel === 'packet-lab-view') {
-      initPacketLab();
     }
   }
 
@@ -155,5 +151,4 @@ function cleanupCurrentView() {
   if (window.cleanupCommon) window.cleanupCommon();
   if (window.cleanupSandbox) window.cleanupSandbox();
   if (window.cleanupNetworkDevices) window.cleanupNetworkDevices();
-  cleanupPacketLab();
 }

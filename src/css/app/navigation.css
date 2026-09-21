@@ -359,7 +359,6 @@ header#app-header .btn-icon {
   }
 }
 
-/* Workspace header: matches the quiet, flat, and typographic aesthetic of landing.html */
 header#app-header {
   position: sticky;
   top: 0;

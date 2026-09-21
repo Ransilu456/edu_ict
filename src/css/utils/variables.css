@@ -8,13 +8,16 @@
   --blue: #b9ddff;
   --orange: #ff7854;
   --dark: #163b31;
+
   --mono: 'DM Mono', monospace;
   --display: 'Manrope', sans-serif;
+
   --bg-primary: #f0f7ff;
   --bg-secondary: #ffffff;
   --bg-tertiary: #e0f2fe;
   --border-color: #cbd5e1;
   --bg-mobile: #e0f2fe;
+
   --text-primary: #1e293b;
   --text-secondary: #475569;
   --text-muted: #64748b;
@@ -30,6 +33,7 @@
   --color-success: #58cc02;
   --color-error: #ff4b4b;
   --color-amber: #ff9600;
+
   --icon-default: #4ade80;
   --icon-input: #10b981;
   --icon-logic: #6366f1;
@@ -37,13 +41,16 @@
   --icon-network: #06b6d4;
   --icon-security: #f43f5e;
   --icon-neutral: #64748b;
+
   --font-sans: 'Manrope', system-ui, sans-serif;
   --font-header: 'Manrope', system-ui, sans-serif;
   --font-sinhala: 'Noto Sans Sinhala', 'Manrope', sans-serif;
   --font-mono: 'DM Mono', monospace;
+
   --transition-fast: 0.1s ease;
   --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -55,6 +62,7 @@
   --radius-sm: 6px;
   --radius-md: 10px;
   --content-max: 1180px;
+  
   --panel: #ffffff;
   --panel-raised: #f6f8f4;
 }
@@ -70,17 +78,16 @@
   --blue: #38bdf8;
   --orange: #fb923c;
   --dark: #bef264;
-  /* ── Core backgrounds: charcoal dark grey with subtle dark green undertone ── */
+
   --bg-primary: #0a0f0d;
   --bg-secondary: #0f1713;
   --bg-tertiary: #16241c;
   --border-color: #1e3025;
   --bg-mobile: #0f1713;
-  /* ── Text ── */
+
   --text-primary: #f1f5f9;
   --text-secondary: #cbd5e1;
   --text-muted: #73887d;
-  /* ── Accent colours (Vivid lime green brand accent) ── */
   --color-indigo: #22c55e;
   --color-indigo-glow: rgba(34, 197, 94, 0.25);
   --color-cyan: #4ade80;
@@ -93,7 +100,7 @@
   --color-success: #bef264;
   --color-error: #f87171;
   --color-amber: #fbbf24;
-  /* ── Icon tints ── */
+
   --icon-default: #4ade80;
   --icon-input: #4ade80;
   --icon-logic: #86efac;
@@ -101,7 +108,7 @@
   --icon-network: #38bdf8;
   --icon-security: #fb7185;
   --icon-neutral: #73887d;
-  /* ── Panel / surface ── */
+
   --panel: #0f1713;
   --panel-raised: #16241c;
 }
