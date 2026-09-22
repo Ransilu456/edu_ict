@@ -215,5 +215,73 @@ export const REAL_ICS = {
         11: (!!(pins[12] || 0) !== !(pins[13] || 0)) ? 1 : 0
       };
     }
+  },
+
+  'ic-7447': {
+    type: 'ic-7447',
+    label: '7447 BCD to 7-Seg',
+    partNumber: 'SN74LS47N',
+    desc: 'BCD to 7-Segment Decoder / Driver',
+    package: 'DIP-16',
+    pinCount: 16,
+    pins: [
+      { pin: 1,  name: 'B',   type: 'input',  desc: 'Input B (Bit 1)' },
+      { pin: 2,  name: 'C',   type: 'input',  desc: 'Input C (Bit 2)' },
+      { pin: 3,  name: 'LT',  type: 'input',  desc: 'Lamp Test (Active LOW)' },
+      { pin: 4,  name: 'BI',  type: 'input',  desc: 'Blanking Input / RBO' },
+      { pin: 5,  name: 'RBI', type: 'input',  desc: 'Ripple-Blanking Input' },
+      { pin: 6,  name: 'D',   type: 'input',  desc: 'Input D (Bit 3 MSB)' },
+      { pin: 7,  name: 'A',   type: 'input',  desc: 'Input A (Bit 0 LSB)' },
+      { pin: 8,  name: 'GND', type: 'ground', desc: 'Ground (0V)' },
+      { pin: 9,  name: 'e',   type: 'output', desc: 'Segment e Output' },
+      { pin: 10, name: 'd',   type: 'output', desc: 'Segment d Output' },
+      { pin: 11, name: 'c',   type: 'output', desc: 'Segment c Output' },
+      { pin: 12, name: 'b',   type: 'output', desc: 'Segment b Output' },
+      { pin: 13, name: 'a',   type: 'output', desc: 'Segment a Output' },
+      { pin: 14, name: 'g',   type: 'output', desc: 'Segment g Output' },
+      { pin: 15, name: 'f',   type: 'output', desc: 'Segment f Output' },
+      { pin: 16, name: 'VCC', type: 'power',  desc: 'Supply Voltage (+5V)' }
+    ],
+    evaluate: (pins) => {
+      const p16 = pins[16] !== undefined ? pins[16] : 1;
+      const p8 = pins[8] !== undefined ? pins[8] : 0;
+      if (p16 === 0 || p8 === 1) return { 13: 0, 12: 0, 11: 0, 10: 0, 9: 0, 15: 0, 14: 0 };
+
+      // Lamp test active low
+      if (pins[3] === 0) return { 13: 1, 12: 1, 11: 1, 10: 1, 9: 1, 15: 1, 14: 1 };
+      // Blanking input active low
+      if (pins[4] === 0) return { 13: 0, 12: 0, 11: 0, 10: 0, 9: 0, 15: 0, 14: 0 };
+
+      const a = pins[7] || 0;
+      const b = pins[1] || 0;
+      const c = pins[2] || 0;
+      const d = pins[6] || 0;
+      const bcd = (d << 3) | (c << 2) | (b << 1) | a;
+
+      const SEG_MAP = [
+        [1, 1, 1, 1, 1, 1, 0], // 0: a,b,c,d,e,f
+        [0, 1, 1, 0, 0, 0, 0], // 1: b,c
+        [1, 1, 0, 1, 1, 0, 1], // 2: a,b,d,e,g
+        [1, 1, 1, 1, 0, 0, 1], // 3: a,b,c,d,g
+        [0, 1, 1, 0, 0, 1, 1], // 4: b,c,f,g
+        [1, 0, 1, 1, 0, 1, 1], // 5: a,c,d,f,g
+        [1, 0, 1, 1, 1, 1, 1], // 6: a,c,d,e,f,g
+        [1, 1, 1, 0, 0, 0, 0], // 7: a,b,c
+        [1, 1, 1, 1, 1, 1, 1], // 8: a,b,c,d,e,f,g
+        [1, 1, 1, 1, 0, 1, 1], // 9: a,b,c,d,f,g
+      ];
+
+      const segs = (bcd <= 9) ? SEG_MAP[bcd] : [0, 0, 0, 0, 0, 0, 0];
+      return {
+        13: segs[0], // a
+        12: segs[1], // b
+        11: segs[2], // c
+        10: segs[3], // d
+        9:  segs[4], // e
+        15: segs[5], // f
+        14: segs[6]  // g
+      };
+    }
   }
 };
+

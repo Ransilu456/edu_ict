@@ -1,5 +1,6 @@
 // IC Logic Chip Tester & Diagnostic Bench
 import { showToast } from '../common.js';
+import { generateICSchematicSVG } from './ic-schematic.js';
 
 const IC_DEFINITIONS = {
   '7408': {
@@ -267,6 +268,7 @@ const IC_DEFINITIONS = {
 
 let currentICKey = '7408';
 let pinStates = {}; // pinNum -> 0 or 1
+let currentViewMode = 'package'; // 'package' | 'schematic'
 
 export function initICTester() {
   const container = document.getElementById('ic-tester-view');
@@ -276,6 +278,9 @@ export function initICTester() {
   setupEventListeners();
   loadIC('7408');
 }
+
+  const sc = s => segActive[s] ? HI : '#162010';
+  const sg = s => segActive[s] ? ' filter="url(#gl)"' : '';
 
 function setupEventListeners() {
   // IC Tab clicks
@@ -337,6 +342,18 @@ function setupEventListeners() {
       }, 300);
     }
   });
+
+  // View mode toggle (Package vs Real Gate Schematic)
+  const modeBtns = document.querySelectorAll('.ic-mode-btn');
+  modeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentViewMode = btn.dataset.mode;
+      updateViewMode();
+      if (window.playSound) window.playSound('click');
+    });
+  });
 }
 
 function loadIC(icKey) {
@@ -359,7 +376,278 @@ function loadIC(icKey) {
   renderGatesView(ic);
   renderTruthTable(ic);
   evaluateIC();
+  // Refresh schematic if in schematic mode
+  if (currentViewMode === 'schematic') renderICSchematic(ic);
 }
+
+// ── View mode switching ──────────────────────────────────────────
+function updateViewMode() {
+  const chipRender = document.getElementById('ic-chip-render');
+  const schRender  = document.getElementById('ic-schematic-render');
+  if (currentViewMode === 'schematic') {
+    if (chipRender) chipRender.style.display = 'none';
+    if (schRender)  schRender.style.display  = 'flex';
+    const ic = IC_DEFINITIONS[currentICKey];
+    if (ic) renderICSchematic(ic);
+  } else {
+    if (chipRender) chipRender.style.display = '';
+    if (schRender)  schRender.style.display  = 'none';
+  }
+}
+
+function renderICSchematic(ic) {
+  const container = document.getElementById('ic-schematic-render');
+  if (!container) return;
+
+  if (currentICKey === '7447') {
+    container.innerHTML = render7447Schematic();
+  } else {
+    // Standard ICs — use generateICSchematicSVG
+    const nodeProxy = { type: `ic-${currentICKey}`, pinValues: pinStates };
+    const svgHtml = generateICSchematicSVG(nodeProxy, ic);
+    container.innerHTML = `<div style="position:relative;width:100%;height:240px;">${svgHtml}</div>`;
+  }
+}
+
+// ── 7447 BCD → 7-Segment Decoder schematic SVG ──────────────────
+function render7447Schematic() {
+  const A  = pinStates[7] || 0;
+  const B  = pinStates[1] || 0;
+  const C  = pinStates[2] || 0;
+  const D  = pinStates[6] || 0;
+  const LT = (pinStates[3] !== undefined) ? pinStates[3] : 1;
+  const BI = (pinStates[4] !== undefined) ? pinStates[4] : 1;
+
+  const bcd = (D << 3) | (C << 2) | (B << 1) | A;
+
+  const SEG_MAP = [
+    [1,1,1,1,1,1,0],[0,1,1,0,0,0,0],[1,1,0,1,1,0,1],
+    [1,1,1,1,0,0,1],[0,1,1,0,0,1,1],[1,0,1,1,0,1,1],
+    [1,0,1,1,1,1,1],[1,1,1,0,0,0,0],[1,1,1,1,1,1,1],[1,1,1,1,0,1,1]
+  ];
+
+  const segs = LT === 0    ? [1,1,1,1,1,1,1] :
+               BI === 0    ? [0,0,0,0,0,0,0] :
+               bcd <= 9   ? SEG_MAP[bcd]    : [0,0,0,0,0,0,0];
+
+  const [sa,sb,sc,sd,se,sf,sg] = segs;
+
+  const HI      = '#bef264';
+  const LO      = '#1e3025';
+  const wHi     = '#22c55e';
+  const wLo     = '#1c2e1e';
+  const dimTxt  = '#475569';
+  const ic  = v => v ? HI : LO;
+  const wc  = v => v ? wHi : wLo;
+  const sw  = v => v ? 2 : 1.2;
+  const gf  = v => v ? ' filter="url(#gl)"' : '';
+
+  // Layout
+  const iBoxR = 140;         // right edge of input box
+  const notX  = 160;         // NOT gate start x
+  const busX1 = iBoxR + 4;   // vertical bus
+  const nandX = 285;         // NAND gate start x
+  const bufX  = 450;         // buffer/triangle start x
+  const oBoxL = 478;         // output box left
+  const oBoxR = 590;         // output box right
+  const dspX  = 618;         // 7-seg display x
+
+  // y of each input pin
+  const yA = 75, yB = 145, yC = 215, yD = 285;
+  // y of each output segment (a–g)
+  const oys = { a:50, b:115, c:180, d:245, e:310, f:375, g:440 };
+  const segNames   = ['a','b','c','d','e','f','g'];
+  const segActive  = { a:sa, b:sb, c:sc, d:sd, e:se, f:sf, g:sg };
+  const segPins    = { a:13, b:12, c:11, d:10, e:9, f:15, g:14 };
+
+  // ── Gate symbol helpers ───────────────────────────────────────
+  const notGate = (x, y, act) => {
+    const col  = ic(act);
+    const fill = act ? 'rgba(190,242,100,0.12)' : 'rgba(10,15,13,0.8)';
+    return `<polygon points="${x},${y-9} ${x+18},${y} ${x},${y+9}" fill="${fill}" stroke="${col}" stroke-width="1.5"/>
+            <circle cx="${x+21}" cy="${y}" r="3.5" fill="${act?HI:'#0a0f0d'}" stroke="${col}" stroke-width="1.5"/>`;
+  };
+
+  const nandGate = (x, y, h, act) => {
+    const col  = ic(act);
+    const fill = act ? 'rgba(190,242,100,0.12)' : 'rgba(10,15,13,0.9)';
+    return `<path d="M${x},${y-h} L${x+20},${y-h} Q${x+44},${y-h} ${x+44},${y} Q${x+44},${y+h} ${x+20},${y+h} L${x},${y+h} Z"
+              fill="${fill}" stroke="${col}" stroke-width="1.5"/>
+            <circle cx="${x+47}" cy="${y}" r="3.5" fill="${act?HI:'#0a0f0d'}" stroke="${col}" stroke-width="1.5"/>`;
+  };
+
+  const bufTri = (x, y, act) => {
+    const col  = ic(act);
+    const fill = act ? 'rgba(190,242,100,0.12)' : 'rgba(10,15,13,0.8)';
+    return `<polygon points="${x},${y-9} ${x+18},${y} ${x},${y+9}" fill="${fill}" stroke="${col}" stroke-width="1.5"/>`;
+  };
+
+  // ── 7-segment display ─────────────────────────────────────────
+  const W=44, H=44, T=8;
+  const dx=dspX, dy=60;
+
+  const segDisplay = `
+    <rect x="${dx-8}" y="${dy-8}" width="${W+T+16}" height="${H*2+T*3+16}" rx="5"
+      fill="#060d08" stroke="#1e3025" stroke-width="1.5"/>
+    <!-- a top -->
+    <rect x="${dx+T}" y="${dy}" width="${W-T*2}" height="${T}" rx="3" fill="${sc('a')}"${sg('a')}/>
+    <!-- b top-right -->
+    <rect x="${dx+W-T}" y="${dy+T}" width="${T}" height="${H-T*2}" rx="3" fill="${sc('b')}"${sg('b')}/>
+    <!-- c bot-right -->
+    <rect x="${dx+W-T}" y="${dy+H+T}" width="${T}" height="${H-T*2}" rx="3" fill="${sc('c')}"${sg('c')}/>
+    <!-- d bottom -->
+    <rect x="${dx+T}" y="${dy+H*2}" width="${W-T*2}" height="${T}" rx="3" fill="${sc('d')}"${sg('d')}/>
+    <!-- e bot-left -->
+    <rect x="${dx}" y="${dy+H+T}" width="${T}" height="${H-T*2}" rx="3" fill="${sc('e')}"${sg('e')}/>
+    <!-- f top-left -->
+    <rect x="${dx}" y="${dy+T}" width="${T}" height="${H-T*2}" rx="3" fill="${sc('f')}"${sg('f')}/>
+    <!-- g middle -->
+    <rect x="${dx+T}" y="${dy+H-T/2}" width="${W-T*2}" height="${T}" rx="3" fill="${sc('g')}"${sg('g')}/>
+    <!-- decimal label -->
+    <text x="${dx+W/2}" y="${dy+H*2+T+22}" fill="${bcd<=9?HI:dimTxt}" font-size="12" font-weight="800" text-anchor="middle">${bcd<=9?bcd:'X'}</text>
+  `;
+
+  // ── Build SVG rows ────────────────────────────────────────────
+  let rows = '';
+  segNames.forEach(seg => {
+    const y = oys[seg];
+    const act = segActive[seg];
+    rows += `
+      <!-- Row: ${seg} (active=${act}) -->
+      <!-- Horizontal wire to NAND input -->
+      <line x1="${busX1+50}" y1="${y}" x2="${nandX}" y2="${y}"
+        stroke="${wc(act)}" stroke-width="${sw(act)}"${gf(act)}/>
+      <!-- Junction dots on vertical buses at this y -->
+      <circle cx="${busX1+5}"  cy="${y}" r="2.5" fill="${A?wHi:wLo}"/>
+      <circle cx="${busX1+17}" cy="${y}" r="2.5" fill="${B?wHi:wLo}"/>
+      <circle cx="${busX1+29}" cy="${y}" r="2.5" fill="${C?wHi:wLo}"/>
+      <!-- NAND gate -->
+      ${nandGate(nandX, y, 14, act)}
+      <!-- Wire: NAND → buffer -->
+      <line x1="${nandX+51}" y1="${y}" x2="${bufX}" y2="${y}"
+        stroke="${wc(act)}" stroke-width="${sw(act)}"${gf(act)}/>
+      <!-- Buffer triangle -->
+      ${bufTri(bufX, y, act)}
+      <!-- Wire: buffer → output box -->
+      <line x1="${bufX+20}" y1="${y}" x2="${oBoxL+10}" y2="${y}"
+        stroke="${wc(act)}" stroke-width="${sw(act)}"${gf(act)}/>
+      <!-- Output label -->
+      <text x="${oBoxL+14}" y="${y-6}"  fill="${ic(act)}" font-size="9">(${segPins[seg]}) OUT</text>
+      <text x="${oBoxL+14}" y="${y+12}" fill="${ic(act)}" font-size="14" font-weight="800">${seg}</text>
+      ${act ? `<circle cx="${oBoxL+7}" cy="${y}" r="4" fill="${HI}"${gf(1)}/>` :
+               `<circle cx="${oBoxL+7}" cy="${y}" r="4" fill="none" stroke="${dimTxt}" stroke-width="1"/>`}
+    `;
+  });
+
+  // ── Vertical input buses ──────────────────────────────────────
+  const lastY = oys.g;
+  const buses = [
+    { x: busX1+5,  val: A, label: 'A' },
+    { x: busX1+17, val: B, label: 'B' },
+    { x: busX1+29, val: C, label: 'C' },
+  ];
+
+  const busLines = buses.map(b => `
+    <line x1="${b.x}" y1="${oys.a}" x2="${b.x}" y2="${lastY}"
+      stroke="${wc(b.val)}" stroke-width="1.2" stroke-dasharray="${b.val?'':'4,3'}"/>
+    <circle cx="${b.x}" cy="${oys.a}" r="3" fill="${b.val?wHi:wLo}"/>
+  `).join('');
+
+  return `<svg viewBox="0 0 760 500" xmlns="http://www.w3.org/2000/svg"
+    style="font-family:'JetBrains Mono',monospace;background:#0a0f0d;width:100%;height:100%;display:block">
+  <defs>
+    <filter id="gl"><feGaussianBlur stdDeviation="2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+
+  <!-- BG grid -->
+  <rect width="760" height="500" fill="#0a0f0d"/>
+  <pattern id="pg" width="20" height="20" patternUnits="userSpaceOnUse">
+    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#0e1a10" stroke-width="0.5"/>
+  </pattern>
+  <rect width="760" height="500" fill="url(#pg)"/>
+
+  <!-- ═══ 4-BIT INPUT BOX ══════════════════════════════════════ -->
+  <rect x="10" y="28" width="130" height="280" rx="8"
+    fill="rgba(0,180,216,0.05)" stroke="#0ea5e9" stroke-width="2"/>
+  <text x="75" y="18" fill="#0ea5e9" font-size="10" font-weight="800" text-anchor="middle" letter-spacing="1.5">4 BIT INPUT</text>
+
+  <!-- INPUT A (Pin 7) -->
+  <line x1="14" y1="${yA}" x2="${iBoxR}" y2="${yA}" stroke="${wc(A)}" stroke-width="${sw(A)}"${gf(A)}/>
+  <text x="18" y="${yA-10}" fill="${ic(A)}" font-size="9" font-weight="700">INPUT (7)</text>
+  <text x="18" y="${yA+14}" fill="${ic(A)}" font-size="13" font-weight="800">A</text>
+  <circle cx="${iBoxR}" cy="${yA}" r="4" fill="${A?wHi:wLo}"/>
+  <line x1="${iBoxR}" y1="${yA}" x2="${busX1+5}" y2="${yA}" stroke="${wc(A)}" stroke-width="${sw(A)}"${gf(A)}/>
+
+  <!-- INPUT B (Pin 1) -->
+  <line x1="14" y1="${yB}" x2="${iBoxR}" y2="${yB}" stroke="${wc(B)}" stroke-width="${sw(B)}"${gf(B)}/>
+  <text x="18" y="${yB-10}" fill="${ic(B)}" font-size="9" font-weight="700">INPUT (1)</text>
+  <text x="18" y="${yB+14}" fill="${ic(B)}" font-size="13" font-weight="800">B</text>
+  <circle cx="${iBoxR}" cy="${yB}" r="4" fill="${B?wHi:wLo}"/>
+  <line x1="${iBoxR}" y1="${yB}" x2="${busX1+17}" y2="${yB}" stroke="${wc(B)}" stroke-width="${sw(B)}"${gf(B)}/>
+
+  <!-- INPUT C (Pin 2) -->
+  <line x1="14" y1="${yC}" x2="${iBoxR}" y2="${yC}" stroke="${wc(C)}" stroke-width="${sw(C)}"${gf(C)}/>
+  <text x="18" y="${yC-10}" fill="${ic(C)}" font-size="9" font-weight="700">INPUT (2)</text>
+  <text x="18" y="${yC+14}" fill="${ic(C)}" font-size="13" font-weight="800">C</text>
+  <circle cx="${iBoxR}" cy="${yC}" r="4" fill="${C?wHi:wLo}"/>
+  <line x1="${iBoxR}" y1="${yC}" x2="${busX1+29}" y2="${yC}" stroke="${wc(C)}" stroke-width="${sw(C)}"${gf(C)}/>
+
+  <!-- INPUT D (Pin 6) + NOT gate for D-bar -->
+  <line x1="14" y1="${yD}" x2="${notX}" y2="${yD}" stroke="${wc(D)}" stroke-width="${sw(D)}"${gf(D)}/>
+  <text x="18" y="${yD-10}" fill="${ic(D)}" font-size="9" font-weight="700">INPUT (6)</text>
+  <text x="18" y="${yD+14}" fill="${ic(D)}" font-size="13" font-weight="800">D</text>
+  ${notGate(notX, yD, D)}
+  <line x1="${notX+25}" y1="${yD}" x2="${busX1+41}" y2="${yD}" stroke="${wc(!D)}" stroke-width="1.2"/>
+  <circle cx="${iBoxR}" cy="${yD}" r="3" fill="${D?wHi:wLo}"/>
+
+  <!-- Control pins -->
+  <line x1="14" y1="355" x2="${iBoxR}" y2="355" stroke="#334155" stroke-width="1"/>
+  <text x="18" y="352" fill="${dimTxt}" font-size="9">(4) BI/RBO</text>
+  ${notGate(notX, 355, false)}
+
+  <line x1="14" y1="390" x2="${iBoxR}" y2="390" stroke="#334155" stroke-width="1"/>
+  <text x="18" y="387" fill="${dimTxt}" font-size="9">(3) LT</text>
+  ${notGate(notX, 390, false)}
+
+  <line x1="14" y1="425" x2="${iBoxR}" y2="425" stroke="#334155" stroke-width="1"/>
+  <text x="18" y="422" fill="${dimTxt}" font-size="9">(5) RBI</text>
+  ${notGate(notX, 425, false)}
+
+  <!-- Vertical input bus lines -->
+  ${busLines}
+  <line x1="${busX1+41}" y1="${yD}" x2="${busX1+41}" y2="${lastY}" stroke="${wc(D)}" stroke-width="1.2" stroke-dasharray="${D?'':'4,3'}"/>
+  <circle cx="${busX1+41}" cy="${yD}" r="3" fill="${D?wHi:wLo}"/>
+
+  <!-- ═══ DECODE MATRIX label ════════════════════════════════════ -->
+  <text x="${(nandX+bufX)/2+10}" y="25" fill="${dimTxt}" font-size="9" font-weight="700" text-anchor="middle" letter-spacing="1.2">BCD DECODE MATRIX</text>
+
+  <!-- Gate rows (a–g) -->
+  ${rows}
+
+  <!-- ═══ 7-BIT OUTPUT BOX ════════════════════════════════════════ -->
+  <rect x="${oBoxL}" y="22" width="${oBoxR-oBoxL}" height="460" rx="8"
+    fill="rgba(239,68,68,0.05)" stroke="#ef4444" stroke-width="1.8"/>
+  <text x="${(oBoxL+oBoxR)/2}" y="14" fill="#ef4444" font-size="10" font-weight="800" text-anchor="middle" letter-spacing="1.5">7 BIT OUTPUT</text>
+
+  <!-- ═══ 7-Segment display ════════════════════════════════════════ -->
+  ${segDisplay}
+
+  <!-- Display segment labels -->
+  <text x="${dspX+W/2-4}" y="${dy-15}" fill="${sc('a')}" font-size="10" font-weight="800" text-anchor="middle">a</text>
+  <text x="${dspX+W+T+10}" y="${dy+H/2}" fill="${sc('b')}" font-size="10" font-weight="800">b</text>
+  <text x="${dspX+W+T+10}" y="${dy+H+H/2+T}" fill="${sc('c')}" font-size="10" font-weight="800">c</text>
+  <text x="${dspX+W/2-4}" y="${dy+H*2+T+18}" fill="${sc('d')}" font-size="10" font-weight="800" text-anchor="middle">d</text>
+  <text x="${dspX-10}" y="${dy+H+H/2+T}" fill="${sc('e')}" font-size="10" font-weight="800" text-anchor="end">e</text>
+  <text x="${dspX-10}" y="${dy+H/2}" fill="${sc('f')}" font-size="10" font-weight="800" text-anchor="end">f</text>
+  <text x="${dspX+W/2-4}" y="${dy+H+T+5}" fill="${sc('g')}" font-size="10" font-weight="800" text-anchor="middle">g</text>
+
+  <!-- Footer -->
+  <text x="380" y="490" fill="${dimTxt}" font-size="9" text-anchor="middle" letter-spacing="0.5"
+    >SN74LS47N — BCD to 7-Seg Decoder/Driver  ·  BCD = ${bcd}${bcd>9?' (invalid)':''}</text>
+</svg>`;
+}
+
 
 function resetPins() {
   const ic = IC_DEFINITIONS[currentICKey];
@@ -541,7 +829,13 @@ function evaluateIC() {
 
   // Highlight matching table row
   highlightMatchingTableRow(ic);
+
+  // Refresh schematic if in schematic mode (live update on pin toggle)
+  if (currentViewMode === 'schematic') {
+    renderICSchematic(ic);
+  }
 }
+
 
 function renderGatesView(ic) {
   const container = document.getElementById('ic-gates-grid');

@@ -281,6 +281,16 @@ function renderShell(c) {
                 <option value="https://en.wikipedia.org/wiki/Internet">Preset: wikipedia.org/wiki</option>
               </select>
             </div>
+
+            <!-- URL Prefix & Protocol Anatomy Explainer -->
+            <div class="url-prefix-breakdown-card" id="url-prefix-breakdown-card">
+              <div class="url-prefix-breakdown-title">
+                <span class="url-prefix-badge">URL PROTOCOL PREFIX &amp; ANATOMY</span>
+                <small>Click any segment below to understand why each prefix and component is needed:</small>
+              </div>
+              <div class="url-prefix-chips" id="url-prefix-chips"></div>
+              <div class="url-prefix-explanation-box" id="url-prefix-explanation-box"></div>
+            </div>
           </div>
 
           <!-- Stepper Dots -->
@@ -401,10 +411,13 @@ function init3DOsi() {
     <div class="osi-slab-3d" id="osi-c-slab-${l.num}" data-layer="${l.num}">
       <div class="slab-face top"></div>
       <div class="slab-face front">
-        <div class="slab-layer-tag">L${l.num}</div>
-        <div class="slab-name">${l.name}</div>
-        <div class="slab-pdu">${l.pdu}</div>
-        <div class="slab-header-chip" style="border-color:${l.color}; color:${l.color}">+ ${l.headerName}</div>
+        <div class="slab-top-row">
+          <div class="slab-layer-tag">L${l.num}</div>
+          <div class="slab-name">${l.name}</div>
+          <div class="slab-pdu">${l.pdu}</div>
+          <div class="slab-header-chip" style="border-color:${l.color}; color:${l.color}">+ ${l.headerName}</div>
+        </div>
+        <div class="slab-layer-stack"></div>
       </div>
       <div class="slab-face side"></div>
     </div>
@@ -414,10 +427,13 @@ function init3DOsi() {
     <div class="osi-slab-3d" id="osi-s-slab-${l.num}" data-layer="${l.num}">
       <div class="slab-face top"></div>
       <div class="slab-face front">
-        <div class="slab-layer-tag">L${l.num}</div>
-        <div class="slab-name">${l.name}</div>
-        <div class="slab-pdu">${l.pdu}</div>
-        <div class="slab-header-chip" style="border-color:${l.color}; color:${l.color}">- ${l.headerName}</div>
+        <div class="slab-top-row">
+          <div class="slab-layer-tag">L${l.num}</div>
+          <div class="slab-name">${l.name}</div>
+          <div class="slab-pdu">${l.pdu}</div>
+          <div class="slab-header-chip" style="border-color:${l.color}; color:${l.color}">- ${l.headerName}</div>
+        </div>
+        <div class="slab-layer-stack"></div>
       </div>
       <div class="slab-face side"></div>
     </div>
@@ -492,6 +508,62 @@ function resetOsi() {
   renderOsiState();
 }
 
+function buildPacketSequenceMarkup() {
+  const layerNumbers = [2, 3, 4, 5, 6, 7];
+  const boxMarkup = layerNumbers
+    .map(num => `<span class="pulse-box pulse-layer" data-layer="${num}">${num}</span>`)
+    .join('');
+
+  return `
+    <div class="pulse-sequence" aria-label="OSI packet headers">
+      ${boxMarkup}
+      <span class="pulse-box pulse-data">data</span>
+    </div>
+  `;
+}
+
+function renderLayerStackForHost(hostId) {
+  const host = document.getElementById(hostId);
+  if (!host) return;
+
+  const slabs = host.querySelectorAll('.osi-slab-3d');
+  slabs.forEach(slab => {
+    const layerNum = Number(slab.dataset.layer);
+    const stack = slab.querySelector('.slab-layer-stack');
+    if (!stack) return;
+
+    let visibleLayers = [];
+    if (hostId === 'osi-client-stack') {
+      if (osiStep >= 1 && osiStep <= 7) {
+        const activeLayer = 8 - osiStep;
+        visibleLayers = OSI_LAYERS.filter(layer => layer.num >= activeLayer && layer.num <= 7);
+      } else if (osiStep >= 8) {
+        visibleLayers = OSI_LAYERS;
+      }
+    } else if (hostId === 'osi-server-stack') {
+      if (osiStep >= 9 && osiStep <= 15) {
+        const activeLayer = osiStep - 8;
+        visibleLayers = OSI_LAYERS.filter(layer => layer.num > activeLayer && layer.num <= 7);
+      } else if (osiStep >= 8) {
+        visibleLayers = OSI_LAYERS;
+      }
+    }
+
+    const isVisible = visibleLayers.some(layer => layer.num === layerNum);
+    stack.innerHTML = isVisible
+      ? visibleLayers
+          .filter(layer => layer.num === layerNum)
+          .map(layer => `
+            <span class="slab-layer-box" style="--layer-color:${layer.color}; border-color:${layer.color}; background:rgba(${hexToRgb(layer.color)}, 0.18);">
+              <span class="slab-layer-box-num">L${layer.num}</span>
+              <span class="slab-layer-box-name">${layer.headerName}</span>
+            </span>
+          `)
+          .join('')
+      : '';
+  });
+}
+
 function renderOsiState() {
   const stagePill = document.getElementById('osi-stage-pill');
   const stageTitle = document.getElementById('osi-stage-title');
@@ -499,6 +571,7 @@ function renderOsiState() {
   const packetTags = document.getElementById('osi-packet-tags');
   const headerDetails = document.getElementById('osi-header-details');
   const pulsePacket = document.getElementById('osi-pulse-packet');
+  const cableLine = document.getElementById('osi-cable-line');
   const clientHost = document.getElementById('osi-client-host');
   const serverHost = document.getElementById('osi-server-host');
 
@@ -507,9 +580,16 @@ function renderOsiState() {
     s.classList.remove('active', 'completed');
   });
 
-  if (pulsePacket) pulsePacket.classList.remove('in-transit');
+  if (pulsePacket) {
+    pulsePacket.classList.remove('in-transit');
+    pulsePacket.innerHTML = `<div class="pulse-inner">${buildPacketSequenceMarkup()}</div>`;
+  }
+  if (cableLine) cableLine.classList.remove('active');
   clientHost?.classList.remove('active');
   serverHost?.classList.remove('active');
+
+  renderLayerStackForHost('osi-client-stack');
+  renderLayerStackForHost('osi-server-stack');
 
   // STAGE 0: IDLE
   if (osiStep === 0) {
@@ -576,7 +656,11 @@ function renderOsiState() {
     for (let l = 1; l <= 7; l++) {
       document.getElementById(`osi-c-slab-${l}`)?.classList.add('completed');
     }
-    if (pulsePacket) pulsePacket.classList.add('in-transit');
+    if (pulsePacket) {
+      pulsePacket.classList.add('in-transit');
+      pulsePacket.innerHTML = `<div class="pulse-inner">${buildPacketSequenceMarkup()}</div>`;
+    }
+    if (cableLine) cableLine.classList.add('active');
 
     if (stagePill) stagePill.textContent = `STAGE 8 / 15 • PHYSICAL WIRE TRANSIT`;
     if (stageTitle) stageTitle.textContent = `Bitstream Traveling Across Cat6 Physical Cable`;
@@ -911,4 +995,133 @@ function renderJourneyStep() {
       </div>
     `;
   }
+
+  renderUrlPrefixBreakdown(urlVal);
 }
+
+function renderUrlPrefixBreakdown(urlVal) {
+  const chipsContainer = document.getElementById('url-prefix-chips');
+  const explContainer = document.getElementById('url-prefix-explanation-box');
+  if (!chipsContainer || !explContainer) return;
+
+  let parsed = null;
+  const rawUrl = (urlVal || '').trim();
+  try {
+    parsed = new URL(rawUrl.includes('://') ? rawUrl : `https://${rawUrl}`);
+  } catch(e) {
+    parsed = {
+      protocol: 'https:',
+      hostname: 'www.logicquest.dev',
+      pathname: '/courses',
+      port: '443',
+      search: ''
+    };
+  }
+
+  const scheme = parsed.protocol ? parsed.protocol + '//' : 'https://';
+  const hostParts = parsed.hostname.split('.');
+  let subdomain = '';
+  let domain = '';
+  let tld = '';
+
+  if (hostParts.length >= 3) {
+    subdomain = hostParts[0] + '.';
+    domain = hostParts[1];
+    tld = '.' + hostParts.slice(2).join('.');
+  } else if (hostParts.length === 2) {
+    domain = hostParts[0];
+    tld = '.' + hostParts[1];
+  } else {
+    domain = parsed.hostname;
+  }
+
+  const port = parsed.port ? `:${parsed.port}` : (scheme.startsWith('https') ? ':443' : ':80');
+  const path = parsed.pathname || '/';
+
+  const segments = [
+    {
+      id: 'scheme',
+      val: scheme,
+      name: 'Protocol Prefix (Scheme)',
+      badge: 'PREFIX',
+      color: '#bef264',
+      bg: 'rgba(190, 242, 100, 0.15)',
+      desc: 'The protocol prefix specifies HOW the browser connects to the server. "https://" means Hypertext Transfer Protocol Secure: all communication is encrypted end-to-end using TLS 1.3 over TCP port 443 before hitting the network cable. If unencrypted "http://" were used, passwords, session cookies, and payloads would travel as plaintext visible to any Wi-Fi sniffer or router on the path.'
+    },
+    ...(subdomain ? [{
+      id: 'subdomain',
+      val: subdomain,
+      name: 'Subdomain Prefix',
+      badge: 'SUBDOMAIN',
+      color: '#38bdf8',
+      bg: 'rgba(56, 189, 248, 0.15)',
+      desc: 'Subdomain prefix identifies a specific sub-division or service cluster belonging to the parent domain (e.g. "www" for web server, "api" for backend REST endpoints, "mail" for SMTP/IMAP servers).'
+    }] : []),
+    {
+      id: 'domain',
+      val: domain,
+      name: 'Registered Domain Name',
+      badge: 'DOMAIN',
+      color: '#a78bfa',
+      bg: 'rgba(167, 139, 250, 0.15)',
+      desc: 'The human-memorable domain name purchased from a domain registrar. Computers cannot route packets using text names—DNS translates this text name into a 32-bit IPv4 address (like 142.250.72.14).'
+    },
+    {
+      id: 'tld',
+      val: tld,
+      name: 'Top-Level Domain (TLD)',
+      badge: 'TLD',
+      color: '#f472b6',
+      bg: 'rgba(244, 114, 182, 0.15)',
+      desc: 'The top-level hierarchy of the Domain Name System (.dev, .com, .edu, .org, .lk). TLDs are managed by root DNS servers. For example, all ".dev" domains are on Google\'s HSTS preload list and strictly forbid unencrypted HTTP.'
+    },
+    {
+      id: 'port',
+      val: port,
+      name: 'Transport Port',
+      badge: 'PORT',
+      color: '#fbbf24',
+      bg: 'rgba(251, 191, 36, 0.15)',
+      desc: 'TCP Port identifies which application service on the server will receive the packets. HTTPS uses port 443 by default (implied by the https:// prefix). Standard unencrypted HTTP uses port 80.'
+    },
+    {
+      id: 'path',
+      val: path,
+      name: 'Resource Path',
+      badge: 'PATH',
+      color: '#34d399',
+      bg: 'rgba(52, 211, 153, 0.15)',
+      desc: 'The exact route or resource identifier on the web server (e.g. file, API route, or SPA view). This path is placed in the HTTP request header: "GET /courses HTTP/2".'
+    },
+  ];
+
+  chipsContainer.innerHTML = segments.map((seg, i) => `
+    <button type="button" class="url-prefix-chip ${i === 0 ? 'active' : ''}" data-seg="${seg.id}" style="--chip-color:${seg.color}; --chip-bg:${seg.bg}">
+      <span class="chip-badge">${seg.badge}</span>
+      <span class="chip-val">${escapeHtml(seg.val)}</span>
+    </button>
+  `).join('');
+
+  function showSegDetail(seg) {
+    explContainer.innerHTML = `
+      <div class="url-detail-card" style="border-left: 3px solid ${seg.color}">
+        <div class="url-detail-head">
+          <strong style="color:${seg.color}">${seg.name}: <code>${escapeHtml(seg.val)}</code></strong>
+          <span class="url-detail-badge" style="background:${seg.bg}; color:${seg.color}; border:1px solid ${seg.color}">${seg.badge}</span>
+        </div>
+        <p>${seg.desc}</p>
+      </div>
+    `;
+  }
+
+  showSegDetail(segments[0]);
+
+  chipsContainer.querySelectorAll('.url-prefix-chip').forEach((chip, i) => {
+    chip.addEventListener('click', () => {
+      chipsContainer.querySelectorAll('.url-prefix-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      showSegDetail(segments[i]);
+    });
+  });
+}
+

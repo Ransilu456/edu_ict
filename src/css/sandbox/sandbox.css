@@ -913,6 +913,8 @@
 .sb-ctx-icon.add { background: rgba(88, 204, 2, 0.14); border-color: rgba(88, 204, 2, 0.4); color: var(--color-success); }
 .sb-ctx-icon.remove { background: rgba(255, 150, 0, 0.12); border-color: rgba(255, 150, 0, 0.4); color: var(--color-amber); }
 .sb-ctx-icon.dup { background: var(--color-indigo-glow); border-color: var(--color-indigo); color: var(--color-indigo); }
+.sb-ctx-icon.rotate { background: rgba(56, 189, 248, 0.14); border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; }
+.sb-ctx-icon.area { background: rgba(190, 242, 100, 0.14); border-color: rgba(190, 242, 100, 0.4); color: #bef264; }
 .sb-ctx-icon.danger { background: rgba(255, 75, 75, 0.12); border-color: rgba(255, 75, 75, 0.4); }
 
 .sb-ctx-label {
@@ -1442,6 +1444,96 @@
   flex-direction: row;
   align-items: center;
   gap: 6px;
+}
+
+/* ═══ ANSI Symbol mode (realistic-gates) ═══
+   SVG gate symbol inside the normal node box — keeps border, bg, padding.
+   Only hides the text header so the SVG is centred in the box. */
+.sandbox-view.realistic-gates .sandbox-node.gate-node {
+  min-width: 110px;
+  padding: 0.45rem;
+}
+
+.sandbox-view.realistic-gates .sandbox-node.gate-node .sandbox-node-header {
+  display: none !important;
+}
+
+.sandbox-view.realistic-gates .sandbox-node.gate-node .gate-symbol svg {
+  width: 92px;
+  max-height: 58px;
+  stroke: var(--text-primary);
+  stroke-width: 2.0;
+}
+
+/* ═══ Schematic / No-Box Gate View ═══
+   Pure schematic look: transparent node, no border, no padding.
+   Gate SVG floats bare on the canvas like a real circuit diagram. */
+.sandbox-view.schematic-gates .sandbox-node.gate-node,
+.sandbox-node.gate-node.no-box-gate {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  min-width: unset !important;
+  padding: 0 !important;
+}
+
+.sandbox-view.schematic-gates .sandbox-node.gate-node .sandbox-node-header,
+.sandbox-node.gate-node.no-box-gate .sandbox-node-header {
+  display: none !important;
+}
+
+.sandbox-view.schematic-gates .sandbox-node.gate-node .gate-input-badge,
+.sandbox-node.gate-node.no-box-gate .gate-input-badge {
+  display: none !important;
+}
+
+.sandbox-view.schematic-gates .sandbox-node.gate-node .node-delete-btn,
+.sandbox-node.gate-node.no-box-gate .node-delete-btn {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.15s ease;
+}
+
+.sandbox-view.schematic-gates .sandbox-node.gate-node:hover .node-delete-btn,
+.sandbox-node.gate-node.no-box-gate:hover .node-delete-btn {
+  opacity: 1;
+}
+
+.sandbox-view.schematic-gates .sandbox-node.gate-node .gate-symbol svg,
+.sandbox-node.gate-node.no-box-gate .gate-symbol svg {
+  width: 96px;
+  max-height: 60px;
+  stroke: var(--text-primary);
+  stroke-width: 2.2;
+}
+
+.sandbox-view.schematic-gates .sandbox-node.gate-node .sandbox-port,
+.sandbox-node.gate-node.no-box-gate .sandbox-port {
+  background: #1e3025;
+  border-color: #3b5343;
+}
+
+@media (max-width: 680px) {
+  .sandbox-node.gate-node {
+    min-width: 104px !important;
+    max-width: 100%;
+  }
+
+  .gate-symbol svg {
+    width: clamp(70px, 18vw, 92px);
+    max-height: 52px;
+  }
+
+  .gate-input-badge {
+    font-size: 0.55rem;
+    padding: 0 0.38rem;
+  }
+
+  .gate-io-btn {
+    width: 18px;
+    height: 18px;
+    font-size: 0.72rem;
+  }
 }
 
 .gate-symbol {
@@ -2464,5 +2556,125 @@
     height: 4px;
   }
 }
+
+/* ═══ Highlight Area / Circuit Region Boxes ═══ */
+.sandbox-region-box {
+  position: absolute;
+  border: 2px solid var(--region-color, #0284c7);
+  background: var(--region-bg, rgba(2, 132, 199, 0.08));
+  border-radius: 6px;
+  pointer-events: auto;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.15s ease;
+}
+
+.sandbox-region-box:hover,
+.sandbox-region-box.selected {
+  box-shadow: 0 0 0 1px var(--region-color, #0284c7), 0 8px 24px rgba(0, 0, 0, 0.35);
+  z-index: 4;
+}
+
+.sandbox-region-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  cursor: move;
+  user-select: none;
+  background: rgba(10, 15, 13, 0.65);
+  border-bottom: 1px dashed var(--region-color, #0284c7);
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  backdrop-filter: blur(4px);
+}
+
+.sandbox-region-label {
+  font-family: var(--font-header, sans-serif);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--region-color, #0284c7);
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: text;
+  outline: none;
+  min-width: 40px;
+}
+
+.sandbox-region-label:focus {
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 0 1px var(--region-color, #0284c7);
+}
+
+.sandbox-region-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.sandbox-region-box:hover .sandbox-region-actions,
+.sandbox-region-box.selected .sandbox-region-actions {
+  opacity: 1;
+}
+
+.region-color-btn {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s ease;
+}
+
+.region-color-btn:hover {
+  transform: scale(1.3);
+}
+
+.region-delete-btn {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.region-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+}
+
+.sandbox-region-resizer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  background: linear-gradient(135deg, transparent 50%, var(--region-color, #0284c7) 50%);
+  border-bottom-right-radius: 4px;
+}
+
+/* ═══ Schematic Junction Dots ═══ */
+.sb-junction-dot {
+  pointer-events: none;
+  transition: r 0.1s ease;
+}
+
+/* ═══ Quick Rotation Context Badge / Buttons ═══ */
+.sb-ctx-item.rotate-preset {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+}
+
 
 

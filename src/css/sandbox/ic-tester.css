@@ -206,6 +206,41 @@
   font-size: 0.88rem;
   font-weight: 800;
   color: var(--text-primary);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ic-view-mode-toggle {
+  display: flex;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.ic-mode-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-header);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ic-mode-btn:hover {
+  color: var(--text-primary);
+}
+
+.ic-mode-btn.active {
+  background: var(--lime, #bef264);
+  color: #0b140e;
+  font-weight: 800;
+  box-shadow: 0 0 10px rgba(190, 242, 100, 0.35);
 }
 
 .ic-badge {
@@ -230,7 +265,30 @@
   padding: 1.5rem;
   border: 1px solid var(--border-color);
   gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
 }
+
+/* Schematic Render Container */
+.ic-schematic-render {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 580px;
+  background: #0b140e;
+  border: 2px solid #1e3025;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.ic-schematic-render svg {
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+}
+
 
 /* DIP Chip Graphic */
 .ic-dip-package {

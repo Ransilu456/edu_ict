@@ -224,7 +224,13 @@ window.initSandboxCanvas = function () {
       return;
     }
     if (!selectedNodeId) return;
-    if (document.activeElement && document.activeElement.tagName === 'TEXTAREA') return;
+    if (document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+    if (e.key === 'r' || e.key === 'R') {
+      e.preventDefault();
+      const deg = e.shiftKey ? 45 : 90;
+      rotateNode(selectedNodeId, deg);
+      return;
+    }
     if (e.key === 'Delete' || e.key === 'Backspace') {
       e.preventDefault();
       deleteNode(selectedNodeId);
@@ -668,19 +674,41 @@ function setupToolbar() {
     reader.readAsText(file);
     importFileInput.value = '';
   });
-  const gateStyleBtn = document.getElementById('sandbox-gate-style-btn');
-  if (gateStyleBtn) {
-    const savedStyle = localStorage.getItem('sandboxGateStyle') || 'box';
-    window.__gateStyle = savedStyle;
-    updateGateStyleBtn(gateStyleBtn, savedStyle);
-    gateStyleBtn.addEventListener('click', () => {
+  // Gate Style Toggle (Toolbar & Layout Menu)
+  const savedGateStyle = localStorage.getItem('sandboxGateStyle') || 'box';
+  window.__gateStyle = savedGateStyle;
+  updateGateStyleBtns(savedGateStyle);
+
+  const gateStyleBtns = document.querySelectorAll('#sandbox-gate-style-btn, #sandbox-menu-gate-style-btn, .sandbox-gate-style-btn');
+  gateStyleBtns.forEach(btn => {
+    if (btn.dataset.bound) return;
+    btn.dataset.bound = 'true';
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
       playSound('click');
       const current = window.__gateStyle || 'box';
-      const next = current === 'box' ? 'realistic' : 'box';
+      const styles = ['box', 'realistic', 'schematic'];
+      const next = styles[(styles.indexOf(current) + 1) % styles.length];
       window.__gateStyle = next;
       localStorage.setItem('sandboxGateStyle', next);
-      updateGateStyleBtn(gateStyleBtn, next);
+      updateGateStyleBtns(next);
       reRenderAllNodes();
+      showToast(`Gate style: ${next === 'schematic' ? 'Schematic (No Box)' : next === 'realistic' ? 'ANSI Symbol' : 'Box View'}`);
+    });
+  });
+
+  // Highlight Area Button (+ Area)
+  const addRegionBtn = document.getElementById('sandbox-add-region-btn');
+  if (addRegionBtn && !addRegionBtn.dataset.bound) {
+    addRegionBtn.dataset.bound = 'true';
+    addRegionBtn.addEventListener('click', () => {
+      if (selectedNodeIds.length > 0) {
+        createRegionAroundNodes(selectedNodeIds);
+      } else if (selectedNodeId) {
+        createRegionAroundNodes([selectedNodeId]);
+      } else {
+        createRegion();
+      }
     });
   }
   const wireStyleBtn = document.getElementById('sandbox-wire-style-btn');
@@ -795,13 +823,34 @@ function setupToolbar() {
   });
 }
 
-function updateGateStyleBtn(btn, style) {
+function updateGateStyleBtns(style) {
+  const sbView = document.querySelector('.sandbox-view');
+  sbView?.classList.remove('realistic-gates', 'schematic-gates');
   if (style === 'realistic') {
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17V7l7 5-7 5"/><circle cx="12" cy="12" r="1.5"/><path d="M13 7h7v10h-7"/></svg> <span>Gate: ANSI</span>`;
-  } else {
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7l5 5-5 5"/></svg> <span>Gate: Box</span>`;
+    sbView?.classList.add('realistic-gates');
+  } else if (style === 'schematic') {
+    sbView?.classList.add('schematic-gates');
   }
+
+  const allBtns = document.querySelectorAll('#sandbox-gate-style-btn, #sandbox-menu-gate-style-btn, .sandbox-gate-style-btn');
+  allBtns.forEach(btn => {
+    if (btn.classList.contains('sandbox-menu-btn')) {
+      btn.textContent = style === 'schematic' ? 'Gate: Schematic (No Box)' : (style === 'realistic' ? 'Gate: ANSI Symbol' : 'Gate: Box View');
+    } else {
+      if (style === 'realistic') {
+        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="15" height="14" rx="2"/><path d="M4 14V8l5 3-5 3"/><circle cx="20" cy="12" r="2"/></svg> <span>Gate: ANSI</span>`;
+        btn.title = 'Current: ANSI Symbol. Click to cycle to Schematic.';
+      } else if (style === 'schematic') {
+        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9L8 9 Q8 3 15 3 Q22 3 22 9 Q22 15 15 15 Q8 15 8 9"/><line x1="1" y1="7" x2="4" y2="7"/><line x1="1" y1="11" x2="4" y2="11"/><line x1="22" y1="9" x2="24" y2="9"/></svg> <span>Gate: Schematic</span>`;
+        btn.title = 'Current: Schematic (No Box). Click to cycle to Box View.';
+      } else {
+        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7l5 5-5 5"/></svg> <span>Gate: Box</span>`;
+        btn.title = 'Current: Box View. Click to cycle to ANSI Symbol.';
+      }
+    }
+  });
 }
+window.updateGateStyleBtns = updateGateStyleBtns;
 
 function updateWireStyleBtn(btn) {
   const labels = { curve: 'Wire: Curve', orthogonal: 'Wire: Right Angle', straight: 'Wire: Straight' };
@@ -848,6 +897,7 @@ function placeNode(type, label, x, y) {
     x: Math.round(x / 10) * 10,
 
     y: Math.round(y / 10) * 10,
+    rotation: 0,
 
     inputsCount: def.inputs,
     outputsCount: def.outputs,
@@ -1016,11 +1066,16 @@ function renderNodeDOM(node) {
   el.className = 'sandbox-node';
   el.style.left = `${node.x}px`;
   el.style.top = `${node.y}px`;
+  if (node.rotation) {
+    el.style.transform = `rotate(${node.rotation}deg)`;
+  }
 
   if (node.type && REAL_ICS[node.type]) {
     renderRealICNodeDOM(node, el);
     return;
   }
+
+  el.dataset.nodeType = node.type;
 
   if (['half-adder', 'full-adder', 'd-flop', 'op-amp'].includes(node.type)) {
     el.classList.add('compound-node');
@@ -1045,9 +1100,14 @@ function renderNodeDOM(node) {
   header.className = 'sandbox-node-header';
   header.innerText = node.label;
 
-  const pureGateTypes = ['not', 'and', 'or', 'nand', 'nor', 'xor', 'xnor'];
+  const pureGateTypes = ['not', 'buffer', 'and', 'or', 'nand', 'nor', 'xor', 'xnor'];
   const gateStyle = window.__gateStyle || localStorage.getItem('sandboxGateStyle') || 'box';
-  if (gateStyle === 'realistic' && pureGateTypes.includes(node.type)) {
+  if (gateStyle === 'schematic' && pureGateTypes.includes(node.type)) {
+    // Schematic mode: no box at all, just the gate symbol
+    header.style.display = 'none';
+    el.classList.add('no-box-gate');
+  } else if (gateStyle === 'realistic' && pureGateTypes.includes(node.type)) {
+    // ANSI symbol mode: keep the box but hide text header
     header.style.display = 'none';
   }
   el.appendChild(header);
@@ -1059,6 +1119,10 @@ function renderNodeDOM(node) {
 
   renderInputPorts(node, el);
   renderOutputPorts(node, el);
+
+  if (['not', 'buffer', 'and', 'or', 'nand', 'nor', 'xor', 'xnor'].includes(node.type)) {
+    updateGateNodeHeight(el, node.inputsCount);
+  }
 
   const onStartDrag = (e) => {
     if (e.target.closest('.sandbox-port') || e.target.closest('button') || e.target.closest('textarea') || e.target.closest('input')) {
@@ -1471,7 +1535,7 @@ function renderNodeBody(node, body) {
       const isMultiInputGate = MULTI_INPUT_GATE_TYPES ? MULTI_INPUT_GATE_TYPES.has(node.type) : false;
       const symWrap = document.createElement('div');
       symWrap.className = 'gate-symbol';
-      if (gateStyle === 'realistic') {
+      if (gateStyle === 'realistic' || gateStyle === 'schematic') {
         symWrap.innerHTML = renderGateSVG(node.type);
       } else {
         const span = document.createElement('span');
@@ -1572,6 +1636,14 @@ function renderGateSVG(type) {
   }
 }
 
+function getGateNodeMetrics(node) {
+  const count = Math.max(2, Number(node.inputsCount) || 2);
+  const baseWidth = node.type === 'not' || node.type === 'buffer' ? 110 : 118;
+  const width = Math.min(220, Math.max(baseWidth, baseWidth + (count - 2) * 12));
+  const height = Math.max(92, count * 22 + 26);
+  return { width, height };
+}
+
 function renderInputPorts(node, el) {
   const count = node.inputsCount;
   if (count === 0) return;
@@ -1583,12 +1655,15 @@ function renderInputPorts(node, el) {
     port.dataset.portIdx = i;
     const portLabels = getInputPortLabels(node.type, node.inputsCount);
     port.title = portLabels[i] || `In ${i}`;
-    const pct = count === 1
-      ? 50
-      : isGate
-        ? 30 + (i * 40) / (count - 1)
 
-        : 20 + (i * 60) / (count - 1);
+    let pct;
+    if (count === 1) {
+      pct = 50;
+    } else if (isGate) {
+      pct = 16 + (i * 68) / (count - 1);
+    } else {
+      pct = 20 + (i * 60) / (count - 1);
+    }
 
     port.style.top = `calc(${pct}% - 4px)`;
     port.style.left = '-7px';
@@ -2044,6 +2119,12 @@ function updateSandboxWires() {
     return lane;
   };
 
+  const fromPortCounts = new Map();
+  sandboxWires.forEach(w => {
+    const k = `${w.fromNodeId}:${w.fromPortIdx}`;
+    fromPortCounts.set(k, (fromPortCounts.get(k) || 0) + 1);
+  });
+
   sandboxWires.forEach((wire) => {
     const fromEl = document.getElementById(wire.fromNodeId);
     const toEl = document.getElementById(wire.toNodeId);
@@ -2183,14 +2264,52 @@ function updateSandboxWires() {
             : `M ${x1} ${y1} C ${channelX} ${y1}, ${channelX} ${y2}, ${x2} ${y2}`;
         }
       } else {
-        const dir = x2 >= x1 ? 1 : -1;
-        const dx = Math.max(40, Math.abs(x2 - x1) * 0.5);
-        const midX = x1 + (x2 - x1) * 0.5;
-        d = wireStyle === 'straight'
-          ? `M ${x1} ${y1} L ${x2} ${y2}`
-          : wireStyle === 'orthogonal'
-            ? `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`
-            : `M ${x1} ${y1} C ${x1 + dir * dx} ${y1}, ${x2 - dir * dx} ${y2}, ${x2} ${y2}`;
+        const dstNode = sandboxNodes.find(n => n.id === wire.toNodeId);
+        const srcRot = ((srcNode?.rotation || 0) * Math.PI) / 180;
+        const dstRot = ((dstNode?.rotation || 0) * Math.PI) / 180;
+
+        const nx1 = Math.cos(srcRot);
+        const ny1 = Math.sin(srcRot);
+        const nx2 = Math.cos(dstRot);
+        const ny2 = Math.sin(dstRot);
+
+        if (wireStyle === 'straight') {
+          d = `M ${x1} ${y1} L ${x2} ${y2}`;
+        } else if (wireStyle === 'orthogonal') {
+          const isSrcVert = Math.abs(ny1) > 0.7;
+          const isDstVert = Math.abs(ny2) > 0.7;
+
+          if (!isSrcVert && !isDstVert) {
+            if (nx1 >= 0 && nx2 >= 0 && x2 >= x1 + 16) {
+              const midX = x1 + (x2 - x1) * 0.5;
+              d = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+            } else if (nx1 >= 0 && nx2 >= 0 && x2 < x1 + 16) {
+              const bypassY = y2 >= y1 ? Math.min(y1, y2) - 30 : Math.max(y1, y2) + 30;
+              d = `M ${x1} ${y1} L ${x1 + 22} ${y1} L ${x1 + 22} ${bypassY} L ${x2 - 22} ${bypassY} L ${x2 - 22} ${y2} L ${x2} ${y2}`;
+            } else {
+              const midX = x1 + (x2 - x1) * 0.5;
+              d = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+            }
+          } else if (isSrcVert && !isDstVert) {
+            const stubY = y1 + (ny1 > 0 ? 24 : -24);
+            const inApproachX = x2 - (nx2 >= 0 ? 20 : -20);
+            d = `M ${x1} ${y1} L ${x1} ${stubY} L ${inApproachX} ${stubY} L ${inApproachX} ${y2} L ${x2} ${y2}`;
+          } else if (!isSrcVert && isDstVert) {
+            const stubX = x1 + (nx1 >= 0 ? 22 : -22);
+            const inApproachY = y2 - (ny2 > 0 ? 22 : -22);
+            d = `M ${x1} ${y1} L ${stubX} ${y1} L ${stubX} ${inApproachY} L ${x2} ${inApproachY} L ${x2} ${y2}`;
+          } else {
+            const midY = y1 + (y2 - y1) * 0.5;
+            d = `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
+          }
+        } else {
+          const len = Math.max(30, Math.hypot(x2 - x1, y2 - y1) * 0.38);
+          const cp1x = x1 + nx1 * len;
+          const cp1y = y1 + ny1 * len;
+          const cp2x = x2 - nx2 * len;
+          const cp2y = y2 - ny2 * len;
+          d = `M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
+        }
       }
     }
 
@@ -2274,6 +2393,17 @@ function updateSandboxWires() {
     wiresSvg.appendChild(casing);
     wiresSvg.appendChild(visPath);
     wiresSvg.appendChild(hitTarget);
+
+    if ((fromPortCounts.get(`${wire.fromNodeId}:${wire.fromPortIdx}`) || 0) > 1) {
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', x1);
+      dot.setAttribute('cy', y1);
+      dot.setAttribute('r', '4');
+      dot.setAttribute('fill', strokeColor);
+      dot.setAttribute('class', 'sb-junction-dot');
+      if (isActive) dot.style.filter = `drop-shadow(0 0 4px ${wireColor})`;
+      wiresSvg.appendChild(dot);
+    }
 
     if (isActive) {
       const flow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -2643,9 +2773,19 @@ window.addGateInput = addGateInput;
 window.removeGateInput = removeGateInput;
 
 function updateGateNodeHeight(el, inputsCount) {
+  const metrics = getGateNodeMetrics({ inputsCount, type: el?.dataset?.nodeType || 'and' });
+  if (el) {
+    el.style.minWidth = `${metrics.width}px`;
+    el.style.width = `${metrics.width}px`;
+    el.style.minHeight = `${metrics.height}px`;
+    el.style.height = `${metrics.height}px`;
+  }
 
-  const minH = Math.max(80, inputsCount * 22 + 20);
-  el.style.minHeight = minH + 'px';
+  const node = sandboxNodes.find(n => n.id === el?.id);
+  if (node) {
+    node.width = metrics.width;
+    node.height = metrics.height;
+  }
 }
 
 // context menu
@@ -2664,6 +2804,9 @@ function showSandboxContextMenu(e, node) {
   const svgMinus = '<svg viewBox="0 0 20 20" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 10h12"/></svg>';
   const svgCopy = '<svg viewBox="0 0 20 20" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="9" height="9" rx="2"/><path d="M4 13V5a1 1 0 0 1 1-1h8"/></svg>';
   const svgTrash = '<svg viewBox="0 0 20 20" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h12M8 6V4h4v2M6 6l1 10a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1l1-10"/></svg>';
+  const svgRotate = '<svg viewBox="0 0 20 20" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 10a7 7 0 1 1-2.05-4.95L17 7"/><path d="M17 3v4h-4"/></svg>';
+  const svgArea = '<svg viewBox="0 0 20 20" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="2" stroke-dasharray="3 3"/><path d="M7 10h6M10 7v6"/></svg>';
+
   const items = [];
   if (isGate) {
     items.push(
@@ -2673,6 +2816,18 @@ function showSandboxContextMenu(e, node) {
     );
   }
   items.push(
+    { icon: svgRotate, tone: 'rotate', label: 'Rotate 90° (R)', action: () => rotateNode(node.id, 90) },
+    { icon: svgRotate, tone: 'rotate', label: 'Rotate 45° (Shift+R)', action: () => rotateNode(node.id, 45) },
+    { icon: svgRotate, tone: 'rotate', label: `Angle: ${node.rotation || 0}° → Next Preset`, action: () => {
+        const angles = [0, 45, 90, 180, 270];
+        const cur = (node.rotation || 0) % 360;
+        const nextIdx = (angles.indexOf(cur) + 1) % angles.length;
+        setNodeRotation(node.id, angles[nextIdx]);
+      }
+    },
+    { separator: true },
+    { icon: svgArea, tone: 'area', label: 'Highlight Area (Box)', action: () => createRegionAroundNodes(selectedNodeIds.length ? selectedNodeIds : [node.id]) },
+    { separator: true },
     { icon: svgCopy, tone: 'dup', label: 'Duplicate', action: () => duplicateNode(node.id) },
     { icon: svgTrash, tone: 'danger', label: 'Delete', danger: true, action: () => deleteNode(node.id) },
   );
@@ -3103,6 +3258,7 @@ function duplicateNode(id) {
     id: `sb-node-${nextNodeId++}`,
     x: src.x + 30,
     y: src.y + 30,
+    rotation: src.rotation || 0,
     inputValues: [...(src.inputValues || [])],
     outputStates: { ...(src.outputStates || {}) },
     pinValues: src.pinValues ? { ...src.pinValues } : null,
@@ -3121,10 +3277,304 @@ function duplicateNode(id) {
 }
 window.duplicateNode = duplicateNode;
 
+function rotateNode(nodeId, degrees) {
+  const node = sandboxNodes.find(n => n.id === nodeId);
+  if (!node) return;
+  pushUndo();
+  node.rotation = (((node.rotation || 0) + degrees) % 360 + 360) % 360;
+  const el = document.getElementById(nodeId);
+  if (el) {
+    el.style.transform = node.rotation ? `rotate(${node.rotation}deg)` : '';
+  }
+  updateSandboxWires();
+  playSound('click');
+  showToast(`Rotated to ${node.rotation}°`);
+}
+window.rotateNode = rotateNode;
+
+function setNodeRotation(nodeId, deg) {
+  const node = sandboxNodes.find(n => n.id === nodeId);
+  if (!node) return;
+  pushUndo();
+  node.rotation = ((deg % 360) + 360) % 360;
+  const el = document.getElementById(nodeId);
+  if (el) {
+    el.style.transform = node.rotation ? `rotate(${node.rotation}deg)` : '';
+  }
+  updateSandboxWires();
+  playSound('click');
+  showToast(`Rotated to ${node.rotation}°`);
+}
+window.setNodeRotation = setNodeRotation;
+
+// ══════════════════════════════════════════════════════════════════
+// HIGHLIGHT AREA / REGION BOX SYSTEM
+// ══════════════════════════════════════════════════════════════════
+let sandboxRegions = [];
+let nextRegionId = 1;
+
+const REGION_COLOR_PRESETS = [
+  { name: 'Cyan Blue', hex: '#0284c7', bg: 'rgba(2, 132, 199, 0.08)' },
+  { name: 'Crimson Red', hex: '#dc2626', bg: 'rgba(220, 38, 38, 0.08)' },
+  { name: 'Lime Green', hex: '#65a30d', bg: 'rgba(101, 163, 13, 0.08)' },
+  { name: 'Amber Gold', hex: '#d97706', bg: 'rgba(217, 119, 6, 0.08)' },
+  { name: 'Purple', hex: '#9333ea', bg: 'rgba(147, 51, 234, 0.08)' },
+  { name: 'Teal', hex: '#0d9488', bg: 'rgba(13, 148, 136, 0.08)' },
+];
+
+function createRegion(params = {}) {
+  pushUndo();
+  const id = `sb-region-${nextRegionId++}`;
+  const center = getViewportCenterWorld();
+  const colorDef = REGION_COLOR_PRESETS[sandboxRegions.length % REGION_COLOR_PRESETS.length];
+
+  const region = {
+    id,
+    x: params.x !== undefined ? Math.round(params.x / 10) * 10 : Math.round((center.x - 110) / 10) * 10,
+    y: params.y !== undefined ? Math.round(params.y / 10) * 10 : Math.round((center.y - 140) / 10) * 10,
+    width: params.width || 220,
+    height: params.height || 280,
+    label: params.label || `BLOCK ${sandboxRegions.length + 1}`,
+    color: params.color || colorDef.hex,
+    bg: params.bg || colorDef.bg,
+  };
+
+  sandboxRegions.push(region);
+  renderRegionDOM(region);
+  playSound('success');
+  showToast(`Added Area: ${region.label}`);
+  return region;
+}
+window.createRegion = createRegion;
+
+function createRegionAroundNodes(nodeIds) {
+  if (!nodeIds || !nodeIds.length) {
+    createRegion();
+    return;
+  }
+  const nodes = sandboxNodes.filter(n => nodeIds.includes(n.id));
+  if (!nodes.length) {
+    createRegion();
+    return;
+  }
+
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  nodes.forEach(n => {
+    const el = document.getElementById(n.id);
+    const metrics = ['not', 'buffer', 'and', 'or', 'nand', 'nor', 'xor', 'xnor'].includes(n.type)
+      ? getGateNodeMetrics(n)
+      : { width: el ? el.offsetWidth : 100, height: el ? el.offsetHeight : 60 };
+    const w = metrics.width || (el ? el.offsetWidth : 100);
+    const h = metrics.height || (el ? el.offsetHeight : 60);
+    if (n.x < minX) minX = n.x;
+    if (n.y < minY) minY = n.y;
+    if (n.x + w > maxX) maxX = n.x + w;
+    if (n.y + h > maxY) maxY = n.y + h;
+  });
+
+  const pad = 24;
+  const region = createRegion({
+    x: Math.max(10, minX - pad),
+    y: Math.max(10, minY - pad - 16),
+    width: Math.max(120, (maxX - minX) + pad * 2),
+    height: Math.max(100, (maxY - minY) + pad * 2 + 16),
+    label: nodes.length === 1 ? `${nodes[0].label || 'STAGE'} BLOCK` : `${nodes.length} GATES BLOCK`,
+  });
+  return region;
+}
+window.createRegionAroundNodes = createRegionAroundNodes;
+
+function renderRegionDOM(region) {
+  document.getElementById(region.id)?.remove();
+
+  const el = document.createElement('div');
+  el.id = region.id;
+  el.className = 'sandbox-region-box';
+  el.style.left = `${region.x}px`;
+  el.style.top = `${region.y}px`;
+  el.style.width = `${region.width}px`;
+  el.style.height = `${region.height}px`;
+  el.style.setProperty('--region-color', region.color);
+  el.style.setProperty('--region-bg', region.bg || `${region.color}14`);
+
+  const header = document.createElement('div');
+  header.className = 'sandbox-region-header';
+
+  const labelSpan = document.createElement('span');
+  labelSpan.className = 'sandbox-region-label';
+  labelSpan.contentEditable = 'true';
+  labelSpan.spellcheck = false;
+  labelSpan.innerText = region.label || 'AREA';
+  labelSpan.title = 'Click to edit label';
+
+  const commitLabel = () => {
+    const newText = labelSpan.innerText.trim();
+    if (newText && newText !== region.label) {
+      pushUndo();
+      region.label = newText;
+    }
+  };
+  labelSpan.addEventListener('blur', commitLabel);
+  labelSpan.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      labelSpan.blur();
+    }
+  });
+
+  const actions = document.createElement('div');
+  actions.className = 'sandbox-region-actions';
+
+  REGION_COLOR_PRESETS.forEach(cp => {
+    const cBtn = document.createElement('button');
+    cBtn.className = 'region-color-btn';
+    cBtn.style.background = cp.hex;
+    cBtn.title = cp.name;
+    cBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pushUndo();
+      region.color = cp.hex;
+      region.bg = cp.bg;
+      el.style.setProperty('--region-color', cp.hex);
+      el.style.setProperty('--region-bg', cp.bg);
+    });
+    actions.appendChild(cBtn);
+  });
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'region-delete-btn';
+  delBtn.innerHTML = '&times;';
+  delBtn.title = 'Delete Area Box';
+  delBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    deleteRegion(region.id);
+  });
+  actions.appendChild(delBtn);
+
+  header.appendChild(labelSpan);
+  header.appendChild(actions);
+  el.appendChild(header);
+
+  // Resizer handle
+  const resizer = document.createElement('div');
+  resizer.className = 'sandbox-region-resizer';
+  resizer.title = 'Drag to resize area';
+  el.appendChild(resizer);
+
+  // Dragging Region
+  const startDragRegion = (e) => {
+    if (e.target.closest('.sandbox-region-actions') || e.target.closest('.sandbox-region-resizer') || e.target === labelSpan) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const getPos = (ev) => {
+      if (ev.touches && ev.touches.length) return { x: ev.touches[0].clientX, y: ev.touches[0].clientY };
+      return { x: ev.clientX, y: ev.clientY };
+    };
+
+    const startPos = getPos(e);
+    const startWorld = screenToWorld(startPos.x, startPos.y);
+    const offX = startWorld.x - region.x;
+    const offY = startWorld.y - region.y;
+
+    const onMove = (mv) => {
+      if (mv.cancelable) mv.preventDefault();
+      const cur = getPos(mv);
+      const curWorld = screenToWorld(cur.x, cur.y);
+      region.x = Math.round((curWorld.x - offX) / 10) * 10;
+      region.y = Math.round((curWorld.y - offY) / 10) * 10;
+      el.style.left = `${region.x}px`;
+      el.style.top = `${region.y}px`;
+    };
+
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onUp);
+      pushUndo();
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onUp, { passive: true });
+  };
+
+  header.addEventListener('mousedown', startDragRegion);
+  header.addEventListener('touchstart', startDragRegion, { passive: false });
+
+  // Resizing Region
+  const startResizeRegion = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const getPos = (ev) => {
+      if (ev.touches && ev.touches.length) return { x: ev.touches[0].clientX, y: ev.touches[0].clientY };
+      return { x: ev.clientX, y: ev.clientY };
+    };
+
+    const startPos = getPos(e);
+    const startWorld = screenToWorld(startPos.x, startPos.y);
+    const initW = region.width;
+    const initH = region.height;
+
+    const onResizeMove = (mv) => {
+      if (mv.cancelable) mv.preventDefault();
+      const cur = getPos(mv);
+      const curWorld = screenToWorld(cur.x, cur.y);
+      const deltaX = curWorld.x - startWorld.x;
+      const deltaY = curWorld.y - startWorld.y;
+
+      region.width = Math.max(90, Math.round((initW + deltaX) / 10) * 10);
+      region.height = Math.max(60, Math.round((initH + deltaY) / 10) * 10);
+      el.style.width = `${region.width}px`;
+      el.style.height = `${region.height}px`;
+    };
+
+    const onResizeUp = () => {
+      window.removeEventListener('mousemove', onResizeMove);
+      window.removeEventListener('mouseup', onResizeUp);
+      window.removeEventListener('touchmove', onResizeMove);
+      window.removeEventListener('touchend', onResizeUp);
+      pushUndo();
+    };
+
+    window.addEventListener('mousemove', onResizeMove);
+    window.addEventListener('mouseup', onResizeUp);
+    window.addEventListener('touchmove', onResizeMove, { passive: false });
+    window.addEventListener('touchend', onResizeUp, { passive: true });
+  };
+
+  resizer.addEventListener('mousedown', startResizeRegion);
+  resizer.addEventListener('touchstart', startResizeRegion, { passive: false });
+
+  (panContainer || workspace).appendChild(el);
+}
+
+function renderAllRegions() {
+  clearAllRegions(false);
+  sandboxRegions.forEach(r => renderRegionDOM(r));
+}
+
+function clearAllRegions(emptyArray = true) {
+  document.querySelectorAll('.sandbox-region-box').forEach(el => el.remove());
+  if (emptyArray) sandboxRegions = [];
+}
+
+function deleteRegion(id) {
+  pushUndo();
+  document.getElementById(id)?.remove();
+  sandboxRegions = sandboxRegions.filter(r => r.id !== id);
+  playSound('click');
+}
+window.deleteRegion = deleteRegion;
+
 function clearSandbox() {
   sandboxNodes.forEach(n => document.getElementById(n.id)?.remove());
   sandboxNodes = [];
   sandboxWires = [];
+  clearAllRegions(true);
   nextNodeId = 1;
   clockTick = 0;
   selectedNodeId = null;
@@ -3204,8 +3654,10 @@ function serializeLayout() {
   return {
     version: 2,
     nextNodeId: nextNodeId,
+    nextRegionId: nextRegionId,
     nodes: sandboxNodes.map(n => ({ ...n })),
     wires: sandboxWires.map(w => ({ ...w })),
+    regions: sandboxRegions.map(r => ({ ...r })),
   };
 }
 
@@ -3213,10 +3665,13 @@ function importLayout(layout) {
   clearSandbox();
   const nodes = layout.nodes || [];
   const wires = layout.wires || [];
+  const regions = layout.regions || [];
   nextNodeId = layout.nextNodeId || (nodes.length + 1);
+  nextRegionId = layout.nextRegionId || (regions.length + 1);
   nodes.forEach(n => {
     const def = COMPONENT_DEFS[n.type];
     if (!def) return;
+    n.rotation = n.rotation || 0;
     n.outputsCount = n.outputsCount ?? def.outputs;
     n.outputState2 = n.outputState2 ?? 0;
     n.outputStates = n.outputStates ?? {};
@@ -3237,6 +3692,8 @@ function importLayout(layout) {
   });
 
   sandboxWires = wires;
+  sandboxRegions = regions.map(r => ({ ...r }));
+  renderAllRegions();
   evaluateSandbox();
 }
 

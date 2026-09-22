@@ -63,11 +63,18 @@
       <div class="ic-panel ic-package-panel">
         <div class="ic-panel-title">
           <span>DIP Package Pinout (Top View)</span>
+          <div class="ic-view-mode-toggle" id="ic-view-mode-toggle">
+            <button type="button" class="ic-mode-btn active" data-mode="package">Package</button>
+            <button type="button" class="ic-mode-btn" data-mode="schematic">Real Gate Schematic</button>
+          </div>
           <span class="ic-badge" id="ic-package-badge">DIP-14</span>
         </div>
         <div class="ic-package-stage">
           <div class="ic-chip-render" id="ic-chip-render">
             <!-- Rendered by ic-tester.js -->
+          </div>
+          <div class="ic-schematic-render" id="ic-schematic-render" style="display: none;">
+            <!-- Real Gate Schematic rendered by ic-tester.js -->
           </div>
           <!-- 7-Segment Display Preview for 7447 -->
           <div class="ic-sevenseg-preview" id="ic-sevenseg-preview" style="display: none;">

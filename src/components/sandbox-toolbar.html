@@ -50,10 +50,18 @@
             </svg><span>Layout</span><span class="sandbox-menu-chevron">▾</span>
         </summary>
         <div class="sandbox-menu-panel">
+            <button class="sandbox-menu-btn sandbox-gate-style-btn" id="sandbox-menu-gate-style-btn" type="button">Gate: Box View</button>
             <button class="sandbox-menu-btn" id="sandbox-wire-style-btn" type="button">Wire: Curve</button>
             <button class="sandbox-menu-btn" id="sandbox-organize-btn" type="button">Organize circuit</button>
         </div>
     </details>
+
+    <button class="sandbox-btn" id="sandbox-add-region-btn" title="Add Highlight Area / Block (Group circuit stages with colors and labels)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="3" stroke-dasharray="3 3" />
+            <path d="M8 12h8M12 8v8" />
+        </svg><span>+ Area</span>
+    </button>
 
     <button class="sandbox-btn" id="sandbox-screenshot-btn" title="Export Circuit as Image">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -94,7 +102,7 @@
         </svg><span>Import</span>
     </button>
 
-    <button class="sandbox-btn" id="sandbox-gate-style-btn" title="Toggle Gate Style (Box / ANSI Symbol)">
+    <button class="sandbox-btn sandbox-gate-style-btn" id="sandbox-gate-style-btn" title="Cycle Gate Mode: Box View / ANSI Symbol / Schematic">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="18" height="18" rx="2" />
             <path d="M9 17V7l5 5-5 5" />
