@@ -1,4 +1,3 @@
-// IC Logic Chip Tester & Diagnostic Bench
 import { showToast } from '../common.js';
 import { generateICSchematicSVG } from './ic-schematic.js';
 
@@ -283,7 +282,6 @@ export function initICTester() {
   const sg = s => segActive[s] ? ' filter="url(#gl)"' : '';
 
 function setupEventListeners() {
-  // IC Tab clicks
   const tabs = document.querySelectorAll('.ic-chip-tab');
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -295,7 +293,6 @@ function setupEventListeners() {
     });
   });
 
-  // Subtabs (Gates vs Truth Table)
   const subtabs = document.querySelectorAll('.ic-subtab');
   subtabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -332,7 +329,6 @@ function setupEventListeners() {
     if (window.navigateToRoute) {
       window.navigateToRoute('/logic/sandbox');
       setTimeout(() => {
-        // Drop tested IC or template onto sandbox
         if (window.loadSandboxTemplate && icKey === '7447') {
           window.loadSandboxTemplate('seven-seg-decoder-demo');
         } else if (window.addSandboxNode) {
@@ -343,7 +339,6 @@ function setupEventListeners() {
     }
   });
 
-  // View mode toggle (Package vs Real Gate Schematic)
   const modeBtns = document.querySelectorAll('.ic-mode-btn');
   modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -365,7 +360,6 @@ function loadIC(icKey) {
   const badge = document.getElementById('ic-package-badge');
   if (badge) badge.textContent = ic.package;
 
-  // Toggle 7-segment display preview
   const sevenSegPreview = document.getElementById('ic-sevenseg-preview');
   if (sevenSegPreview) {
     sevenSegPreview.style.display = icKey === '7447' ? 'flex' : 'none';
@@ -376,11 +370,9 @@ function loadIC(icKey) {
   renderGatesView(ic);
   renderTruthTable(ic);
   evaluateIC();
-  // Refresh schematic if in schematic mode
   if (currentViewMode === 'schematic') renderICSchematic(ic);
 }
 
-// ── View mode switching ──────────────────────────────────────────
 function updateViewMode() {
   const chipRender = document.getElementById('ic-chip-render');
   const schRender  = document.getElementById('ic-schematic-render');
@@ -402,14 +394,12 @@ function renderICSchematic(ic) {
   if (currentICKey === '7447') {
     container.innerHTML = render7447Schematic();
   } else {
-    // Standard ICs — use generateICSchematicSVG
     const nodeProxy = { type: `ic-${currentICKey}`, pinValues: pinStates };
     const svgHtml = generateICSchematicSVG(nodeProxy, ic);
     container.innerHTML = `<div style="position:relative;width:100%;height:240px;">${svgHtml}</div>`;
   }
 }
 
-// ── 7447 BCD → 7-Segment Decoder schematic SVG ──────────────────
 function render7447Schematic() {
   const A  = pinStates[7] || 0;
   const B  = pinStates[1] || 0;
@@ -452,15 +442,14 @@ function render7447Schematic() {
   const oBoxR = 590;         // output box right
   const dspX  = 618;         // 7-seg display x
 
-  // y of each input pin
+  // y of each input 
   const yA = 75, yB = 145, yC = 215, yD = 285;
-  // y of each output segment (a–g)
+  // y of each output 
   const oys = { a:50, b:115, c:180, d:245, e:310, f:375, g:440 };
   const segNames   = ['a','b','c','d','e','f','g'];
   const segActive  = { a:sa, b:sb, c:sc, d:sd, e:se, f:sf, g:sg };
   const segPins    = { a:13, b:12, c:11, d:10, e:9, f:15, g:14 };
 
-  // ── Gate symbol helpers ───────────────────────────────────────
   const notGate = (x, y, act) => {
     const col  = ic(act);
     const fill = act ? 'rgba(190,242,100,0.12)' : 'rgba(10,15,13,0.8)';
@@ -482,7 +471,6 @@ function render7447Schematic() {
     return `<polygon points="${x},${y-9} ${x+18},${y} ${x},${y+9}" fill="${fill}" stroke="${col}" stroke-width="1.5"/>`;
   };
 
-  // ── 7-segment display ─────────────────────────────────────────
   const W=44, H=44, T=8;
   const dx=dspX, dy=60;
 
@@ -507,7 +495,6 @@ function render7447Schematic() {
     <text x="${dx+W/2}" y="${dy+H*2+T+22}" fill="${bcd<=9?HI:dimTxt}" font-size="12" font-weight="800" text-anchor="middle">${bcd<=9?bcd:'X'}</text>
   `;
 
-  // ── Build SVG rows ────────────────────────────────────────────
   let rows = '';
   segNames.forEach(seg => {
     const y = oys[seg];
@@ -539,7 +526,6 @@ function render7447Schematic() {
     `;
   });
 
-  // ── Vertical input buses ──────────────────────────────────────
   const lastY = oys.g;
   const buses = [
     { x: busX1+5,  val: A, label: 'A' },
@@ -567,7 +553,6 @@ function render7447Schematic() {
   </pattern>
   <rect width="760" height="500" fill="url(#pg)"/>
 
-  <!-- ═══ 4-BIT INPUT BOX ══════════════════════════════════════ -->
   <rect x="10" y="28" width="130" height="280" rx="8"
     fill="rgba(0,180,216,0.05)" stroke="#0ea5e9" stroke-width="2"/>
   <text x="75" y="18" fill="#0ea5e9" font-size="10" font-weight="800" text-anchor="middle" letter-spacing="1.5">4 BIT INPUT</text>
@@ -619,18 +604,14 @@ function render7447Schematic() {
   <line x1="${busX1+41}" y1="${yD}" x2="${busX1+41}" y2="${lastY}" stroke="${wc(D)}" stroke-width="1.2" stroke-dasharray="${D?'':'4,3'}"/>
   <circle cx="${busX1+41}" cy="${yD}" r="3" fill="${D?wHi:wLo}"/>
 
-  <!-- ═══ DECODE MATRIX label ════════════════════════════════════ -->
   <text x="${(nandX+bufX)/2+10}" y="25" fill="${dimTxt}" font-size="9" font-weight="700" text-anchor="middle" letter-spacing="1.2">BCD DECODE MATRIX</text>
 
-  <!-- Gate rows (a–g) -->
   ${rows}
 
-  <!-- ═══ 7-BIT OUTPUT BOX ════════════════════════════════════════ -->
   <rect x="${oBoxL}" y="22" width="${oBoxR-oBoxL}" height="460" rx="8"
     fill="rgba(239,68,68,0.05)" stroke="#ef4444" stroke-width="1.8"/>
   <text x="${(oBoxL+oBoxR)/2}" y="14" fill="#ef4444" font-size="10" font-weight="800" text-anchor="middle" letter-spacing="1.5">7 BIT OUTPUT</text>
 
-  <!-- ═══ 7-Segment display ════════════════════════════════════════ -->
   ${segDisplay}
 
   <!-- Display segment labels -->
@@ -642,7 +623,6 @@ function render7447Schematic() {
   <text x="${dspX-10}" y="${dy+H/2}" fill="${sc('f')}" font-size="10" font-weight="800" text-anchor="end">f</text>
   <text x="${dspX+W/2-4}" y="${dy+H+T+5}" fill="${sc('g')}" font-size="10" font-weight="800" text-anchor="middle">g</text>
 
-  <!-- Footer -->
   <text x="380" y="490" fill="${dimTxt}" font-size="9" text-anchor="middle" letter-spacing="0.5"
     >SN74LS47N — BCD to 7-Seg Decoder/Driver  ·  BCD = ${bcd}${bcd>9?' (invalid)':''}</text>
 </svg>`;
@@ -657,7 +637,6 @@ function resetPins() {
     if (pin.type === 'power') {
       pinStates[pin.num] = pin.name === 'VCC' ? 1 : 0;
     } else if (pin.type === 'input') {
-      // Default control pins for 7447
       if (pin.name === 'LT' || pin.name === 'BI' || pin.name === 'RBI') {
         pinStates[pin.num] = 1; // active high for normal operation
       } else {
@@ -739,7 +718,6 @@ function evaluateIC() {
   if (!ic) return;
 
   if (ic.gateType === 'decoder') {
-    // 7447 BCD Decoder evaluation
     const valA = pinStates[7] || 0; // Pin 7: A (LSB)
     const valB = pinStates[1] || 0; // Pin 1: B
     const valC = pinStates[2] || 0; // Pin 2: C
@@ -767,7 +745,6 @@ function evaluateIC() {
       pinStates[pin] = segs[i];
     });
 
-    // Update 7-segment display on bench
     segNames.forEach((name, i) => {
       const segEl = document.getElementById(`ic-seg-${name}`);
       if (segEl) segEl.classList.toggle('active', segs[i] === 1);
@@ -777,14 +754,12 @@ function evaluateIC() {
     if (valEl) valEl.textContent = bcdVal <= 9 ? String(bcdVal) : '-';
 
   } else {
-    // Standard logic gates (AND, OR, NOT, NAND, NOR, XOR)
     ic.gates.forEach(g => {
       const a = pinStates[g.inA] || 0;
       const b = g.inB !== undefined ? (pinStates[g.inB] || 0) : 0;
       const out = ic.evalGate(a, b);
       pinStates[g.out] = out;
 
-      // Update gate card in Gates view
       const gateStatus = document.getElementById(`ic-gate-status-${g.name.replace(/\s+/g, '')}`);
       if (gateStatus) {
         gateStatus.textContent = out ? 'HIGH (1)' : 'LOW (0)';
@@ -808,7 +783,6 @@ function evaluateIC() {
     });
   }
 
-  // Update DIP pin rendering indicators
   ic.pins.forEach(pin => {
     const val = pinStates[pin.num] || 0;
     const ctrlEl = document.getElementById(`ic-pin-ctrl-${pin.num}`);
@@ -827,10 +801,8 @@ function evaluateIC() {
     }
   });
 
-  // Highlight matching table row
   highlightMatchingTableRow(ic);
 
-  // Refresh schematic if in schematic mode (live update on pin toggle)
   if (currentViewMode === 'schematic') {
     renderICSchematic(ic);
   }

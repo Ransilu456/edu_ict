@@ -23,7 +23,7 @@ const I = {
   parity: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18M7 3v18M17 3v18"/></svg>`
 };
 
-// 7 OSI Layers Definition (Numbered 7 at top down to 1 at bottom)
+// 7 OSI Layers Definition 
 const OSI_LAYERS = [
   {
     num: 7,
@@ -84,13 +84,13 @@ const OSI_LAYERS = [
     name: 'Physical',
     pdu: 'Bits',
     headerName: 'BITSTREAM',
-    headerDesc: 'Physical Bitstream (Encoding: 1000BASE-T PAM-5 4D-PAM5 Signaling, 1.0 Gbps bit pulses)',
+    headerDesc: 'Physical Bitstream (Encoding: 1.0 Gbps bit pulses)',
     actionDesc: 'Modulates frame into electrical voltage pulses transmitted across copper Cat6 media.',
     color: '#bef264',
   },
 ];
 
-let osiStep = 0; // 0 = Idle, 1..7 = Encapsulation (L7->L1), 8 = Wire Transit, 9..15 = De-encapsulation (L1->L7)
+let osiStep = 0; 
 let osiPlaying = false;
 let userPayload = 'Hello LogicQuest!';
 
@@ -150,10 +150,8 @@ function renderShell(c) {
         </button>
       </nav>
 
-      <!-- Panel 1: 3D OSI Simulator -->
       <div class="nd-panel active" id="tab-osi-tab">
         <div class="osi-3d-lab">
-          <!-- Top Hero & Controls -->
           <div class="osi-hero-bar">
             <div class="osi-hero-info">
               <span class="osi-kicker"><span class="osi-kicker-dot"></span>7-LAYER INTERACTIVE SIMULATOR</span>
@@ -162,7 +160,6 @@ function renderShell(c) {
             </div>
             
             <div class="osi-hero-controls">
-              <!-- Custom Payload Input -->
               <div class="osi-payload-picker">
                 <label for="osi-payload-input">Data Payload:</label>
                 <div class="osi-input-wrap">
@@ -176,7 +173,6 @@ function renderShell(c) {
                 </div>
               </div>
 
-              <!-- Playback buttons -->
               <div class="osi-ctrl-row">
                 <button class="nd-btn-ctrl" id="osi-step-back" title="Step Back">${I.stepBack}</button>
                 <button class="nd-btn-ctrl nd-btn-primary" id="osi-play-toggle">${I.play} Play</button>
@@ -190,9 +186,7 @@ function renderShell(c) {
             </div>
           </div>
 
-          <!-- 3D Visualization Arena -->
           <div class="osi-arena">
-            <!-- Left: Client / Sender Stack -->
             <div class="osi-host-card client" id="osi-client-host">
               <div class="osi-host-header">
                 <div class="osi-host-icon">${I.laptop}</div>
@@ -205,7 +199,6 @@ function renderShell(c) {
               <div class="osi-stack-3d" id="osi-client-stack"></div>
             </div>
 
-            <!-- Middle: Physical Medium / Cable -->
             <div class="osi-cable-arena">
               <div class="osi-cable-path">
                 <div class="osi-cable-line" id="osi-cable-line"></div>
@@ -217,12 +210,11 @@ function renderShell(c) {
                 </div>
               </div>
               <div class="osi-medium-badge">
-                <span>1000BASE-T Copper Twisted Pair (Cat6)</span>
-                <small id="osi-wire-stats">Link: 1000 Mbps &bull; Full Duplex &bull; 67% c</small>
+                <span>Twisted Pair</span>
+                <small id="osi-wire-stats">Link: 1000 Mbps</small>
               </div>
             </div>
 
-            <!-- Right: Server / Receiver Stack -->
             <div class="osi-host-card server" id="osi-server-host">
               <div class="osi-host-header">
                 <div class="osi-host-icon">${I.server}</div>
@@ -236,7 +228,6 @@ function renderShell(c) {
             </div>
           </div>
 
-          <!-- Bottom: Live Protocol Inspector & Layer Explanation -->
           <div class="osi-inspector-panel">
             <div class="osi-inspector-header">
               <div class="osi-stage-pill" id="osi-stage-pill">STAGE 0 / 15 &bull; IDLE</div>
@@ -246,7 +237,6 @@ function renderShell(c) {
               Choose your data message above, then click <strong>Play</strong> or <strong>Step Next</strong> to watch OSI layers process and encapsulate the payload.
             </p>
 
-            <!-- Dynamic Packet Structure visualization -->
             <div class="osi-packet-structure-box">
               <div class="packet-structure-label">Current PDU Packet Structure (Headers + Payload):</div>
               <div class="packet-tags-container" id="osi-packet-tags">
@@ -254,16 +244,13 @@ function renderShell(c) {
               </div>
             </div>
 
-            <!-- Header breakdown table -->
             <div class="osi-header-details" id="osi-header-details"></div>
           </div>
         </div>
       </div>
 
-      <!-- Panel 2: URL to Pixels Journey -->
       <div class="nd-panel" id="tab-url-tab">
         <div class="url-journey-lab">
-          <!-- URL Bar & Selector -->
           <div class="url-hero-header">
             <div>
               <span class="osi-kicker"><span class="osi-kicker-dot"></span>FULL-STACK NETWORK LIFECYCLE</span>
@@ -282,7 +269,6 @@ function renderShell(c) {
               </select>
             </div>
 
-            <!-- URL Prefix & Protocol Anatomy Explainer -->
             <div class="url-prefix-breakdown-card" id="url-prefix-breakdown-card">
               <div class="url-prefix-breakdown-title">
                 <span class="url-prefix-badge">URL PROTOCOL PREFIX &amp; ANATOMY</span>
@@ -293,10 +279,8 @@ function renderShell(c) {
             </div>
           </div>
 
-          <!-- Stepper Dots -->
           <div class="url-stepper-track" id="url-stepper-dots"></div>
 
-          <!-- Network Hop Topology diagram -->
           <div class="url-hops-stage">
             <div class="url-hop-node" id="hop-node-device">
               <div class="hop-icon-box">${I.laptop}</div>
@@ -326,7 +310,6 @@ function renderShell(c) {
             </div>
           </div>
 
-          <!-- Active Step Inspection Card -->
           <div class="url-step-card" id="url-step-card">
             <div class="url-card-header">
               <div class="url-step-badge" id="url-step-badge">STEP 1 OF 9</div>
@@ -337,7 +320,6 @@ function renderShell(c) {
             <div class="url-protocol-packet" id="url-protocol-packet"></div>
           </div>
 
-          <!-- Playback controls -->
           <div class="url-controls-footer">
             <button class="nd-btn-ctrl" id="url-prev-btn">${I.stepBack} Previous</button>
             <button class="nd-btn-ctrl nd-btn-primary" id="url-play-btn">${I.play} Auto Play</button>
@@ -347,12 +329,10 @@ function renderShell(c) {
         </div>
       </div>
 
-      <!-- Panel 3: Subnetting -->
       <div class="nd-panel" id="tab-subnet-tab">
         <div id="subnet-root-container"></div>
       </div>
 
-      <!-- Panel 4: Parity & Signal Encoding -->
       <div class="nd-panel" id="tab-parity-tab">
         <div id="parity-root-container"></div>
       </div>
@@ -397,16 +377,11 @@ export function switchNDTab(tabId) {
   }
 }
 
-/* ============================================================
-   3D OSI SIMULATOR IMPLEMENTATION
-   ============================================================ */
-
 function init3DOsi() {
   const clientStack = document.getElementById('osi-client-stack');
   const serverStack = document.getElementById('osi-server-stack');
   if (!clientStack || !serverStack) return;
 
-  // Render 3D Slabs for both client and server (Layers 7 down to 1)
   clientStack.innerHTML = OSI_LAYERS.map(l => `
     <div class="osi-slab-3d" id="osi-c-slab-${l.num}" data-layer="${l.num}">
       <div class="slab-face top"></div>
@@ -439,7 +414,6 @@ function init3DOsi() {
     </div>
   `).join('');
 
-  // Event Listeners for Payload Input
   const payloadInput = document.getElementById('osi-payload-input');
   payloadInput?.addEventListener('input', (e) => {
     userPayload = e.target.value || 'Data';
@@ -575,7 +549,6 @@ function renderOsiState() {
   const clientHost = document.getElementById('osi-client-host');
   const serverHost = document.getElementById('osi-server-host');
 
-  // Clear all active/completed classes from slabs
   document.querySelectorAll('.osi-slab-3d').forEach(s => {
     s.classList.remove('active', 'completed');
   });
@@ -593,15 +566,14 @@ function renderOsiState() {
 
   // STAGE 0: IDLE
   if (osiStep === 0) {
-    if (stagePill) stagePill.textContent = 'STAGE 0 / 15 • IDLE';
+    if (stagePill) stagePill.textContent = 'STAGE 0 / 15  IDLE';
     if (stageTitle) stageTitle.textContent = 'Ready to begin transmission';
-    if (stageDesc) stageDesc.innerHTML = `Data payload is initialized with <strong>"${escapeHtml(userPayload)}"</strong>. Click <strong>Play</strong> or <strong>Step Next</strong> to begin client encapsulation.`;
+    if (stageDesc) stageDesc.innerHTML = `Data payload is initialized with <strong>"${escapeHtml(userPayload)}"</strong>.`;
     if (packetTags) packetTags.innerHTML = `<span class="packet-tag data">[DATA: "${escapeHtml(userPayload)}"]</span>`;
     if (headerDetails) headerDetails.innerHTML = '';
     return;
   }
 
-  // STAGES 1 to 7: ENCAPSULATION (Client Sender, L7 -> L1)
   if (osiStep >= 1 && osiStep <= 7) {
     clientHost?.classList.add('active');
     const layerNum = 8 - osiStep; // 7, 6, 5, 4, 3, 2, 1
@@ -611,19 +583,17 @@ function renderOsiState() {
     const activeSlab = document.getElementById(`osi-c-slab-${layerNum}`);
     activeSlab?.classList.add('active');
 
-    // Completed previous layers (from L7 down to layerNum + 1)
     for (let l = 7; l > layerNum; l--) {
       document.getElementById(`osi-c-slab-${l}`)?.classList.add('completed');
     }
 
-    if (stagePill) stagePill.textContent = `STAGE ${osiStep} / 15 • CLIENT ENCAPSULATION`;
+    if (stagePill) stagePill.textContent = `STAGE ${osiStep} / 15  CLIENT ENCAPSULATION`;
     if (stageTitle) stageTitle.innerHTML = `Layer ${layerNum} (${currentLayer.name}) Encapsulation: Added [${currentLayer.headerName}]`;
     if (stageDesc) stageDesc.innerHTML = `<strong>PDU: ${currentLayer.pdu}</strong> — ${currentLayer.actionDesc}`;
 
     // Build cumulative packet tags
     if (packetTags) {
       let tagsHtml = '';
-      // Added headers so far (from layerNum up to 2, then data)
       for (let l = layerNum; l <= 7; l++) {
         const item = OSI_LAYERS.find(x => x.num === l);
         tagsHtml += `<span class="packet-tag" style="border-color:${item.color}; background:rgba(${hexToRgb(item.color)}, 0.18); color:${item.color}">[${item.headerName}]</span>`;
@@ -662,7 +632,7 @@ function renderOsiState() {
     }
     if (cableLine) cableLine.classList.add('active');
 
-    if (stagePill) stagePill.textContent = `STAGE 8 / 15 • PHYSICAL WIRE TRANSIT`;
+    if (stagePill) stagePill.textContent = `STAGE 8 / 15  PHYSICAL WIRE TRANSIT`;
     if (stageTitle) stageTitle.textContent = `Bitstream Traveling Across Cat6 Physical Cable`;
     if (stageDesc) stageDesc.innerHTML = `The completely encapsulated Ethernet Frame is modulated into high-frequency electrical pulses traveling at ~200,000 km/s (67% speed of light) through the copper wire towards Server.`;
 
@@ -703,12 +673,11 @@ function renderOsiState() {
     const activeSlab = document.getElementById(`osi-s-slab-${layerNum}`);
     activeSlab?.classList.add('active');
 
-    // Completed server slabs (from L1 up to layerNum - 1)
     for (let l = 1; l < layerNum; l++) {
       document.getElementById(`osi-s-slab-${l}`)?.classList.add('completed');
     }
 
-    if (stagePill) stagePill.textContent = `STAGE ${osiStep} / 15 • SERVER DE-ENCAPSULATION`;
+    if (stagePill) stagePill.textContent = `STAGE ${osiStep} / 15  SERVER DE-ENCAPSULATION`;
     if (stageTitle) stageTitle.innerHTML = `Layer ${layerNum} (${currentLayer.name}) De-encapsulation: Stripped &amp; Verified [${currentLayer.headerName}]`;
 
     if (layerNum === 7) {

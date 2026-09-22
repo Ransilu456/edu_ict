@@ -4,7 +4,6 @@ import sandboxSidebarHtml from '../components/sandbox-sidebar.html?raw';
 import sandboxToolbarHtml from '../components/sandbox-toolbar.html?raw';
 import sandboxModalsHtml from '../components/sandbox-modals.html?raw';
 import networkViewHtml from '../components/network-view.html?raw';
-import icTesterViewHtml from '../components/ic-tester-view.html?raw';
 // import breadboardViewHtml from '../components/breadboard-view.html?raw';
 import globalModalsHtml from '../components/global-modals.html?raw';
 import footerHtml from '../components/app-footer.html?raw';
@@ -20,7 +19,7 @@ export function mountComponents() {
   mount('app-header', headerHtml);
   const main = document.getElementById('app-main');
   if (main) {
-    main.innerHTML = booleanHtml + binaryHtml + sandboxViewHtml + icTesterViewHtml + networkViewHtml;
+    main.innerHTML = booleanHtml + binaryHtml + sandboxViewHtml  + networkViewHtml;
     const sidebarSlot = document.getElementById('sandbox-sidebar-slot');
     if (sidebarSlot) sidebarSlot.outerHTML = sandboxSidebarHtml;
     const toolbarSlot = document.getElementById('sandbox-toolbar-slot');

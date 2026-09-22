@@ -113,13 +113,11 @@ nav {
 [data-theme="dark"] nav {
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
-  border-radius: 9999px;
   box-shadow: none;
 }
 
 :root.dark .nav-tab,
 [data-theme="dark"] .nav-tab {
-  border-radius: 9999px;
   color: var(--text-secondary);
 }
 
