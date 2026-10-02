@@ -12,7 +12,7 @@ function tokenize(expr) {
       tokens.push(operators[word] ? { type: operators[word] } : { type: 'IDENT', value: word });
       continue;
     }
-    const symbols = { '+': 'OR', '|': 'OR', '*': 'AND', '.': 'AND', '∧': 'AND', '∨': 'OR', '⊕': 'XOR', '⊙': 'XNOR', '¬': 'NOT' };
+    const symbols = { '+': 'OR', '|': 'OR', '*': 'AND', '.': 'AND', '∧': 'AND', '∨': 'OR', '⊕': 'XOR', '⊙': 'XNOR', '¬': 'NOT', '!': 'NOT', '~': 'NOT' };
     if (symbols[ch]) tokens.push({ type: symbols[ch] });
     else if (ch === '(') tokens.push({ type: 'LPAREN' });
     else if (ch === ')') tokens.push({ type: 'RPAREN' });
@@ -42,19 +42,25 @@ function createParser(tokens) {
       index++;
       return { op: 'VAR', name: token.value };
     }
-    if (consume('NOT')) {
-      return { op: 'NOT', expr: parsePrimary() };
-    }
     throw new Error('Expected identifier or parenthesis');
   };
   const parseUnary = () => {
     if (consume('NOT')) return { op: 'NOT', expr: parseUnary() };
-    return parsePrimary();
+    let expression = parsePrimary();
+    while (consume('NOT')) expression = { op: 'NOT', expr: expression };
+    return expression;
   };
   const parseAnd = () => {
     let left = parseUnary();
-    while (consume('AND') || consume('NAND')) {
-      const operator = tokens[index - 1].type;
+    while (true) {
+      let operator;
+      if (consume('AND') || consume('NAND')) {
+        operator = tokens[index - 1].type;
+      } else if (['IDENT', 'LPAREN', 'NOT'].includes(peek().type)) {
+        operator = 'AND';
+      } else {
+        break;
+      }
       const right = parseUnary();
       left = { op: operator === 'NAND' ? 'NAND' : 'AND', left, right };
     }
@@ -62,9 +68,10 @@ function createParser(tokens) {
   };
   const parseXor = () => {
     let left = parseAnd();
-    while (consume('XOR')) {
+    while (consume('XOR') || consume('XNOR')) {
+      const operator = tokens[index - 1].type;
       const right = parseAnd();
-      left = { op: 'XOR', left, right };
+      left = { op: operator, left, right };
     }
     return left;
   };
@@ -118,34 +125,52 @@ function astToCircuit(ast) {
   const nodes = [];
   const wires = [];
   let leafIndex = 0;
+  const inputNodes = new Map();
+  const maxDepth = treeDepth(ast);
   const createNode = (type, label, x, y, inputsCount = 1, outputsCount = 1) => {
     const id = `bool-${Math.random().toString(36).slice(2,8)}`;
     nodes.push({ id, type, label, x, y, inputsCount, outputsCount, outputState: 0, outputState2: 0, inputValues: Array(inputsCount).fill(0), data: {} });
     return id;
   };
+  const allocateGateY = (x, desiredY) => {
+    const occupied = nodes.filter(node => node.x === x && node.type !== 'input').map(node => node.y);
+    const isOccupied = candidate => occupied.some(y => Math.abs(y - candidate) < 120);
+    if (!isOccupied(desiredY)) return desiredY;
+    for (let step = 1; ; step++) {
+      const above = desiredY - step * 120;
+      if (!isOccupied(above)) return above;
+      const below = desiredY + step * 120;
+      if (!isOccupied(below)) return below;
+    }
+  };
   const walk = (node, depth = 0) => {
     if (node.op === 'VAR') {
-      const y = 70 + leafIndex++ * 100;
-      return { id: createNode('input', node.name, 70, y, 0), y };
+      if (inputNodes.has(node.name)) return inputNodes.get(node.name);
+      const y = 70 + leafIndex++ * 120;
+      const result = { id: createNode('input', node.name, 70, y, 0), y };
+      inputNodes.set(node.name, result);
+      return result;
     }
     if (node.op === 'NOT') {
       const input = walk(node.expr, depth + 1);
-      const y = input.y;
-      const outId = createNode('not', 'NOT', 70 + depth * 180, y, 1);
+      const x = 70 + (maxDepth - depth - 1) * 180;
+      const y = allocateGateY(x, input.y);
+      const outId = createNode('not', 'NOT', x, y, 1);
       wires.push({ fromNodeId: input.id, fromPortIdx: 0, toNodeId: outId, toPortIdx: 0 });
       return { id: outId, y };
     }
     const left = walk(node.left, depth + 1);
     const right = walk(node.right, depth + 1);
     const gateType = { AND: 'and', OR: 'or', XOR: 'xor', XNOR: 'xnor', NAND: 'nand', NOR: 'nor' }[node.op];
-    const y = (left.y + right.y) / 2;
-    const outId = createNode(gateType, gateType.toUpperCase(), 70 + depth * 180, y, 2);
+    const x = 70 + (maxDepth - depth - 1) * 180;
+    const y = allocateGateY(x, (left.y + right.y) / 2);
+    const outId = createNode(gateType, gateType.toUpperCase(), x, y, 2);
     wires.push({ fromNodeId: left.id, fromPortIdx: 0, toNodeId: outId, toPortIdx: 0 });
     wires.push({ fromNodeId: right.id, fromPortIdx: 0, toNodeId: outId, toPortIdx: 1 });
     return { id: outId, y };
   };
   const root = walk(ast);
-  const outputId = createNode('output', 'OUTPUT', 70 + treeDepth(ast) * 180, root.y, 1, 0);
+  const outputId = createNode('output', 'OUTPUT', 70 + maxDepth * 180, root.y, 1, 0);
   wires.push({ fromNodeId: root.id, fromPortIdx: 0, toNodeId: outputId, toPortIdx: 0 });
   return { nodes, wires };
 }

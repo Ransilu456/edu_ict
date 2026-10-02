@@ -2214,10 +2214,13 @@ function updateSandboxWires() {
   const getPortSide = (port) => {
     const parent = port.parentElement;
     if (!parent) return 'right';
-    if (port.closest('.real-ic-col.left') || port.style.left === '-7px' || port.classList.contains('port-input')) {
+    const icColumn = port.closest('.real-ic-col');
+    if (icColumn?.classList.contains('left')) return 'left';
+    if (icColumn?.classList.contains('right')) return 'right';
+    if (port.style.left === '-7px' || port.classList.contains('port-input')) {
       return 'left';
     }
-    if (port.closest('.real-ic-col.right') || port.style.right === '-7px' || port.classList.contains('port-output')) {
+    if (port.style.right === '-7px' || port.classList.contains('port-output')) {
       return 'right';
     }
     const rect = parent.getBoundingClientRect();
@@ -2291,7 +2294,7 @@ function updateSandboxWires() {
       const nodeBottom = nodeBounds.bottom;
       const outIsLeft = sourceSide === 'left';
       const inIsLeft = targetSide === 'left';
-      const laneOffset = nextRouteLane(`${wire.fromNodeId}:${wire.fromPortIdx}:${wire.toPortIdx}:self:${outIsLeft ? 'left' : 'right'}`, 16);
+      const laneOffset = nextRouteLane(`${wire.fromNodeId}:self:${outIsLeft ? 'left' : 'right'}:${inIsLeft ? 'left' : 'right'}`, 16);
 
       if (outIsLeft && inIsLeft) {
         const outX = nodeLeft - 28 - laneOffset;
