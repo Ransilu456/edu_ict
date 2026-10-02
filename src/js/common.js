@@ -202,7 +202,6 @@ export function showToast(msg, type = 'auto') {
   if (!toast) {
     toast = document.createElement('div');
     toast.id = 'sb-toast';
-    toast.className = 'app-toast';
     document.body.appendChild(toast);
   }
 
@@ -225,6 +224,7 @@ export function showToast(msg, type = 'auto') {
 
   let iconSvg = '';
   let accentColor = 'var(--lime, #bef264)';
+
   if (resolvedType === 'success') {
     accentColor = 'var(--lime, #bef264)';
     iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--lime, #bef264); flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>`;
@@ -235,8 +235,8 @@ export function showToast(msg, type = 'auto') {
     accentColor = 'var(--color-amber, #fbbf24)';
     iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-amber, #fbbf24); flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
   } else {
-    accentColor = 'var(--blue, #38bdf8)';
-    iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue, #38bdf8); flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+    accentColor = 'var(--lime, #bef264)';
+    iconSvg = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--lime, #bef264); flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
   }
 
   toast.innerHTML = `${iconSvg}<span style="color:var(--text-primary, #f1f5f9)">${cleanMsg}</span>`;
@@ -252,7 +252,7 @@ export function showToast(msg, type = 'auto') {
     font-size: 0.82rem;
     font-family: var(--font-header, sans-serif);
     font-weight: 700;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 16px ${resolvedType === 'success' ? 'rgba(190, 242, 100, 0.2)' : 'rgba(0,0,0,0.3)'};
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.123), 0 0 16px rgba(190, 242, 100, 0.2);
     border: 1px solid ${resolvedType === 'success' ? 'rgba(190, 242, 100, 0.35)' : 'var(--border-color, #1e3025)'};
     display: flex;
     align-items: center;
@@ -273,6 +273,7 @@ export function showToast(msg, type = 'auto') {
     toast.style.transform = 'translateX(-50%) translateY(12px)';
   }, 2400);
 }
+
 window.showToast = showToast;
 
 function cleanupCommon() {}

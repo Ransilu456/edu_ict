@@ -53,7 +53,6 @@ function setupViewNavigation() {
     '/networking/journey': { panel: 'network-devices-view', subtab: 'url-tab' },
     '/networking/subnetting': { panel: 'network-devices-view', subtab: 'subnet-tab' },
     '/networking/signal-encoding': { panel: 'network-devices-view', subtab: 'parity-tab' },
-    '/hardware/breadboard': { panel: 'breadboard-view' },
   };
 
   const requestedRoute = workspaceMode

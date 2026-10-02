@@ -62,9 +62,13 @@
   --radius-sm: 6px;
   --radius-md: 10px;
   --content-max: 1180px;
-  
+
   --panel: #ffffff;
   --panel-raised: #f6f8f4;
+
+  --empty-shadow: rgba(0, 0, 0, 0.126);
+  --region-top-color: rgba(10, 15, 13, 0.212);
+  --region-shadow-color: rgba(246, 246, 248, 0.94);
 }
 
 :root.dark,
@@ -111,6 +115,10 @@
 
   --panel: #0f1713;
   --panel-raised: #16241c;
+
+  --empty-shadow: rgba(0, 0, 0, 0.4);
+  --region-top-color: rgba(10, 15, 13, 0.65);
+  --region-shadow-color: rgba(10, 15, 13, 0.35);
 }
 
 * {

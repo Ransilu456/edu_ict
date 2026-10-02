@@ -35,7 +35,7 @@ let selectionRectEl = null;
 const MAX_UNDO = 30;
 let undoStack = [];
 let _ignorePortClick = false;
-let wireStyle = localStorage.getItem('logicQuest_wireStyle') || 'curve';
+let wireStyle = localStorage.getItem('logicQuest_wireStyle') || 'orthogonal';
 
 export const WIRE_PALETTE = [
   { name: 'Blue', hex: '#3b82f6' },
@@ -1120,8 +1120,11 @@ function renderNodeDOM(node) {
   renderInputPorts(node, el);
   renderOutputPorts(node, el);
 
+  syncNodeMetrics(node, el);
+
   if (['not', 'buffer', 'and', 'or', 'nand', 'nor', 'xor', 'xnor'].includes(node.type)) {
     updateGateNodeHeight(el, node.inputsCount);
+    syncNodeMetrics(node, el);
   }
 
   const onStartDrag = (e) => {
@@ -1644,6 +1647,91 @@ function getGateNodeMetrics(node) {
   return { width, height };
 }
 
+function getNodeVisualMetrics(node) {
+  if (!node) return { width: 120, height: 90 };
+  if (typeof node.width === 'number' && typeof node.height === 'number') {
+    return { width: node.width, height: node.height };
+  }
+
+  const element = document.getElementById(node.id);
+  if (element && element.offsetWidth && element.offsetHeight) {
+    return {
+      width: element.offsetWidth,
+      height: element.offsetHeight,
+    };
+  }
+
+  const type = node.type;
+  const preset = {
+    input: { width: 90, height: 62 },
+    output: { width: 120, height: 110 },
+    'rgb-led': { width: 110, height: 100 },
+    buzzer: { width: 110, height: 100 },
+    'led-bar': { width: 130, height: 100 },
+    clock: { width: 126, height: 90 },
+    'seven-seg': { width: 110, height: 120 },
+    'text-label': { width: 140, height: 46 },
+  };
+
+  if (preset[type]) return preset[type];
+  if (REAL_ICS[type]) return { width: 220, height: 154 };
+
+  return getGateNodeMetrics(node);
+}
+
+function getNodeWorldBounds(node) {
+  const element = node && document.getElementById(node.id);
+  if (element) {
+    const rect = element.getBoundingClientRect();
+    const topLeft = screenToWorld(rect.left, rect.top);
+    const bottomRight = screenToWorld(rect.right, rect.bottom);
+    const left = Math.min(topLeft.x, bottomRight.x);
+    const top = Math.min(topLeft.y, bottomRight.y);
+    const right = Math.max(topLeft.x, bottomRight.x);
+    const bottom = Math.max(topLeft.y, bottomRight.y);
+    return { left, top, right, bottom, width: right - left, height: bottom - top };
+  }
+
+  const { width, height } = getNodeVisualMetrics(node);
+  return {
+    left: node.x || 0,
+    top: node.y || 0,
+    right: (node.x || 0) + width,
+    bottom: (node.y || 0) + height,
+    width,
+    height,
+  };
+}
+
+function syncNodeMetrics(node, el = document.getElementById(node.id)) {
+  if (!node || !el) return;
+  const width = el.offsetWidth || node.width || 120;
+  const height = el.offsetHeight || node.height || 90;
+  node.width = width;
+  node.height = height;
+  return { width, height };
+}
+
+function getNodePortWorldPoint(node, direction, portIdx) {
+  if (!node) return { x: 0, y: 0 };
+  const element = document.getElementById(node.id);
+  const ports = element?.querySelectorAll(direction === 'input' ? '.port-input' : '.port-output');
+  const port = Array.from(ports || []).find(candidate => Number(candidate.dataset.portIdx) === portIdx);
+  if (port) {
+    const rect = port.getBoundingClientRect();
+    return screenToWorld(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  }
+
+  const bounds = getNodeWorldBounds(node);
+  const count = direction === 'input'
+    ? Math.max(1, Number(node.inputsCount) || 1)
+    : Math.max(1, Number(node.outputsCount) || 1);
+  const fraction = count <= 1 ? 0.5 : 0.2 + (portIdx / Math.max(1, count - 1)) * 0.6;
+  const y = bounds.top + bounds.height * fraction;
+  const x = direction === 'input' ? bounds.left : bounds.right;
+  return { x, y };
+}
+
 function renderInputPorts(node, el) {
   const count = node.inputsCount;
   if (count === 0) return;
@@ -1913,6 +2001,11 @@ function startDrag(e, node) {
       domEl.style.left = `${node.x}px`;
       domEl.style.top = `${node.y}px`;
     }
+
+    const affectingRegion = sandboxRegions.find(r => getRegionNodeIds(r).includes(node.id));
+    if (affectingRegion) {
+      syncRegionToAttachedNodes(affectingRegion);
+    }
     updateSandboxWires();
   }
 
@@ -2113,10 +2206,23 @@ function updateSandboxWires() {
   });
 
   const routeLaneCounts = new Map();
-  const nextRouteLane = (key) => {
+  const nextRouteLane = (key, spacing = 18) => {
     const lane = routeLaneCounts.get(key) || 0;
     routeLaneCounts.set(key, lane + 1);
-    return lane;
+    return lane * spacing;
+  };
+  const getPortSide = (port) => {
+    const parent = port.parentElement;
+    if (!parent) return 'right';
+    if (port.closest('.real-ic-col.left') || port.style.left === '-7px' || port.classList.contains('port-input')) {
+      return 'left';
+    }
+    if (port.closest('.real-ic-col.right') || port.style.right === '-7px' || port.classList.contains('port-output')) {
+      return 'right';
+    }
+    const rect = parent.getBoundingClientRect();
+    const portRect = port.getBoundingClientRect();
+    return portRect.left + portRect.width / 2 < rect.left + rect.width / 2 ? 'left' : 'right';
   };
 
   const fromPortCounts = new Map();
@@ -2147,17 +2253,17 @@ function updateSandboxWires() {
     outPort.closest('.real-ic-pin-row')?.querySelector('.real-ic-pin-indicator')?.classList.add('connected');
     inPort.closest('.real-ic-pin-row')?.querySelector('.real-ic-pin-indicator')?.classList.add('connected');
 
-    const oR = outPort.getBoundingClientRect();
-    const iR = inPort.getBoundingClientRect();
-
-    const sourcePoint = screenToWorld(oR.left + oR.width / 2, oR.top + oR.height / 2);
-    const targetPoint = screenToWorld(iR.left + iR.width / 2, iR.top + iR.height / 2);
+    const srcNode = sandboxNodes.find(n => n.id === wire.fromNodeId);
+    const dstNode = sandboxNodes.find(n => n.id === wire.toNodeId);
+    const sourcePoint = getNodePortWorldPoint(srcNode, 'output', wire.fromPortIdx);
+    const targetPoint = getNodePortWorldPoint(dstNode, 'input', wire.toPortIdx);
     const x1 = sourcePoint.x;
     const y1 = sourcePoint.y;
     const x2 = targetPoint.x;
     const y2 = targetPoint.y;
+    const sourceSide = getPortSide(outPort);
+    const targetSide = getPortSide(inPort);
 
-    const srcNode = sandboxNodes.find(n => n.id === wire.fromNodeId);
     let srcVal = 0;
     if (srcNode) {
       if (srcNode.outputStates && srcNode.outputStates[wire.fromPortIdx] !== undefined) {
@@ -2177,58 +2283,41 @@ function updateSandboxWires() {
     const isSelfConnection = wire.fromNodeId === wire.toNodeId;
     let d = '';
 
-    if (isSelfConnection && fromEl) {
-      // Connecting two pins of the SAME IC / component: route cleanly OUTSIDE the node body
-      const fromBounds = screenToWorld(fromEl.getBoundingClientRect().left, fromEl.getBoundingClientRect().top);
-      const nodeTop = fromBounds.y;
-      const nodeLeft = fromBounds.x;
-      const nodeRight = screenToWorld(fromEl.getBoundingClientRect().right, fromEl.getBoundingClientRect().top).x;
-      const nodeBottom = screenToWorld(fromEl.getBoundingClientRect().left, fromEl.getBoundingClientRect().bottom).y;
-
-      const outIsLeft = !!outPort.closest('.real-ic-col.left');
-      const inIsLeft = !!inPort.closest('.real-ic-col.left');
+    if (isSelfConnection && srcNode) {
+      const nodeBounds = getNodeWorldBounds(srcNode);
+      const nodeTop = nodeBounds.top;
+      const nodeLeft = nodeBounds.left;
+      const nodeRight = nodeBounds.right;
+      const nodeBottom = nodeBounds.bottom;
+      const outIsLeft = sourceSide === 'left';
+      const inIsLeft = targetSide === 'left';
+      const laneOffset = nextRouteLane(`${wire.fromNodeId}:${wire.fromPortIdx}:${wire.toPortIdx}:self:${outIsLeft ? 'left' : 'right'}`, 16);
 
       if (outIsLeft && inIsLeft) {
-        // Both pins on the left side: route outside to the left
-        const lane = nextRouteLane(`${wire.fromNodeId}:left`);
-        const outX = nodeLeft - 28 - lane * 14;
-        if (wireStyle === 'orthogonal') {
-          d = `M ${x1} ${y1} L ${outX} ${y1} L ${outX} ${y2} L ${x2} ${y2}`;
-        } else {
-          d = `M ${x1} ${y1} C ${outX} ${y1}, ${outX} ${y2}, ${x2} ${y2}`;
-        }
+        const outX = nodeLeft - 28 - laneOffset;
+        d = wireStyle === 'orthogonal'
+          ? `M ${x1} ${y1} L ${outX} ${y1} L ${outX} ${y2} L ${x2} ${y2}`
+          : `M ${x1} ${y1} C ${outX} ${y1}, ${outX} ${y2}, ${x2} ${y2}`;
       } else if (!outIsLeft && !inIsLeft) {
-        // Both pins on the right side: route outside to the right
-        const lane = nextRouteLane(`${wire.fromNodeId}:right`);
-        const outX = nodeRight + 28 + lane * 14;
-        if (wireStyle === 'orthogonal') {
-          d = `M ${x1} ${y1} L ${outX} ${y1} L ${outX} ${y2} L ${x2} ${y2}`;
-        } else {
-          d = `M ${x1} ${y1} C ${outX} ${y1}, ${outX} ${y2}, ${x2} ${y2}`;
-        }
+        const outX = nodeRight + 28 + laneOffset;
+        d = wireStyle === 'orthogonal'
+          ? `M ${x1} ${y1} L ${outX} ${y1} L ${outX} ${y2} L ${x2} ${y2}`
+          : `M ${x1} ${y1} C ${outX} ${y1}, ${outX} ${y2}, ${x2} ${y2}`;
       } else {
-        // One pin on left, one pin on right: route around the top or bottom of the IC
         const distToTop = (y1 - nodeTop) + (y2 - nodeTop);
         const distToBottom = (nodeBottom - y1) + (nodeBottom - y2);
         const goTop = distToTop <= distToBottom;
-        const lane = nextRouteLane(`${wire.fromNodeId}:cross:${goTop ? 'top' : 'bottom'}`);
-
+        const bypassY = goTop ? nodeTop - 30 - laneOffset : nodeBottom + 30 + laneOffset;
         const leftX = nodeLeft - 28;
         const rightX = nodeRight + 28;
-        const bypassY = goTop
-          ? (nodeTop - 30 - lane * 18)
-          : (nodeBottom + 30 + lane * 18);
 
-        if (wireStyle === 'orthogonal') {
-          d = outIsLeft
+        d = wireStyle === 'orthogonal'
+          ? outIsLeft
             ? `M ${x1} ${y1} L ${leftX} ${y1} L ${leftX} ${bypassY} L ${rightX} ${bypassY} L ${rightX} ${y2} L ${x2} ${y2}`
-            : `M ${x1} ${y1} L ${rightX} ${y1} L ${rightX} ${bypassY} L ${leftX} ${bypassY} L ${leftX} ${y2} L ${x2} ${y2}`;
-        } else {
-          const midX = (x1 + x2) * 0.5;
-          d = outIsLeft
-            ? `M ${x1} ${y1} C ${leftX} ${y1}, ${leftX} ${bypassY}, ${midX} ${bypassY} S ${rightX} ${y2}, ${x2} ${y2}`
-            : `M ${x1} ${y1} C ${rightX} ${y1}, ${rightX} ${bypassY}, ${midX} ${bypassY} S ${leftX} ${y2}, ${x2} ${y2}`;
-        }
+            : `M ${x1} ${y1} L ${rightX} ${y1} L ${rightX} ${bypassY} L ${leftX} ${bypassY} L ${leftX} ${y2} L ${x2} ${y2}`
+          : outIsLeft
+            ? `M ${x1} ${y1} C ${leftX} ${y1}, ${leftX} ${bypassY}, ${(x1 + x2) * 0.5} ${bypassY} S ${rightX} ${y2}, ${x2} ${y2}`
+            : `M ${x1} ${y1} C ${rightX} ${y1}, ${rightX} ${bypassY}, ${(x1 + x2) * 0.5} ${bypassY} S ${leftX} ${y2}, ${x2} ${y2}`;
       }
     } else {
       const fromIsIC = fromEl.classList.contains('real-ic-node');
@@ -2236,38 +2325,22 @@ function updateSandboxWires() {
 
       if (fromIsIC || toIsIC) {
         const icEl = fromIsIC ? fromEl : toEl;
-        const icPort = fromIsIC ? outPort : inPort;
-        const icBounds = icEl.getBoundingClientRect();
-        const icBoundsWorld = screenToWorld(icBounds.left, icBounds.top);
-        const icLeft = icBoundsWorld.x;
-        const icRight = screenToWorld(icBounds.right, icBounds.top).x;
-        const onLeft = !!icPort.closest('.real-ic-col.left');
-        const side = onLeft ? 'left' : 'right';
-        const lane = nextRouteLane(`${icEl.id}:${side}:external`);
-        const channelX = onLeft
-          ? icLeft - 28 - lane * 14
-          : icRight + 28 + lane * 14;
-        const channelStartX = fromIsIC ? x1 : x2;
-        const channelStartY = fromIsIC ? y1 : y2;
-        const channelEndX = fromIsIC ? x2 : x1;
-        const channelEndY = fromIsIC ? y2 : y1;
+        const icNode = fromIsIC ? srcNode : dstNode;
+        const icBounds = icNode ? getNodeWorldBounds(icNode) : null;
+        const icLeft = icBounds ? icBounds.left : x1;
+        const icRight = icBounds ? icBounds.right : x2;
+        const onLeft = sourceSide === 'left' || targetSide === 'left';
+        const laneOffset = nextRouteLane(`${icEl.id}:${onLeft ? 'left' : 'right'}:external:${wire.fromPortIdx}:${wire.toPortIdx}`, 14);
+        const channelX = onLeft ? icLeft - 28 - laneOffset : icRight + 28 + laneOffset;
 
-        if (wireStyle === 'orthogonal') {
-          d = fromIsIC
+        d = wireStyle === 'straight'
+          ? `M ${x1} ${y1} L ${x2} ${y2}`
+          : wireStyle === 'orthogonal'
             ? `M ${x1} ${y1} L ${channelX} ${y1} L ${channelX} ${y2} L ${x2} ${y2}`
-            : `M ${x1} ${y1} L ${channelX} ${y1} L ${channelX} ${y2} L ${x2} ${y2}`;
-        } else if (wireStyle === 'straight') {
-          d = `M ${x1} ${y1} L ${x2} ${y2}`;
-        } else {
-          d = fromIsIC
-            ? `M ${x1} ${y1} C ${channelX} ${y1}, ${channelX} ${y2}, ${x2} ${y2}`
             : `M ${x1} ${y1} C ${channelX} ${y1}, ${channelX} ${y2}, ${x2} ${y2}`;
-        }
       } else {
-        const dstNode = sandboxNodes.find(n => n.id === wire.toNodeId);
         const srcRot = ((srcNode?.rotation || 0) * Math.PI) / 180;
         const dstRot = ((dstNode?.rotation || 0) * Math.PI) / 180;
-
         const nx1 = Math.cos(srcRot);
         const ny1 = Math.sin(srcRot);
         const nx2 = Math.cos(dstRot);
@@ -2276,38 +2349,33 @@ function updateSandboxWires() {
         if (wireStyle === 'straight') {
           d = `M ${x1} ${y1} L ${x2} ${y2}`;
         } else if (wireStyle === 'orthogonal') {
+          const sideBias = sourceSide === targetSide ? (sourceSide === 'left' ? -1 : 1) : 0;
+          const laneOffset = nextRouteLane(`${wire.fromNodeId}:${wire.toPortIdx}:${wire.toNodeId}:${wire.toPortIdx}:${sourceSide}:${targetSide}:route`, 20);
           const isSrcVert = Math.abs(ny1) > 0.7;
           const isDstVert = Math.abs(ny2) > 0.7;
 
           if (!isSrcVert && !isDstVert) {
-            if (nx1 >= 0 && nx2 >= 0 && x2 >= x1 + 16) {
-              const midX = x1 + (x2 - x1) * 0.5;
-              d = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
-            } else if (nx1 >= 0 && nx2 >= 0 && x2 < x1 + 16) {
-              const bypassY = y2 >= y1 ? Math.min(y1, y2) - 30 : Math.max(y1, y2) + 30;
-              d = `M ${x1} ${y1} L ${x1 + 22} ${y1} L ${x1 + 22} ${bypassY} L ${x2 - 22} ${bypassY} L ${x2 - 22} ${y2} L ${x2} ${y2}`;
-            } else {
-              const midX = x1 + (x2 - x1) * 0.5;
-              d = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
-            }
+            const midX = x1 + (x2 - x1) * 0.5 + laneOffset * 0.18 * sideBias;
+            d = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
           } else if (isSrcVert && !isDstVert) {
-            const stubY = y1 + (ny1 > 0 ? 24 : -24);
+            const stubY = y1 + (ny1 > 0 ? 24 + laneOffset : -24 - laneOffset);
             const inApproachX = x2 - (nx2 >= 0 ? 20 : -20);
             d = `M ${x1} ${y1} L ${x1} ${stubY} L ${inApproachX} ${stubY} L ${inApproachX} ${y2} L ${x2} ${y2}`;
           } else if (!isSrcVert && isDstVert) {
-            const stubX = x1 + (nx1 >= 0 ? 22 : -22);
+            const stubX = x1 + (nx1 >= 0 ? 22 + laneOffset : -22 - laneOffset);
             const inApproachY = y2 - (ny2 > 0 ? 22 : -22);
             d = `M ${x1} ${y1} L ${stubX} ${y1} L ${stubX} ${inApproachY} L ${x2} ${inApproachY} L ${x2} ${y2}`;
           } else {
-            const midY = y1 + (y2 - y1) * 0.5;
+            const midY = y1 + (y2 - y1) * 0.5 + laneOffset * 0.2;
             d = `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
           }
         } else {
+          const laneOffset = nextRouteLane(`${wire.fromNodeId}:${wire.toNodeId}:curve:${wire.fromPortIdx}:${wire.toPortIdx}:${sourceSide}:${targetSide}`, 12);
           const len = Math.max(30, Math.hypot(x2 - x1, y2 - y1) * 0.38);
-          const cp1x = x1 + nx1 * len;
-          const cp1y = y1 + ny1 * len;
-          const cp2x = x2 - nx2 * len;
-          const cp2y = y2 - ny2 * len;
+          const cp1x = x1 + nx1 * len + (sourceSide === 'left' ? -1 : 1) * laneOffset * 0.35;
+          const cp1y = y1 + ny1 * len + laneOffset * 0.15;
+          const cp2x = x2 - nx2 * len + (targetSide === 'left' ? -1 : 1) * laneOffset * 0.35;
+          const cp2y = y2 - ny2 * len - laneOffset * 0.15;
           d = `M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
         }
       }
@@ -3322,6 +3390,55 @@ const REGION_COLOR_PRESETS = [
   { name: 'Teal', hex: '#0d9488', bg: 'rgba(13, 148, 136, 0.08)' },
 ];
 
+function getRegionNodeIds(region) {
+  if (!region) return [];
+  if (Array.isArray(region.nodeIds) && region.nodeIds.length) return region.nodeIds.filter(Boolean);
+  return sandboxNodes
+    .filter(n => n.x >= region.x && n.x <= region.x + region.width && n.y >= region.y && n.y <= region.y + region.height)
+    .map(n => n.id);
+}
+
+function syncRegionToAttachedNodes(region) {
+  const nodeIds = getRegionNodeIds(region);
+  if (!nodeIds.length) return;
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  nodeIds.forEach(id => {
+    const node = sandboxNodes.find(n => n.id === id);
+    if (!node) return;
+    const bounds = getNodeWorldBounds(node);
+    minX = Math.min(minX, bounds.left);
+    minY = Math.min(minY, bounds.top);
+    maxX = Math.max(maxX, bounds.right);
+    maxY = Math.max(maxY, bounds.bottom);
+  });
+
+  if (!Number.isFinite(minX)) return;
+
+  const pad = 24;
+  const newX = Math.min(region.x, Math.round((minX - pad) / 10) * 10);
+  const newY = Math.min(region.y, Math.round((minY - pad - 16) / 10) * 10);
+  const newWidth = Math.max(region.width, Math.ceil((maxX + pad - newX) / 10) * 10);
+  const newHeight = Math.max(region.height, Math.ceil((maxY + pad + 16 - newY) / 10) * 10);
+
+  region.x = newX;
+  region.y = newY;
+  region.width = newWidth;
+  region.height = newHeight;
+
+  const el = document.getElementById(region.id);
+  if (el) {
+    el.style.left = `${region.x}px`;
+    el.style.top = `${region.y}px`;
+    el.style.width = `${region.width}px`;
+    el.style.height = `${region.height}px`;
+  }
+}
+
 function createRegion(params = {}) {
   pushUndo();
   const id = `sb-region-${nextRegionId++}`;
@@ -3337,6 +3454,7 @@ function createRegion(params = {}) {
     label: params.label || `BLOCK ${sandboxRegions.length + 1}`,
     color: params.color || colorDef.hex,
     bg: params.bg || colorDef.bg,
+    nodeIds: Array.isArray(params.nodeIds) ? params.nodeIds.filter(Boolean) : [],
   };
 
   sandboxRegions.push(region);
@@ -3360,16 +3478,11 @@ function createRegionAroundNodes(nodeIds) {
 
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   nodes.forEach(n => {
-    const el = document.getElementById(n.id);
-    const metrics = ['not', 'buffer', 'and', 'or', 'nand', 'nor', 'xor', 'xnor'].includes(n.type)
-      ? getGateNodeMetrics(n)
-      : { width: el ? el.offsetWidth : 100, height: el ? el.offsetHeight : 60 };
-    const w = metrics.width || (el ? el.offsetWidth : 100);
-    const h = metrics.height || (el ? el.offsetHeight : 60);
-    if (n.x < minX) minX = n.x;
-    if (n.y < minY) minY = n.y;
-    if (n.x + w > maxX) maxX = n.x + w;
-    if (n.y + h > maxY) maxY = n.y + h;
+    const bounds = getNodeWorldBounds(n);
+    minX = Math.min(minX, bounds.left);
+    minY = Math.min(minY, bounds.top);
+    maxX = Math.max(maxX, bounds.right);
+    maxY = Math.max(maxY, bounds.bottom);
   });
 
   const pad = 24;
@@ -3379,6 +3492,7 @@ function createRegionAroundNodes(nodeIds) {
     width: Math.max(120, (maxX - minX) + pad * 2),
     height: Math.max(100, (maxY - minY) + pad * 2 + 16),
     label: nodes.length === 1 ? `${nodes[0].label || 'STAGE'} BLOCK` : `${nodes.length} GATES BLOCK`,
+    nodeIds: nodes.map(n => n.id),
   });
   return region;
 }
@@ -3474,17 +3588,40 @@ function renderRegionDOM(region) {
 
     const startPos = getPos(e);
     const startWorld = screenToWorld(startPos.x, startPos.y);
+    const startRegionX = region.x;
+    const startRegionY = region.y;
     const offX = startWorld.x - region.x;
     const offY = startWorld.y - region.y;
+    const attachedNodeIds = getRegionNodeIds(region);
+    const nodeAnchorMap = new Map(attachedNodeIds.map(id => {
+      const node = sandboxNodes.find(n => n.id === id);
+      return [id, { x: node?.x ?? 0, y: node?.y ?? 0 }];
+    }));
 
     const onMove = (mv) => {
       if (mv.cancelable) mv.preventDefault();
       const cur = getPos(mv);
       const curWorld = screenToWorld(cur.x, cur.y);
-      region.x = Math.round((curWorld.x - offX) / 10) * 10;
-      region.y = Math.round((curWorld.y - offY) / 10) * 10;
+      const deltaX = curWorld.x - startWorld.x;
+      const deltaY = curWorld.y - startWorld.y;
+      region.x = Math.round((startRegionX + deltaX) / 10) * 10;
+      region.y = Math.round((startRegionY + deltaY) / 10) * 10;
       el.style.left = `${region.x}px`;
       el.style.top = `${region.y}px`;
+
+      attachedNodeIds.forEach(id => {
+        const node = sandboxNodes.find(n => n.id === id);
+        if (!node) return;
+        const anchor = nodeAnchorMap.get(id) || { x: node.x, y: node.y };
+        const domEl = document.getElementById(node.id);
+        node.x = Math.round((anchor.x + deltaX) / 10) * 10;
+        node.y = Math.round((anchor.y + deltaY) / 10) * 10;
+        if (domEl) {
+          domEl.style.left = `${node.x}px`;
+          domEl.style.top = `${node.y}px`;
+        }
+      });
+      updateSandboxWires();
     };
 
     const onUp = () => {

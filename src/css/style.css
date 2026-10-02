@@ -8,7 +8,6 @@
 @import './utils/utilities.css';
 @import './app/app-footer.css';
 @import './bool/bollean_and_binary.css';
-@import './breadboard/breadboard.css';
 
 button {
 	font-family: var(--font-header) !important;

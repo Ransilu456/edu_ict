@@ -839,7 +839,7 @@ h2 em {
 
 .closing-section {
   margin-top: 55px;
-  padding: 20px 24px 25px;
+  padding: 80px 24px 80px;
   background: var(--dark);
   color: #f5f8ef;
   text-align: center;
@@ -1020,6 +1020,27 @@ h2 em {
   .landing-footer p {
     order: 3;
     width: 100%;
+  }
+}
+
+@media (min-width: 2000px){
+  .landing-nav{
+    width: 100%;
+    padding: 48px;
+  }
+
+  .landing-nav nav,
+  .landing-nav a,
+  .landing-nav div{
+    font-size: 25px;
+  }
+
+  section{
+            width: 90% !important;
+  }
+
+  .closing-section{
+    width: 100% !important;
   }
 }
 
