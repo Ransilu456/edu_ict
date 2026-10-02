@@ -1,6 +1,7 @@
 import './common.js';
 import './sandbox/sandbox.js';
 import { initBooleanTool } from './bool/boolean-tool.js';
+import { initAssemblyComputer } from './bool/assembly-computer.js';
 import { initBinaryTool } from './bool/binary-tool.js';
 import { initNetworkSuite as initNetworkDevices } from './network/network-suite.js';
 import { initICTester } from './sandbox/ic-tester.js';
@@ -40,6 +41,7 @@ function setupViewNavigation() {
     '/logic': { panel: 'sandbox-view' },
     '/logic/sandbox': { panel: 'sandbox-view' },
     '/logic/boolean': { panel: 'boolean-view' },
+    '/logic/assembly': { panel: 'assembly-view' },
     '/logic/ic-tester': { panel: 'ic-tester-view' },
     '/ic-tester': { panel: 'ic-tester-view' },
     '/ic-test': { panel: 'ic-tester-view' },
@@ -98,6 +100,8 @@ function setupViewNavigation() {
       window.initSandboxCanvas?.();
     } else if (route.panel === 'boolean-view') {
       initBooleanTool();
+    } else if (route.panel === 'assembly-view') {
+      initAssemblyComputer();
     } else if (route.panel === 'binary-view') {
       initBinaryTool();
     } else if (route.panel === 'network-devices-view') {

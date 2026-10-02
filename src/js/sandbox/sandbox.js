@@ -1,6 +1,7 @@
 import { REAL_ICS } from './real-ic-defs.js';
 import { initWaveform, sampleWaveform } from './waveform.js';
 import { generateICSchematicSVG } from './ic-schematic.js';
+import { createAluGateCircuit, createRegisterBankCircuit } from '../bool/assembly-computer.js';
 import { snapWorld, getNodePlacementPoint, findFreePlacement, organizeCircuit as organizeSandboxCircuit } from './sandbox-layout.js';
 
 // canvas state
@@ -148,6 +149,7 @@ const COMPONENT_DEFS = {
   'comparator': { inputs: 4, outputs: 3, label: '2-bit Comparator', category: 'Combinational' },
   'seven-seg': { inputs: 4, outputs: 0, label: '7-Seg Display', category: 'Outputs' },
   'text-label': { inputs: 0, outputs: 0, label: 'Text Label', category: 'Utility' },
+  'computer-block': { inputs: 1, outputs: 1, label: 'Computer Block', category: 'Computer' },
   'ic-7408': { inputs: 15, outputs: 15, label: '7408 Quad AND', category: 'ICs' },
   'ic-7432': { inputs: 15, outputs: 15, label: '7432 Quad OR', category: 'ICs' },
   'ic-7404': { inputs: 15, outputs: 15, label: '7404 Hex NOT', category: 'ICs' },
@@ -244,6 +246,20 @@ window.initSandboxCanvas = function () {
 };
 
 function loadPendingCircuit() {
+  const pendingComputer = sessionStorage.getItem('logicQuest_pendingComputer');
+  if (pendingComputer) {
+    try {
+      importLayout(JSON.parse(pendingComputer));
+      fitCircuitToWorkspace();
+      sessionStorage.removeItem('logicQuest_pendingComputer');
+      sessionStorage.removeItem('logicQuest_pendingCircuit');
+      showToast('Assembly computer built in the sandbox');
+    } catch {
+      sessionStorage.removeItem('logicQuest_pendingComputer');
+      showAlert('The assembly computer could not be built.', 'Computer Builder');
+    }
+    return;
+  }
   const pendingCircuit = sessionStorage.getItem('logicQuest_pendingCircuit');
   if (!pendingCircuit) return;
   try {
@@ -255,6 +271,34 @@ function loadPendingCircuit() {
     sessionStorage.removeItem('logicQuest_pendingCircuit');
     showAlert('The generated circuit could not be loaded.', 'Circuit Import');
   }
+}
+
+function fitCircuitToWorkspace() {
+  const rect = getWorkspaceRect();
+  if (!sandboxNodes.length || !rect.width || !rect.height) return;
+  const bounds = sandboxNodes.reduce((result, node) => {
+    const { width, height } = getNodeVisualMetrics(node);
+    result.left = Math.min(result.left, node.x);
+    result.top = Math.min(result.top, node.y);
+    result.right = Math.max(result.right, node.x + width);
+    result.bottom = Math.max(result.bottom, node.y + height);
+    return result;
+  }, { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity });
+  sandboxRegions.forEach(region => {
+    bounds.left = Math.min(bounds.left, region.x);
+    bounds.top = Math.min(bounds.top, region.y);
+    bounds.right = Math.max(bounds.right, region.x + region.width);
+    bounds.bottom = Math.max(bounds.bottom, region.y + region.height);
+  });
+  const contentWidth = Math.max(1, bounds.right - bounds.left);
+  const contentHeight = Math.max(1, bounds.bottom - bounds.top);
+  const horizontalPadding = Math.min(56, rect.width * 0.08);
+  const verticalPadding = Math.min(96, rect.height * 0.18);
+  zoom = Math.max(0.18, Math.min(1, (rect.width - horizontalPadding * 2) / contentWidth, (rect.height - verticalPadding * 2) / contentHeight));
+  panX = horizontalPadding - bounds.left * zoom;
+  panY = Math.max(verticalPadding, (rect.height - contentHeight * zoom) / 2) - bounds.top * zoom;
+  applyViewportTransform();
+  updateSandboxWires();
 }
 
 function setupSidebarSearch() {
@@ -1051,7 +1095,9 @@ function renderRealICNodeDOM(node, el) {
   el.addEventListener('click', (e) => {
     if (isDragging) return;
     e.stopPropagation();
-    selectNode(node.id, e.shiftKey || e.ctrlKey || e.metaKey);
+    const multiSelect = e.shiftKey || e.ctrlKey || e.metaKey;
+    selectNode(node.id, multiSelect);
+    if (!multiSelect) openComputerBlockInspector(node);
   });
 
   (panContainer || workspace).appendChild(el);
@@ -1087,6 +1133,7 @@ function renderNodeDOM(node) {
   if (node.type === 'seven-seg') el.classList.add('seven-seg-node');
   if (node.type === 'rgb-led') el.classList.add('rgb-led-node');
   if (node.type === 'led-bar') el.classList.add('led-bar-node');
+  if (node.type === 'computer-block') el.classList.add('computer-block-node');
   if (node.type === 'text-label') el.classList.add('node-text-label');
 
   const delBtn = document.createElement('button');
@@ -1138,7 +1185,9 @@ function renderNodeDOM(node) {
   el.addEventListener('click', (e) => {
     if (isDragging) return;
     e.stopPropagation();
-    selectNode(node.id, e.shiftKey || e.ctrlKey || e.metaKey);
+    const multiSelect = e.shiftKey || e.ctrlKey || e.metaKey;
+    selectNode(node.id, multiSelect);
+    if (!multiSelect && node.type !== 'input' && node.type !== 'clock') openComputerBlockInspector(node);
   });
   el.addEventListener('dblclick', (e) => {
     e.stopPropagation();
@@ -1157,6 +1206,30 @@ function renderNodeDOM(node) {
 
 function renderNodeBody(node, body) {
   switch (node.type) {
+    case 'computer-block': {
+      const plate = document.createElement('div');
+      plate.className = 'computer-block-plate';
+      const category = document.createElement('span');
+      category.className = 'computer-block-category';
+      category.textContent = node.data?.category || 'COMPUTER';
+      const detail = document.createElement('span');
+      detail.className = 'computer-block-detail';
+      detail.textContent = node.data?.detail || '';
+      plate.append(category, detail);
+      if (node.data?.drilldown) {
+        const drilldown = document.createElement('button');
+        drilldown.className = 'computer-block-drilldown';
+        drilldown.type = 'button';
+        drilldown.textContent = node.data.drilldown === 'alu' ? 'IC adder' : 'Register circuit';
+        drilldown.addEventListener('click', event => {
+          event.stopPropagation();
+          openComputerCircuitDrilldown(node);
+        });
+        plate.appendChild(drilldown);
+      }
+      body.appendChild(plate);
+      break;
+    }
     case 'input': {
       const btn = document.createElement('button');
       btn.className = node.outputState === 1 ? 'sandbox-toggle-btn high' : 'sandbox-toggle-btn';
@@ -1742,7 +1815,7 @@ function renderInputPorts(node, el) {
     port.className = 'sandbox-port port-input';
     port.dataset.portIdx = i;
     const portLabels = getInputPortLabels(node.type, node.inputsCount);
-    port.title = portLabels[i] || `In ${i}`;
+    port.title = node.data?.inputLabels?.[i] || portLabels[i] || `In ${i}`;
 
     let pct;
     if (count === 1) {
@@ -1782,7 +1855,7 @@ function renderOutputPorts(node, el) {
     const port = document.createElement('div');
     port.className = 'sandbox-port port-output';
     port.dataset.portIdx = i;
-    port.title = portLabels[i] || `Out ${i}`;
+    port.title = node.data?.outputLabels?.[i] || portLabels[i] || `Out ${i}`;
 
     const pct = count === 1
       ? 50
@@ -2489,6 +2562,29 @@ function updateSandboxWires() {
       flow.style.pointerEvents = 'none';
       wiresSvg.appendChild(flow);
     }
+
+    if (wire.bitLabel) {
+      const packet = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      packet.setAttribute('class', 'sb-wire-data-packet');
+      packet.setAttribute('aria-label', `Bits ${wire.bitLabel}`);
+      packet.style.pointerEvents = 'none';
+      const packetBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      packetBg.setAttribute('x', '-24');
+      packetBg.setAttribute('y', '-10');
+      packetBg.setAttribute('width', '48');
+      packetBg.setAttribute('height', '20');
+      packetBg.setAttribute('rx', '4');
+      const packetBits = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      packetBits.setAttribute('text-anchor', 'middle');
+      packetBits.setAttribute('y', '3.5');
+      packetBits.textContent = wire.bitLabel;
+      const motion = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+      motion.setAttribute('path', d);
+      motion.setAttribute('dur', '2.4s');
+      motion.setAttribute('repeatCount', 'indefinite');
+      packet.append(packetBg, packetBits, motion);
+      wiresSvg.appendChild(packet);
+    }
   });
 
   sandboxNodes.forEach(node => {
@@ -2764,6 +2860,19 @@ function computeNodeOutput(node) {
       node.outputState = (a > b) ? 1 : 0;
       break;
 
+    case 'mux-2-1':
+      node.outputState = c ? (b ? 1 : 0) : (a ? 1 : 0);
+      break;
+
+    case 'decoder-2-4': {
+      const address = ((a ? 1 : 0) << 1) | (b ? 1 : 0);
+      node.outputState = address === 0 ? 1 : 0;
+      node.outputState2 = address === 1 ? 1 : 0;
+      node.outputState3 = address === 2 ? 1 : 0;
+      node.outputState4 = address === 3 ? 1 : 0;
+      break;
+    }
+
     case 'd-flop': {
       const clk = b ? 1 : 0;
       if (clk === 1 && node.prevClockState === 0) {
@@ -2988,6 +3097,17 @@ function updateNodeVisuals(node) {
     }
     case 'led-bar': {
       updateLedBar(node);
+      break;
+    }
+    case 'seven-seg': {
+      const value = ((node.inputValues[0] || 0) << 3)
+        | ((node.inputValues[1] || 0) << 2)
+        | ((node.inputValues[2] || 0) << 1)
+        | (node.inputValues[3] || 0);
+      const segments = ['abcdef', 'bc', 'abdeg', 'abcdg', 'bcfg', 'acdfg', 'acdefg', 'abc', 'abcdefg', 'abcdfg', 'abcefg', 'cdefg', 'adef', 'bcdeg', 'adefg', 'aefg'];
+      for (const segment of 'abcdefg') {
+        document.getElementById(`${node.id}-seg-${segment}`)?.classList.toggle('active', segments[value].includes(segment));
+      }
       break;
     }
     case 'clock': {
@@ -3997,6 +4117,104 @@ const sevenSegMapHtml = `
   </table>
 </div>
 `;
+
+function openComputerCircuitDrilldown(node) {
+  const circuit = node.data?.drilldown === 'register-bank'
+    ? createRegisterBankCircuit(node.data?.registerValues?.[0] || 0)
+    : createAluGateCircuit(node.data?.registerValues || [0, 0]);
+  sessionStorage.setItem('logicQuest_computerParent', JSON.stringify(serializeLayout()));
+  sessionStorage.setItem('logicQuest_pendingComputer', JSON.stringify(circuit));
+  document.getElementById('logic-modal').style.display = 'none';
+  loadPendingCircuit();
+}
+
+function openComputerBlockInspector(node) {
+  const modal = document.getElementById('logic-modal');
+  const title = document.getElementById('logic-modal-title');
+  const content = document.getElementById('logic-modal-content');
+  if (!modal || !title || !content) return;
+
+  const ic = REAL_ICS[node.type];
+  title.textContent = ic ? `${ic.label} · ${ic.package}` : node.label;
+  content.replaceChildren();
+  const summary = document.createElement('p');
+  summary.className = 'computer-inspector-summary';
+  summary.textContent = ic?.desc || node.data?.detail || `${node.type} component`;
+  content.appendChild(summary);
+
+  const rows = document.createElement('div');
+  rows.className = 'computer-inspector-signals';
+  const appendSignal = (label, value, direction) => {
+    const row = document.createElement('div');
+    row.className = 'computer-inspector-signal';
+    const name = document.createElement('span');
+    name.textContent = `${direction} · ${label}`;
+    const bit = document.createElement('code');
+    bit.textContent = value;
+    row.append(name, bit);
+    rows.appendChild(row);
+  };
+
+  if (ic) {
+    ic.pins.forEach(pin => {
+      const value = node.pinValues?.[pin.pin] ?? (pin.name === 'VCC' ? 1 : 0);
+      appendSignal(`Pin ${pin.pin} ${pin.name}`, `${value} · ${pin.type}`, pin.type === 'output' ? 'OUT' : 'IN');
+    });
+  } else {
+    const inputs = node.data?.inputLabels || getInputPortLabels(node.type, node.inputsCount);
+    const outputs = node.data?.outputLabels || getOutputPortLabels(node.type);
+    inputs.slice(0, node.inputsCount).forEach((label, index) => {
+      const wire = sandboxWires.find(item => item.toNodeId === node.id && item.toPortIdx === index);
+      const value = node.type === 'computer-block' && wire?.bitLabel !== undefined
+        ? wire.bitLabel
+        : String(node.inputValues?.[index] || 0);
+      appendSignal(label, value, 'IN');
+    });
+    outputs.slice(0, node.outputsCount).forEach((label, index) => {
+      const wire = sandboxWires.find(item => item.fromNodeId === node.id && item.fromPortIdx === index);
+      const state = node.outputStates?.[index] ?? [node.outputState, node.outputState2, node.outputState3, node.outputState4][index] ?? 0;
+      const value = node.type === 'computer-block' && wire?.bitLabel !== undefined ? wire.bitLabel : String(state);
+      appendSignal(label, value, 'OUT');
+    });
+  }
+  content.appendChild(rows);
+
+  const actions = document.createElement('div');
+  actions.className = 'computer-inspector-actions';
+  if (node.id === 'cpu-alu') {
+    const expandButton = document.createElement('button');
+    expandButton.className = 'btn-primary';
+    expandButton.type = 'button';
+    expandButton.textContent = 'Open 8-bit IC gate circuit';
+    expandButton.addEventListener('click', () => openComputerCircuitDrilldown(node));
+    actions.appendChild(expandButton);
+  }
+  if (node.id === 'cpu-registers') {
+    const expandButton = document.createElement('button');
+    expandButton.className = 'btn-primary';
+    expandButton.type = 'button';
+    expandButton.textContent = 'Open 8-bit register circuit';
+    expandButton.addEventListener('click', () => openComputerCircuitDrilldown(node));
+    actions.appendChild(expandButton);
+  }
+  const parentLayout = sessionStorage.getItem('logicQuest_computerParent');
+  if (parentLayout) {
+    const backButton = document.createElement('button');
+    backButton.className = 'btn-secondary';
+    backButton.type = 'button';
+    backButton.textContent = 'Back to computer diagram';
+    backButton.addEventListener('click', () => {
+      sessionStorage.setItem('logicQuest_pendingComputer', parentLayout);
+      sessionStorage.removeItem('logicQuest_computerParent');
+      modal.style.display = 'none';
+      loadPendingCircuit();
+    });
+    actions.appendChild(backButton);
+  }
+  if (actions.childElementCount) content.appendChild(actions);
+
+  modal.style.display = 'flex';
+}
 
 function openLogicViewer(type) {
   const modal = document.getElementById('logic-modal');

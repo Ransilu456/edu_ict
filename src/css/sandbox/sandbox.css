@@ -483,6 +483,55 @@
   pointer-events: auto;
 }
 
+.sandbox-node.computer-block-node {
+  box-sizing: border-box;
+  width: 170px;
+  min-height: 92px;
+  align-items: stretch;
+  border-color: color-mix(in srgb, var(--color-cyan) 55%, var(--border-color));
+  background: color-mix(in srgb, var(--bg-secondary) 90%, var(--color-cyan));
+}
+
+.computer-block-node .sandbox-node-header {
+  color: var(--text-primary);
+}
+
+.computer-block-plate {
+  display: grid;
+  gap: 5px;
+  width: 100%;
+  min-height: 38px;
+}
+
+.computer-block-category {
+  color: var(--color-cyan);
+  font: 700 0.58rem var(--font-mono);
+  text-transform: uppercase;
+}
+
+.computer-block-detail {
+  color: var(--text-secondary);
+  font: 500 0.66rem/1.35 var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.computer-block-drilldown {
+  justify-self: start;
+  min-height: 22px;
+  padding: 3px 7px;
+  border: 1px solid var(--color-cyan);
+  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--color-cyan);
+  font: 700 0.6rem var(--font-mono);
+  cursor: pointer;
+}
+
+.computer-block-drilldown:hover {
+  background: var(--color-cyan-glow);
+  color: var(--text-primary);
+}
+
 .sandbox-port {
   width: 8px;
   height: 8px;
@@ -1416,6 +1465,63 @@
   opacity: 0.9;
   animation: marchingAnts 0.8s linear infinite;
   background: transparent;
+}
+
+.sb-wire-data-packet rect {
+  fill: var(--bg-primary);
+  stroke: var(--color-cyan);
+  stroke-width: 1.25;
+  filter: drop-shadow(0 1px 3px rgba(15, 23, 42, .3));
+}
+
+.sb-wire-data-packet text {
+  fill: var(--color-cyan);
+  font: 700 8px var(--font-mono);
+  paint-order: stroke;
+  stroke: var(--bg-primary);
+  stroke-width: .7px;
+}
+
+.computer-inspector-summary {
+  margin: 0 0 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.computer-inspector-signals {
+  display: grid;
+  max-height: min(48vh, 360px);
+  overflow: auto;
+  border: 1px solid var(--border-color);
+}
+
+.computer-inspector-signal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 34px;
+  padding: 5px 9px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font: .72rem var(--font-mono);
+}
+
+.computer-inspector-signal:last-child {
+  border-bottom: 0;
+}
+
+.computer-inspector-signal code {
+  color: var(--color-cyan);
+  font: 700 .7rem var(--font-mono);
+  text-align: right;
+}
+
+.computer-inspector-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin-top: 1rem;
 }
 
 .sb-wire-hit {

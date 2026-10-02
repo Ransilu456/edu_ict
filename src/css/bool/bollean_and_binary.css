@@ -88,6 +88,114 @@
 	overflow-x: auto;
 }
 
+.assembly-workbench {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.assembly-workbench h2 {
+	margin: .8rem 0;
+	color: var(--text-primary);
+	font-size: 2.4rem;
+}
+
+.assembly-view.active {
+	display: block;
+	overflow: auto;
+}
+
+.assembly-view {
+	--lab-accent: var(--color-cyan);
+	--lab-accent-soft: var(--color-cyan-glow);
+	background-color: var(--bg-primary);
+	background-image: linear-gradient(var(--border-color) 1px, transparent 1px), linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+	background-size: 28px 28px;
+}
+
+.assembly-content {
+	width: min(1080px, calc(100% - 3rem));
+	margin: 0 auto;
+	padding: 3rem 0;
+}
+
+.assembly-workbench .home-intro {
+	max-width: 650px;
+}
+
+.assembly-form {
+	display: grid;
+	gap: .85rem;
+	padding: 1.25rem;
+	border: 1px solid var(--border-color);
+	background: var(--bg-secondary);
+}
+
+.assembly-form label {
+	color: var(--text-primary);
+	font-size: .7rem;
+	font-weight: 800;
+	text-transform: uppercase;
+}
+
+.assembly-form textarea {
+	box-sizing: border-box;
+	width: 100%;
+	min-height: 220px;
+	padding: 1rem;
+	resize: vertical;
+	border: 1px solid var(--border-color);
+	border-radius: 5px;
+	background: var(--bg-primary);
+	color: var(--text-primary);
+	font: .88rem/1.65 var(--font-mono);
+	tab-size: 4;
+}
+
+.assembly-form textarea:focus {
+	border-color: var(--color-cyan);
+	outline: 2px solid var(--color-cyan-glow);
+}
+
+.assembly-controls {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.assembly-isa {
+	color: var(--text-muted);
+	font: .68rem/1.6 var(--font-mono);
+}
+
+.assembly-form button {
+	min-height: 42px;
+	padding: 9px 14px;
+	border: 1px solid var(--lab-accent, #22b8e6);
+	border-radius: 5px;
+	background: var(--lab-accent, #22b8e6);
+	color: #08202a;
+	font: 800 .72rem var(--font-header);
+	cursor: pointer;
+}
+
+.assembly-output {
+	margin-top: 1rem;
+	padding: 1rem;
+	border: 1px solid var(--border-color);
+	background: var(--bg-secondary);
+	color: var(--text-secondary);
+	font: .8rem/1.5 var(--font-mono);
+	white-space: pre-wrap;
+}
+
+.assembly-output.assembly-error {
+	border-color: var(--color-error);
+	color: var(--color-error);
+}
+
 .boolean-result-head {
 	display: flex;
 	justify-content: space-between;
@@ -500,6 +608,15 @@
 
 	.binary-input-grid {
 		grid-template-columns: 1fr;
+	}
+
+	.assembly-content {
+		width: min(100% - 2rem, 620px);
+		padding: 2.75rem 0;
+	}
+
+	.assembly-workbench h2 {
+		font-size: 1.8rem;
 	}
 }
 

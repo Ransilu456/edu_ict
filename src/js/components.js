@@ -11,6 +11,7 @@ const booleanHtml = `<section class="view-panel boolean-view"><div class="boolea
 const binaryHtml = `<section class="view-panel binary-view"><div class="boolean-content"><div class="home-kicker"><span>BINARY / BITWISE LAB</span></div><h1>See every bit do its work.</h1><p class="home-intro">Compare two numbers in binary and inspect the result of common bitwise operations.</p><form id="binary-form" class="boolean-form"><div class="binary-input-grid"><label>First decimal number<input name="left" type="number" value="10" min="0"></label><label>Second number or shift count<input name="right" type="number" value="12" min="0"></label><label>Fixed width<select name="width"><option value="4">4 bits</option><option value="8" selected>8 bits</option><option value="16">16 bits</option></select></label></div><fieldset class="bit-operation-group"><legend>Operation</legend><div class="bit-operation-buttons"><button type="button" data-bit-operation="AND" class="active">AND</button><button type="button" data-bit-operation="OR">OR</button><button type="button" data-bit-operation="XOR">XOR</button><button type="button" data-bit-operation="NOT">NOT</button><button type="button" data-bit-operation="LSHIFT">LEFT SHIFT</button><button type="button" data-bit-operation="RSHIFT">RIGHT SHIFT</button></div></fieldset></form><div id="binary-output" class="boolean-output"></div></div></section>`;
 
 export function mountComponents() {
+  const assemblyHtml = `<section class="assembly-workbench"><div class="home-kicker"><span>8-BIT COMPUTER / ASSEMBLY LAB</span></div><h2>Build a computer from a program.</h2><p class="home-intro">Run a short assembly program, then inspect its CPU, registers, buses, and RAM as connected sandbox components.</p><form id="assembly-form" class="assembly-form"><label for="assembly-source">Program</label><textarea id="assembly-source" spellcheck="false" rows="10">; Add two values, store the result in RAM, and read it back&#10;LDI R0, 7&#10;LDI R1, 5&#10;ADD R2, R0, R1&#10;STORE [0x10], R2&#10;LOAD R3, [0x10]&#10;OUT R3&#10;HALT</textarea><div class="assembly-controls"><span class="assembly-isa">LDI / MOV / ADD / SUB / LOAD / STORE / JMP / JZ / OUT / HALT</span><button type="submit">Run &amp; build in sandbox</button></div></form><pre id="assembly-output" class="assembly-output" aria-live="polite" hidden></pre></section>`;
   const mount = (id, html) => {
     const target = document.getElementById(id);
     if (target) target.innerHTML = html;
@@ -18,7 +19,9 @@ export function mountComponents() {
   mount('app-header', headerHtml);
   const main = document.getElementById('app-main');
   if (main) {
-    main.innerHTML = booleanHtml + binaryHtml + sandboxViewHtml  + networkViewHtml;
+    main.innerHTML = booleanHtml + '<section class="view-panel assembly-view"><div class="assembly-content"></div></section>' + binaryHtml + sandboxViewHtml + networkViewHtml;
+    main.querySelector('#boolean-expression').value = 'A AND B';
+    main.querySelector('.assembly-content')?.insertAdjacentHTML('beforeend', assemblyHtml);
     const sidebarSlot = document.getElementById('sandbox-sidebar-slot');
     if (sidebarSlot) sidebarSlot.outerHTML = sandboxSidebarHtml;
     const toolbarSlot = document.getElementById('sandbox-toolbar-slot');
